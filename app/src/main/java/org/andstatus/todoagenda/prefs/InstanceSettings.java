@@ -123,6 +123,8 @@ public class InstanceSettings {
     private boolean showOnlyClosestInstanceOfRecurringEvent = false;
     static final String PREF_HIDE_DUPLICATES = "hideDuplicates";
     private boolean hideDuplicates = false;
+    static final String PREF_HIDE_SUBTASKS = "hideSubtasks";
+    private HideSubtasks hideSubtasks = HideSubtasks.defaultValue;
     static final String PREF_ALL_DAY_EVENTS_PLACEMENT = "allDayEventsPlacement";
     private AllDayEventsPlacement allDayEventsPlacement = AllDayEventsPlacement.defaultValue;
     static final String PREF_TASK_SCHEDULING = "taskScheduling";
@@ -273,6 +275,9 @@ public class InstanceSettings {
             if (json.has(PREF_HIDE_DUPLICATES)) {
                 hideDuplicates = json.getBoolean(PREF_HIDE_DUPLICATES);
             }
+            if (json.has(PREF_HIDE_SUBTASKS)) {
+                hideSubtasks = HideSubtasks.fromValue(json.getString(PREF_HIDE_SUBTASKS));
+            }
             if (json.has(PREF_ALL_DAY_EVENTS_PLACEMENT)) {
                 allDayEventsPlacement = AllDayEventsPlacement.fromValue(json.getString(PREF_ALL_DAY_EVENTS_PLACEMENT));
             }
@@ -376,6 +381,7 @@ public class InstanceSettings {
         showOnlyClosestInstanceOfRecurringEvent = ApplicationPreferences
                 .getShowOnlyClosestInstanceOfRecurringEvent(context);
         hideDuplicates = ApplicationPreferences.getHideDuplicates(context);
+        setHideSubtasks(ApplicationPreferences.getHideSubtasks(context));
         setAllDayEventsPlacement(ApplicationPreferences.getAllDayEventsPlacement(context));
         taskScheduling = ApplicationPreferences.getTaskScheduling(context);
         taskWithoutDates = ApplicationPreferences.getTasksWithoutDates(context);
@@ -466,6 +472,7 @@ public class InstanceSettings {
             json.put(PREF_MULTILINE_DETAILS, multilineDetails);
             json.put(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, showOnlyClosestInstanceOfRecurringEvent);
             json.put(PREF_HIDE_DUPLICATES, hideDuplicates);
+            json.put(PREF_HIDE_SUBTASKS, hideSubtasks.value);
             json.put(PREF_ALL_DAY_EVENTS_PLACEMENT, allDayEventsPlacement.value);
             json.put(PREF_TASK_SCHEDULING, taskScheduling.value);
             json.put(PREF_TASK_WITHOUT_DATES, taskWithoutDates.value);
@@ -658,6 +665,15 @@ public class InstanceSettings {
 
     public boolean getHideDuplicates() {
         return hideDuplicates;
+    }
+
+    public HideSubtasks getHideSubtasks() {
+        return hideSubtasks;
+    }
+
+    public InstanceSettings setHideSubtasks(HideSubtasks hideSubtasks) {
+        this.hideSubtasks = hideSubtasks;
+        return this;
     }
 
     public AllDayEventsPlacement getAllDayEventsPlacement() {

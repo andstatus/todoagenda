@@ -272,4 +272,12 @@
         <item>top_day</item>
         <item>bottom_day</item>
     </string-array>
+    <string-array name="pref_hide_subtasks_entries">
+        <item>@string/pref_hide_subtasks_show_all</item>
+        <item>@string/pref_hide_subtasks_hide_all</item>
+    </string-array>
+    <string-array name="pref_hide_subtasks_values" tools:ignore="MissingTranslation">
+        <item>show_all</item>
+        <item>hide_all</item>
+    </string-array>
 </resources>

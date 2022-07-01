@@ -20,6 +20,7 @@ public class TaskEvent implements WidgetEvent {
     private DateTime dueDate;
     private int color;
     private TaskStatus status = TaskStatus.UNKNOWN;
+    private Long parent = null;
 
     public TaskEvent(InstanceSettings settings, DateTimeZone zone) {
         this.settings = settings;
@@ -104,5 +105,17 @@ public class TaskEvent implements WidgetEvent {
 
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public Long getParent() {
+        return parent;
+    }
+
+    public void setParent(Long parent) {
+        this.parent = parent;
+    }
+
+    public boolean isSubtask() {
+        return parent != null;
     }
 }

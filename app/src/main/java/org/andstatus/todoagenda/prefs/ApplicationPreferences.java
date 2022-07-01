@@ -34,6 +34,7 @@ import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_FILL_ALL_DAY_
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_FILTER_MODE;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HIDE_DUPLICATES;
+import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HIDE_SUBTASKS;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_INDICATE_ALERTS;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_INDICATE_RECURRING;
@@ -353,6 +354,14 @@ public class ApplicationPreferences {
 
     public static void setHideDuplicates(Context context, boolean value) {
         setBoolean(context, PREF_HIDE_DUPLICATES, value);
+    }
+
+    public static HideSubtasks getHideSubtasks(Context context) {
+        return HideSubtasks.fromValue(getString(context, PREF_HIDE_SUBTASKS, ""))
+    }
+
+    public static void setHideSubtasks(Context content, HideSubtasks value) {
+        setString(context, PREF_HIDE_SUBTASKS, value.value);
     }
 
     public static void setAllDayEventsPlacement(Context context, AllDayEventsPlacement value) {

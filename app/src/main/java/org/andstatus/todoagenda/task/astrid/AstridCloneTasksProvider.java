@@ -46,8 +46,9 @@ public class AstridCloneTasksProvider extends AbstractTaskProvider {
     private static final String TASKS_COLUMN_START_DATE = "hideUntil";
     private static final String TASKS_COLUMN_IMPORTANCE = "importance";
     private static final String TASKS_COLUMN_COMPLETED = "completed";
+    private static final String TASKS_COLUMN_PARENT = "parent";
     private static final String[] PROJECTION = {TASKS_COLUMN_ID, TASKS_COLUMN_TITLE, TASKS_COLUMN_DUE_DATE,
-            TASKS_COLUMN_START_DATE, TASKS_COLUMN_IMPORTANCE, TASKS_COLUMN_COMPLETED};
+            TASKS_COLUMN_START_DATE, TASKS_COLUMN_IMPORTANCE, TASKS_COLUMN_COMPLETED, TASKS_COLUMN_PARENT};
 
     private final AstridCloneTaskSource taskSource;
 
@@ -129,6 +130,7 @@ public class AstridCloneTasksProvider extends AbstractTaskProvider {
         task.setDates(startMillis, dueMillis);
         int priority = cursor.getInt(cursor.getColumnIndex(TASKS_COLUMN_IMPORTANCE));
         int color = context.getColor(priorityToColor(priority));
+        Long parent = getPositiveLongOrNull(cursor, TASKS_COLUMN_PARENT);
         task.setColor(getAsOpaque(color));
 
         return task;

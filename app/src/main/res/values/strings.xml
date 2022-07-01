@@ -208,6 +208,9 @@
     <string name="pref_hide_based_on_keywords_title">Hide based on keywords in a title</string>
     <string name="show_only_closest_instance_of_recurring_event">Show only the closest instance of a recurring event</string>
     <string name="hide_duplicates">Hide duplicates</string>
+    <string name="pref_hide_subtasks_title">Hide subtasks</string>
+    <string name="pref_hide_subtasks_show_all">Show all subtasks</string>
+    <string name="pref_hide_subtasks_hide_all">Hide all subtasks</string>
     <string name="all_day_events_placement_title">All day events placement</string>
     <string name="all_day_events_placement_top_of_the_days_events">At the top of the day\'s events</string>
     <string name="all_day_events_placement_bottom_of_the_days_events">At the bottom of the day\'s events</string>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.andstatus.todoagenda.prefs.FilterMode;
+import org.andstatus.todoagenda.prefs.HideSubtasks;
 import org.andstatus.todoagenda.prefs.TaskScheduling;
 import org.andstatus.todoagenda.provider.EventProvider;
 import org.andstatus.todoagenda.provider.EventProviderType;
@@ -52,6 +53,16 @@ public abstract class AbstractTaskProvider extends EventProvider {
         if (getSettings().getTaskScheduling() == TaskScheduling.DATE_DUE) {
             if (!task.hasStartDate()) {
                 if (task.hasDueDate() && task.getDueDate().isAfter(getSettings().getEndOfTimeRange())) return false;
+            }
+        }
+        HideSubtasks hideSubtasks = getSettings().getHideSubtasks();
+        if (hideSubtasks != HideSubtasks.SHOW_ALL && task.isSubtask()) {
+            switch (hideSubtasks) {
+                case HideSubtasks.HIDE_ALL:
+                    return false;
+                case HideSubtasks.SHOW_ALL:  // for completed switch
+                default:
+                    break;
             }
         }
 

@@ -35,6 +35,12 @@
             android:key="hideDuplicates"
             android:title="@string/hide_duplicates" />
         <ListPreference
+            android:key="hideSubtasks"
+            android:defaultValue="show_all"
+            android:entries="@array/pref_show_subtasks_entries"
+            android:entryValues="@array/pref_show_subtasks_values"
+            android:title="@string/pref_show_subtasks_title" />
+        <ListPreference
             android:key="allDayEventsPlacement"
             android:defaultValue="top_day"
             android:entries="@array/pref_all_day_events_placement_entries"
