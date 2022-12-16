@@ -18,7 +18,7 @@ public class WrongDatesLostEventsTest extends BaseWidgetTest {
     public void testIssue205() {
         final String method = "testIssue205";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.wrong_dates_lost_events);
+                org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events);
         provider.addResults(inputs);
 
         playResults(method);

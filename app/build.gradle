@@ -12,7 +12,6 @@ android {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
-        testApplicationId "org.andstatus.todoagenda.tests"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "TodoAgenda-$versionName".toString()
 

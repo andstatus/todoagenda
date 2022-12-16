@@ -118,7 +118,7 @@ public class FakeCalendarContentProviderTest extends BaseWidgetTest {
     @Test
     public void testJsonToAndFrom() throws JSONException {
         QueryResultsStorage inputs1 = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.birthday);
+                org.andstatus.todoagenda.test.R.raw.birthday);
         JSONObject jsonOutput = inputs1.toJson(provider.getContext(), provider.getWidgetId(), true);
         QueryResultsStorage inputs2 = QueryResultsStorage.fromJson(provider.getWidgetId(), jsonOutput);
         assertEquals(inputs1, inputs2);

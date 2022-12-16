@@ -22,7 +22,7 @@ public class PastDueHeaderWithTasksTest extends BaseWidgetTest {
     public void testPastDueHeaderWithTasks() {
         final String method = "testPastDueHeaderWithTasks";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.past_due_header_with_tasks);
+                org.andstatus.todoagenda.test.R.raw.past_due_header_with_tasks);
         provider.addResults(inputs);
 
         playResults(method);

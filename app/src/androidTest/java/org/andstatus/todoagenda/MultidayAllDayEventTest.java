@@ -20,7 +20,7 @@ public class MultidayAllDayEventTest extends BaseWidgetTest {
     public void testInsidePeriod() {
         final String method = "testInsidePeriod";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.multi_day);
+                org.andstatus.todoagenda.test.R.raw.multi_day);
         DateTime now = new DateTime(2015, 8, 30, 0, 0, 1, 0, getSettings().clock().getZone());
         inputs.setExecutedAt(now);
         provider.addResults(inputs);

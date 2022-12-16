@@ -17,7 +17,7 @@ public class TodaysColorsEventsTest extends BaseWidgetTest {
     public void testIssue327() {
         final String method = "testIssue327";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.todays_colors);
+                org.andstatus.todoagenda.test.R.raw.todays_colors);
         provider.addResults(inputs);
 
         playResults(method);

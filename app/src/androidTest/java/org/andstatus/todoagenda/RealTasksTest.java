@@ -18,7 +18,7 @@ public class RealTasksTest extends BaseWidgetTest {
     public void testTasksWithoutStartAndDueDates() {
         final String method = "testTasksWithoutStartAndDueDates";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.real_tasks);
+                org.andstatus.todoagenda.test.R.raw.real_tasks);
         provider.addResults(inputs);
         playResults(method);
 

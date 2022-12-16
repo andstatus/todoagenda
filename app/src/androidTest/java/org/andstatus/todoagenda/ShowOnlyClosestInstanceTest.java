@@ -20,7 +20,7 @@ public class ShowOnlyClosestInstanceTest extends BaseWidgetTest {
     public void testShowOnlyClosestInstance() {
         final String method = "testShowOnlyClosestInstance";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.closest_event);
+                org.andstatus.todoagenda.test.R.raw.closest_event);
         provider.addResults(inputs);
 
         playResults(method);

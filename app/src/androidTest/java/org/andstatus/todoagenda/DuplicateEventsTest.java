@@ -17,7 +17,7 @@ public class DuplicateEventsTest extends BaseWidgetTest {
     public void testIssue354() {
         final String method = "testIssue354";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.duplicates);
+                org.andstatus.todoagenda.test.R.raw.duplicates);
         provider.addResults(inputs);
 
         playResults(method);

@@ -18,7 +18,7 @@ public class WeirdDayHeaderTest extends BaseWidgetTest {
     public void testWeirdDayHeader() {
         final String method = "testWeirdDayHeader";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.weird_day_header);
+                org.andstatus.todoagenda.test.R.raw.weird_day_header);
         provider.addResults(inputs);
         playResults(method);
 

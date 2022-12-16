@@ -14,7 +14,7 @@ public class AllDayEventsTest extends BaseWidgetTest {
     public void testAllDayEventsPlacement() {
         final String method = "testAllDayEventsPlacement";
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.all_day_tasks);
+                org.andstatus.todoagenda.test.R.raw.all_day_tasks);
         provider.addResults(inputs);
         playResults(method);
 

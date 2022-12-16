@@ -240,7 +240,7 @@ public class TasksFilteringAndOrderingTest extends BaseWidgetTest {
 
     private void oneCase(String method, UnaryOperator<InstanceSettings> setter, List<String> names) {
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.filter_tasks_308_no_filters);
+                org.andstatus.todoagenda.test.R.raw.filter_tasks_308_no_filters);
         provider.addResults(inputs);
 
         oneCaseSettings(method, setter, names);

@@ -21,7 +21,7 @@ public class BirthdayTest extends BaseWidgetTest {
     @Test
     public void testBirthdayOneDayOnly() {
         QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.tests.R.raw.birthday);
+                org.andstatus.todoagenda.test.R.raw.birthday);
 
         provider.startEditingPreferences();
         ApplicationPreferences.setWidgetHeaderDateFormat(provider.getContext(), DateFormatValue.of(DateFormatType.CUSTOM, "YYYY-MM-dd"));

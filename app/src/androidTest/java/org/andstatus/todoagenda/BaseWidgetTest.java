@@ -133,7 +133,7 @@ public class BaseWidgetTest {
     }
 
     protected void ensureNonEmptyResults() {
-        QueryResultsStorage inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.tests.R.raw.birthday);
+        QueryResultsStorage inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday);
         InstanceSettings settings = getSettings();
         settings.setFilterMode(FilterMode.NO_FILTERING);
         provider.addResults(inputs);
