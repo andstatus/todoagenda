@@ -5,10 +5,10 @@ buildscript {
     }
 
     ext {
-        compileSdkVersion = 31 as int
-        buildToolsVersion = '31.0.0'
+        compileSdkVersion = 33 as int
+        buildToolsVersion = '33.0.1'
         minSdkVersion = 24 as int
-        targetSdkVersion = 31 as int
+        targetSdkVersion = 33 as int
 
         // Lookup the latest here: https://mvnrepository.com/
         annotationVersion = '1.0.1'
@@ -23,7 +23,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.1.2'
+        classpath 'com.android.tools.build:gradle:7.3.1'
     }
 
     // https://github.com/facebook/flipper/issues/146#issuecomment-463667556
