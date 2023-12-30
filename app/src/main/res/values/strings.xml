@@ -206,6 +206,7 @@
     <string name="ended_six_months_ago">Ended six months ago</string>
     <string name="ended_one_year_ago">Ended one year ago</string>
     <string name="pref_hide_based_on_keywords_title">Hide based on keywords in a title</string>
+    <string name="pref_show_based_on_keywords_title">Show based on keywords in a title</string>
     <string name="show_only_closest_instance_of_recurring_event">Show only the closest instance of a recurring event</string>
     <string name="hide_duplicates">Hide duplicates</string>
     <string name="all_day_events_placement_title">All day events placement</string>

@@ -38,7 +38,7 @@ public class KeywordsFilterTest {
 
     private void assertOneQueryToKeywords(String query, String... keywords) {
         int size = keywords.length;
-        KeywordsFilter filter1 = new KeywordsFilter(query);
+        KeywordsFilter filter1 = new KeywordsFilter(false, query);
         assertEquals(filter1.toString(), size, filter1.keywords.size());
         for (int ind = 0; ind < size; ind++) {
             assertEquals(filter1.toString(), keywords[ind], filter1.keywords.get(ind));
@@ -46,10 +46,10 @@ public class KeywordsFilterTest {
     }
 
     private void assertMatch(String query, String body) {
-        assertTrue("no keywords from '" + query + "' match: '" + body + "'", new KeywordsFilter(query).matched(body));
+        assertTrue("no keywords from '" + query + "' match: '" + body + "'", new KeywordsFilter(false, query).matched(body));
     }
 
     private void assertNotMatch(String query, String body) {
-        assertFalse("Some keyword from '" + query + "' match: '" + body + "'", new KeywordsFilter(query).matched(body));
+        assertFalse("Some keyword from '" + query + "' match: '" + body + "'", new KeywordsFilter(false, query).matched(body));
     }
 }

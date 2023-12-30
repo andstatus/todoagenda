@@ -98,7 +98,10 @@ In particular, see these solutions:
 
 <a id="v4.7"/>
 
-### 2023-12-30 v4.7.0 Allow changing language of User Interface for Android 13+
+### 2023-12-30 v4.7.1 Show based on keywords in a title
+* [Show based on keywords in a title](https://github.com/plusonelabs/calendar-widget/issues/122) option added,
+  allowing to see events that have certain text included. 
+  In addition to existing option "Hide based on keywords in a title".
 * Allow changing language of User Interface for Android 13+ in Android System Settings - Apps, see
   [Per-app language preferences](https://developer.android.com/guide/topics/resources/app-languages),
   [#119](https://github.com/andstatus/todoagenda/issues/119)

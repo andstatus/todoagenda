@@ -30,7 +30,7 @@ public abstract class AbstractTaskProvider extends EventProvider {
     List<TaskEvent> queryEvents() {
         initialiseParameters();
         if (myContentResolver.isPermissionNeeded(context, type.permission) ||
-                getSettings().getActiveEventSources(type).isEmpty()) {
+            getSettings().getActiveEventSources(type).isEmpty()) {
             return Collections.emptyList();
         }
 
@@ -54,8 +54,10 @@ public abstract class AbstractTaskProvider extends EventProvider {
                 if (task.hasDueDate() && task.getDueDate().isAfter(getSettings().getEndOfTimeRange())) return false;
             }
         }
-
-        return !mKeywordsFilter.matched(task.getTitle());
+        if (hideBasedOnKeywordsFilter.matched(task.getTitle())) {
+            return false;
+        }
+        return showBasedOnKeywordsFilter.matched(task.getTitle());
     }
 
     public abstract Intent newViewEventIntent(TaskEvent event);

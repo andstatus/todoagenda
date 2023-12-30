@@ -1,22 +1,5 @@
 package org.andstatus.todoagenda.prefs;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.text.TextUtils;
-
-import androidx.preference.PreferenceManager;
-
-import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref;
-import org.andstatus.todoagenda.prefs.colors.ColorThemeType;
-import org.andstatus.todoagenda.prefs.colors.TextColorPref;
-import org.andstatus.todoagenda.prefs.colors.TextColorSource;
-import org.andstatus.todoagenda.prefs.colors.ThemeColors;
-import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue;
-import org.andstatus.todoagenda.widget.EventEntryLayout;
-import org.andstatus.todoagenda.widget.WidgetHeaderLayout;
-
-import java.util.List;
-
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_ACTIVE_SOURCES;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_COMPACT_LAYOUT;
@@ -44,6 +27,7 @@ import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_MULTILINE_TIT
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_MULTILINE_TITLE_DEFAULT;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_REFRESH_PERIOD_MINUTES;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_REFRESH_PERIOD_MINUTES_DEFAULT;
+import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_DAY_HEADERS;
 import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_END_TIME;
@@ -68,6 +52,23 @@ import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_INSTAN
 import static org.andstatus.todoagenda.prefs.colors.ThemeColors.PREF_TEXT_COLOR_SOURCE;
 import static org.andstatus.todoagenda.util.StringUtil.isEmpty;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.text.TextUtils;
+
+import androidx.preference.PreferenceManager;
+
+import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref;
+import org.andstatus.todoagenda.prefs.colors.ColorThemeType;
+import org.andstatus.todoagenda.prefs.colors.TextColorPref;
+import org.andstatus.todoagenda.prefs.colors.TextColorSource;
+import org.andstatus.todoagenda.prefs.colors.ThemeColors;
+import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue;
+import org.andstatus.todoagenda.widget.EventEntryLayout;
+import org.andstatus.todoagenda.widget.WidgetHeaderLayout;
+
+import java.util.List;
+
 public class ApplicationPreferences {
     public static final String PREF_DIFFERENT_COLORS_FOR_DARK = "differentColorsForDark";
     private static final String PREF_COLOR_THEME_TYPE = "colorThemeType";
@@ -87,6 +88,7 @@ public class ApplicationPreferences {
             setEventsEnded(context, settings.getEventsEnded());
             setFillAllDayEvents(context, settings.getFillAllDayEvents());
             setHideBasedOnKeywords(context, settings.getHideBasedOnKeywords());
+            setShowBasedOnKeywords(context, settings.getShowBasedOnKeywords());
 
             ThemeColors colors = settings.colors();
             setString(context, PREF_COLOR_THEME_TYPE, colors.colorThemeType.value);
@@ -198,6 +200,14 @@ public class ApplicationPreferences {
 
     private static void setHideBasedOnKeywords(Context context, String value) {
         setString(context, PREF_HIDE_BASED_ON_KEYWORDS, value);
+    }
+
+    public static String getShowBasedOnKeywords(Context context) {
+        return getString(context, PREF_SHOW_BASED_ON_KEYWORDS, "");
+    }
+
+    private static void setShowBasedOnKeywords(Context context, String value) {
+        setString(context, PREF_SHOW_BASED_ON_KEYWORDS, value);
     }
 
     public static boolean areDifferentColorsForDark(Context context) {

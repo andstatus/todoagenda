@@ -115,9 +115,11 @@ public class InstanceSettings {
     private boolean showPastEventsWithDefaultColor = false;
     static final String PREF_EVENT_RANGE = "eventRange";
     static final String PREF_EVENT_RANGE_DEFAULT = "30";
-    private int eventRange = Integer.valueOf(PREF_EVENT_RANGE_DEFAULT);
+    private int eventRange = Integer.parseInt(PREF_EVENT_RANGE_DEFAULT);
     static final String PREF_HIDE_BASED_ON_KEYWORDS = "hideBasedOnKeywords";
     private String hideBasedOnKeywords = "";
+    static final String PREF_SHOW_BASED_ON_KEYWORDS = "showBasedOnKeywords";
+    private String showBasedOnKeywords = "";
     static final String PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT =
             "showOnlyClosestInstanceOfRecurringEvent";
     private boolean showOnlyClosestInstanceOfRecurringEvent = false;
@@ -201,6 +203,9 @@ public class InstanceSettings {
             }
             if (json.has(PREF_HIDE_BASED_ON_KEYWORDS)) {
                 hideBasedOnKeywords = json.getString(PREF_HIDE_BASED_ON_KEYWORDS);
+            }
+            if (json.has(PREF_SHOW_BASED_ON_KEYWORDS)) {
+                showBasedOnKeywords = json.getString(PREF_SHOW_BASED_ON_KEYWORDS);
             }
 
             boolean differentColorsForDark = ColorThemeType.canHaveDifferentColorsForDark() && json.has(PREF_DARK_THEME);
@@ -330,6 +335,7 @@ public class InstanceSettings {
         eventsEnded = ApplicationPreferences.getEventsEnded(context);
         fillAllDayEvents = ApplicationPreferences.getFillAllDayEvents(context);
         hideBasedOnKeywords = ApplicationPreferences.getHideBasedOnKeywords(context);
+        showBasedOnKeywords = ApplicationPreferences.getShowBasedOnKeywords(context);
 
         switch (ApplicationPreferences.getEditingColorThemeType(context)) {
             case DARK:
@@ -441,6 +447,7 @@ public class InstanceSettings {
             json.put(PREF_EVENTS_ENDED, eventsEnded.save());
             json.put(PREF_FILL_ALL_DAY, fillAllDayEvents);
             json.put(PREF_HIDE_BASED_ON_KEYWORDS, hideBasedOnKeywords);
+            json.put(PREF_SHOW_BASED_ON_KEYWORDS, showBasedOnKeywords);
 
             defaultColors.toJson(json);
             if (!darkColors.isEmpty()) {
@@ -543,6 +550,10 @@ public class InstanceSettings {
 
     public String getHideBasedOnKeywords() {
         return hideBasedOnKeywords;
+    }
+
+    public String getShowBasedOnKeywords() {
+        return showBasedOnKeywords;
     }
 
     public ThemeColors colors() {

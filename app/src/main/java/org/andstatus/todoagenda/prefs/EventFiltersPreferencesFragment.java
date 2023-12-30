@@ -29,6 +29,7 @@ public class EventFiltersPreferencesFragment extends PreferenceFragmentCompat
         showEventsEnded();
         showEvenRange();
         showHideBasedOnKeywords();
+        showShowBasedOnKeywords();
         showAllDayEventsPlacement();
         showTaskScheduling();
         showTasksWithoutDates();
@@ -47,7 +48,17 @@ public class EventFiltersPreferencesFragment extends PreferenceFragmentCompat
 
     private void showHideBasedOnKeywords() {
         EditTextPreference preference = (EditTextPreference) findPreference(InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS);
-        KeywordsFilter filter = new KeywordsFilter(preference.getText());
+        KeywordsFilter filter = new KeywordsFilter(false, preference.getText());
+        if (filter.isEmpty()) {
+            preference.setSummary(R.string.this_option_is_turned_off);
+        } else {
+            preference.setSummary(filter.toString());
+        }
+    }
+
+    private void showShowBasedOnKeywords() {
+        EditTextPreference preference = (EditTextPreference) findPreference(InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS);
+        KeywordsFilter filter = new KeywordsFilter(true, preference.getText());
         if (filter.isEmpty()) {
             preference.setSummary(R.string.this_option_is_turned_off);
         } else {

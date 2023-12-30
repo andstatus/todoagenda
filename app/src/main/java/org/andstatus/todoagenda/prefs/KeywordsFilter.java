@@ -12,11 +12,13 @@ import java.util.List;
  */
 public class KeywordsFilter {
 
+    private final boolean matchOnNoKeywords;
     protected final List<String> keywords = new ArrayList<>();
     private static final char DOUBLE_QUOTE = '"';
     private static final char SINGLE_QUOTE = '\'';
 
-    public KeywordsFilter(String text) {
+    public KeywordsFilter(boolean matchOnNoKeywords, String text) {
+        this.matchOnNoKeywords = matchOnNoKeywords;
         if (TextUtils.isEmpty(text)) {
             return;
         }
@@ -69,7 +71,10 @@ public class KeywordsFilter {
     }
 
     public boolean matched(String s) {
-        if (keywords.isEmpty() || TextUtils.isEmpty(s)) {
+        if (keywords.isEmpty()) {
+            return matchOnNoKeywords;
+        }
+        if (TextUtils.isEmpty(s)) {
             return false;
         }
         for (String keyword : keywords) {

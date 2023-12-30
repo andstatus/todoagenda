@@ -179,7 +179,10 @@ public class CalendarEventProvider extends EventProvider {
         return myContentResolver.foldEvents(uri, getProjection(), selection, null, EVENT_SORT_ORDER,
                 new ArrayList<>(), eventList -> cursor -> {
                     CalendarEvent event = newCalendarEvent(cursor);
-                    if (!eventList.contains(event) && !mKeywordsFilter.matched(event.getTitle())) {
+                    if (!eventList.contains(event) &&
+                        !hideBasedOnKeywordsFilter.matched(event.getTitle()) &&
+                        showBasedOnKeywordsFilter.matched(event.getTitle())
+                    ) {
                         eventList.add(event);
                     }
                     return eventList;

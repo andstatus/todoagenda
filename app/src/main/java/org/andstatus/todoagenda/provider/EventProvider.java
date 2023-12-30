@@ -45,7 +45,8 @@ public class EventProvider {
     protected final MyContentResolver myContentResolver;
 
     // Below are parameters, which may change in settings
-    protected KeywordsFilter mKeywordsFilter;
+    protected KeywordsFilter hideBasedOnKeywordsFilter;
+    protected KeywordsFilter showBasedOnKeywordsFilter;
     protected DateTime mStartOfTimeRange;
     protected DateTime mEndOfTimeRange;
 
@@ -57,7 +58,8 @@ public class EventProvider {
     }
 
     protected void initialiseParameters() {
-        mKeywordsFilter = new KeywordsFilter(getSettings().getHideBasedOnKeywords());
+        hideBasedOnKeywordsFilter = new KeywordsFilter(false, getSettings().getHideBasedOnKeywords());
+        showBasedOnKeywordsFilter = new KeywordsFilter(true, getSettings().getShowBasedOnKeywords());
         mStartOfTimeRange = getSettings().getStartOfTimeRange();
         mEndOfTimeRange = getSettings().getEndOfTimeRange();
     }
