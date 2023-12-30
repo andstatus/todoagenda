@@ -6,9 +6,13 @@ android {
 
     useLibrary 'android.test.mock'
 
+    androidResources {
+        generateLocaleConfig true
+    }
+
     defaultConfig {
-        versionCode 699
-        versionName '4.6.0'
+        versionCode 700
+        versionName '4.7.0'
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
@@ -34,6 +38,7 @@ android {
     lint {
         abortOnError false
     }
+    namespace 'org.andstatus.todoagenda'
 
     if (project.hasProperty('todoagendaStoreFile')) {
         signingConfigs {

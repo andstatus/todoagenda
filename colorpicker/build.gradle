@@ -37,6 +37,7 @@ android {
             minifyEnabled false
         }
     }
+    namespace 'com.rarepebble.colorpicker'
 }
 
 dependencies {

@@ -96,6 +96,13 @@ In particular, see these solutions:
 
 ## Changelog
 
+<a id="v4.7"/>
+
+### 2023-12-30 v4.7.0 Allow changing language of User Interface for Android 13+
+* Allow changing language of User Interface for Android 13+ in Android System Settings - Apps, see
+  [Per-app language preferences](https://developer.android.com/guide/topics/resources/app-languages),
+  [#119](https://github.com/andstatus/todoagenda/issues/119)
+
 <a id="v4.5"/>
 
 ### 2022-03-19 v4.5.5 Update time zones and fix All day events.

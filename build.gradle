@@ -6,28 +6,28 @@ buildscript {
 
     ext {
         compileSdkVersion = 33 as int
-        buildToolsVersion = '33.0.1'
+        buildToolsVersion = '34.0.0'
         minSdkVersion = 24 as int
         targetSdkVersion = 33 as int
 
         // Lookup the latest here: https://mvnrepository.com/
         annotationVersion = '1.0.1'
-        appCompatVersion = '1.4.1'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
-        espressoCoreVersion = '3.4.0'
+        appCompatVersion = '1.6.1'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
+        espressoCoreVersion = '3.5.1'
         jodaTimeVersion = '2.10.13'
         junitVersion = '4.13.2'
         junitJupiterVersion = '5.8.2'
-        preferenceVersion = '1.2.0'
-        testRulesVersion = '1.4.0'
-        testRunnerVersion = '1.4.0'
+        preferenceVersion = '1.2.1'
+        testRulesVersion = '1.5.0'
+        testRunnerVersion = '1.5.0'
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.1'
+        classpath 'com.android.tools.build:gradle:8.2.0'
     }
 
     // https://github.com/facebook/flipper/issues/146#issuecomment-463667556
-    configurations.all {
+    configurations.configureEach {
         resolutionStrategy.eachDependency { DependencyResolveDetails details ->
             def requested = details.requested
             if (requested.group == "androidx") {
