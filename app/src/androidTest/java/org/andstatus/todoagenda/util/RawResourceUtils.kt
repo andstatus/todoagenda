@@ -2,47 +2,40 @@
  * Based on the example: 
  * http://stackoverflow.com/questions/4087674/android-read-text-raw-resource-file
  */
+package org.andstatus.todoagenda.util
 
-package org.andstatus.todoagenda.util;
+import android.content.Context
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.nio.charset.Charset
 
-import android.content.Context;
-import android.content.res.Resources;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-
-public class RawResourceUtils {
-
-    public static String getString(Context context, int id) throws IOException {
-        return new String(getBytes(id, context), Charset.forName("UTF-8"));
+object RawResourceUtils {
+    @Throws(IOException::class)
+    fun getString(context: Context, id: Int): String {
+        return String(getBytes(id, context), Charset.forName("UTF-8"))
     }
 
     /**
      * reads resources regardless of their size
      */
-    private static byte[] getBytes(int id, Context context) throws IOException {
-        Resources resources = context.getResources();
-        InputStream is = resources.openRawResource(id);
-
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-        byte[] readBuffer = new byte[4 * 1024];
-
-        try {
-            int read;
+    @Throws(IOException::class)
+    private fun getBytes(id: Int, context: Context): ByteArray {
+        val resources = context.resources
+        val `is` = resources.openRawResource(id)
+        val bout = ByteArrayOutputStream()
+        val readBuffer = ByteArray(4 * 1024)
+        return try {
+            var read: Int
             do {
-                read = is.read(readBuffer, 0, readBuffer.length);
+                read = `is`.read(readBuffer, 0, readBuffer.size)
                 if (read == -1) {
-                    break;
+                    break
                 }
-                bout.write(readBuffer, 0, read);
-            } while (true);
-
-            return bout.toByteArray();
+                bout.write(readBuffer, 0, read)
+            } while (true)
+            bout.toByteArray()
         } finally {
-            is.close();
+            `is`.close()
         }
     }
 }

@@ -1,31 +1,28 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import org.andstatus.todoagenda.provider.QueryResultsStorage;
-import org.andstatus.todoagenda.widget.CalendarEntry;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.andstatus.todoagenda.widget.CalendarEntry
+import org.junit.Assert
+import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class WrongDatesLostEventsTest extends BaseWidgetTest {
-
+class WrongDatesLostEventsTest : BaseWidgetTest() {
     /**
      * https://github.com/plusonelabs/calendar-widget/issues/205
      */
     @Test
-    public void testIssue205() {
-        final String method = "testIssue205";
-        QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events);
-        provider.addResults(inputs);
-
-        playResults(method);
-        assertEquals("Number of entries", 11, getFactory().getWidgetEntries().size());
-        assertEquals("On Saturday", "Maker Fair", ((CalendarEntry) getFactory().getWidgetEntries().get(4)).getEvent().getTitle());
-        assertEquals("On Saturday", 6, getFactory().getWidgetEntries().get(4).entryDate.getDayOfWeek());
-        assertEquals("On Sunday", "Ribakovs", ((CalendarEntry) getFactory().getWidgetEntries().get(7)).getEvent().getTitle());
-        assertEquals("On Sunday", 7, getFactory().getWidgetEntries().get(7).entryDate.getDayOfWeek());
+    fun testIssue205() {
+        val method = "testIssue205"
+        val inputs = provider!!.loadResultsAndSettings(
+            org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events
+        )
+        provider!!.addResults(inputs)
+        playResults(method)
+        Assert.assertEquals("Number of entries", 11, getFactory().widgetEntries.size.toLong())
+        Assert.assertEquals("On Saturday", "Maker Fair", (getFactory().widgetEntries[4] as CalendarEntry).event.title)
+        Assert.assertEquals("On Saturday", 6, getFactory().widgetEntries[4].entryDate.dayOfWeek.toLong())
+        Assert.assertEquals("On Sunday", "Ribakovs", (getFactory().widgetEntries[7] as CalendarEntry).event.title)
+        Assert.assertEquals("On Sunday", 7, getFactory().widgetEntries[7].entryDate.dayOfWeek.toLong())
     }
 }

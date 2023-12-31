@@ -1,73 +1,79 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import org.andstatus.todoagenda.prefs.ApplicationPreferences;
-import org.andstatus.todoagenda.provider.QueryResultsStorage;
-import org.andstatus.todoagenda.widget.DayHeader;
-import org.andstatus.todoagenda.widget.LastEntry;
-import org.andstatus.todoagenda.widget.WidgetEntry;
-import org.joda.time.DateTime;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.widget.DayHeader
+import org.andstatus.todoagenda.widget.LastEntry
+import org.joda.time.DateTime
+import org.junit.Assert
+import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class MultidayAllDayEventTest extends BaseWidgetTest {
-
+class MultidayAllDayEventTest : BaseWidgetTest() {
     @Test
-    public void testInsidePeriod() {
-        final String method = "testInsidePeriod";
-        QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.test.R.raw.multi_day);
-        DateTime now = new DateTime(2015, 8, 30, 0, 0, 1, 0, getSettings().clock().getZone());
-        inputs.setExecutedAt(now);
-        provider.addResults(inputs);
-
-        int dateRange = 30;
-        provider.startEditingPreferences();
-        ApplicationPreferences.setEventRange(provider.getContext(), dateRange);
-        provider.savePreferences();
-        playResults(method);
-
-        DateTime today = now.withTimeAtStartOfDay();
-        DateTime endOfRangeTime = today.plusDays(dateRange);
-        int dayOfEventEntryPrev = 0;
-        int dayOfHeaderPrev = 0;
-        for (int ind = 0; ind < getFactory().getWidgetEntries().size(); ind++) {
-            WidgetEntry entry = getFactory().getWidgetEntries().get(ind);
-            String logMsg = method + "; " + String.format("%02d ", ind) + entry.toString();
+    fun testInsidePeriod() {
+        val method = "testInsidePeriod"
+        val inputs = provider!!.loadResultsAndSettings(
+            org.andstatus.todoagenda.test.R.raw.multi_day
+        )
+        val now = DateTime(2015, 8, 30, 0, 0, 1, 0, settings.clock().zone)
+        inputs!!.executedAt = now
+        provider!!.addResults(inputs)
+        val dateRange = 30
+        provider!!.startEditingPreferences()
+        ApplicationPreferences.setEventRange(provider.context, dateRange)
+        provider!!.savePreferences()
+        playResults(method)
+        val today = now.withTimeAtStartOfDay()
+        val endOfRangeTime = today.plusDays(dateRange)
+        var dayOfEventEntryPrev = 0
+        var dayOfHeaderPrev = 0
+        for (ind in getFactory().widgetEntries.indices) {
+            val entry = getFactory().widgetEntries[ind]
+            val logMsg = method + "; " + String.format("%02d ", ind) + entry.toString()
             if (entry.entryDay.isBefore(today)) {
-                fail("Is present before today " + logMsg);
+                Assert.fail("Is present before today $logMsg")
             }
             if (entry.entryDay.isAfter(endOfRangeTime)) {
-                fail("After end of range " + logMsg);
+                Assert.fail("After end of range $logMsg")
             }
-            int dayOfEntry = entry.entryDay.getDayOfYear();
-            if (entry instanceof DayHeader) {
+            val dayOfEntry = entry.entryDay.dayOfYear
+            if (entry is DayHeader) {
                 if (dayOfHeaderPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {
-                        fail("No today's header " + logMsg);
+                        Assert.fail("No today's header $logMsg")
                     }
                 } else {
-                    assertEquals("No header " + logMsg, dayOfHeaderPrev + 1, dayOfEntry);
+                    Assert.assertEquals("No header $logMsg", (dayOfHeaderPrev + 1).toLong(), dayOfEntry.toLong())
                 }
-                dayOfHeaderPrev = dayOfEntry;
-            } else if (entry instanceof LastEntry) {
-                assertEquals(LastEntry.LastEntryType.LAST, ((LastEntry) entry).type);
+                dayOfHeaderPrev = dayOfEntry
+            } else if (entry is LastEntry) {
+                Assert.assertEquals(LastEntry.LastEntryType.LAST, entry.type)
             } else {
                 if (dayOfEventEntryPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {
-                        fail("Today not filled " + logMsg);
+                        Assert.fail("Today not filled $logMsg")
                     }
                 } else {
-                    assertEquals("Day not filled " + logMsg, dayOfEventEntryPrev + 1, dayOfEntry);
+                    Assert.assertEquals(
+                        "Day not filled $logMsg",
+                        (dayOfEventEntryPrev + 1).toLong(),
+                        dayOfEntry.toLong()
+                    )
                 }
-                dayOfEventEntryPrev = dayOfEntry;
+                dayOfEventEntryPrev = dayOfEntry
             }
         }
-        assertEquals("Wrong last day header " + method, endOfRangeTime.getDayOfYear(), dayOfHeaderPrev);
-        assertEquals("Wrong last filled day " + method, endOfRangeTime.getDayOfYear(), dayOfEventEntryPrev);
+        Assert.assertEquals(
+            "Wrong last day header $method",
+            endOfRangeTime.dayOfYear.toLong(),
+            dayOfHeaderPrev.toLong()
+        )
+        Assert.assertEquals(
+            "Wrong last filled day $method",
+            endOfRangeTime.dayOfYear.toLong(),
+            dayOfEventEntryPrev.toLong()
+        )
     }
 }

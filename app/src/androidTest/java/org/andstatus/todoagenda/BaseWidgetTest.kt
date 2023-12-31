@@ -1,149 +1,142 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import android.util.Log;
-
-import org.andstatus.todoagenda.prefs.FilterMode;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.provider.FakeCalendarContentProvider;
-import org.andstatus.todoagenda.provider.QueryResultsStorage;
-import org.andstatus.todoagenda.util.LazyVal;
-import org.andstatus.todoagenda.widget.WidgetEntry;
-import org.andstatus.todoagenda.widget.WidgetEntryPosition;
-import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.Before;
-
-import java.util.List;
+import android.util.Log
+import org.andstatus.todoagenda.prefs.FilterMode
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.provider.FakeCalendarContentProvider
+import org.andstatus.todoagenda.util.LazyVal
+import org.andstatus.todoagenda.widget.WidgetEntryPosition
+import org.joda.time.DateTime
+import org.junit.After
+import org.junit.Assert
+import org.junit.Before
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class BaseWidgetTest {
-    final static String TAG = BaseWidgetTest.class.getSimpleName();
-    private static final int MAX_MILLIS_TO_WAIT_FOR_LAUNCHER = 2000;
-    private static final int MAX_MILLIS_TO_WAIT_FOR_FACTORY_CREATION = 40000;
-
-    protected FakeCalendarContentProvider provider = null;
-    protected LazyVal<RemoteViewsFactory> factory = LazyVal.of(
-        () -> new RemoteViewsFactory(provider.getContext(), provider.getWidgetId(), false));
-
+open class BaseWidgetTest {
+    protected lateinit var provider: FakeCalendarContentProvider
+    protected var factory = LazyVal.of { RemoteViewsFactory(provider.context, provider.widgetId, false) }
     @Before
-    public void setUp() throws Exception {
-        provider = FakeCalendarContentProvider.getContentProvider();
+    @Throws(Exception::class)
+    open fun setUp() {
+        provider = FakeCalendarContentProvider.contentProvider
     }
 
     @After
-    public void tearDown() throws Exception {
-        FakeCalendarContentProvider.tearDown();
-        factory.reset();
+    @Throws(Exception::class)
+    open fun tearDown() {
+        FakeCalendarContentProvider.tearDown()
+        factory.reset()
     }
 
-    DateTime dateTime(
-        int year,
-        int monthOfYear,
-        int dayOfMonth) {
-        return dateTime(year, monthOfYear, dayOfMonth, 0, 0);
+    @JvmOverloads
+    fun dateTime(
+        year: Int,
+        monthOfYear: Int,
+        dayOfMonth: Int,
+        hourOfDay: Int = 0,
+        minuteOfHour: Int = 0
+    ): DateTime {
+        return DateTime(
+            year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, 0, 0,
+            provider.settings.clock().zone
+        )
     }
 
-    DateTime dateTime(
-        int year,
-        int monthOfYear,
-        int dayOfMonth,
-        int hourOfDay,
-        int minuteOfHour) {
-        return new DateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, 0, 0,
-            provider.getSettings().clock().getZone());
-    }
-
-    protected void playResults(String tag) {
-        Log.d(tag, provider.getWidgetId() + " playResults started");
-        provider.updateAppSettings(tag);
-
+    protected fun playResults(tag: String?) {
+        Log.d(tag, provider.widgetId.toString() + " playResults started")
+        provider.updateAppSettings(tag)
         if (provider.usesActualWidget) {
-            InstanceState.clear(provider.getWidgetId());
-            EnvironmentChangedReceiver.updateWidget(provider.getContext(), provider.getWidgetId());
-            if (!RemoteViewsFactory.factories.containsKey(provider.getWidgetId())) {
-                waitForRemoteViewsFactoryCreation();
+            InstanceState.clear(provider.widgetId)
+            EnvironmentChangedReceiver.updateWidget(provider.context, provider.widgetId)
+            if (!RemoteViewsFactory.factories.containsKey(provider.widgetId)) {
+                waitForRemoteViewsFactoryCreation()
             }
-            waitTillWidgetIsUpdated(tag);
-            waitTillWidgetIsReloaded(tag);
-            waitTillWidgetIsRedrawn(tag);
-            EnvironmentChangedReceiver.sleep(1000);
-            if (InstanceState.get(provider.getWidgetId()).listReloaded == 0) {
-                Log.d(tag, provider.getWidgetId() + " was not reloaded by a Launcher");
-                getFactory().onDataSetChanged();
+            waitTillWidgetIsUpdated(tag)
+            waitTillWidgetIsReloaded(tag)
+            waitTillWidgetIsRedrawn(tag)
+            EnvironmentChangedReceiver.sleep(1000)
+            if (InstanceState.get(provider.widgetId).listReloaded == 0L) {
+                Log.d(tag, provider.widgetId.toString() + " was not reloaded by a Launcher")
+                getFactory().onDataSetChanged()
             }
         } else {
-            getFactory().onDataSetChanged();
+            getFactory().onDataSetChanged()
         }
-        getFactory().logWidgetEntries(tag);
-        Log.d(tag, provider.getWidgetId() + " playResults ended");
+        getFactory().logWidgetEntries(tag)
+        Log.d(tag, provider.widgetId.toString() + " playResults ended")
     }
 
-    private void waitForRemoteViewsFactoryCreation() {
-        long start = System.currentTimeMillis();
-        while (RemoteViewsFactory.factories.get(getSettings().getWidgetId()) == null &&
-            Math.abs(System.currentTimeMillis() - start) < MAX_MILLIS_TO_WAIT_FOR_FACTORY_CREATION) {
-            EnvironmentChangedReceiver.sleep(20);
+    private fun waitForRemoteViewsFactoryCreation() {
+        val start = System.currentTimeMillis()
+        while (RemoteViewsFactory.factories[settings.widgetId] == null &&
+            Math.abs(System.currentTimeMillis() - start) < MAX_MILLIS_TO_WAIT_FOR_FACTORY_CREATION
+        ) {
+            EnvironmentChangedReceiver.sleep(20)
         }
     }
 
-    private void waitTillWidgetIsUpdated(String tag) {
-        long start = System.currentTimeMillis();
+    private fun waitTillWidgetIsUpdated(tag: String?) {
+        val start = System.currentTimeMillis()
         while (Math.abs(System.currentTimeMillis() - start) < MAX_MILLIS_TO_WAIT_FOR_LAUNCHER) {
-            if (InstanceState.get(provider.getWidgetId()).updated > 0) {
-                Log.d(tag, provider.getWidgetId() + " updated");
-                break;
+            if (InstanceState.get(provider.widgetId).updated > 0) {
+                Log.d(tag, provider.widgetId.toString() + " updated")
+                break
             }
-            EnvironmentChangedReceiver.sleep(20);
+            EnvironmentChangedReceiver.sleep(20)
         }
     }
 
-    private void waitTillWidgetIsReloaded(String tag) {
-        long start = System.currentTimeMillis();
+    private fun waitTillWidgetIsReloaded(tag: String?) {
+        val start = System.currentTimeMillis()
         while (Math.abs(System.currentTimeMillis() - start) < MAX_MILLIS_TO_WAIT_FOR_LAUNCHER) {
-            if (InstanceState.get(provider.getWidgetId()).listReloaded > 0) {
-                Log.d(tag, provider.getWidgetId() + " reloaded");
-                break;
+            if (InstanceState.get(provider.widgetId).listReloaded > 0) {
+                Log.d(tag, provider.widgetId.toString() + " reloaded")
+                break
             }
-            EnvironmentChangedReceiver.sleep(20);
+            EnvironmentChangedReceiver.sleep(20)
         }
     }
 
-    private void waitTillWidgetIsRedrawn(String tag) {
-        long start = System.currentTimeMillis();
+    private fun waitTillWidgetIsRedrawn(tag: String?) {
+        val start = System.currentTimeMillis()
         while (Math.abs(System.currentTimeMillis() - start) < MAX_MILLIS_TO_WAIT_FOR_LAUNCHER) {
-            if (InstanceState.get(provider.getWidgetId()).listRedrawn > 0) {
-                Log.d(tag, provider.getWidgetId() + " redrawn");
-                break;
+            if (InstanceState.get(provider.widgetId).listRedrawn > 0) {
+                Log.d(tag, provider.widgetId.toString() + " redrawn")
+                break
             }
-            EnvironmentChangedReceiver.sleep(20);
+            EnvironmentChangedReceiver.sleep(20)
         }
     }
 
-    protected InstanceSettings getSettings() {
-        return provider.getSettings();
+    protected val settings: InstanceSettings
+        get() = provider.settings
+
+    fun getFactory(): RemoteViewsFactory {
+        val existingFactory = RemoteViewsFactory.factories[provider.widgetId]
+        return existingFactory ?: factory.get()
     }
 
-    public RemoteViewsFactory getFactory() {
-        RemoteViewsFactory existingFactory = RemoteViewsFactory.factories.get(provider.getWidgetId());
-        return existingFactory == null ? factory.get() : existingFactory;
+    protected fun ensureNonEmptyResults() {
+        val inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday)
+        val settings = settings
+        settings.setFilterMode(FilterMode.NO_FILTERING)
+        provider.addResults(inputs)
     }
 
-    protected void ensureNonEmptyResults() {
-        QueryResultsStorage inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday);
-        InstanceSettings settings = getSettings();
-        settings.setFilterMode(FilterMode.NO_FILTERING);
-        provider.addResults(inputs);
+    protected fun assertPosition(ind: Int, position: WidgetEntryPosition) {
+        val widgetEntries = getFactory().widgetEntries
+        Assert.assertTrue(
+            "Expecting " + position + " at " + (ind + 1) + "th entry, but found only " +
+                widgetEntries.size + " entries", widgetEntries.size > ind
+        )
+        Assert.assertEquals(widgetEntries[ind].toString(), position, widgetEntries[ind].entryPosition)
     }
 
-    protected void assertPosition(int ind, WidgetEntryPosition position) {
-        List<? extends WidgetEntry> widgetEntries = getFactory().getWidgetEntries();
-        assertTrue("Expecting " + position + " at " + (ind + 1) + "th entry, but found only " +
-            widgetEntries.size() + " entries", widgetEntries.size() > ind);
-        assertEquals(widgetEntries.get(ind).toString(), position, widgetEntries.get(ind).entryPosition);
+    companion object {
+        val TAG: String = BaseWidgetTest::class.java.simpleName
+        private const val MAX_MILLIS_TO_WAIT_FOR_LAUNCHER = 2000
+        private const val MAX_MILLIS_TO_WAIT_FOR_FACTORY_CREATION = 40000
     }
 }

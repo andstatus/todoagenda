@@ -1,193 +1,179 @@
-package org.andstatus.todoagenda.provider;
+package org.andstatus.todoagenda.provider
 
-import android.content.Context;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.RawRes;
-import androidx.test.platform.app.InstrumentationRegistry;
-
-import org.andstatus.todoagenda.calendar.CalendarEvent;
-import org.andstatus.todoagenda.prefs.AllSettings;
-import org.andstatus.todoagenda.prefs.ApplicationPreferences;
-import org.andstatus.todoagenda.prefs.EventSource;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
-import org.andstatus.todoagenda.prefs.SettingsStorage;
-import org.andstatus.todoagenda.prefs.SnapshotMode;
-import org.andstatus.todoagenda.util.RawResourceUtils;
-import org.joda.time.DateTime;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.andstatus.todoagenda.prefs.AllSettings.getStorageKey;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_ID;
-import static org.andstatus.todoagenda.provider.QueryResultsStorage.KEY_SETTINGS;
-import static org.junit.Assert.fail;
+import android.content.Context
+import android.util.Log
+import androidx.annotation.RawRes
+import androidx.test.platform.app.InstrumentationRegistry
+import org.andstatus.todoagenda.calendar.CalendarEvent
+import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.prefs.EventSource
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.OrderedEventSource
+import org.andstatus.todoagenda.prefs.SettingsStorage
+import org.andstatus.todoagenda.prefs.SnapshotMode
+import org.andstatus.todoagenda.util.RawResourceUtils
+import org.joda.time.DateTime
+import org.json.JSONObject
+import org.junit.Assert
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.Volatile
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class FakeCalendarContentProvider {
-    final static String TAG = FakeCalendarContentProvider.class.getSimpleName();
-    private static final int TEST_WIDGET_ID_MIN = 434892;
-    private static final String[] ZONE_IDS = {"America/Los_Angeles", "Europe/Moscow", "Asia/Kuala_Lumpur", "UTC"};
-    private final QueryResultsStorage results = new QueryResultsStorage();
-    private final Context context;
+class FakeCalendarContentProvider private constructor(val context: Context) {
+    private val results = QueryResultsStorage()
+    val widgetId: Int
+    val usesActualWidget: Boolean
 
-    private final static AtomicInteger lastWidgetId = new AtomicInteger(TEST_WIDGET_ID_MIN);
-    private final int widgetId;
-    public final boolean usesActualWidget;
-    private volatile InstanceSettings settings;
+    @Volatile
+    lateinit var settings: InstanceSettings
 
-    public static FakeCalendarContentProvider getContentProvider() {
-        Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        FakeCalendarContentProvider contentProvider = new FakeCalendarContentProvider(targetContext);
-        return contentProvider;
+    init {
+        val instanceToReuse = AllSettings.getInstances(context).values.stream()
+            .filter { obj: InstanceSettings -> obj.isForTestsReplaying }.findFirst().orElse(null)
+        usesActualWidget = instanceToReuse != null
+        widgetId = if (usesActualWidget) instanceToReuse!!.widgetId else lastWidgetId.incrementAndGet()
+        val settings = InstanceSettings(
+            context, widgetId,
+            "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX
+        )
+        settings.activeEventSources = settings.activeEventSources
+        settings.clock().lockedTimeZoneId = ZONE_IDS[(System.currentTimeMillis() % ZONE_IDS.size).toInt()]
+        setSettings1(settings)
     }
 
-    private FakeCalendarContentProvider(Context context) {
-        this.context = context;
-        InstanceSettings instanceToReuse = AllSettings.getInstances(context).values().stream()
-                .filter(InstanceSettings::isForTestsReplaying).findFirst().orElse(null);
-        usesActualWidget = instanceToReuse != null;
-
-        widgetId = usesActualWidget ? instanceToReuse.getWidgetId() : lastWidgetId.incrementAndGet();
-        InstanceSettings settings = new InstanceSettings(context, widgetId,
-                "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX);
-        settings.setActiveEventSources(settings.getActiveEventSources());
-
-        settings.clock().setLockedTimeZoneId(ZONE_IDS[(int)(System.currentTimeMillis() % ZONE_IDS.length)]);
-        setSettings(settings);
+    private fun setSettings1(settings: InstanceSettings) {
+        this.settings = settings
+        AllSettings.addNew(TAG, context, settings)
     }
 
-    private void setSettings(InstanceSettings settings) {
-        this.settings = settings;
-        AllSettings.addNew(TAG, context, settings);
-    }
-
-    public void updateAppSettings(String tag) {
-        settings.setResultsStorage(results);
-        if (!results.getResults().isEmpty()) {
-            settings.clock().setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings);
+    fun updateAppSettings(tag: String?) {
+        settings!!.resultsStorage = results
+        if (!results.results.isEmpty()) {
+            settings!!.clock().setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
         }
-        AllSettings.addNew(tag, context, settings);
-        if (results.getResults().size() > 0) {
-            Log.d(tag, "Results executed at " + settings.clock().now());
+        AllSettings.addNew(tag, context, settings)
+        if (results.results.size > 0) {
+            Log.d(tag, "Results executed at " + settings!!.clock().now())
         }
     }
 
-    public static void tearDown() {
-        List<Integer> toDelete = new ArrayList<>();
-        Map<Integer, InstanceSettings> instances = AllSettings.getLoadedInstances();
-        for(InstanceSettings settings : instances.values()) {
-            if (settings.getWidgetId() >= TEST_WIDGET_ID_MIN) {
-                toDelete.add(settings.getWidgetId());
-            }
-        }
-        Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        for(int widgetId : toDelete) {
-            instances.remove(widgetId);
-            SettingsStorage.delete(context, getStorageKey(widgetId));
-        }
-        ApplicationPreferences.setWidgetId(context, TEST_WIDGET_ID_MIN);
+    fun addResults(newResults: QueryResultsStorage?) {
+        results.addResults(newResults)
     }
 
-    public void addResults(QueryResultsStorage newResults) {
-        results.addResults(newResults);
+    fun setExecutedAt(executedAt: DateTime?) {
+        results.executedAt = executedAt
     }
 
-    public void setExecutedAt(DateTime executedAt) {
-        results.setExecutedAt(executedAt);
+    fun addRow(event: CalendarEvent) {
+        addRow(
+            QueryRow()
+                .setCalendarId(event.eventSource.source.id)
+                .setEventId(event.eventId)
+                .setTitle(event.title)
+                .setBegin(event.startMillis)
+                .setEnd(event.endMillis)
+                .setDisplayColor(event.color)
+                .setAllDay(if (event.isAllDay) 1 else 0)
+                .setEventLocation(event.location)
+                .setHasAlarm(if (event.isAlarmActive) 1 else 0)
+                .setRRule(if (event.isRecurring) "FREQ=WEEKLY;WKST=MO;BYDAY=MO,WE,FR" else null)
+        )
     }
 
-    public void addRow(CalendarEvent event) {
-        addRow(new QueryRow()
-                .setCalendarId(event.getEventSource().source.getId())
-                .setEventId(event.getEventId())
-                .setTitle(event.getTitle())
-                .setBegin(event.getStartMillis())
-                .setEnd(event.getEndMillis())
-                .setDisplayColor(event.getColor())
-                .setAllDay(event.isAllDay() ? 1 : 0)
-                .setEventLocation(event.getLocation())
-                .setHasAlarm(event.isAlarmActive() ? 1 : 0)
-                .setRRule(event.isRecurring() ? "FREQ=WEEKLY;WKST=MO;BYDAY=MO,WE,FR" : null)
-        );
+    fun addRow(queryRow: QueryRow?) {
+        val providerType = EventProviderType.CALENDAR
+        val result = results.findLast(providerType).orElseGet { addFirstQueryResult(providerType) }
+        result.addRow(queryRow)
     }
 
-    public void addRow(QueryRow queryRow) {
-        EventProviderType providerType = EventProviderType.CALENDAR;
-        QueryResult result = results.findLast(providerType).orElseGet( () -> addFirstQueryResult(providerType));
-        result.addRow(queryRow);
+    private fun addFirstQueryResult(providerType: EventProviderType): QueryResult {
+        ensureOneActiveEventSource(providerType)
+        val r2 = QueryResult(providerType, settings!!.widgetId, settings!!.clock().now())
+        results.addResult(r2)
+        return r2
     }
 
-    private QueryResult addFirstQueryResult(EventProviderType providerType) {
-        ensureOneActiveEventSource(providerType);
-        QueryResult r2 = new QueryResult(providerType, settings.getWidgetId(), settings.clock().now());
-        results.addResult(r2);
-        return r2;
-    }
-
-    private void ensureOneActiveEventSource(EventProviderType type) {
-        if (settings.getActiveEventSources().stream().noneMatch(source -> source.source.providerType == type)) {
-            int sourceId = settings.getActiveEventSources().size() + 1;
-            EventSource source = new EventSource(type, sourceId,
-                    "(Mocked " + type + " #" + sourceId + ")",
-                    "", 0, true);
-            OrderedEventSource newSource = new OrderedEventSource(source, 1);
-            settings.getActiveEventSources().add(newSource);
+    private fun ensureOneActiveEventSource(type: EventProviderType) {
+        if (settings!!.activeEventSources.stream()
+                .noneMatch { source: OrderedEventSource -> source.source.providerType === type }
+        ) {
+            val sourceId = settings!!.activeEventSources.size + 1
+            val source = EventSource(
+                type, sourceId,
+                "(Mocked $type #$sourceId)",
+                "", 0, true
+            )
+            val newSource = OrderedEventSource(source, 1)
+            settings!!.activeEventSources.add(newSource)
         }
     }
 
-    @NonNull
-    public InstanceSettings getSettings() {
-        return settings;
+    fun clear() {
+        results.clear()
     }
 
-    public void clear() {
-        results.clear();
+    fun startEditingPreferences() {
+        ApplicationPreferences.fromInstanceSettings(context, widgetId)
     }
 
-    public int getWidgetId() {
-        return widgetId;
+    fun savePreferences() {
+        ApplicationPreferences.save(context, widgetId)
+        settings = AllSettings.instanceFromId(context, widgetId)
     }
 
-    public void startEditingPreferences() {
-        ApplicationPreferences.fromInstanceSettings(getContext(), getWidgetId());
-    }
-
-    public void savePreferences() {
-        ApplicationPreferences.save(getContext(), getWidgetId());
-        settings = AllSettings.instanceFromId(getContext(), getWidgetId());
-    }
-
-    public QueryResultsStorage loadResultsAndSettings(@RawRes int jsonResId) {
+    fun loadResultsAndSettings(@RawRes jsonResId: Int): QueryResultsStorage? {
         try {
-            JSONObject json = new JSONObject(RawResourceUtils.getString(InstrumentationRegistry.getInstrumentation().getContext(), jsonResId));
-            json.getJSONObject(KEY_SETTINGS).put(PREF_WIDGET_ID, widgetId);
-            WidgetData widgetData = WidgetData.fromJson(json);
-            InstanceSettings settings = widgetData.getSettingsForWidget(context, this.settings, widgetId);
-            setSettings(settings);
-            return settings.getResultsStorage();
-        } catch (Exception e) {
-            fail("loadResultsAndSettings" + e.getMessage());
+            val json =
+                JSONObject(RawResourceUtils.getString(InstrumentationRegistry.getInstrumentation().context, jsonResId))
+            json.getJSONObject(QueryResultsStorage.KEY_SETTINGS).put(InstanceSettings.PREF_WIDGET_ID, widgetId)
+            val widgetData = WidgetData.fromJson(json)
+            val settings = widgetData.getSettingsForWidget(context, settings, widgetId)
+            setSettings1(settings)
+            return settings.resultsStorage
+        } catch (e: Exception) {
+            Assert.fail("loadResultsAndSettings" + e.message)
         }
-        return null;
+        return null
     }
 
-    public OrderedEventSource getFirstActiveEventSource() {
-        for(OrderedEventSource orderedSource: getSettings().getActiveEventSources()) {
-            return orderedSource;
+    val firstActiveEventSource: OrderedEventSource
+        get() {
+            for (orderedSource in settings.activeEventSources) {
+                return orderedSource
+            }
+            return OrderedEventSource.EMPTY
         }
-        return OrderedEventSource.EMPTY;
-    }
 
-    public Context getContext() {
-        return context;
+    companion object {
+        val TAG = FakeCalendarContentProvider::class.java.simpleName
+        private const val TEST_WIDGET_ID_MIN = 434892
+        private val ZONE_IDS = arrayOf("America/Los_Angeles", "Europe/Moscow", "Asia/Kuala_Lumpur", "UTC")
+        private val lastWidgetId = AtomicInteger(TEST_WIDGET_ID_MIN)
+        val contentProvider: FakeCalendarContentProvider
+            get() {
+                val targetContext =
+                    InstrumentationRegistry.getInstrumentation().targetContext
+                return FakeCalendarContentProvider(targetContext)
+            }
+
+        fun tearDown() {
+            val toDelete: MutableList<Int> = ArrayList()
+            val instances = AllSettings.getLoadedInstances()
+            for (settings in instances.values) {
+                if (settings.widgetId >= TEST_WIDGET_ID_MIN) {
+                    toDelete.add(settings.widgetId)
+                }
+            }
+            val context = InstrumentationRegistry.getInstrumentation().targetContext
+            for (widgetId in toDelete) {
+                instances.remove(widgetId)
+                SettingsStorage.delete(context, AllSettings.getStorageKey(widgetId))
+            }
+            ApplicationPreferences.setWidgetId(context, TEST_WIDGET_ID_MIN)
+        }
     }
 }

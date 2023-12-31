@@ -1,55 +1,49 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Assert
+import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class KeywordsFilterTest {
-
+class KeywordsFilterTest {
     @Test
-    public void testPhrases() {
-        String query = "\"do it\"";
-        final String keywordDN = "do it";
-        assertOneQueryToKeywords(query, keywordDN);
-        final String body1 = "Looking for do it";
-        assertMatch(query, body1);
-        assertNotMatch(query, "Looking for it do");
-
-        query = "word " + query;
-        final String keywordW = "word";
-        assertOneQueryToKeywords(query, keywordW, keywordDN);
-        final String body2 = body1 + " with a word, that is interesting";
-        assertMatch("those this that", body2);
-        assertNotMatch("something other", body2);
-
-        String query3 = "Hidden \"Smith's\" '. Birthday'";
-        assertOneQueryToKeywords(query3, "Hidden", "Smith's", ". Birthday");
-        assertMatch(query3, "Smith. Birthday");
-        assertNotMatch(query3, "Smith Birthday");
-        assertMatch(query3, "Smith's Birthday");
-        assertMatch(query3, "Smith Hidden Birthday");
-        assertNotMatch(query3, "Smith.Birthday");
+    fun testPhrases() {
+        var query = "\"do it\""
+        val keywordDN = "do it"
+        assertOneQueryToKeywords(query, keywordDN)
+        val body1 = "Looking for do it"
+        assertMatch(query, body1)
+        assertNotMatch(query, "Looking for it do")
+        query = "word $query"
+        val keywordW = "word"
+        assertOneQueryToKeywords(query, keywordW, keywordDN)
+        val body2 = "$body1 with a word, that is interesting"
+        assertMatch("those this that", body2)
+        assertNotMatch("something other", body2)
+        val query3 = "Hidden \"Smith's\" '. Birthday'"
+        assertOneQueryToKeywords(query3, "Hidden", "Smith's", ". Birthday")
+        assertMatch(query3, "Smith. Birthday")
+        assertNotMatch(query3, "Smith Birthday")
+        assertMatch(query3, "Smith's Birthday")
+        assertMatch(query3, "Smith Hidden Birthday")
+        assertNotMatch(query3, "Smith.Birthday")
     }
 
-    private void assertOneQueryToKeywords(String query, String... keywords) {
-        int size = keywords.length;
-        KeywordsFilter filter1 = new KeywordsFilter(false, query);
-        assertEquals(filter1.toString(), size, filter1.keywords.size());
-        for (int ind = 0; ind < size; ind++) {
-            assertEquals(filter1.toString(), keywords[ind], filter1.keywords.get(ind));
+    private fun assertOneQueryToKeywords(query: String, vararg keywords: String) {
+        val size = keywords.size
+        val filter1 = KeywordsFilter(false, query)
+        Assert.assertEquals(filter1.toString(), size.toLong(), filter1.keywords.size.toLong())
+        for (ind in 0 until size) {
+            Assert.assertEquals(filter1.toString(), keywords[ind], filter1.keywords[ind])
         }
     }
 
-    private void assertMatch(String query, String body) {
-        assertTrue("no keywords from '" + query + "' match: '" + body + "'", new KeywordsFilter(false, query).matched(body));
+    private fun assertMatch(query: String, body: String) {
+        Assert.assertTrue("no keywords from '$query' match: '$body'", KeywordsFilter(false, query).matched(body))
     }
 
-    private void assertNotMatch(String query, String body) {
-        assertFalse("Some keyword from '" + query + "' match: '" + body + "'", new KeywordsFilter(false, query).matched(body));
+    private fun assertNotMatch(query: String, body: String) {
+        Assert.assertFalse("Some keyword from '$query' match: '$body'", KeywordsFilter(false, query).matched(body))
     }
 }

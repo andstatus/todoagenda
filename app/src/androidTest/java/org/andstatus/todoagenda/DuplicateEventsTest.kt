@@ -1,26 +1,23 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import org.andstatus.todoagenda.provider.QueryResultsStorage;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Assert
+import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class DuplicateEventsTest extends BaseWidgetTest {
-
+class DuplicateEventsTest : BaseWidgetTest() {
     /**
      * https://github.com/plusonelabs/calendar-widget/issues/354
      */
     @Test
-    public void testIssue354() {
-        final String method = "testIssue354";
-        QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.test.R.raw.duplicates);
-        provider.addResults(inputs);
-
-        playResults(method);
-        assertEquals("Number of entries", 40, getFactory().getWidgetEntries().size());
+    fun testIssue354() {
+        val method = "testIssue354"
+        val inputs = provider!!.loadResultsAndSettings(
+            org.andstatus.todoagenda.test.R.raw.duplicates
+        )
+        provider!!.addResults(inputs)
+        playResults(method)
+        Assert.assertEquals("Number of entries", 40, getFactory().widgetEntries.size.toLong())
     }
 }

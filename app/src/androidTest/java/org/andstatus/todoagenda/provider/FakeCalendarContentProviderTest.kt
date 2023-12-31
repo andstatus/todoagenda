@@ -1,126 +1,124 @@
-package org.andstatus.todoagenda.provider;
+package org.andstatus.todoagenda.provider
 
-import android.net.Uri;
-import android.provider.CalendarContract;
-
-import org.andstatus.todoagenda.BaseWidgetTest;
-import org.andstatus.todoagenda.calendar.CalendarEventProvider;
-import org.andstatus.todoagenda.util.PermissionsUtil;
-import org.joda.time.DateTime;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertTrue;
+import android.database.Cursor
+import android.net.Uri
+import android.provider.CalendarContract
+import org.andstatus.todoagenda.BaseWidgetTest
+import org.andstatus.todoagenda.calendar.CalendarEventProvider
+import org.andstatus.todoagenda.util.PermissionsUtil
+import org.json.JSONException
+import org.junit.Assert
+import org.junit.Test
+import java.util.function.Function
 
 /**
  * Tests of the Testing framework itself
  *
  * @author yvolk@yurivolkov.com
  */
-public class FakeCalendarContentProviderTest extends BaseWidgetTest {
-    private final static String TAG = FakeCalendarContentProviderTest.class.getSimpleName();
-
-    private final String[] projection = CalendarEventProvider.getProjection();
-    private final String sortOrder = CalendarEventProvider.EVENT_SORT_ORDER;
-    private long eventId = 0;
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+class FakeCalendarContentProviderTest : BaseWidgetTest() {
+    private val projection = CalendarEventProvider.getProjection()
+    private val sortOrder = CalendarEventProvider.EVENT_SORT_ORDER
+    private var eventId: Long = 0
+    @Throws(Exception::class)
+    override fun setUp() {
+        super.setUp()
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        QueryResultsStorage.setNeedToStoreResults(false, 0);
-        super.tearDown();
+    @Throws(Exception::class)
+    override fun tearDown() {
+        QueryResultsStorage.setNeedToStoreResults(false, 0)
+        super.tearDown()
     }
 
     @Test
-    public void testTestMode() {
-        assertTrue("isTestMode should be true", PermissionsUtil.isTestMode());
+    fun testTestMode() {
+        Assert.assertTrue("isTestMode should be true", PermissionsUtil.isTestMode())
     }
 
     @Test
-    public void testTwoEventsToday() {
-        QueryResultsStorage results = new QueryResultsStorage();
-        QueryResult input1 = newResult("");
-        results.addResult(input1);
-        QueryResult input2 = newResult("SOMETHING=1");
-        results.addResult(input2);
-        provider.addResults(results);
-        provider.updateAppSettings(TAG);
-
-        QueryResultsStorage.setNeedToStoreResults(true, provider.getWidgetId());
-        MyContentResolver resolver = new MyContentResolver(EventProviderType.CALENDAR, provider.getContext(), provider.getWidgetId());
-
-        QueryResult result1 = queryList(resolver, input1.getUri(), input1.getSelection());
-        List<QueryResult> stored1 = QueryResultsStorage.getStorage().getResults(EventProviderType.CALENDAR, provider.getWidgetId());
-
-        assertEquals(input1, result1);
-        assertEquals(result1, input1);
-        assertEquals("Results 1 size\n" + stored1, 1, stored1.size());
-        assertEquals(input1, stored1.get(0));
-
-        QueryResult result2 = queryList(resolver, input2.getUri(), input2.getSelection());
-        List<QueryResult> stored2 = QueryResultsStorage.getStorage().getResults(EventProviderType.CALENDAR, provider.getWidgetId());
-
-        assertEquals(input2, result2);
-        assertEquals(result2, input2);
-        assertEquals("Results 2 size\n" + stored2, 2, stored2.size());
-        assertEquals(input2, stored2.get(1));
-
-        assertNotSame(result1, result2);
-
-        result1.getRows().get(1).setTitle("Changed title");
-        assertNotSame(input1, result1);
-        assertNotSame(result1, input1);
+    fun testTwoEventsToday() {
+        val results = QueryResultsStorage()
+        val input1 = newResult("")
+        results.addResult(input1)
+        val input2 = newResult("SOMETHING=1")
+        results.addResult(input2)
+        provider!!.addResults(results)
+        provider!!.updateAppSettings(TAG)
+        QueryResultsStorage.setNeedToStoreResults(true, provider.widgetId)
+        val resolver = MyContentResolver(EventProviderType.CALENDAR, provider.context, provider.widgetId)
+        val result1 = queryList(resolver, input1.uri, input1.selection)
+        val stored1 = QueryResultsStorage.getStorage().getResults(EventProviderType.CALENDAR, provider.widgetId)
+        Assert.assertEquals(input1, result1)
+        Assert.assertEquals(result1, input1)
+        Assert.assertEquals("Results 1 size\n$stored1", 1, stored1.size.toLong())
+        Assert.assertEquals(input1, stored1[0])
+        val result2 = queryList(resolver, input2.uri, input2.selection)
+        val stored2 = QueryResultsStorage.getStorage().getResults(EventProviderType.CALENDAR, provider.widgetId)
+        Assert.assertEquals(input2, result2)
+        Assert.assertEquals(result2, input2)
+        Assert.assertEquals("Results 2 size\n$stored2", 2, stored2.size.toLong())
+        Assert.assertEquals(input2, stored2[1])
+        Assert.assertNotSame(result1, result2)
+        result1.rows[1].setTitle("Changed title")
+        Assert.assertNotSame(input1, result1)
+        Assert.assertNotSame(result1, input1)
     }
 
-    private QueryResult newResult(String selection) {
-        QueryResult input = new QueryResult(EventProviderType.CALENDAR, getSettings(),
-                CalendarContract.Instances.CONTENT_URI, projection, selection, null, sortOrder);
-        DateTime today = getSettings().clock().now().withTimeAtStartOfDay();
-        input.addRow(new QueryRow().setEventId(++eventId)
-                .setTitle("First Event today").setBegin(today.plusHours(8).getMillis()));
-        input.addRow(new QueryRow()
+    private fun newResult(selection: String): QueryResult {
+        val input = QueryResult(
+            EventProviderType.CALENDAR, settings,
+            CalendarContract.Instances.CONTENT_URI, projection, selection, null, sortOrder
+        )
+        val today = settings.clock().now().withTimeAtStartOfDay()
+        input.addRow(
+            QueryRow().setEventId(++eventId)
+                .setTitle("First Event today").setBegin(today.plusHours(8).millis)
+        )
+        input.addRow(
+            QueryRow()
                 .setEventId(++eventId)
                 .setTitle("Event with all known attributes")
-                .setBegin(today.plusHours(12).getMillis())
-                .setEnd(today.plusHours(13).getMillis())
+                .setBegin(today.plusHours(12).millis)
+                .setEnd(today.plusHours(13).millis)
                 .setDisplayColor(0xFF00FF)
                 .setAllDay(false)
                 .setEventLocation("somewhere")
                 .setHasAlarm(true)
                 .setRRule("what's this?")
-        );
-        assertEquals(CalendarContract.Instances.CONTENT_URI, input.getUri());
-        assertEquals(selection, input.getSelection());
-        return input;
+        )
+        Assert.assertEquals(CalendarContract.Instances.CONTENT_URI, input.uri)
+        Assert.assertEquals(selection, input.selection)
+        return input
     }
 
-    private QueryResult queryList(MyContentResolver resolver, Uri uri, String selection) {
-        QueryResult result = new QueryResult(EventProviderType.CALENDAR, getSettings(),
-                uri, projection, selection, null, sortOrder);
-
-        result = resolver.foldEvents(uri, projection, selection, null, sortOrder, result, r -> cursor -> {
-            r.addRow(cursor);
-            return r;
-        });
-        result.dropNullColumns();
-        return result;
+    private fun queryList(resolver: MyContentResolver, uri: Uri, selection: String): QueryResult {
+        var result = QueryResult(
+            EventProviderType.CALENDAR, settings,
+            uri, projection, selection, null, sortOrder
+        )
+        result = resolver.foldEvents(uri, projection, selection, null, sortOrder, result) { r: QueryResult ->
+            Function { cursor: Cursor? ->
+                r.addRow(cursor)
+                r
+            }
+        }
+        result.dropNullColumns()
+        return result
     }
 
     @Test
-    public void testJsonToAndFrom() throws JSONException {
-        QueryResultsStorage inputs1 = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.test.R.raw.birthday);
-        JSONObject jsonOutput = inputs1.toJson(provider.getContext(), provider.getWidgetId(), true);
-        QueryResultsStorage inputs2 = QueryResultsStorage.fromJson(provider.getWidgetId(), jsonOutput);
-        assertEquals(inputs1, inputs2);
+    @Throws(JSONException::class)
+    fun testJsonToAndFrom() {
+        val inputs1 = provider!!.loadResultsAndSettings(
+            org.andstatus.todoagenda.test.R.raw.birthday
+        )
+        val jsonOutput = inputs1!!.toJson(provider.context, provider.widgetId, true)
+        val inputs2 = QueryResultsStorage.fromJson(provider.widgetId, jsonOutput)
+        Assert.assertEquals(inputs1, inputs2)
+    }
+
+    companion object {
+        private val TAG = FakeCalendarContentProviderTest::class.java.simpleName
     }
 }

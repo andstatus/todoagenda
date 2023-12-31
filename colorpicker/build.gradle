@@ -38,6 +38,9 @@ android {
             minifyEnabled false
         }
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
     namespace 'com.rarepebble.colorpicker'
 }
 

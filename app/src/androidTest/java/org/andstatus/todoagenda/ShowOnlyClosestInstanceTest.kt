@@ -1,38 +1,34 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import org.andstatus.todoagenda.provider.QueryResultsStorage;
-import org.andstatus.todoagenda.widget.CalendarEntry;
-import org.andstatus.todoagenda.widget.WidgetEntry;
-import org.junit.Test;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import org.andstatus.todoagenda.widget.CalendarEntry
+import org.andstatus.todoagenda.widget.WidgetEntry
+import org.junit.Assert
+import org.junit.Test
+import java.util.stream.Collectors
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class ShowOnlyClosestInstanceTest extends BaseWidgetTest {
-
+class ShowOnlyClosestInstanceTest : BaseWidgetTest() {
     @Test
-    public void testShowOnlyClosestInstance() {
-        final String method = "testShowOnlyClosestInstance";
-        QueryResultsStorage inputs = provider.loadResultsAndSettings(
-                org.andstatus.todoagenda.test.R.raw.closest_event);
-        provider.addResults(inputs);
-
-        playResults(method);
-
-        assertEquals("SnaphotDate", dateTime(2020, 2, 15),
-                getSettings().clock().now().withTimeAtStartOfDay());
-
-        List<? extends WidgetEntry> entries = getFactory().getWidgetEntries().stream()
-                .filter(e -> e.getTitle().startsWith("Test event 2 that")).collect(Collectors.toList());
-        assertEquals("Number of entries of the test event " + entries, 2, entries.size());
-        assertNotEquals("Entries should have different IDs\n" + entries + "\n",
-                ((CalendarEntry) entries.get(0)).getEvent().getEventId(),
-                ((CalendarEntry) entries.get(1)).getEvent().getEventId());
+    fun testShowOnlyClosestInstance() {
+        val method = "testShowOnlyClosestInstance"
+        val inputs = provider!!.loadResultsAndSettings(
+            org.andstatus.todoagenda.test.R.raw.closest_event
+        )
+        provider!!.addResults(inputs)
+        playResults(method)
+        Assert.assertEquals(
+            "SnaphotDate", dateTime(2020, 2, 15),
+            settings.clock().now().withTimeAtStartOfDay()
+        )
+        val entries = getFactory().widgetEntries.stream()
+            .filter { e: WidgetEntry<*> -> e.title.startsWith("Test event 2 that") }.collect(Collectors.toList())
+        Assert.assertEquals("Number of entries of the test event $entries", 2, entries.size.toLong())
+        Assert.assertNotEquals(
+            "Entries should have different IDs\n$entries\n",
+            (entries[0] as CalendarEntry).event.eventId,
+            (entries[1] as CalendarEntry).event.eventId
+        )
     }
 }
