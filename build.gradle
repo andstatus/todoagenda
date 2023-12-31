@@ -14,16 +14,19 @@ buildscript {
         annotationVersion = '1.0.1'
         appCompatVersion = '1.6.1'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
         espressoCoreVersion = '3.5.1'
-        jodaTimeVersion = '2.10.13'
+        jodaTimeVersion = '2.12.5'     // https://github.com/JodaOrg/joda-time/releases
         junitVersion = '4.13.2'
         junitJupiterVersion = '5.8.2'
         preferenceVersion = '1.2.1'
         testRulesVersion = '1.5.0'
         testRunnerVersion = '1.5.0'
+        kotlinVersion = '1.9.22'
+        ktxVersion = '1.10.1'  // https://androidx.tech/artifacts/core/core-ktx/
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 
     // https://github.com/facebook/flipper/issues/146#issuecomment-463667556
@@ -36,6 +39,22 @@ buildscript {
                 }
             }
         }
+    }
+}
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 allprojects {

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 ext {
     bintrayRepo = 'maven'
@@ -43,4 +44,5 @@ android {
 dependencies {
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.preference:preference:$preferenceVersion"
+    implementation "androidx.core:core-ktx:$ktxVersion"
 }
