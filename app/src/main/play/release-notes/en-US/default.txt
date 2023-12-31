@@ -1,4 +1,2 @@
-v.4.5.6 Screenshots and descriptions for F-Droid.
-v.4.5.5 Fix: Tasks re-appeared.
-v.4.5.4 Fixed: All tasks show grey. Removed hardcoded transparency for Tentative tasks.
-v.4.5.3 Update time zones and fix All day events.
+v4.7.2 Filter for Today and Tomorrow. Show based on keywords in a title. Allow changing language of User Interface for Android 13+
+
