@@ -5,6 +5,7 @@ import android.util.Log;
 import org.andstatus.todoagenda.calendar.CalendarEvent;
 import org.andstatus.todoagenda.prefs.OrderedEventSource;
 import org.andstatus.todoagenda.provider.QueryRow;
+import org.andstatus.todoagenda.util.MyClock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
@@ -112,10 +113,9 @@ public class IllegalInstantDueToTimeZoneTransitionTest extends BaseWidgetTest {
     /** https://github.com/andstatus/todoagenda/issues/13  */
     @Test
     public void testPeriodicAlarmTimeDuringTimeGap() {
-        DateTimeZone defaultZone = DateTimeZone.getDefault();
         try {
             DateTimeZone zone = DateTimeZone.forID("America/Winnipeg");
-            DateTimeZone.setDefault(zone);
+            MyClock.setDefaultTimeZone(zone);
             int periodMinutes = 10;
 
             DateTime nowUtc = new DateTime(2020, 3, 8, 2, 15,
@@ -140,7 +140,7 @@ public class IllegalInstantDueToTimeZoneTransitionTest extends BaseWidgetTest {
                     54 + 1 + periodMinutes - 60, zone);
             assertEquals(expWinnipeg, exactMinutesPlusMinutes(nowWinnipeg, periodMinutes));
         } finally {
-            DateTimeZone.setDefault(defaultZone);
+            MyClock.setDefaultTimeZone(null);
         }
     }
 }

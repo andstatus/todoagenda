@@ -155,7 +155,7 @@ public class InstanceSettings {
 
     static final String PREF_LOCK_TIME_ZONE = "lockTimeZone";
     static final String PREF_LOCKED_TIME_ZONE_ID = "lockedTimeZoneId";
-    private volatile MyClock clock = new MyClock();
+    private final MyClock clock = new MyClock();
 
     static final String PREF_SNAPSHOT_MODE = "snapshotMode";
     final static String PREF_REFRESH_PERIOD_MINUTES = "refreshPeriodMinutes";

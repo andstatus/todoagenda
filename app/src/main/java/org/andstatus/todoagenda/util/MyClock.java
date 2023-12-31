@@ -11,6 +11,7 @@ import org.joda.time.Minutes;
 
 /**
  * A clock, the can be changed independently from a Device clock
+ *
  * @author yvolk@yurivolkov.com
  */
 public class MyClock {
@@ -21,10 +22,16 @@ public class MyClock {
     private volatile DateTime snapshotDate = null;
     private volatile DateTime snapshotDateSetAt = null;
     private volatile String lockedTimeZoneId = "";
-    private volatile DateTimeZone zone;
+    private static volatile DateTimeZone defaultTimeZone = null;
+    private volatile DateTimeZone zone = getDefaultTimeZone();
 
-    public MyClock() {
-        zone = DateTimeZone.getDefault();
+
+    public static void setDefaultTimeZone(DateTimeZone zone) {
+        defaultTimeZone = zone;
+    }
+
+    public static DateTimeZone getDefaultTimeZone() {
+        return defaultTimeZone != null ? defaultTimeZone : DateTimeZone.forTimeZone(java.util.TimeZone.getDefault());
     }
 
     public void setSnapshotMode(SnapshotMode snapshotModeIn, InstanceSettings settings) {
@@ -47,13 +54,13 @@ public class MyClock {
         updateZone();
     }
 
-    private void updateZone() {
+    public void updateZone() {
         if (snapshotMode == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
             zone = snapshotDate.getZone();
         } else if (StringUtil.nonEmpty(lockedTimeZoneId)) {
             zone = DateTimeZone.forID(lockedTimeZoneId);
         } else {
-            zone = DateTimeZone.getDefault();
+            zone = getDefaultTimeZone();
         }
     }
 
@@ -76,8 +83,8 @@ public class MyClock {
         DateTime snapshotDate = this.snapshotDate;
         if (getSnapshotMode() == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
             return PermissionsUtil.isTestMode()
-                    ? getTimeMachineDate(zone)
-                    : snapshotDate.withZone(zone);
+                ? getTimeMachineDate(zone)
+                : snapshotDate.withZone(zone);
         } else {
             return DateTime.now(zone);
         }
@@ -132,7 +139,7 @@ public class MyClock {
 
     public int getNumberOfMinutesTo(DateTime date) {
         return Minutes.minutesBetween(now(date.getZone()), date)
-                .getMinutes();
+            .getMinutes();
     }
 
     public DateTime startOfTomorrow() {

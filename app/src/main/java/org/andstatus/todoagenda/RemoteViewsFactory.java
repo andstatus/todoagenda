@@ -183,6 +183,7 @@ public class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory
             InstanceSettings settings = AllSettings.instanceFromId(context, widgetId);
             RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_initial);
 
+            settings.clock().updateZone();
             configureWidgetHeader(settings, rv);
             configureWidgetEntriesList(settings, rv);
 

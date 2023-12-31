@@ -47,6 +47,8 @@ public class EnvironmentChangedReceiver extends BroadcastReceiver {
             IntentFilter filter = new IntentFilter();
             filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
             filter.addAction(Intent.ACTION_DREAMING_STOPPED);
+            filter.addAction(Intent.ACTION_TIME_CHANGED);
+            filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
             context.registerReceiver(receiver, filter);
 
             EnvironmentChangedReceiver oldReceiver = registeredReceiver.getAndSet(receiver);
