@@ -1,0 +1,1016 @@
+{
+  "deviceInfo": {
+    "versionCode": 33,
+    "versionRelease": "13",
+    "versionCodename": "REL",
+    "buildManufacturer": "Google",
+    "buildBrand": "google",
+    "buildModel": "sdk_gphone64_x86_64"
+  },
+  "applicationInfo": {
+    "versionName": "4.6.0",
+    "versionCode": 699
+  },
+  "settings": {
+    "widgetId": 2,
+    "widgetHeaderDateFormat": "defaultWeekday:",
+    "widgetInstanceName": "Test issue #102",
+    "activeSources": [
+      {
+        "providerType": 4,
+        "id": 1,
+        "title": "Default list",
+        "summary": "",
+        "color": 0,
+        "isAvailable": true
+      },
+      {
+        "providerType": 4,
+        "id": 2,
+        "title": "TaskList002",
+        "summary": "",
+        "color": -4142541,
+        "isAvailable": true
+      }
+    ],
+    "eventRange": 7,
+    "eventsEnded": "NONE",
+    "fillAllDay": true,
+    "hideBasedOnKeywords": "",
+    "widgetHeaderBackgroundColor": 0,
+    "pastEventsBackgroundColor": -1082623956,
+    "todaysEventsBackgroundColor": -620756993,
+    "backgroundColor": -2147483648,
+    "textColorSource": "auto",
+    "headerTheme": "DARK",
+    "widgetHeaderTextColor": -1694498817,
+    "dayHeaderThemePast": "DARK",
+    "dayHeaderTextColorPast": -3355444,
+    "entryThemePast": "BLACK",
+    "eventTextColorPast": -1,
+    "dayHeaderTheme": "LIGHT",
+    "dayHeaderTextColorToday": -8947849,
+    "entryTheme": "WHITE",
+    "eventTextColorToday": -16777216,
+    "dayHeaderThemeFuture": "DARK",
+    "dayHeaderTextColorFuture": -3355444,
+    "entryThemeFuture": "BLACK",
+    "eventTextColorFuture": -1,
+    "showDaysWithoutEvents": false,
+    "showDayHeaders": true,
+    "dayHeaderDateFormat": "defaultWeekday:",
+    "horizontalLineBelowDayHeader": false,
+    "showPastEventsUnderOneHeader": false,
+    "showPastEventsWithDefaultColor": false,
+    "showEventIcon": true,
+    "entryDateFormat": "days:bbbb",
+    "showEndTime": true,
+    "showLocation": true,
+    "dateFormat": "auto",
+    "lockedTimeZoneId": "",
+    "snapshotMode": "live_data",
+    "refreshPeriodMinutes": 10,
+    "eventEntryLayout": "DEFAULT",
+    "multiline_title": false,
+    "multiline_details": false,
+    "showOnlyClosestInstanceOfRecurringEvent": false,
+    "hideDuplicates": false,
+    "allDayEventsPlacement": "top_day",
+    "taskScheduling": "date_due",
+    "taskWithoutDates": "end_of_list",
+    "filterMode": "normal",
+    "indicateAlerts": true,
+    "indicateRecurring": false,
+    "compactLayout": false,
+    "widgetHeaderLayout": "ONE_ROW",
+    "textSizeScale": "1.0",
+    "dayHeaderAlignment": "RIGHT"
+  },
+  "resultsVersion": 3,
+  "results": [
+    {
+      "providerType": 4,
+      "executedAt": 1671198090390,
+      "timeZoneId": "UTC",
+      "millisOffsetUtcToLocal": 0,
+      "standardMillisOffsetUtcToLocal": 0,
+      "uri": "content:\/\/org.tasks\/todoagenda",
+      "projection": [
+        "gtl_account",
+        "cd_object",
+        "parent",
+        "cd_order",
+        "notes",
+        "dueDate",
+        "gt_last_sync",
+        "cd_last_sync",
+        "cdl_id",
+        "cdl_uuid",
+        "gt_parent",
+        "gt_task",
+        "read_only",
+        "cdl_url",
+        "cd_id",
+        "modified",
+        "cdl_color",
+        "cd_deleted",
+        "cdl_name",
+        "estimatedSeconds",
+        "cd_etag",
+        "gt_order",
+        "created",
+        "completed",
+        "recurrence",
+        "notificationFlags",
+        "gtl_color",
+        "cdl_icon",
+        "cd_calendar",
+        "gtl_icon",
+        "_id",
+        "lastNotified",
+        "cd_task",
+        "cdl_access",
+        "cdl_order",
+        "timerStart",
+        "importance",
+        "collapsed",
+        "cd_remote_id",
+        "title",
+        "gt_id",
+        "gt_remote_id",
+        "gt_deleted",
+        "gtl_remote_id",
+        "cdl_ctag",
+        "calendarUri",
+        "gtl_title",
+        "elapsedSeconds",
+        "gt_moved",
+        "gt_remote_order",
+        "cd_remote_parent",
+        "gtl_id",
+        "gtl_remote_order",
+        "hideUntil",
+        "remoteId",
+        "deleted",
+        "gt_remote_parent",
+        "gtl_last_sync",
+        "cdl_account",
+        "gt_list_id",
+        "repeat_from"
+      ],
+      "selection": "completed = 0 AND hideUntil <= 1671802890390 AND cdl_id IN ( 1,2 )",
+      "selectionArgs": [],
+      "sortOrder": "",
+      "rows": [
+        {
+          "cd_object": {
+            "type": 3,
+            "value": "3084174859008082270.ics"
+          },
+          "parent": {
+            "type": 1,
+            "value": 0
+          },
+          "dueDate": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_last_sync": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_id": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_uuid": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "read_only": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_id": {
+            "type": 1,
+            "value": 1
+          },
+          "modified": {
+            "type": 1,
+            "value": 1671196354979
+          },
+          "cdl_color": {
+            "type": 1,
+            "value": -4142541
+          },
+          "cd_deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_name": {
+            "type": 3,
+            "value": "TaskList002"
+          },
+          "estimatedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "created": {
+            "type": 1,
+            "value": 1671192578226
+          },
+          "completed": {
+            "type": 1,
+            "value": 0
+          },
+          "notificationFlags": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_icon": {
+            "type": 1,
+            "value": 1005
+          },
+          "cd_calendar": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "_id": {
+            "type": 1,
+            "value": 1
+          },
+          "lastNotified": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_task": {
+            "type": 1,
+            "value": 1
+          },
+          "cdl_access": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_order": {
+            "type": 1,
+            "value": -1
+          },
+          "timerStart": {
+            "type": 1,
+            "value": 0
+          },
+          "importance": {
+            "type": 1,
+            "value": 2
+          },
+          "collapsed": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_remote_id": {
+            "type": 3,
+            "value": "3084174859008082270"
+          },
+          "title": {
+            "type": 3,
+            "value": "Tomorrow's w\/o due date"
+          },
+          "elapsedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "hideUntil": {
+            "type": 1,
+            "value": 1671235200000
+          },
+          "remoteId": {
+            "type": 3,
+            "value": "3217542208110570599"
+          },
+          "deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_account": {
+            "type": 3,
+            "value": "local"
+          },
+          "repeat_from": {
+            "type": 1,
+            "value": 0
+          }
+        },
+        {
+          "cd_object": {
+            "type": 3,
+            "value": "1419410357152740838.ics"
+          },
+          "parent": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_order": {
+            "type": 1,
+            "value": 692885376
+          },
+          "dueDate": {
+            "type": 1,
+            "value": 1671364800000
+          },
+          "cd_last_sync": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_id": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_uuid": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "read_only": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_id": {
+            "type": 1,
+            "value": 3
+          },
+          "modified": {
+            "type": 1,
+            "value": 1671196338728
+          },
+          "cdl_color": {
+            "type": 1,
+            "value": -4142541
+          },
+          "cd_deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_name": {
+            "type": 3,
+            "value": "TaskList002"
+          },
+          "estimatedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "created": {
+            "type": 1,
+            "value": 1671195235817
+          },
+          "completed": {
+            "type": 1,
+            "value": 0
+          },
+          "notificationFlags": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_icon": {
+            "type": 1,
+            "value": 1005
+          },
+          "cd_calendar": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "_id": {
+            "type": 1,
+            "value": 3
+          },
+          "lastNotified": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_task": {
+            "type": 1,
+            "value": 3
+          },
+          "cdl_access": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_order": {
+            "type": 1,
+            "value": -1
+          },
+          "timerStart": {
+            "type": 1,
+            "value": 0
+          },
+          "importance": {
+            "type": 1,
+            "value": 2
+          },
+          "collapsed": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_remote_id": {
+            "type": 3,
+            "value": "1419410357152740838"
+          },
+          "title": {
+            "type": 3,
+            "value": "Tomottow's due in one day"
+          },
+          "elapsedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "hideUntil": {
+            "type": 1,
+            "value": 1671235200000
+          },
+          "remoteId": {
+            "type": 3,
+            "value": "1886328478965154954"
+          },
+          "deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_account": {
+            "type": 3,
+            "value": "local"
+          },
+          "repeat_from": {
+            "type": 1,
+            "value": 0
+          }
+        },
+        {
+          "cd_object": {
+            "type": 3,
+            "value": "1438920561784826976.ics"
+          },
+          "parent": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_order": {
+            "type": 1,
+            "value": 692885375
+          },
+          "dueDate": {
+            "type": 1,
+            "value": 1671278400000
+          },
+          "cd_last_sync": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_id": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_uuid": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "read_only": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_id": {
+            "type": 1,
+            "value": 4
+          },
+          "modified": {
+            "type": 1,
+            "value": 1671196329062
+          },
+          "cdl_color": {
+            "type": 1,
+            "value": -4142541
+          },
+          "cd_deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_name": {
+            "type": 3,
+            "value": "TaskList002"
+          },
+          "estimatedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "created": {
+            "type": 1,
+            "value": 1671196181657
+          },
+          "completed": {
+            "type": 1,
+            "value": 0
+          },
+          "notificationFlags": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_icon": {
+            "type": 1,
+            "value": 1005
+          },
+          "cd_calendar": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "_id": {
+            "type": 1,
+            "value": 4
+          },
+          "lastNotified": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_task": {
+            "type": 1,
+            "value": 4
+          },
+          "cdl_access": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_order": {
+            "type": 1,
+            "value": -1
+          },
+          "timerStart": {
+            "type": 1,
+            "value": 0
+          },
+          "importance": {
+            "type": 1,
+            "value": 2
+          },
+          "collapsed": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_remote_id": {
+            "type": 3,
+            "value": "1438920561784826976"
+          },
+          "title": {
+            "type": 3,
+            "value": "Tomorrow's task"
+          },
+          "elapsedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "hideUntil": {
+            "type": 1,
+            "value": 1671235200000
+          },
+          "remoteId": {
+            "type": 3,
+            "value": "1479686514770341575"
+          },
+          "deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_account": {
+            "type": 3,
+            "value": "local"
+          },
+          "repeat_from": {
+            "type": 1,
+            "value": 0
+          }
+        },
+        {
+          "cd_object": {
+            "type": 3,
+            "value": "1453763001022358262.ics"
+          },
+          "parent": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_order": {
+            "type": 1,
+            "value": 692885377
+          },
+          "dueDate": {
+            "type": 1,
+            "value": 1671883200000
+          },
+          "cd_last_sync": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_id": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_uuid": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "read_only": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_id": {
+            "type": 1,
+            "value": 2
+          },
+          "modified": {
+            "type": 1,
+            "value": 1671197005713
+          },
+          "cdl_color": {
+            "type": 1,
+            "value": -4142541
+          },
+          "cd_deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_name": {
+            "type": 3,
+            "value": "TaskList002"
+          },
+          "estimatedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "created": {
+            "type": 1,
+            "value": 1671192712472
+          },
+          "completed": {
+            "type": 1,
+            "value": 0
+          },
+          "notificationFlags": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_icon": {
+            "type": 1,
+            "value": 1005
+          },
+          "cd_calendar": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "_id": {
+            "type": 1,
+            "value": 2
+          },
+          "lastNotified": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_task": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_access": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_order": {
+            "type": 1,
+            "value": -1
+          },
+          "timerStart": {
+            "type": 1,
+            "value": 0
+          },
+          "importance": {
+            "type": 1,
+            "value": 2
+          },
+          "collapsed": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_remote_id": {
+            "type": 3,
+            "value": "1453763001022358262"
+          },
+          "title": {
+            "type": 3,
+            "value": "Tomorrow's 5PM due in one week"
+          },
+          "elapsedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "hideUntil": {
+            "type": 1,
+            "value": 1671296401000
+          },
+          "remoteId": {
+            "type": 3,
+            "value": "436131506587840851"
+          },
+          "deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_account": {
+            "type": 3,
+            "value": "local"
+          },
+          "repeat_from": {
+            "type": 1,
+            "value": 0
+          }
+        },
+        {
+          "cd_object": {
+            "type": 3,
+            "value": "1358936572998395438.ics"
+          },
+          "parent": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_order": {
+            "type": 1,
+            "value": 692885374
+          },
+          "dueDate": {
+            "type": 1,
+            "value": 1671310801000
+          },
+          "cd_last_sync": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_id": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_uuid": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "read_only": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_id": {
+            "type": 1,
+            "value": 5
+          },
+          "modified": {
+            "type": 1,
+            "value": 1671196740414
+          },
+          "cdl_color": {
+            "type": 1,
+            "value": -4142541
+          },
+          "cd_deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_name": {
+            "type": 3,
+            "value": "TaskList002"
+          },
+          "estimatedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "created": {
+            "type": 1,
+            "value": 1671196670293
+          },
+          "completed": {
+            "type": 1,
+            "value": 0
+          },
+          "notificationFlags": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_icon": {
+            "type": 1,
+            "value": 1005
+          },
+          "cd_calendar": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "_id": {
+            "type": 1,
+            "value": 5
+          },
+          "lastNotified": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_task": {
+            "type": 1,
+            "value": 5
+          },
+          "cdl_access": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_order": {
+            "type": 1,
+            "value": -1
+          },
+          "timerStart": {
+            "type": 1,
+            "value": 0
+          },
+          "importance": {
+            "type": 1,
+            "value": 2
+          },
+          "collapsed": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_remote_id": {
+            "type": 3,
+            "value": "1358936572998395438"
+          },
+          "title": {
+            "type": 3,
+            "value": "Tomorrow 8 to 9PM"
+          },
+          "elapsedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "hideUntil": {
+            "type": 1,
+            "value": 1671307201000
+          },
+          "remoteId": {
+            "type": 3,
+            "value": "4404916391041211118"
+          },
+          "deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_account": {
+            "type": 3,
+            "value": "local"
+          },
+          "repeat_from": {
+            "type": 1,
+            "value": 0
+          }
+        },
+        {
+          "cd_object": {
+            "type": 3,
+            "value": "2901783211416338024.ics"
+          },
+          "parent": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_order": {
+            "type": 1,
+            "value": 692885373
+          },
+          "dueDate": {
+            "type": 1,
+            "value": 1671451200000
+          },
+          "cd_last_sync": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_id": {
+            "type": 1,
+            "value": 2
+          },
+          "cdl_uuid": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "read_only": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_id": {
+            "type": 1,
+            "value": 6
+          },
+          "modified": {
+            "type": 1,
+            "value": 1671197281451
+          },
+          "cdl_color": {
+            "type": 1,
+            "value": -4142541
+          },
+          "cd_deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_name": {
+            "type": 3,
+            "value": "TaskList002"
+          },
+          "estimatedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "created": {
+            "type": 1,
+            "value": 1671197228110
+          },
+          "completed": {
+            "type": 1,
+            "value": 0
+          },
+          "notificationFlags": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_icon": {
+            "type": 1,
+            "value": 1005
+          },
+          "cd_calendar": {
+            "type": 3,
+            "value": "754287237378042658"
+          },
+          "_id": {
+            "type": 1,
+            "value": 6
+          },
+          "lastNotified": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_task": {
+            "type": 1,
+            "value": 6
+          },
+          "cdl_access": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_order": {
+            "type": 1,
+            "value": -1
+          },
+          "timerStart": {
+            "type": 1,
+            "value": 0
+          },
+          "importance": {
+            "type": 1,
+            "value": 2
+          },
+          "collapsed": {
+            "type": 1,
+            "value": 0
+          },
+          "cd_remote_id": {
+            "type": 3,
+            "value": "2901783211416338024"
+          },
+          "title": {
+            "type": 3,
+            "value": "Two days ahead due in a day"
+          },
+          "elapsedSeconds": {
+            "type": 1,
+            "value": 0
+          },
+          "hideUntil": {
+            "type": 1,
+            "value": 1671321600000
+          },
+          "remoteId": {
+            "type": 3,
+            "value": "3110617784557708046"
+          },
+          "deleted": {
+            "type": 1,
+            "value": 0
+          },
+          "cdl_account": {
+            "type": 3,
+            "value": "local"
+          },
+          "repeat_from": {
+            "type": 1,
+            "value": 0
+          }
+        }
+      ]
+    }
+  ]
+}

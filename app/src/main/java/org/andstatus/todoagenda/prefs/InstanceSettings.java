@@ -116,7 +116,9 @@ public class InstanceSettings {
     private boolean showPastEventsWithDefaultColor = false;
     static final String PREF_EVENT_RANGE = "eventRange";
     static final String PREF_EVENT_RANGE_DEFAULT = "30";
-    private int eventRange = Integer.parseInt(PREF_EVENT_RANGE_DEFAULT);
+    public static final int EVENT_RANGE_TODAY = 0;
+    public static final int EVENT_RANGE_TODAY_AND_TOMORROW = -1;
+    public int eventRange = Integer.parseInt(PREF_EVENT_RANGE_DEFAULT);
     static final String PREF_HIDE_BASED_ON_KEYWORDS = "hideBasedOnKeywords";
     private String hideBasedOnKeywords = "";
     static final String PREF_SHOW_BASED_ON_KEYWORDS = "showBasedOnKeywords";
@@ -529,14 +531,10 @@ public class InstanceSettings {
             : activeEventSources;
     }
 
-    public int getEventRange() {
-        return eventRange;
-    }
-
     public DateTime getEndOfTimeRange() {
-        return (getEventRange() > 0
-            ? clock.now().plusDays(getEventRange())
-            : clock.now().withTimeAtStartOfDay().plusDays(1))
+        return (eventRange > 0
+            ? clock.now().plusDays(eventRange)
+            : clock.now().withTimeAtStartOfDay().plusDays(1 - eventRange))
             .minusMillis(1);
     }
 

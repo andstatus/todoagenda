@@ -84,7 +84,7 @@ public class ApplicationPreferences {
             setDateFormat(context, PREF_WIDGET_HEADER_DATE_FORMAT, settings.getWidgetHeaderDateFormat());
             setString(context, PREF_WIDGET_INSTANCE_NAME, settings.getWidgetInstanceName());
             setActiveEventSources(context, settings.getActiveEventSources());
-            setEventRange(context, settings.getEventRange());
+            setEventRange(context, settings.eventRange);
             setEventsEnded(context, settings.getEventsEnded());
             setFillAllDayEvents(context, settings.getFillAllDayEvents());
             setHideBasedOnKeywords(context, settings.getHideBasedOnKeywords());

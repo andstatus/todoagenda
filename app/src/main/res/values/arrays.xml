@@ -68,6 +68,7 @@
     </string-array>
     <string-array name="pref_event_range_entries">
         <item>@string/event_range_today</item>
+        <item>@string/event_range_today_and_tomorrow</item>
         <item>@string/event_range_one_day</item>
         <item>@string/event_range_one_week</item>
         <item>@string/event_range_two_weeks</item>
@@ -79,6 +80,7 @@
     </string-array>
     <string-array name="pref_event_range_values" tools:ignore="MissingTranslation">
         <item>0</item>
+        <item>-1</item>
         <item>1</item>
         <item>7</item>
         <item>14</item>

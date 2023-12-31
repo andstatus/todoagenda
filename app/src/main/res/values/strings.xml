@@ -182,6 +182,7 @@
     <string name="event_details_event_range_title">Date range</string>
     <string name="event_details_event_range_desc">Configure the number of events to display</string>
     <string name="event_range_today">Today</string>
+    <string name="event_range_today_and_tomorrow">Today and Tomorrow</string>
     <string name="event_range_one_day">One day</string>
     <string name="event_range_one_week">One week</string>
     <string name="event_range_two_weeks">Two weeks</string>

@@ -98,7 +98,10 @@ In particular, see these solutions:
 
 <a id="v4.7"/>
 
-### 2023-12-30 v4.7.1 Show based on keywords in a title
+### 2023-12-31 v4.7.2 Show based on keywords in a title
+* Date range filtering extended with "[Today and Tomorrow](https://github.com/plusonelabs/calendar-widget/issues/123)"
+  option. This is different from the "One day" option as that hides events after current time on the next day,
+  which is a bit confusing.
 * [Show based on keywords in a title](https://github.com/plusonelabs/calendar-widget/issues/122) option added,
   allowing to see events that have certain text included. 
   In addition to existing option "Hide based on keywords in a title".
