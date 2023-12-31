@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 /**
  * Loaded settings of one Widget
+ *
  * @author yvolk@yurivolkov.com
  */
 public class InstanceSettings {
@@ -121,7 +122,7 @@ public class InstanceSettings {
     static final String PREF_SHOW_BASED_ON_KEYWORDS = "showBasedOnKeywords";
     private String showBasedOnKeywords = "";
     static final String PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT =
-            "showOnlyClosestInstanceOfRecurringEvent";
+        "showOnlyClosestInstanceOfRecurringEvent";
     private boolean showOnlyClosestInstanceOfRecurringEvent = false;
     static final String PREF_HIDE_DUPLICATES = "hideDuplicates";
     private boolean hideDuplicates = false;
@@ -167,7 +168,7 @@ public class InstanceSettings {
         String instanceName = json.optString(PREF_WIDGET_INSTANCE_NAME);
 
         if (storedSettings != null && storedSettings.isForTestsReplaying() &&
-                !instanceName.endsWith(TEST_REPLAY_SUFFIX)) {
+            !instanceName.endsWith(TEST_REPLAY_SUFFIX)) {
             instanceName = (StringUtil.isEmpty(instanceName) ? "" : instanceName + " - ") + TEST_REPLAY_SUFFIX;
         }
 
@@ -182,11 +183,11 @@ public class InstanceSettings {
         try {
             if (json.has(PREF_WIDGET_HEADER_DATE_FORMAT)) {
                 widgetHeaderDateFormat = DateFormatValue.load(
-                        json.getString(PREF_WIDGET_HEADER_DATE_FORMAT), PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT);
+                    json.getString(PREF_WIDGET_HEADER_DATE_FORMAT), PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT);
             } else if (json.has(PREF_SHOW_DATE_ON_WIDGET_HEADER)) {
                 widgetHeaderDateFormat = json.getBoolean(PREF_SHOW_DATE_ON_WIDGET_HEADER)
-                        ? PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
-                        : DateFormatType.HIDDEN.defaultValue();
+                    ? PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
+                    : DateFormatType.HIDDEN.defaultValue();
             }
             if (json.has(PREF_ACTIVE_SOURCES)) {
                 JSONArray jsonArray = json.getJSONArray(PREF_ACTIVE_SOURCES);
@@ -210,10 +211,10 @@ public class InstanceSettings {
 
             boolean differentColorsForDark = ColorThemeType.canHaveDifferentColorsForDark() && json.has(PREF_DARK_THEME);
             defaultColors = ThemeColors.fromJson(context,
-                    differentColorsForDark ? ColorThemeType.LIGHT : ColorThemeType.SINGLE, json);
+                differentColorsForDark ? ColorThemeType.LIGHT : ColorThemeType.SINGLE, json);
             darkColors = differentColorsForDark
-                    ? ThemeColors.fromJson(context, ColorThemeType.DARK, json.getJSONObject(PREF_DARK_THEME))
-                    : ThemeColors.EMPTY;
+                ? ThemeColors.fromJson(context, ColorThemeType.DARK, json.getJSONObject(PREF_DARK_THEME))
+                : ThemeColors.EMPTY;
 
             if (json.has(PREF_SHOW_DAYS_WITHOUT_EVENTS)) {
                 showDaysWithoutEvents = json.getBoolean(PREF_SHOW_DAYS_WITHOUT_EVENTS);
@@ -223,7 +224,7 @@ public class InstanceSettings {
             }
             if (json.has(PREF_DAY_HEADER_DATE_FORMAT)) {
                 dayHeaderDateFormat = DateFormatValue.load(
-                        json.getString(PREF_DAY_HEADER_DATE_FORMAT), PREF_DAY_HEADER_DATE_FORMAT_DEFAULT);
+                    json.getString(PREF_DAY_HEADER_DATE_FORMAT), PREF_DAY_HEADER_DATE_FORMAT_DEFAULT);
             }
             if (json.has(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER)) {
                 horizontalLineBelowDayHeader = json.getBoolean(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER);
@@ -242,12 +243,12 @@ public class InstanceSettings {
             }
             if (json.has(PREF_ENTRY_DATE_FORMAT)) {
                 entryDateFormat = DateFormatValue.load(
-                        json.getString(PREF_ENTRY_DATE_FORMAT), PREF_ENTRY_DATE_FORMAT_DEFAULT);
+                    json.getString(PREF_ENTRY_DATE_FORMAT), PREF_ENTRY_DATE_FORMAT_DEFAULT);
             } else if (json.has(PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT)) {
                 entryDateFormat = (json.getBoolean(PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT) &&
-                            eventEntryLayout == EventEntryLayout.ONE_LINE
-                        ? DateFormatType.NUMBER_OF_DAYS
-                        : DateFormatType.HIDDEN)
+                    eventEntryLayout == EventEntryLayout.ONE_LINE
+                    ? DateFormatType.NUMBER_OF_DAYS
+                    : DateFormatType.HIDDEN)
                     .defaultValue();
             }
             if (json.has(PREF_SHOW_END_TIME)) {
@@ -273,7 +274,7 @@ public class InstanceSettings {
             }
             if (json.has(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT)) {
                 showOnlyClosestInstanceOfRecurringEvent = json.getBoolean(
-                        PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT);
+                    PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT);
             }
             if (json.has(PREF_HIDE_DUPLICATES)) {
                 hideDuplicates = json.getBoolean(PREF_HIDE_DUPLICATES);
@@ -322,8 +323,8 @@ public class InstanceSettings {
     static InstanceSettings fromApplicationPreferences(Context context, int widgetId, InstanceSettings settingsStored) {
         synchronized (ApplicationPreferences.class) {
             InstanceSettings settings = new InstanceSettings(context, widgetId,
-                    ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME,
-                            ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, "")));
+                ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME,
+                    ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, "")));
             return settings.setFromApplicationPreferences(settingsStored);
         }
     }
@@ -341,16 +342,16 @@ public class InstanceSettings {
             case DARK:
                 darkColors = new ThemeColors(context, ColorThemeType.DARK).setFromApplicationPreferences();
                 defaultColors = settingsStored == null
-                        ? darkColors
-                        : settingsStored.defaultColors.copy(context, ColorThemeType.LIGHT);
+                    ? darkColors
+                    : settingsStored.defaultColors.copy(context, ColorThemeType.LIGHT);
                 break;
             case LIGHT:
                 defaultColors = new ThemeColors(context, ColorThemeType.LIGHT).setFromApplicationPreferences();
                 darkColors = settingsStored == null
                     ? defaultColors
                     : settingsStored.darkColors.isEmpty()
-                        ? settingsStored.defaultColors.copy(context, ColorThemeType.DARK)
-                        : settingsStored.darkColors.copy(context, ColorThemeType.DARK);
+                    ? settingsStored.defaultColors.copy(context, ColorThemeType.DARK)
+                    : settingsStored.darkColors.copy(context, ColorThemeType.DARK);
                 break;
             case SINGLE:
                 darkColors = ThemeColors.EMPTY;
@@ -359,8 +360,8 @@ public class InstanceSettings {
             case NONE:
                 darkColors = ThemeColors.EMPTY;
                 defaultColors = settingsStored == null
-                        ? darkColors
-                        : settingsStored.defaultColors.copy(context, ColorThemeType.SINGLE);
+                    ? darkColors
+                    : settingsStored.defaultColors.copy(context, ColorThemeType.SINGLE);
                 break;
         }
 
@@ -380,7 +381,7 @@ public class InstanceSettings {
         multilineTitle = ApplicationPreferences.isMultilineTitle(context);
         multilineDetails = ApplicationPreferences.isMultilineDetails(context);
         showOnlyClosestInstanceOfRecurringEvent = ApplicationPreferences
-                .getShowOnlyClosestInstanceOfRecurringEvent(context);
+            .getShowOnlyClosestInstanceOfRecurringEvent(context);
         hideDuplicates = ApplicationPreferences.getHideDuplicates(context);
         setAllDayEventsPlacement(ApplicationPreferences.getAllDayEventsPlacement(context));
         taskScheduling = ApplicationPreferences.getTaskScheduling(context);
@@ -391,9 +392,9 @@ public class InstanceSettings {
         compactLayout = ApplicationPreferences.isCompactLayout(context);
         widgetHeaderLayout = ApplicationPreferences.getWidgetHeaderLayout(context);
         textSizeScale = TextSizeScale.fromPreferenceValue(
-                ApplicationPreferences.getString(context, PREF_TEXT_SIZE_SCALE, ""));
+            ApplicationPreferences.getString(context, PREF_TEXT_SIZE_SCALE, ""));
         dayHeaderAlignment = ApplicationPreferences.getString(context, PREF_DAY_HEADER_ALIGNMENT,
-                PREF_DAY_HEADER_ALIGNMENT_DEFAULT);
+            PREF_DAY_HEADER_ALIGNMENT_DEFAULT);
 
         clock().setLockedTimeZoneId(ApplicationPreferences.getLockedTimeZoneId(context));
         if (settingsStored != null && settingsStored.hasResults()) {
@@ -419,7 +420,9 @@ public class InstanceSettings {
         return widgetId == 0;
     }
 
-    /** @return true if success */
+    /**
+     * @return true if success
+     */
     boolean save(String tag, String method) {
         String msgLog = "save from " + method;
         if (widgetId == 0) {
@@ -514,7 +517,7 @@ public class InstanceSettings {
 
     public List<OrderedEventSource> getActiveEventSources(EventProviderType type) {
         List<OrderedEventSource> sources = new ArrayList<>();
-        for(OrderedEventSource orderedSource: getActiveEventSources()) {
+        for (OrderedEventSource orderedSource : getActiveEventSources()) {
             if (orderedSource.source.providerType == type) sources.add(orderedSource);
         }
         return sources;
@@ -522,8 +525,8 @@ public class InstanceSettings {
 
     public List<OrderedEventSource> getActiveEventSources() {
         return activeEventSources.isEmpty() && isLiveMode()
-                ? EventProviderType.getAvailableSources()
-                : activeEventSources;
+            ? EventProviderType.getAvailableSources()
+            : activeEventSources;
     }
 
     public int getEventRange() {
@@ -531,9 +534,10 @@ public class InstanceSettings {
     }
 
     public DateTime getEndOfTimeRange() {
-        return getEventRange() > 0
-                ? clock.now().plusDays(getEventRange())
-                : clock.now().withTimeAtStartOfDay().plusDays(1);
+        return (getEventRange() > 0
+            ? clock.now().plusDays(getEventRange())
+            : clock.now().withTimeAtStartOfDay().plusDays(1))
+            .minusMillis(1);
     }
 
     public EndedSomeTimeAgo getEventsEnded() {
@@ -558,8 +562,8 @@ public class InstanceSettings {
 
     public ThemeColors colors() {
         return !darkColors.isEmpty() && isDarkThemeOn(context)
-                ? darkColors
-                : defaultColors;
+            ? darkColors
+            : defaultColors;
     }
 
     public static boolean isDarkThemeOn(Context context) {
@@ -700,13 +704,13 @@ public class InstanceSettings {
 
     public FilterMode getFilterMode() {
         return filterMode == FilterMode.NORMAL_FILTER && clock().getSnapshotMode().isSnapshotMode()
-                ? FilterMode.DEBUG_FILTER
-                : filterMode;
+            ? FilterMode.DEBUG_FILTER
+            : filterMode;
     }
 
     public InstanceSettings setFilterMode(FilterMode filterMode) {
-         this.filterMode = filterMode;
-         return this;
+        this.filterMode = filterMode;
+        return this;
     }
 
     @Override
@@ -757,13 +761,13 @@ public class InstanceSettings {
 
     public boolean noPastEvents() {
         return filterMode != FilterMode.NO_FILTERING &&
-                !getShowPastEventsWithDefaultColor() &&
-                getEventsEnded() == EndedSomeTimeAgo.NONE &&
-                noTaskSources();
+            !getShowPastEventsWithDefaultColor() &&
+            getEventsEnded() == EndedSomeTimeAgo.NONE &&
+            noTaskSources();
     }
 
     public boolean noTaskSources() {
-        for(OrderedEventSource orderedSource: getActiveEventSources()) {
+        for (OrderedEventSource orderedSource : getActiveEventSources()) {
             if (!orderedSource.source.providerType.isCalendar) return false;
         }
         return true;
@@ -774,7 +778,7 @@ public class InstanceSettings {
     }
 
     public OrderedEventSource getActiveEventSource(EventProviderType type, int sourceId) {
-        for(OrderedEventSource orderedSource: getActiveEventSources()) {
+        for (OrderedEventSource orderedSource : getActiveEventSources()) {
             if (orderedSource.source.providerType == type && orderedSource.source.getId() == sourceId) {
                 return orderedSource;
             }
@@ -782,7 +786,7 @@ public class InstanceSettings {
         if (isSnapshotMode()) {
             // TODO: Map Calendars when moving between devices
             EventSource eventSource = new EventSource(type, sourceId, "(" + type + " #" + sourceId + ")",
-                    "", 0, false);
+                "", 0, false);
             OrderedEventSource orderedSource = new OrderedEventSource(eventSource, getActiveEventSources().size() + 1);
             getActiveEventSources().add(orderedSource);
             return orderedSource;
@@ -792,7 +796,7 @@ public class InstanceSettings {
     }
 
     public OrderedEventSource getFirstSource(boolean isCalendar) {
-        for(OrderedEventSource orderedSource: getActiveEventSources()) {
+        for (OrderedEventSource orderedSource : getActiveEventSources()) {
             if (orderedSource.source.providerType.isCalendar == isCalendar) {
                 return orderedSource;
             }
