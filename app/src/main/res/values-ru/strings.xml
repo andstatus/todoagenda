@@ -170,7 +170,7 @@
     <string name="ended_three_months_ago">Завершились три месяца назад</string>
     <string name="ended_six_months_ago">Завершились шесть месяцев назад</string>
     <string name="ended_one_year_ago">Завершились год назад</string>
-    <string name="pref_hide_based_on_keywords_title">Скрыть при начичии ключевых слов в названии</string>
+    <string name="pref_hide_based_on_keywords_title">Скрыть при наличии ключевых слов в названии</string>
     <string name="pref_show_based_on_keywords_title">Показать только при начичии ключевых слов в названии</string>
     <string name="show_only_closest_instance_of_recurring_event">Показать только ближайший экземпляр повторяющегося события</string>
     <string name="hide_duplicates">Убрать дубликаты</string>

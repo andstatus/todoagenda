@@ -1,2 +1,2 @@
-v4.7.2 Filter for Today and Tomorrow. Show based on keywords in a title. Allow changing language of User Interface for Android 13+
+v4.7.3 Filter for Today and Tomorrow. Show based on keywords in a title. Allow changing language of User Interface for Android 13+
 
