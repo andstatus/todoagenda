@@ -43,7 +43,7 @@ fun interface CheckedPredicate<T> {
      * @return a new `CheckedPredicate` with `p1.and(p2).test(t) == true :<=> p1.test(t) && p2.test(t) == true`
      * @throws NullPointerException if the given predicate `that` is null
      */
-    fun and(that: CheckedPredicate<in T>): CheckedPredicate<T>? {
+    fun and(that: CheckedPredicate<in T>): CheckedPredicate<T> {
         Objects.requireNonNull(that, "that is null")
         return CheckedPredicate { t: T -> test(t) && that.test(t) }
     }
@@ -53,7 +53,7 @@ fun interface CheckedPredicate<T> {
      *
      * @return A new `CheckedPredicate` with `p.negate().test(t) == true :<=> p.test(t) == false`
      */
-    fun negate(): CheckedPredicate<T>? {
+    fun negate(): CheckedPredicate<T> {
         return CheckedPredicate { t: T -> !test(t) }
     }
 
@@ -64,7 +64,7 @@ fun interface CheckedPredicate<T> {
      * @return a new `CheckedPredicate` with `p1.or(p2).test(t) :<=> p1.test(t) || p2.test(t)`
      * @throws NullPointerException if the given predicate `that` is null
      */
-    fun or(that: CheckedPredicate<in T>): CheckedPredicate<T>? {
+    fun or(that: CheckedPredicate<in T>): CheckedPredicate<T> {
         Objects.requireNonNull(that, "that is null")
         return CheckedPredicate { t: T -> test(t) || that.test(t) }
     }
@@ -79,9 +79,9 @@ fun interface CheckedPredicate<T> {
          * @throws NullPointerException if the given predicate `that` is null
         </T> */
         @JvmStatic
-        fun <T> not(that: CheckedPredicate<in T>): CheckedPredicate<T>? {
+        fun <T> not(that: CheckedPredicate<in T>): CheckedPredicate<T> {
             Objects.requireNonNull(that, "that is null")
-            return that.negate() as CheckedPredicate<T>?
+            return that.negate() as CheckedPredicate<T>
         }
     }
 }

@@ -16,1165 +16,841 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.vavr.control;
+package io.vavr.control
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.util.Objects
+import java.util.Optional
+import java.util.concurrent.Callable
+import java.util.function.Consumer
+import java.util.function.Function
+import java.util.stream.Collectors
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-@SuppressWarnings("deprecation")
-class TryTest {
-
-    // -- Testees
-
-    private static final String SUCCESS_VALUE = "success";
-    private static final Try<String> SUCCESS = Try.success(SUCCESS_VALUE);
-
-    private static final Exception FAILURE_CAUSE = new IllegalStateException("failure");
-    private static final Try<String> FAILURE = Try.failure(FAILURE_CAUSE);
-
-    private static final Error ERROR = new Error();
-    private static final AssertionError ASSERTION_ERROR = new AssertionError("unexpected");
-
-    private static final LinkageError LINKAGE_ERROR = new LinkageError();
-    private static final ThreadDeath THREAD_DEATH = new ThreadDeath();
-    private static final VirtualMachineError VM_ERROR = new VirtualMachineError() {
-        private static final long serialVersionUID = 1L;
-    };
-
+@Suppress("deprecation")
+internal class TryTest {
     // -- static .of(Callable)
-
     @Test
-    void shouldCreateSuccessWhenCallingTryOfWithNullValue() {
-        assertNotNull(Try.of(() -> null));
+    fun shouldCreateSuccessWhenCallingTryOfWithNullValue() {
+        Assertions.assertNotNull(Try.of<Any?> { null })
     }
 
     @Test
-    void shouldCreateSuccessWhenCallingTryOfCallable() {
-        assertTrue(Try.of(() -> SUCCESS_VALUE).isSuccess);
+    fun shouldCreateSuccessWhenCallingTryOfCallable() {
+        Assertions.assertTrue(Try.of { SUCCESS_VALUE }.isSuccess)
     }
 
     @Test
-    void shouldCreateFailureWhenCallingTryOfCallable() {
-        assertTrue(Try.of(() -> { throw FAILURE_CAUSE; }).isFailure);
+    fun shouldCreateFailureWhenCallingTryOfCallable() {
+        Assertions.assertTrue(Try.of<Any> { throw FAILURE_CAUSE }.isFailure)
     }
 
     @Test
-    void shouldThrowNPEWhenCallingTryOfCallable() {
-        assertEquals(
-                "callable is null",
-                assertThrows(NullPointerException.class, () -> Try.of(null)).getMessage()
-        );
+    fun shouldRethrowLinkageErrorWhenCallingTryOfCallable() {
+        Assertions.assertSame(
+            LINKAGE_ERROR,
+            Assertions.assertThrows(LINKAGE_ERROR.javaClass) {
+                Try.of(
+                    Callable<Any> { throw LINKAGE_ERROR })
+            }
+        )
     }
 
     @Test
-    void shouldRethrowLinkageErrorWhenCallingTryOfCallable() {
-        assertSame(
-                LINKAGE_ERROR,
-                assertThrows(LINKAGE_ERROR.getClass(), () -> Try.of(() -> { throw LINKAGE_ERROR; }))
-        );
+    fun shouldRethrowThreadDeathWhenCallingTryOfCallable() {
+        Assertions.assertSame(
+            THREAD_DEATH,
+            Assertions.assertThrows(THREAD_DEATH.javaClass) {
+                Try.of(
+                    Callable<Any> { throw THREAD_DEATH })
+            }
+        )
     }
 
     @Test
-    void shouldRethrowThreadDeathWhenCallingTryOfCallable() {
-        assertSame(
-                THREAD_DEATH,
-                assertThrows(THREAD_DEATH.getClass(), () -> Try.of(() -> { throw THREAD_DEATH; }))
-        );
+    fun shouldRethrowVirtualMachoneErrorWhenCallingTryOfCallable() {
+        Assertions.assertSame(
+            VM_ERROR,
+            Assertions.assertThrows(VM_ERROR.javaClass) {
+                Try.of(
+                    Callable<Any> { throw VM_ERROR })
+            }
+        )
     }
 
     @Test
-    void shouldRethrowVirtualMachoneErrorWhenCallingTryOfCallable() {
-        assertSame(
-                VM_ERROR,
-                assertThrows(VM_ERROR.getClass(), () -> Try.of(() -> { throw VM_ERROR; }))
-        );
+    fun shouldBeIndistinguishableWhenCreatingFailureWithOfFactoryOrWithFailureFactory() {
+        val failure1 = Try.of<String> { throw FAILURE_CAUSE }
+        val failure2 = Try.failure<String>(FAILURE_CAUSE)
+        Assertions.assertSame(
+            FAILURE_CAUSE,
+            Assertions.assertThrows(NonFatalException::class.java) { failure1.get() }.cause
+        )
+        Assertions.assertSame(
+            FAILURE_CAUSE,
+            Assertions.assertThrows(NonFatalException::class.java) { failure2.get() }.cause
+        )
+        Assertions.assertSame(failure1.cause, failure2.cause)
+        Assertions.assertEquals(failure1.isFailure, failure2.isFailure)
+        Assertions.assertEquals(failure1.isSuccess, failure2.isSuccess)
+        Assertions.assertEquals(failure1, failure2)
+        Assertions.assertEquals(failure1.hashCode(), failure2.hashCode())
+        Assertions.assertEquals(failure1.toString(), failure2.toString())
     }
 
     @Test
-    void shouldBeIndistinguishableWhenCreatingFailureWithOfFactoryOrWithFailureFactory() {
-        final Try<String> failure1 = Try.of(() -> { throw FAILURE_CAUSE; });
-        final Try<String> failure2 = Try.failure(FAILURE_CAUSE);
-        assertSame(
-                FAILURE_CAUSE,
-                assertThrows(NonFatalException.class, failure1::get).getCause()
-        );
-        assertSame(
-                FAILURE_CAUSE,
-                assertThrows(NonFatalException.class, failure2::get).getCause()
-        );
-        assertSame(failure1.cause, failure2.cause);
-        assertEquals(failure1.isFailure, failure2.isFailure);
-        assertEquals(failure1.isSuccess, failure2.isSuccess);
-        assertEquals(failure1, failure2);
-        assertEquals(failure1.hashCode(), failure2.hashCode());
-        assertEquals(failure1.toString(), failure2.toString());
-    }
-
-    @Test
-    void shouldBeIndistinguishableWhenCreatingSuccessWithOfFactoryOrWithSuccessFactory() {
-        final Try<String> success1 = Try.of(() -> SUCCESS_VALUE);
-        final Try<String> success2 = Try.success(SUCCESS_VALUE);
-        assertSame(success1.get(), success2.get());
-        assertThrows(UnsupportedOperationException.class, success1::getCause);
-        assertThrows(UnsupportedOperationException.class, success2::getCause);
-        assertEquals(success1.isFailure, success2.isFailure);
-        assertEquals(success1.isSuccess, success2.isSuccess);
-        assertEquals(success1, success2);
-        assertEquals(success1.hashCode(), success2.hashCode());
-        assertEquals(success1.toString(), success2.toString());
+    fun shouldBeIndistinguishableWhenCreatingSuccessWithOfFactoryOrWithSuccessFactory() {
+        val success1 = Try.of { SUCCESS_VALUE }
+        val success2 = Try.success(SUCCESS_VALUE)
+        Assertions.assertSame(success1.get(), success2.get())
+        Assertions.assertThrows(UnsupportedOperationException::class.java) { success1.cause }
+        Assertions.assertThrows(UnsupportedOperationException::class.java) { success2.cause }
+        Assertions.assertEquals(success1.isFailure, success2.isFailure)
+        Assertions.assertEquals(success1.isSuccess, success2.isSuccess)
+        Assertions.assertEquals(success1, success2)
+        Assertions.assertEquals(success1.hashCode(), success2.hashCode())
+        Assertions.assertEquals(success1.toString(), success2.toString())
     }
 
     // -- static .run(CheckedRunnable)
-
     @Test
-    void shouldCreateSuccessWhenCallingTryRunCheckedRunnable() {
-        assertTrue(Try.run(() -> {}).isSuccess);
+    fun shouldCreateSuccessWhenCallingTryRunCheckedRunnable() {
+        Assertions.assertTrue(Try.run {}.isSuccess)
     }
 
     @Test
-    void shouldCreateFailureWhenCallingTryRunCheckedRunnable() {
-        assertTrue(Try.run(() -> { throw ERROR; }).isFailure);
+    fun shouldCreateFailureWhenCallingTryRunCheckedRunnable() {
+        Assertions.assertTrue(Try.run { throw ERROR }.isFailure)
     }
 
     @Test
-    void shouldThrowNPEWhenCallingTryRunCheckedRunnable() {
-        assertEquals(
-                "runnable is null",
-                assertThrows(NullPointerException.class, () -> Try.run(null)).getMessage()
-        );
+    fun shouldRethrowLinkageErrorWhenCallingTryRunCheckedRunnable() {
+        Assertions.assertSame(
+            LINKAGE_ERROR,
+            Assertions.assertThrows(LINKAGE_ERROR.javaClass) { Try.run { throw LINKAGE_ERROR } }
+        )
     }
 
     @Test
-    void shouldRethrowLinkageErrorWhenCallingTryRunCheckedRunnable() {
-        assertSame(
-                LINKAGE_ERROR,
-                assertThrows(LINKAGE_ERROR.getClass(), () -> Try.run(() -> { throw LINKAGE_ERROR; }))
-        );
+    fun shouldRethrowThreadDeathWhenCallingTryRunCheckedRunnable() {
+        Assertions.assertSame(
+            THREAD_DEATH,
+            Assertions.assertThrows(THREAD_DEATH.javaClass) { Try.run { throw THREAD_DEATH } }
+        )
     }
 
     @Test
-    void shouldRethrowThreadDeathWhenCallingTryRunCheckedRunnable() {
-        assertSame(
-                THREAD_DEATH,
-                assertThrows(THREAD_DEATH.getClass(), () -> Try.run(() -> { throw THREAD_DEATH; }))
-        );
-    }
-
-    @Test
-    void shouldRethrowVirtualMachineErrorWhenCallingTryRunCheckedRunnable() {
-        assertSame(
-                VM_ERROR,
-                assertThrows(VM_ERROR.getClass(), () -> Try.run(() -> { throw VM_ERROR; }))
-        );
+    fun shouldRethrowVirtualMachineErrorWhenCallingTryRunCheckedRunnable() {
+        Assertions.assertSame(
+            VM_ERROR,
+            Assertions.assertThrows(VM_ERROR.javaClass) { Try.run { throw VM_ERROR } }
+        )
     }
 
     // -- static .success(Object)
-    
     @Test
-    void shouldCreateSuccessWithNullValue() {
-        assertNotNull(Try.success(null));
+    fun shouldCreateSuccessWithNullValue() {
+        Assertions.assertNotNull(Try.success<Any?>(null))
     }
 
     @Test
-    void shouldCreateSuccess() {
-        assertNotNull(Try.success(SUCCESS_VALUE));
+    fun shouldCreateSuccess() {
+        Assertions.assertNotNull(Try.success(SUCCESS_VALUE))
     }
 
     @Test
-    void shouldVerifyBasicSuccessProperties() {
-        assertSame(SUCCESS_VALUE, SUCCESS.get());
-        assertSame(
-                "getCause() on Success",
-                assertThrows(UnsupportedOperationException.class, SUCCESS::getCause).getMessage()
-        );
-        assertFalse(SUCCESS.isFailure);
-        assertTrue(SUCCESS.isSuccess);
-        assertEquals(Try.success(SUCCESS_VALUE), SUCCESS);
-        assertEquals(31 + Objects.hashCode(SUCCESS_VALUE), SUCCESS.hashCode());
-        assertEquals("Success(" + SUCCESS_VALUE + ")", SUCCESS.toString());
-    }
-
-    // -- static .failure(Throwable)
-
-    @Test
-    void shouldCreateFailureWithNullValue() {
-        assertNotNull(Try.failure(null));
+    fun shouldVerifyBasicSuccessProperties() {
+        Assertions.assertSame(SUCCESS_VALUE, SUCCESS.get())
+        Assertions.assertSame(
+            "getCause() on Success",
+            Assertions.assertThrows(UnsupportedOperationException::class.java) { SUCCESS.cause }.message
+        )
+        Assertions.assertFalse(SUCCESS.isFailure)
+        Assertions.assertTrue(SUCCESS.isSuccess)
+        Assertions.assertEquals(Try.success(SUCCESS_VALUE), SUCCESS)
+        Assertions.assertEquals(31 + Objects.hashCode(SUCCESS_VALUE), SUCCESS.hashCode())
+        Assertions.assertEquals("Success(" + SUCCESS_VALUE + ")", SUCCESS.toString())
     }
 
     @Test
-    void shouldCreateFailure() {
-        assertNotNull(Try.failure(FAILURE_CAUSE));
+    fun shouldCreateFailure() {
+        Assertions.assertNotNull(Try.failure<Any>(FAILURE_CAUSE))
     }
 
     @Test
-    void shouldVerifyBasicFailureProperties() {
-        assertSame(
-                FAILURE_CAUSE,
-                assertThrows(RuntimeException.class, FAILURE::get).getCause()
-        );
-        assertSame(FAILURE_CAUSE, FAILURE.cause);
-        assertFalse(FAILURE.isSuccess);
-        assertTrue(FAILURE.isFailure);
-        assertEquals(Try.failure(FAILURE_CAUSE), FAILURE);
-        assertEquals(Objects.hashCode(FAILURE_CAUSE), FAILURE.hashCode());
-        assertEquals("Failure(" + FAILURE_CAUSE + ")", FAILURE.toString());
+    fun shouldVerifyBasicFailureProperties() {
+        Assertions.assertSame(
+            FAILURE_CAUSE,
+            Assertions.assertThrows(RuntimeException::class.java) { FAILURE.get() }.cause
+        )
+        Assertions.assertSame(FAILURE_CAUSE, FAILURE.cause)
+        Assertions.assertFalse(FAILURE.isSuccess)
+        Assertions.assertTrue(FAILURE.isFailure)
+        Assertions.assertEquals(Try.failure<Any>(FAILURE_CAUSE), FAILURE)
+        Assertions.assertEquals(Objects.hashCode(FAILURE_CAUSE), FAILURE.hashCode())
+        Assertions.assertEquals("Failure(" + FAILURE_CAUSE + ")", FAILURE.toString())
     }
 
     @Test
-    void shouldRethrowLinkageErrorWhenCallingTryFailure() {
-        assertSame(
-                LINKAGE_ERROR,
-                assertThrows(LINKAGE_ERROR.getClass(), () -> Try.failure(LINKAGE_ERROR))
-        );
+    fun shouldRethrowLinkageErrorWhenCallingTryFailure() {
+        Assertions.assertSame(
+            LINKAGE_ERROR,
+            Assertions.assertThrows(LINKAGE_ERROR.javaClass) { Try.failure<Any>(LINKAGE_ERROR) }
+        )
     }
 
     @Test
-    void shouldRethrowThreadDeathWhenCallingTryFailure() {
-        assertSame(
-                THREAD_DEATH,
-                assertThrows(THREAD_DEATH.getClass(), () -> Try.failure(THREAD_DEATH))
-        );
+    fun shouldRethrowThreadDeathWhenCallingTryFailure() {
+        Assertions.assertSame(
+            THREAD_DEATH,
+            Assertions.assertThrows(THREAD_DEATH.javaClass) { Try.failure<Any>(THREAD_DEATH) }
+        )
     }
 
     @Test
-    void shouldRethrowVirtualMachineErrorWhenCallingTryFailure() {
-        assertSame(
-                VM_ERROR,
-                assertThrows(VM_ERROR.getClass(), () -> Try.failure(VM_ERROR))
-        );
+    fun shouldRethrowVirtualMachineErrorWhenCallingTryFailure() {
+        Assertions.assertSame(
+            VM_ERROR,
+            Assertions.assertThrows(VM_ERROR.javaClass) { Try.failure<Any>(VM_ERROR) }
+        )
     }
 
     // -- .collect(Collector)
-
     @Test
-    void shouldCollectNone() {
-        assertEquals("", FAILURE.collect(Collectors.joining()));
+    fun shouldCollectNone() {
+        Assertions.assertEquals("", FAILURE.collect(Collectors.joining()))
     }
 
     @Test
-    void shouldCollectSome() {
-        assertEquals(SUCCESS_VALUE, SUCCESS.collect(Collectors.joining()));
+    fun shouldCollectSome() {
+        Assertions.assertEquals(SUCCESS_VALUE, SUCCESS.collect(Collectors.joining()))
     }
 
     // -- .failed()
-
     @Test
-    void shouldInvertSuccessByCallingFailed() {
-        final Try<Throwable> testee = SUCCESS.failed();
-        assertTrue(testee.isFailure);
-        assertEquals(UnsupportedOperationException.class, testee.cause.getClass());
-        assertEquals("Success.failed()", testee.cause.getMessage());
+    fun shouldInvertSuccessByCallingFailed() {
+        val testee = SUCCESS.failed()
+        Assertions.assertTrue(testee.isFailure)
+        Assertions.assertEquals(UnsupportedOperationException::class.java, testee.cause.javaClass)
+        Assertions.assertEquals("Success.failed()", testee.cause.message)
     }
 
     @Test
-    void shouldInvertSuccessWithNullValueByCallingFailed() {
-        assertNotNull(Try.success(null).failed());
+    fun shouldInvertSuccessWithNullValueByCallingFailed() {
+        Assertions.assertNotNull(Try.success<Any?>(null).failed())
     }
 
     @Test
-    void shouldInvertFailureByCallingFailed() {
-        assertEquals(Try.success(FAILURE_CAUSE), FAILURE.failed());
-    }
-
-    @Test
-    void shouldInvertFailureWithNullCauseByCallingFailed() {
-        assertNotNull(Try.failure(null).failed());
+    fun shouldInvertFailureByCallingFailed() {
+        Assertions.assertEquals(Try.success(FAILURE_CAUSE), FAILURE.failed())
     }
 
     // -- .filter(CheckedPredicate)
-
     @Test
-    void shouldFilterMatchingPredicateOnFailure() {
-        assertSame(FAILURE, FAILURE.filter(s -> true));
+    fun shouldFilterMatchingPredicateOnFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.filter { s: String? -> true })
     }
 
     @Test
-    void shouldFilterNonMatchingPredicateOnFailure() {
-        assertSame(FAILURE, FAILURE.filter(s -> false));
+    fun shouldFilterNonMatchingPredicateOnFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.filter { s: String? -> false })
     }
 
     @Test
-    void shouldFilterWithExceptionOnFailure() {
-        assertSame(FAILURE, FAILURE.filter(t -> { throw ERROR; }));
+    fun shouldFilterWithExceptionOnFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.filter { t: String? -> throw ERROR })
     }
 
     @Test
-    void shouldFilterMatchingPredicateOnSuccess() {
-        assertSame(SUCCESS, SUCCESS.filter(s -> true));
+    fun shouldFilterMatchingPredicateOnSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.filter { s: String? -> true })
     }
 
     @Test
-    void shouldFilterNonMatchingPredicateOnSuccess() {
-        final Try<String> testee = SUCCESS.filter(s -> false);
-        assertTrue(testee.isFailure);
-        assertEquals(NoSuchElementException.class, testee.cause.getClass());
-        assertEquals("Predicate does not hold for " + SUCCESS_VALUE, testee.cause.getMessage());
+    fun shouldFilterNonMatchingPredicateOnSuccess() {
+        val testee = SUCCESS.filter { s: String? -> false }
+        Assertions.assertTrue(testee.isFailure)
+        Assertions.assertEquals(NoSuchElementException::class.java, testee.cause.javaClass)
+        Assertions.assertEquals("Predicate does not hold for " + SUCCESS_VALUE, testee.cause.message)
     }
 
     @Test
-    void shouldFilterWithExceptionOnSuccess() {
-        final Try<String> testee = SUCCESS.filter(t -> { throw ERROR; });
-        assertTrue(testee.isFailure);
-        assertSame(ERROR, testee.cause);
+    fun shouldFilterWithExceptionOnSuccess() {
+        val testee = SUCCESS.filter { t: String? -> throw ERROR }
+        Assertions.assertTrue(testee.isFailure)
+        Assertions.assertSame(ERROR, testee.cause)
     }
 
     @Test
-    void shouldThrowNPEWhenFilteringFailureWithNullPredicate() {
-        assertEquals(
-                "predicate is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.filter(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEWhenFilteringSuccessWithNullPredicate() {
-        assertEquals(
-                "predicate is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.filter(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldFilterFailureWithNullCause() {
-        assertNotNull(Try.failure(null).filter(x -> true));
-    }
-
-    @Test
-    void shouldFilterSuccessWithNullValue() {
-        assertNotNull(Try.success(null).filter(x -> true));
+    fun shouldFilterSuccessWithNullValue() {
+        Assertions.assertNotNull(Try.success<Any?>(null).filter { x: Any? -> true })
     }
 
     // -- .flatMap(CheckedFunction)
-
     @Test
-    void shouldFlatMapSuccessToNull() {
-        assertNull(SUCCESS.flatMap(ignored -> null));
+    fun shouldFlatMapSuccessToNull() {
+        Assertions.assertNull(SUCCESS.flatMap<Any?> { ignored: String? -> FAILURE })
     }
 
     @Test
-    void shouldFlatMapToSuccessOnSuccess() {
-        assertSame(SUCCESS, SUCCESS.flatMap(ignored -> SUCCESS));
+    fun shouldFlatMapToSuccessOnSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.flatMap { ignored: String? -> SUCCESS })
     }
 
     @Test
-    void shouldFlatMapToFailureOnSuccess() {
-        assertSame(FAILURE, SUCCESS.flatMap(ignored -> FAILURE));
+    fun shouldFlatMapToFailureOnSuccess() {
+        Assertions.assertSame(FAILURE, SUCCESS.flatMap { ignored: String? -> FAILURE })
     }
 
     @Test
-    void shouldFlatMapOnFailure() {
-        assertSame(FAILURE, FAILURE.flatMap(ignored -> { throw ASSERTION_ERROR; }));
+    fun shouldFlatMapOnFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.flatMap<Any> { ignored: String? -> throw ASSERTION_ERROR })
     }
 
     @Test
-    void shouldCaptureExceptionWhenFlatMappingSuccess() {
-        assertEquals(Try.failure(ERROR), SUCCESS.flatMap(ignored -> { throw ERROR; }));
+    fun shouldCaptureExceptionWhenFlatMappingSuccess() {
+        Assertions.assertEquals(Try.failure<Any>(ERROR), SUCCESS.flatMap<Any> { ignored: String? -> throw ERROR })
     }
 
     @Test
-    void shouldIgnoreExceptionWhenFlatMappingFailure() {
-        assertSame(FAILURE, FAILURE.flatMap(ignored -> { throw ERROR; }));
+    fun shouldIgnoreExceptionWhenFlatMappingFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.flatMap<Any> { ignored: String? -> throw ERROR })
     }
 
     @Test
-    void shouldThrowNPEWhenFlatMappingFailureWithNullParam() {
-        assertEquals(
-                "mapper is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.flatMap(null)).getMessage()
-        );
+    fun shouldFlatMapSuccessWithNullValue() {
+        Assertions.assertSame(SUCCESS, Try.success<Any?>(null).flatMap { s: Any? -> SUCCESS })
     }
 
     @Test
-    void shouldThrowNPEWhenFlatMappingSuccessWithNullParam() {
-        assertEquals(
-                "mapper is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.flatMap(null)).getMessage()
-        );
+    fun shouldFoldSuccessWhenValueIsNull() {
+        Assertions.assertEquals(1, Try.success<Any?>(null).fold({ x: Throwable? -> 0 }) { s: Any? -> 1 })
     }
 
     @Test
-    void shouldFlatMapFailureWithNullCause() {
-        assertNotNull(Try.failure(null).flatMap(x -> null));
+    fun shouldFoldFailureToNull() {
+        Assertions.assertNull(FAILURE.fold({ x: Throwable? -> null }) { s: String? -> "" })
     }
 
     @Test
-    void shouldFlatMapSuccessWithNullValue() {
-        assertSame(SUCCESS, Try.success(null).flatMap(s -> SUCCESS));
-    }
-
-    // -- .fold(Function, Function)
-
-    @Test
-    void shouldFoldFailureWhenCauseIsNull() {
-        assertEquals(0, Try.failure(null).fold(x -> 0, s -> 1).intValue());
+    fun shouldFoldSuccessToNull() {
+        Assertions.assertNull(SUCCESS.fold({ x: Throwable? -> "" }) { s: String? -> null })
     }
 
     @Test
-    void shouldFoldSuccessWhenValueIsNull() {
-        assertEquals(1, Try.success(null).fold(x -> 0, s -> 1).intValue());
+    fun shouldFoldAndReturnValueIfSuccess() {
+        val folded = SUCCESS.fold({ x: Throwable? -> throw ASSERTION_ERROR }) { obj: String -> obj.length }
+        Assertions.assertEquals(SUCCESS_VALUE.length, folded)
     }
 
     @Test
-    void shouldFoldFailureToNull() {
-        assertNull(FAILURE.fold(x -> null, s -> ""));
-    }
-
-    @Test
-    void shouldFoldSuccessToNull() {
-        assertNull(SUCCESS.fold(x -> "", s -> null));
-    }
-
-    @Test
-    void shouldFoldAndReturnValueIfSuccess() {
-        final int folded = SUCCESS.fold(x -> { throw ASSERTION_ERROR; }, String::length);
-        assertEquals(SUCCESS_VALUE.length(), folded);
-    }
-
-    @Test
-    void shouldFoldAndReturnAlternateValueIfFailure() {
-        final String folded = FAILURE.fold(x -> SUCCESS_VALUE, a -> { throw ASSERTION_ERROR; });
-        assertEquals(SUCCESS_VALUE, folded);
-    }
-
-    @Test
-    void shouldFoldSuccessAndThrowNPEOnWhenIfFailureFunctionIsNull() {
-        assertEquals(
-                "ifFailure is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.fold(null, Function.identity())).getMessage()
-        );
-    }
-
-    @Test
-    void shouldFoldFailureAndThrowNPEOnWhenIfFailureFunctionIsNull() {
-        assertEquals(
-                "ifFailure is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.fold(null, Function.identity())).getMessage()
-        );
-    }
-
-    @Test
-    void shouldFoldSuccessAndThrowNPEOnWhenIfSuccessFunctionIsNull() {
-        assertEquals(
-                "ifSuccess is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.fold(Function.identity(), null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldFoldFailureAndThrowNPEOnWhenIfSuccessFunctionIsNull() {
-        assertEquals(
-                "ifSuccess is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.fold(Function.identity(), null)).getMessage()
-        );
+    fun shouldFoldAndReturnAlternateValueIfFailure() {
+        val folded = FAILURE.fold({ x: Throwable? -> SUCCESS_VALUE }) { a: String? -> throw ASSERTION_ERROR }
+        Assertions.assertEquals(SUCCESS_VALUE, folded)
     }
 
     // -- .forEach(Consumer)
-
     @Test
-    void shouldConsumeFailureWithForEach() {
-        final List<String> list = new ArrayList<>();
-        FAILURE.forEach(list::add);
-        assertEquals(Collections.emptyList(), list);
+    fun shouldConsumeFailureWithForEach() {
+        val list: MutableList<String> = ArrayList()
+        FAILURE.forEach(Consumer { e: String -> list.add(e) })
+        Assertions.assertEquals(emptyList<Any>(), list)
     }
 
     @Test
-    void shouldConsumeSuccessWithForEach() {
-        final List<String> list = new ArrayList<>();
-        SUCCESS.forEach(list::add);
-        assertEquals(Collections.singletonList(SUCCESS_VALUE), list);
+    fun shouldConsumeSuccessWithForEach() {
+        val list: MutableList<String> = ArrayList()
+        SUCCESS.forEach(Consumer { e: String -> list.add(e) })
+        Assertions.assertEquals(listOf(SUCCESS_VALUE), list)
     }
 
     @Test
-    void shouldThrowNPEWhenConsumingFailureWithForEachAndActionIsNull() {
-        //noinspection ConstantConditions
-        assertThrows(NullPointerException.class, () -> FAILURE.forEach(null));
+    fun shouldThrowNPEWhenConsumingFailureWithForEachAndActionIsNull() {
+        Assertions.assertThrows(NullPointerException::class.java) { FAILURE.forEach(null) }
     }
 
     @Test
-    void shouldThrowNPEWhenConsumingSuccessWithForEachAndActionIsNull() {
-        //noinspection ConstantConditions
-        assertThrows(NullPointerException.class, () -> SUCCESS.forEach(null));
+    fun shouldThrowNPEWhenConsumingSuccessWithForEachAndActionIsNull() {
+        Assertions.assertThrows(NullPointerException::class.java) { SUCCESS.forEach(null) }
     }
 
     // -- .get()
-
     @Test
-    void shouldGetOnSuccessWhenValueIsNull() {
-        assertNull(Try.success(null).get());
+    fun shouldGetOnSuccessWhenValueIsNull() {
+        Assertions.assertNull(Try.success<Any?>(null).get())
     }
 
     @Test
-    void shouldGetOnSuccessWhenValueIsNonNull() {
-        assertEquals(SUCCESS_VALUE, SUCCESS.get());
+    fun shouldGetOnSuccessWhenValueIsNonNull() {
+        Assertions.assertEquals(SUCCESS_VALUE, SUCCESS.get())
     }
 
     @Test
-    void shouldThrowCauseWrappedInRuntimeExceptionWhenGetOnFailure() {
-        assertSame(
-                FAILURE_CAUSE,
-                assertThrows(NonFatalException.class, FAILURE::get).getCause()
-        );
+    fun shouldThrowCauseWrappedInRuntimeExceptionWhenGetOnFailure() {
+        Assertions.assertSame(
+            FAILURE_CAUSE,
+            Assertions.assertThrows(NonFatalException::class.java) { FAILURE.get() }.cause
+        )
     }
 
     @Test
-    void shouldThrowNullCauseWrappedInRuntimeExceptionWhenGetOnFailure() {
-        assertNull(assertThrows(NonFatalException.class, () -> Try.failure(null).get()).getCause());
-    }
-
-    // -- .getCause()
-
-    @Test
-    void shouldGetCauseOnFailureWhenCauseIsNull() {
-        assertNull(Try.failure(null).cause);
-    }
-    
-    @Test
-    void shouldGetCauseOnFailure() {
-        assertSame(FAILURE_CAUSE, FAILURE.cause);
+    fun shouldThrowNullCauseWrappedInRuntimeExceptionWhenGetOnFailure() {
+        val ex = IllegalStateException("failure")
+        Assertions.assertEquals(ex, Assertions.assertThrows(NonFatalException::class.java) {
+            Try.failure<Any>(ex).get()
+        }.cause)
     }
 
     @Test
-    void shouldThrowWhenCallingGetCauseOnSuccess() {
-        assertEquals(
-                "getCause() on Success",
-                assertThrows(UnsupportedOperationException.class, SUCCESS::getCause).getMessage()
-        );
+    fun shouldGetCauseOnFailure() {
+        Assertions.assertSame(FAILURE_CAUSE, FAILURE.cause)
+    }
+
+    @Test
+    fun shouldThrowWhenCallingGetCauseOnSuccess() {
+        Assertions.assertEquals(
+            "getCause() on Success",
+            Assertions.assertThrows(UnsupportedOperationException::class.java) { SUCCESS.cause }.message
+        )
     }
 
     // -- .getOrElse(Object)
-
     @Test
-    void shouldReturnElseWhenGetOrElseOnFailure() {
-        assertSame(SUCCESS_VALUE, FAILURE.getOrElse(SUCCESS_VALUE));
+    fun shouldReturnElseWhenGetOrElseOnFailure() {
+        Assertions.assertSame(SUCCESS_VALUE, FAILURE.getOrElse(SUCCESS_VALUE))
     }
 
     @Test
-    void shouldGetOrElseOnSuccess() {
-        assertSame(SUCCESS_VALUE, SUCCESS.getOrElse(null));
+    fun shouldGetOrElseOnSuccess() {
+        Assertions.assertSame(SUCCESS_VALUE, SUCCESS.getOrElse(SUCCESS_VALUE2))
     }
 
     // -- .getOrElseGet(Supplier)
-
     @Test
-    void shouldReturnElseWhenGetOrElseGetOnFailure() {
-        assertSame(SUCCESS_VALUE, FAILURE.getOrElseGet(() -> SUCCESS_VALUE));
+    fun shouldReturnElseWhenGetOrElseGetOnFailure() {
+        Assertions.assertSame(SUCCESS_VALUE, FAILURE.getOrElseGet { SUCCESS_VALUE })
     }
 
     @Test
-    void shouldGetOrElseGetOnSuccess() {
-        assertSame(SUCCESS_VALUE, SUCCESS.getOrElseGet(() -> { throw ASSERTION_ERROR; }));
+    fun shouldGetOrElseGetOnSuccess() {
+        Assertions.assertSame(SUCCESS_VALUE, SUCCESS.getOrElseGet { throw ASSERTION_ERROR })
     }
 
     // -- .getOrElseThrow(Function)
-
     @Test
-    void shouldThrowOtherWhenGetOrElseThrowOnFailure() {
-        assertSame(
-                ERROR,
-                assertThrows(ERROR.getClass(), () -> FAILURE.getOrElseThrow(x -> ERROR))
-        );
+    fun shouldThrowOtherWhenGetOrElseThrowOnFailure() {
+        Assertions.assertSame(
+            ERROR,
+            Assertions.assertThrows(ERROR.javaClass) {
+                FAILURE.getOrElseThrow(
+                    Function { x: Throwable? -> ERROR })
+            }
+        )
     }
 
     @Test
-    void shouldOrElseThrowOnSuccess() {
-        assertSame(SUCCESS_VALUE, SUCCESS.getOrElseThrow(x -> null));
-    }
-
-    @Test
-    void shouldThrowNPEWhenWhenGetOrElseThrowOnFailureAndExceptionProviderIsNull() {
-        assertEquals(
-                "exceptionProvider is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.getOrElseThrow(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEWhenWhenGetOrElseThrowOnSuccessAndExceptionProviderIsNull() {
-        assertEquals(
-                "exceptionProvider is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.getOrElseThrow(null)).getMessage()
-        );
+    fun shouldOrElseThrowOnSuccess() {
+        Assertions.assertSame(SUCCESS_VALUE, SUCCESS.getOrElseThrow { x: Throwable? -> RuntimeException() })
     }
 
     // -- .isFailure()
-
     @Test
-    void shouldDetectFailureIfFailure() {
-        assertTrue(FAILURE.isFailure);
+    fun shouldDetectFailureIfFailure() {
+        Assertions.assertTrue(FAILURE.isFailure)
     }
 
     @Test
-    void shouldDetectNonFailureIfSuccess() {
-        assertFalse(SUCCESS.isFailure);
+    fun shouldDetectNonFailureIfSuccess() {
+        Assertions.assertFalse(SUCCESS.isFailure)
     }
 
     // -- .isSuccess()
-
     @Test
-    void shouldDetectSuccessIfSuccess() {
-        assertTrue(SUCCESS.isSuccess);
+    fun shouldDetectSuccessIfSuccess() {
+        Assertions.assertTrue(SUCCESS.isSuccess)
     }
 
     @Test
-    void shouldDetectNonSuccessIfSuccess() {
-        assertFalse(FAILURE.isSuccess);
+    fun shouldDetectNonSuccessIfSuccess() {
+        Assertions.assertFalse(FAILURE.isSuccess)
     }
 
     // -- .iterator()
-
     @Test
-    void shouldIterateSuccess() {
-        final Iterator<String> testee = SUCCESS.iterator();
-        assertTrue(testee.hasNext());
-        assertSame(SUCCESS_VALUE, testee.next());
-        assertFalse(testee.hasNext());
-        assertThrows(NoSuchElementException.class, testee::next);
+    fun shouldIterateSuccess() {
+        val testee: Iterator<String> = SUCCESS.iterator()
+        Assertions.assertTrue(testee.hasNext())
+        Assertions.assertSame(SUCCESS_VALUE, testee.next())
+        Assertions.assertFalse(testee.hasNext())
+        Assertions.assertThrows(NoSuchElementException::class.java) { testee.next() }
     }
 
     @Test
-    void shouldIterateFailure() {
-        final Iterator<String> testee = FAILURE.iterator();
-        assertFalse(testee.hasNext());
-        assertThrows(NoSuchElementException.class, testee::next);
+    fun shouldIterateFailure() {
+        val testee: Iterator<String> = FAILURE.iterator()
+        Assertions.assertFalse(testee.hasNext())
+        Assertions.assertThrows(NoSuchElementException::class.java) { testee.next() }
     }
 
     // -- .map(CheckedFunction)
-
     @Test
-    void shouldMapFailure() {
-        assertSame(FAILURE, FAILURE.map(ignored -> { throw ASSERTION_ERROR; }));
+    fun shouldMapFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.map<Any> { ignored: String? -> throw ASSERTION_ERROR })
     }
 
     @Test
-    void shouldMapSuccess() {
-        assertEquals(Try.success(SUCCESS_VALUE + "!"), SUCCESS.map(s -> s + "!"));
+    fun shouldMapSuccess() {
+        Assertions.assertEquals(Try.success(SUCCESS_VALUE + "!"), SUCCESS.map { s: String -> "$s!" })
     }
 
     @Test
-    void shouldMapSuccessWhenValueIsNull() {
-        assertEquals(Try.success("null!"), Try.success(null).map(s -> s + "!"));
+    fun shouldMapSuccessWhenValueIsNull() {
+        Assertions.assertEquals(Try.success("null!"), Try.success<Any?>(null).map { s: Any? -> s.toString() + "!" })
     }
 
     @Test
-    void shouldMapSuccessWithException() {
-        assertEquals(Try.failure(ERROR), SUCCESS.map(ignored -> { throw ERROR; }));
-    }
-
-    @Test
-    void shouldThrowNPEWhenMappingFailureAndParamIsNull() {
-        assertEquals(
-                "mapper is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.map(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEWhenMappingSuccessAndParamIsNull() {
-        assertEquals(
-                "mapper is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.map(null)).getMessage()
-        );
+    fun shouldMapSuccessWithException() {
+        Assertions.assertEquals(Try.failure<Any>(ERROR), SUCCESS.map<Any> { ignored: String? -> throw ERROR })
     }
 
     // -- .mapFailure(CheckedFunction)
-
     @Test
-    void shouldMapFailureOnFailure() {
-        assertEquals(Try.failure(ERROR), FAILURE.mapFailure(x -> ERROR));
+    fun shouldMapFailureOnFailure() {
+        Assertions.assertEquals(Try.failure<Any>(ERROR), FAILURE.mapFailure { x: Throwable? -> ERROR })
     }
 
     @Test
-    void shouldMapFailureOnFailureWhenCauseIsNull() {
-        assertEquals(Try.failure(ERROR), Try.failure(null).mapFailure(x -> ERROR));
+    fun shouldMapFailureOnFailureWhenCauseIsNull() {
+        Assertions.assertEquals(Try.failure<Any>(ERROR), Try.failure<Any>(FAILURE_CAUSE)
+            .mapFailure { x: Throwable? -> ERROR })
     }
 
     @Test
-    void shouldMapFailureWithExceptionOnFailure() {
-        assertEquals(Try.failure(ERROR), FAILURE.mapFailure(x -> { throw ERROR; }));
+    fun shouldMapFailureWithExceptionOnFailure() {
+        Assertions.assertEquals(Try.failure<Any>(ERROR), FAILURE.mapFailure { x: Throwable? -> throw ERROR })
     }
 
     @Test
-    void shouldMapFailureOnSuccess() {
-        assertSame(SUCCESS, SUCCESS.mapFailure(x -> { throw ASSERTION_ERROR; }));
-    }
-
-    @Test
-    void shouldThrowNPEWhenCallingMapFailureOnFailureAndParamIsNull() {
-        assertEquals(
-                "mapper is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.mapFailure(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEWhenCallingMapFailureOnSuccessAndParamIsNull() {
-        assertEquals(
-                "mapper is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.mapFailure(null)).getMessage()
-        );
+    fun shouldMapFailureOnSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.mapFailure { x: Throwable? -> throw ASSERTION_ERROR })
     }
 
     // -- .onFailure(Consumer)
-
     @Test
-    void shouldConsumeThrowableWhenCallingOnFailureGivenFailure() {
-        final List<Throwable> sideEffect = new ArrayList<>();
-        FAILURE.onFailure(sideEffect::add);
-        assertEquals(Collections.singletonList(FAILURE_CAUSE), sideEffect);
+    fun shouldConsumeThrowableWhenCallingOnFailureGivenFailure() {
+        val sideEffect: MutableList<Throwable> = ArrayList()
+        FAILURE.onFailure { e: Throwable -> sideEffect.add(e) }
+        Assertions.assertEquals(listOf(FAILURE_CAUSE), sideEffect)
     }
 
     @Test
-    void shouldNotHandleUnexpectedExceptionWhenCallingOnFailureGivenFailure() {
-        assertSame(
-                ERROR,
-                assertThrows(ERROR.getClass(), () -> FAILURE.onFailure(ignored -> { throw ERROR; }))
-        );
-    }
-    
-    @Test
-    void shouldDoNothingWhenCallingOnFailureGivenSuccess() {
-        assertSame(SUCCESS, SUCCESS.onFailure(x -> { throw ASSERTION_ERROR; }));
+    fun shouldNotHandleUnexpectedExceptionWhenCallingOnFailureGivenFailure() {
+        Assertions.assertSame(
+            ERROR,
+            Assertions.assertThrows(ERROR.javaClass) { FAILURE.onFailure { ignored: Throwable? -> throw ERROR } }
+        )
     }
 
     @Test
-    void shouldThrowNPEWhenCallingOnFailureWithNullParamGivenFailure() {
-        assertEquals(
-                "action is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.onFailure(null)).getMessage()
-        );
-    }
-    
-    @Test
-    void shouldThrowNPEWhenCallingOnFailureWithNullParamGivenSuccess() {
-        assertEquals(
-                "action is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.onFailure(null)).getMessage()
-        );
+    fun shouldDoNothingWhenCallingOnFailureGivenSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.onFailure { x: Throwable? -> throw ASSERTION_ERROR })
     }
 
     // -- .onSuccess(Consumer)
-
     @Test
-    void shouldConsumeValueWhenCallingOnSuccessGivenSuccess() {
-        final List<String> sideEffect = new ArrayList<>();
-        SUCCESS.onSuccess(sideEffect::add);
-        assertEquals(Collections.singletonList(SUCCESS_VALUE), sideEffect);
+    fun shouldConsumeValueWhenCallingOnSuccessGivenSuccess() {
+        val sideEffect: MutableList<String> = ArrayList()
+        SUCCESS.onSuccess { e: String -> sideEffect.add(e) }
+        Assertions.assertEquals(listOf(SUCCESS_VALUE), sideEffect)
     }
 
     @Test
-    void shouldNotHandleUnexpectedExceptionWhenCallingOnSuccessGivenSuccess() {
-        assertSame(
-                ERROR,
-                assertThrows(ERROR.getClass(), () -> SUCCESS.onSuccess(ignored -> { throw ERROR; }))
-        );
+    fun shouldNotHandleUnexpectedExceptionWhenCallingOnSuccessGivenSuccess() {
+        Assertions.assertSame(
+            ERROR,
+            Assertions.assertThrows(ERROR.javaClass) { SUCCESS.onSuccess { ignored: String? -> throw ERROR } }
+        )
     }
 
     @Test
-    void shouldDoNothingWhenCallingOnSuccessGivenFailure() {
-        assertSame(FAILURE, FAILURE.onSuccess(x -> { throw ASSERTION_ERROR; }));
-    }
-
-    @Test
-    void shouldThrowNPEWhenCallingOnSuccessWithNullParamOnFailure() {
-        assertEquals(
-                "action is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.onSuccess(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEWhenCallingOnSuccessWithNullParamOnSuccess() {
-        assertEquals(
-                "action is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.onSuccess(null)).getMessage()
-        );
+    fun shouldDoNothingWhenCallingOnSuccessGivenFailure() {
+        Assertions.assertSame(FAILURE, FAILURE.onSuccess { x: String? -> throw ASSERTION_ERROR })
     }
 
     // -- .orElse(Callable)
-
     @Test
-    void shouldReturnSelfOnOrElseIfSuccess() {
-        assertSame(SUCCESS, SUCCESS.orElse(() -> null));
+    fun shouldReturnSelfOnOrElseIfSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.orElse { null })
     }
 
     @Test
-    void shouldReturnAlternativeOnOrElseIfFailure() {
-        assertSame(SUCCESS, FAILURE.orElse(() -> SUCCESS));
+    fun shouldReturnAlternativeOnOrElseIfFailure() {
+        Assertions.assertSame(SUCCESS, FAILURE.orElse { SUCCESS })
     }
 
     @Test
-    void shouldCaptureErrorOnOrElseIfFailure() {
-        assertSame(ERROR, FAILURE.orElse(() -> { throw ERROR; }).cause);
-    }
-
-    @Test
-    void shouldThrowNPEOnOrElseWithNullParameterIfSuccess() {
-        assertEquals(
-                "callable is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.orElse(null)).getMessage()
-
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnOrElseWithNullParameterIfFailure() {
-        assertEquals(
-                "callable is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.orElse(null)).getMessage()
-        );
+    fun shouldCaptureErrorOnOrElseIfFailure() {
+        Assertions.assertSame(ERROR, FAILURE.orElse { throw ERROR }.cause)
     }
 
     // -- .recover(Class, CheckedFunction)
-
     @Test
-    void shouldRecoverWhenFailureMatchesExactly() {
-        assertEquals(SUCCESS, FAILURE.recover(FAILURE_CAUSE.getClass(), x -> SUCCESS_VALUE));
+    fun shouldRecoverWhenFailureMatchesExactly() {
+        Assertions.assertEquals(SUCCESS, FAILURE.recover(FAILURE_CAUSE.javaClass) { x: Exception? -> SUCCESS_VALUE })
     }
 
     @Test
-    void shouldRecoverWhenFailureIsAssignableFrom() {
-        assertEquals(SUCCESS, FAILURE.recover(Throwable.class, x -> SUCCESS_VALUE));
+    fun shouldRecoverWhenFailureIsAssignableFrom() {
+        Assertions.assertEquals(SUCCESS, FAILURE.recover(Throwable::class.java) { x: Throwable? -> SUCCESS_VALUE })
     }
 
     @Test
-    void shouldNotRecoverWhenFailureIsNotAssignableFrom() {
-        assertEquals(FAILURE, FAILURE.recover(VirtualMachineError.class, x -> SUCCESS_VALUE));
+    fun shouldNotRecoverWhenFailureIsNotAssignableFrom() {
+        Assertions.assertEquals(
+            FAILURE, FAILURE.recover(
+                VirtualMachineError::class.java
+            ) { x: VirtualMachineError? -> SUCCESS_VALUE })
     }
 
     @Test
-    void shouldRecoverWhenSuccess() {
-        assertSame(SUCCESS, SUCCESS.recover(Throwable.class, x -> null));
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverFailureWhenExceptionTypeIsNull() {
-        assertEquals(
-                "exceptionType is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.recover(null, x -> null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverFailureWhenRecoveryFunctionIsNull() {
-        assertEquals(
-                "recoveryFunction is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.recover(Error.class, null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverSuccessWhenExceptionTypeIsNull() {
-        assertEquals(
-                "exceptionType is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.recover(null, x -> null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverSuccessWhenRecoveryFunctionIsNull() {
-        assertEquals(
-                "recoveryFunction is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.recover(Error.class, null)).getMessage()
-        );
+    fun shouldRecoverWhenSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.recover(Throwable::class.java) { x: Throwable? -> "FAILURE" })
     }
 
     // -- .recoverWith(Class, CheckedFunction)
-
     @Test
-    void shouldRecoverWithWhenFailureMatchesExactly() {
-        assertSame(SUCCESS, FAILURE.recoverWith(FAILURE_CAUSE.getClass(), x -> SUCCESS));
+    fun shouldRecoverWithWhenFailureMatchesExactly() {
+        Assertions.assertSame(SUCCESS, FAILURE.recoverWith(FAILURE_CAUSE.javaClass) { x: Exception? -> SUCCESS })
     }
 
     @Test
-    void shouldRecoverWithSuccessWhenFailureIsAssignableFrom() {
-        assertSame(SUCCESS, FAILURE.recoverWith(Throwable.class, x -> SUCCESS));
+    fun shouldRecoverWithSuccessWhenFailureIsAssignableFrom() {
+        Assertions.assertSame(SUCCESS, FAILURE.recoverWith(Throwable::class.java) { x: Throwable? -> SUCCESS })
     }
 
     @Test
-    void shouldRecoverWithFailureWhenFailureIsAssignableFrom() {
-        final Try<String> failure = Try.failure(ERROR);
-        assertSame(failure, FAILURE.recoverWith(Throwable.class, x -> failure));
+    fun shouldRecoverWithFailureWhenFailureIsAssignableFrom() {
+        val failure = Try.failure<String>(ERROR)
+        Assertions.assertSame(failure, FAILURE.recoverWith(Throwable::class.java) { x: Throwable? -> failure })
     }
 
     @Test
-    void shouldNotRecoverWithWhenFailureIsNotAssignableFrom() {
-        assertSame(FAILURE, FAILURE.recoverWith(VirtualMachineError.class, x -> SUCCESS));
+    fun shouldNotRecoverWithWhenFailureIsNotAssignableFrom() {
+        Assertions.assertSame(
+            FAILURE, FAILURE.recoverWith(
+                VirtualMachineError::class.java
+            ) { x: VirtualMachineError? -> SUCCESS })
     }
 
     @Test
-    void shouldRecoverWithWhenSuccess() {
-        assertSame(SUCCESS, SUCCESS.recoverWith(Throwable.class, x -> null));
+    fun shouldRecoverWithWhenSuccess() {
+        Assertions.assertSame(SUCCESS, SUCCESS.recoverWith(Throwable::class.java) { x: Throwable? -> FAILURE })
     }
 
     @Test
-    void shouldThrowNPEOnRecoverWithFailureWhenExceptionTypeIsNull() {
-        assertEquals(
-                "exceptionType is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.recoverWith(null, x -> null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverWithFailureWhenRecoveryFunctionIsNull() {
-        assertEquals(
-                "recoveryFunction is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.recoverWith(Error.class, null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverWithSuccessWhenExceptionTypeIsNull() {
-        assertEquals(
-                "exceptionType is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.recoverWith(null, x -> null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEOnRecoverWithSuccessWhenRecoveryFunctionIsNull() {
-        assertEquals(
-                "recoveryFunction is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.recoverWith(Error.class, null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldCaptureExceptionWhenRecoverWithFailure() {
-        assertEquals(Try.failure(ERROR), FAILURE.recoverWith(Throwable.class, ignored -> { throw ERROR; }));
+    fun shouldCaptureExceptionWhenRecoverWithFailure() {
+        Assertions.assertEquals(
+            Try.failure<Any>(ERROR), FAILURE.recoverWith(
+                Throwable::class.java
+            ) { ignored: Throwable? -> throw ERROR })
     }
 
     // -- .stream()
-
     @Test
-    void shouldStreamFailure() {
-        assertEquals(Collections.emptyList(), FAILURE.stream().collect(Collectors.toList()));
+    fun shouldStreamFailure() {
+        Assertions.assertEquals(emptyList<Any>(), FAILURE.stream().collect(Collectors.toList()))
     }
 
     @Test
-    void shouldStreamSuccess() {
-        assertEquals(Collections.singletonList(SUCCESS_VALUE), SUCCESS.stream().collect(Collectors.toList()));
+    fun shouldStreamSuccess() {
+        Assertions.assertEquals(listOf(SUCCESS_VALUE), SUCCESS.stream().collect(Collectors.toList()))
     }
 
     // -- .toOptional()
-
     @Test
-    void shouldConvertFailureToOptional() {
-        assertEquals(Optional.empty(), FAILURE.toOptional());
-    }
-
-
-    @Test
-    void shouldConvertSuccessOfNonNullToOptional() {
-        assertEquals(Optional.of(SUCCESS_VALUE), SUCCESS.toOptional());
+    fun shouldConvertFailureToOptional() {
+        Assertions.assertEquals(Optional.empty<Any>(), FAILURE.toOptional())
     }
 
     @Test
-    void shouldConvertSuccessOfNullToOptional() {
-        assertEquals(Optional.empty(), Try.success(null).toOptional());
+    fun shouldConvertSuccessOfNonNullToOptional() {
+        Assertions.assertEquals(Optional.of(SUCCESS_VALUE), SUCCESS.toOptional())
+    }
+
+    @Test
+    fun shouldConvertSuccessOfNullToOptional() {
+        Assertions.assertEquals(Optional.empty<Any>(), Try.success<Any?>(null).toOptional())
     }
 
     // -- .transform(CheckedFunction, CheckedFunction)
-
     @Test
-    void shouldTransformFailureWhenCauseIsNull() {
-        assertSame(SUCCESS, Try.failure(null).transform(x -> SUCCESS, s -> { throw ASSERTION_ERROR; }));
+    fun shouldTransformFailureWhenCauseIsNull() {
+        Assertions.assertSame(
+            SUCCESS, Try.failure<Any>(ERROR).transform(
+                { x: Throwable? -> SUCCESS }) { s: Any? -> throw ASSERTION_ERROR })
     }
 
     @Test
-    void shouldTransformSuccessWhenValueIsNull() {
-        assertSame(SUCCESS, Try.success(null).transform(x -> { throw ASSERTION_ERROR; }, s -> SUCCESS));
+    fun shouldTransformSuccessWhenValueIsNull() {
+        Assertions.assertSame(
+            SUCCESS, Try.success<Any?>(null).transform(
+                { x: Throwable? -> throw ASSERTION_ERROR }) { s: Any? -> SUCCESS })
     }
 
     @Test
-    void shouldTransformFailureToNull() {
-        assertNull(FAILURE.transform(x -> null, s -> { throw ASSERTION_ERROR; }));
+    fun shouldTransformFailureToNull() {
+        Assertions.assertEquals(FAILURE2,
+            FAILURE.transform<Any>({ x: Throwable? -> FAILURE2 }) { s: String? -> throw ASSERTION_ERROR })
     }
 
     @Test
-    void shouldTransformSuccessToNull() {
-        assertNull(SUCCESS.transform(x -> { throw ASSERTION_ERROR; }, s -> null));
+    fun shouldTransformSuccessToNull() {
+        Assertions.assertEquals(
+            FAILURE2,
+            SUCCESS.transform<Any>({ x: Throwable? -> throw ASSERTION_ERROR }) { s: String? -> FAILURE2 })
     }
 
     @Test
-    void shouldTransformAndReturnValueIfSuccess() {
-        final Try<Integer> transformed = SUCCESS.transform(x -> { throw ASSERTION_ERROR; }, s -> Try.success(s.length()));
-        assertEquals(Try.success(SUCCESS_VALUE.length()), transformed);
+    fun shouldTransformAndReturnValueIfSuccess() {
+        val transformed =
+            SUCCESS.transform({ x: Throwable? -> throw ASSERTION_ERROR }) { s: String -> Try.success(s.length) }
+        Assertions.assertEquals(Try.success(SUCCESS_VALUE.length), transformed)
     }
 
     @Test
-    void shouldTransformAndReturnAlternateValueIfFailure() {
-        final Try<String> transformed = FAILURE.transform(x -> SUCCESS, a -> { throw ASSERTION_ERROR; });
-        assertSame(SUCCESS, transformed);
+    fun shouldTransformAndReturnAlternateValueIfFailure() {
+        val transformed = FAILURE.transform(
+            { x: Throwable? -> SUCCESS }) { a: String? -> throw ASSERTION_ERROR }
+        Assertions.assertSame(SUCCESS, transformed)
     }
 
     @Test
-    void shouldTransformAndThrowNPEOnWhenOnFailureFunctionIsNullIfSuccess() {
-        assertEquals(
-                "ifFailure is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.transform(null, s -> { throw ASSERTION_ERROR; })).getMessage()
-        );
+    fun shouldTransformFailureAndCaptureException() {
+        val transformed = FAILURE.transform<String>(
+            { x: Throwable? -> throw ERROR }) { s: String? -> throw ASSERTION_ERROR }
+        Assertions.assertEquals(Try.failure<Any>(ERROR), transformed)
     }
 
     @Test
-    void shouldTransformAndThrowNPEOnWhenOnFailureFunctionIsNullIfFailure() {
-        assertEquals(
-                "ifFailure is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.transform(null, s -> { throw ASSERTION_ERROR; })).getMessage()
-        );
-    }
-
-    @Test
-    void shouldTransformAndThrowNPEOnWhenOnSuccessFunctionIsNullIfSuccess() {
-        assertEquals(
-                "ifSuccess is null",
-                assertThrows(NullPointerException.class, () -> SUCCESS.transform(x -> { throw ASSERTION_ERROR; }, null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldTransformAndThrowNPEOnWhenOnSuccessFunctionIsNullIfFailure() {
-        assertEquals(
-                "ifSuccess is null",
-                assertThrows(NullPointerException.class, () -> FAILURE.transform(x -> { throw ASSERTION_ERROR; }, null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldTransformFailureAndCaptureException() {
-        final Try<String> transformed = FAILURE.transform(x -> { throw ERROR; }, s -> { throw ASSERTION_ERROR; });
-        assertEquals(Try.failure(ERROR), transformed);
-    }
-
-    @Test
-    void shouldTransformSuccessAndCaptureException() {
-        final Try<String> transformed = SUCCESS.transform(x -> { throw ASSERTION_ERROR; }, s -> { throw ERROR; });
-        assertEquals(Try.failure(ERROR), transformed);
+    fun shouldTransformSuccessAndCaptureException() {
+        val transformed = SUCCESS.transform<String>(
+            { x: Throwable? -> throw ASSERTION_ERROR }) { s: String? -> throw ERROR }
+        Assertions.assertEquals(Try.failure<Any>(ERROR), transformed)
     }
 
     // -- Object.equals(Object)
-
     @Test
-    void shouldEqualFailureIfObjectIsSame() {
-        assertEquals(FAILURE, FAILURE);
+    fun shouldEqualFailureIfObjectIsSame() {
+        Assertions.assertEquals(FAILURE, FAILURE)
     }
 
     @Test
-    void shouldNotEqualFailureIfObjectIsNotSame() {
-        assertNotEquals(Try.failure(new Error()), Try.failure(new Error()));
+    fun shouldNotEqualFailureIfObjectIsNotSame() {
+        Assertions.assertNotEquals(Try.failure<Any>(Error()), Try.failure<Any>(Error()))
     }
 
     @Test
-    void shouldEqualSuccessIfObjectIsSame() {
-        assertEquals(SUCCESS, SUCCESS);
+    fun shouldEqualSuccessIfObjectIsSame() {
+        Assertions.assertEquals(SUCCESS, SUCCESS)
     }
 
     @Test
-    void shouldNotEqualFailureAndSuccess() {
-        assertNotEquals(SUCCESS, FAILURE);
+    fun shouldNotEqualFailureAndSuccess() {
+        Assertions.assertNotEquals(SUCCESS, FAILURE)
     }
 
     @Test
-    void shouldNotEqualSuccessAndFailure() {
-        assertNotEquals(FAILURE, SUCCESS);
+    fun shouldNotEqualSuccessAndFailure() {
+        Assertions.assertNotEquals(FAILURE, SUCCESS)
     }
 
     @Test
-    void shouldNotEqualSuccessIfValuesDiffer() {
-        assertNotEquals(Try.success("1"), Try.success(1));
+    fun shouldNotEqualSuccessIfValuesDiffer() {
+        Assertions.assertNotEquals(Try.success("1"), Try.success(1))
     }
 
     // -- Object.hashCode()
-
     @Test
-    void shouldHashFailure() {
-        assertEquals(Objects.hashCode(FAILURE_CAUSE), FAILURE.hashCode());
+    fun shouldHashFailure() {
+        Assertions.assertEquals(Objects.hashCode(FAILURE_CAUSE), FAILURE.hashCode())
     }
 
     @Test
-    void shouldHashFailureWithNullCause() {
-        assertEquals(Objects.hashCode(null), Try.failure(null).hashCode());
+    fun shouldHashSuccess() {
+        Assertions.assertEquals(31 + Objects.hashCode(SUCCESS_VALUE), SUCCESS.hashCode())
     }
 
     @Test
-    void shouldHashSuccess() {
-        assertEquals(31 + Objects.hashCode(SUCCESS_VALUE), SUCCESS.hashCode());
-    }
-
-    @Test
-    void shouldHashSuccessWithNullValue() {
-        assertEquals(31 + Objects.hashCode(null), Try.success(null).hashCode());
+    fun shouldHashSuccessWithNullValue() {
+        Assertions.assertEquals(31 + Objects.hashCode(null), Try.success<Any?>(null).hashCode())
     }
 
     // -- Object.toString()
-
     @Test
-    void shouldConvertFailureToString() {
-        assertEquals("Failure(" + FAILURE_CAUSE + ")", FAILURE.toString());
+    fun shouldConvertFailureToString() {
+        Assertions.assertEquals("Failure(" + FAILURE_CAUSE + ")", FAILURE.toString())
     }
 
     @Test
-    void shouldConvertFailureWithNullCauseToString() {
-        assertEquals("Failure(null)", Try.failure(null).toString());
+    fun shouldConvertSuccessToString() {
+        Assertions.assertEquals("Success(" + SUCCESS_VALUE + ")", SUCCESS.toString())
     }
 
     @Test
-    void shouldConvertSuccessToString() {
-        assertEquals("Success(" + SUCCESS_VALUE + ")", SUCCESS.toString());
-    }
-
-    @Test
-    void shouldConvertSuccessWithNullValueToString() {
-        assertEquals("Success(null)", Try.success(null).toString());
+    fun shouldConvertSuccessWithNullValueToString() {
+        Assertions.assertEquals("Success(null)", Try.success<Any?>(null).toString())
     }
 
     // Serialization
-
     @Test
-    void shouldSerializeFailure() throws IOException, ClassNotFoundException {
-        final Try<String> testee = deserialize(serialize(FAILURE));
-        assertSame(FAILURE.cause.getClass(), testee.cause.getClass());
-        assertEquals(FAILURE.cause.getMessage(), testee.cause.getMessage());
+    @Throws(IOException::class, ClassNotFoundException::class)
+    fun shouldSerializeFailure() {
+        val testee = deserialize<Try<String>>(serialize(FAILURE))
+        Assertions.assertSame(FAILURE.cause.javaClass, testee.cause.javaClass)
+        Assertions.assertEquals(FAILURE.cause.message, testee.cause.message)
     }
 
     @Test
-    void shouldSerializeSuccess() throws IOException, ClassNotFoundException {
-        assertEquals(SUCCESS, deserialize(serialize(SUCCESS)));
+    @Throws(IOException::class, ClassNotFoundException::class)
+    fun shouldSerializeSuccess() {
+        Assertions.assertEquals(SUCCESS, deserialize(serialize(SUCCESS)))
     }
 
-    private static byte[] serialize(Object obj) throws IOException {
-        try (final ByteArrayOutputStream buf = new ByteArrayOutputStream(); final ObjectOutputStream stream = new ObjectOutputStream(buf)) {
-            stream.writeObject(obj);
-            return buf.toByteArray();
+    companion object {
+        // -- Testees
+        private const val SUCCESS_VALUE = "success1"
+        private const val SUCCESS_VALUE2 = "success2"
+        private val SUCCESS = Try.success(SUCCESS_VALUE)
+        private val FAILURE_CAUSE: Exception = IllegalStateException("failure")
+        private val FAILURE = Try.failure<String>(FAILURE_CAUSE)
+        private val FAILURE_CAUSE2: Exception = IllegalStateException("failure2")
+        private val FAILURE2 = Try.failure<String>(FAILURE_CAUSE2)
+        private val ERROR = Error()
+        private val ASSERTION_ERROR = AssertionError("unexpected")
+        private val LINKAGE_ERROR = LinkageError()
+        private val THREAD_DEATH = ThreadDeath()
+        private val VM_ERROR: VirtualMachineError = object : VirtualMachineError() {
+            private val serialVersionUID = 1L
         }
-    }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        try (final ObjectInputStream stream = new ObjectInputStream(new ByteArrayInputStream(data))) {
-            return (T) stream.readObject();
+        @Throws(IOException::class)
+        private fun serialize(obj: Any): ByteArray {
+            ByteArrayOutputStream().use { buf ->
+                ObjectOutputStream(buf).use { stream ->
+                    stream.writeObject(obj)
+                    return buf.toByteArray()
+                }
+            }
+        }
+
+        @Throws(IOException::class, ClassNotFoundException::class)
+        private fun <T> deserialize(data: ByteArray): T {
+            ObjectInputStream(ByteArrayInputStream(data)).use { stream -> return stream.readObject() as T }
         }
     }
 }

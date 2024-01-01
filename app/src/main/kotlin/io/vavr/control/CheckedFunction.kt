@@ -18,7 +18,6 @@
  */
 package io.vavr.control
 
-import org.andstatus.todoagenda.R
 import java.util.Objects
 
 /**
@@ -47,7 +46,7 @@ fun interface CheckedFunction<T, R> {
      * @return a function composed of this and `after`
      * @throws NullPointerException if `after` is null
     </U> */
-    fun <U> andThen(after: CheckedFunction<in R, out U>): CheckedFunction<T, U>? {
+    fun <U> andThen(after: CheckedFunction<in R, out U>): CheckedFunction<T, U> {
         Objects.requireNonNull(after, "after is null")
         return CheckedFunction { t: T -> after.apply(apply(t)) }
     }
@@ -61,7 +60,7 @@ fun interface CheckedFunction<T, R> {
      * @return a function composed of `before` and this
      * @throws NullPointerException if `before` is null
     </U> */
-    fun <U> compose(before: CheckedFunction<in U, out T>): CheckedFunction<U, R>? {
+    fun <U> compose(before: CheckedFunction<in U, out T>): CheckedFunction<U, R> {
         Objects.requireNonNull(before, "before is null")
         return CheckedFunction { u: U -> apply(before.apply(u)) }
     }
@@ -74,7 +73,7 @@ fun interface CheckedFunction<T, R> {
          * @return the identity `CheckedFunction`
         </T> */
         @JvmStatic
-        fun <T> identity(): CheckedFunction<T, T>? {
+        fun <T> identity(): CheckedFunction<T, T> {
             return CheckedFunction { t: T -> t }
         }
     }

@@ -215,11 +215,11 @@ private constructor() : Iterable<T>, Serializable {
      * @return a `Try`
      * @throws NullPointerException if `mapper` is null
     </U> */
-    fun <U> flatMap(mapper: CheckedFunction<in T, out Try<out U>>): Try<U>? {
+    fun <U> flatMap(mapper: CheckedFunction<in T, out Try<out U>>): Try<U> {
         Objects.requireNonNull(mapper, "mapper is null")
         return if (isSuccess) {
             try {
-                mapper.apply(get()) as Try<U>?
+                mapper.apply(get()) as Try<U>
             } catch (t: Throwable) {
                 failure(t)
             }
@@ -291,7 +291,7 @@ private constructor() : Iterable<T>, Serializable {
      * @throws NullPointerException if the given `exceptionProvider` is null
     </X> */
     @Throws()
-    fun <X : Throwable> getOrElseThrow(exceptionProvider: Function<in Throwable?, out X>): T {
+    fun <X : Throwable> getOrElseThrow(exceptionProvider: Function<in Throwable, out X>): T {
         Objects.requireNonNull(exceptionProvider, "exceptionProvider is null")
         return if (isSuccess) {
             get()
@@ -421,13 +421,13 @@ private constructor() : Iterable<T>, Serializable {
      * @param callable a [Callable]
      * @return a `Try` instance
      */
-    fun orElse(callable: Callable<out Try<out T>>): Try<T>? {
+    fun orElse(callable: Callable<out Try<out T>>): Try<T> {
         Objects.requireNonNull(callable, "callable is null")
         return if (isSuccess) {
             this
         } else {
             try {
-                callable.call() as Try<T>?
+                callable.call() as Try<T>
             } catch (x: Throwable) {
                 failure(x)
             }
@@ -593,9 +593,7 @@ private constructor() : Iterable<T>, Serializable {
         }
 
         override val cause: Throwable
-            get() =
-                throw UnsupportedOperationException("getCause() on Success")
-
+            get() = throw UnsupportedOperationException("get cause on Success")
 
         override val isFailure: Boolean = false
 

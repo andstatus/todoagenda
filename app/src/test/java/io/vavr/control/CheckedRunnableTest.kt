@@ -16,24 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.vavr.control;
+package io.vavr.control
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-class CheckedRunnableTest {
-
+internal class CheckedRunnableTest {
     // -- .run()
-
     @Test
-    void shouldRunExceptionalCase() {
-        final CheckedRunnable f = () -> { throw new Exception("error"); };
-        assertEquals(
-                "error",
-                assertThrows(Exception.class, f::run).getMessage()
-        );
+    fun shouldRunExceptionalCase() {
+        val f = CheckedRunnable { throw Exception("error") }
+        Assertions.assertEquals(
+            "error",
+            Assertions.assertThrows(Exception::class.java) { f.run() }.message
+        )
     }
-
 }

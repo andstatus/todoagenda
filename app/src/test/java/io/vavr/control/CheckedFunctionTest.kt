@@ -16,113 +16,91 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.vavr.control;
+package io.vavr.control
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class CheckedFunctionTest {
-
+internal class CheckedFunctionTest {
     // -- static .identity()
-
     @Test
-    void shouldCreateIdentity() throws Exception {
-        CheckedFunction<Object, Object> f = CheckedFunction.identity();
-        assertNull(f.apply(null));
-        assertEquals(1, f.apply(1));
+    @Throws(Exception::class)
+    fun shouldCreateIdentity() {
+        val f = CheckedFunction.identity<Any?>()
+        Assertions.assertNull(f.apply(null))
+        Assertions.assertEquals(1, f.apply(1))
     }
 
     // -- .andThen(CheckedFunction)
-
     @Test
-    void shouldApplyOneCheckedFunctionAndThenAnotherCheckedFunction() throws Exception {
-        final CheckedFunction<Integer, Boolean> before = i -> i % 2 == 0;
-        final CheckedFunction<Boolean, String> after = Object::toString;
-        final CheckedFunction<Integer, String> f = before.andThen(after);
-        assertEquals("true", f.apply(0));
-        assertEquals("false", f.apply(1));
+    @Throws(Exception::class)
+    fun shouldApplyOneCheckedFunctionAndThenAnotherCheckedFunction() {
+        val before = CheckedFunction { i: Int -> i % 2 == 0 }
+        val after = CheckedFunction { obj: Boolean -> obj.toString() }
+        val f = before.andThen(after)
+        Assertions.assertEquals("true", f.apply(0))
+        Assertions.assertEquals("false", f.apply(1))
     }
 
     @Test
-    void shouldNotApplyAfterWhenBeforeThrowsWhenCombiningWithAndThen() {
-        final CheckedFunction<Integer, Boolean> before = ignored -> { throw new Exception("before"); };
-        final CheckedFunction<Boolean, String> after = ignored -> { throw new AssertionError("after called"); };
-        final CheckedFunction<Integer, String> f = before.andThen(after);
-        assertEquals(
-                "before",
-                assertThrows(Exception.class, () -> f.apply(null)).getMessage()
-        );
+    fun shouldNotApplyAfterWhenBeforeThrowsWhenCombiningWithAndThen() {
+        val before = CheckedFunction<Int?, Boolean> { ignored: Int? -> throw Exception("before") }
+        val after = CheckedFunction<Boolean, String> { ignored: Boolean? -> throw AssertionError("after called") }
+        val f = before.andThen(after)
+        Assertions.assertEquals(
+            "before",
+            Assertions.assertThrows(Exception::class.java) { f.apply(null) }.message
+        )
     }
 
     @Test
-    void shouldApplyBeforeWhenAfterThrowsWhenCombiningWithAndThen() {
-        final CheckedFunction<Integer, Boolean> before = ignored -> true;
-        final CheckedFunction<Boolean, String> after = ignored -> { throw new Exception("after"); };
-        final CheckedFunction<Integer, String> f = before.andThen(after);
-        assertEquals(
-                "after",
-                assertThrows(Exception.class, () -> f.apply(null)).getMessage()
-        );
-    }
-
-    @Test
-    void shouldThrowNPEIfAndThenReceivesNullParam() {
-        final CheckedFunction<?, ?> f = o -> o;
-        assertEquals(
-                "after is null",
-                assertThrows(NullPointerException.class, () -> f.andThen(null)).getMessage()
-        );
+    fun shouldApplyBeforeWhenAfterThrowsWhenCombiningWithAndThen() {
+        val before = CheckedFunction { ignored: Int? -> true }
+        val after = CheckedFunction<Boolean, String> { ignored: Boolean? -> throw Exception("after") }
+        val f = before.andThen(after)
+        Assertions.assertEquals(
+            "after",
+            Assertions.assertThrows(Exception::class.java) { f.apply(null) }.message
+        )
     }
 
     // -- .apply(Object)
-
     @Test
-    void shouldBeAbleToThrowCheckedException() {
-        final CheckedFunction<?, ?> f = ignored -> { throw new Exception(); };
-        assertThrows(Exception.class, () -> f.apply(null));
+    fun shouldBeAbleToThrowCheckedException() {
+        val f = CheckedFunction<Any?, Any?> { ignored: Any? -> throw Exception() }
+        Assertions.assertThrows(Exception::class.java) { f.apply(null) }
     }
 
     // -- .compose(CheckedFunction)
-
     @Test
-    void shouldApplyOneCheckedFunctionComposedWithAnotherCheckedFunction() throws Exception {
-        final CheckedFunction<Integer, Boolean> before = i -> i % 2 == 0;
-        final CheckedFunction<Boolean, String> after = Object::toString;
-        final CheckedFunction<Integer, String> f = after.compose(before);
-        assertEquals("true", f.apply(0));
-        assertEquals("false", f.apply(1));
+    @Throws(Exception::class)
+    fun shouldApplyOneCheckedFunctionComposedWithAnotherCheckedFunction() {
+        val before = CheckedFunction { i: Int -> i % 2 == 0 }
+        val after = CheckedFunction { obj: Boolean -> obj.toString() }
+        val f = after.compose(before)
+        Assertions.assertEquals("true", f.apply(0))
+        Assertions.assertEquals("false", f.apply(1))
     }
 
     @Test
-    void shouldNotApplyAfterWhenBeforeThrowsWhenCombiningWithCompose() {
-        final CheckedFunction<Integer, Boolean> before = ignored -> { throw new Exception("before"); };
-        final CheckedFunction<Boolean, String> after = ignored -> { throw new AssertionError("before called"); };
-        final CheckedFunction<Integer, String> f = after.compose(before);
-        assertEquals(
-                "before",
-                assertThrows(Exception.class, () -> f.apply(null)).getMessage()
-        );
+    fun shouldNotApplyAfterWhenBeforeThrowsWhenCombiningWithCompose() {
+        val before = CheckedFunction<Int?, Boolean> { ignored: Int? -> throw Exception("before") }
+        val after = CheckedFunction<Boolean, String> { ignored: Boolean? -> throw AssertionError("before called") }
+        val f = after.compose(before)
+        Assertions.assertEquals(
+            "before",
+            Assertions.assertThrows(Exception::class.java) { f.apply(null) }.message
+        )
     }
 
     @Test
-    void shouldApplyBeforeWhenAfterThrowsWhenCombiningWithCompose() {
-        final CheckedFunction<Integer, Boolean> before = ignored -> true;
-        final CheckedFunction<Boolean, String> after = ignored -> { throw new Exception("after"); };
-        final CheckedFunction<Integer, String> f = after.compose(before);
-        assertEquals(
-                "after",
-                assertThrows(Exception.class, () -> f.apply(null)).getMessage()
-        );
+    fun shouldApplyBeforeWhenAfterThrowsWhenCombiningWithCompose() {
+        val before = CheckedFunction { ignored: Int? -> true }
+        val after = CheckedFunction<Boolean, String> { ignored: Boolean? -> throw Exception("after") }
+        val f = after.compose(before)
+        Assertions.assertEquals(
+            "after",
+            Assertions.assertThrows(Exception::class.java) { f.apply(null) }.message
+        )
     }
-
-    @Test
-    void shouldThrowNPEIfComposeReceivesNullParam() {
-        final CheckedFunction<?, ?> f = o -> o;
-        assertEquals(
-                "before is null",
-                assertThrows(NullPointerException.class, () -> f.compose(null)).getMessage()
-        );
-    }
-    
 }
