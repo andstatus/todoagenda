@@ -46,11 +46,13 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
             Log.e(TAG, settings.toJson().toString(2))
             Assert.fail("No active event sources")
         }
-        provider!!.addRow(
+        provider.addRow(
             CalendarEvent(settings, provider.context, provider.widgetId, false)
                 .setStartDate(settings.clock().startOfTomorrow())
                 .setEventSource(provider.firstActiveEventSource)
-                .setTitle("This will be the only event that will be shown")
+                .apply {
+                    title = "This will be the only event that will be shown"
+                }
         )
         playResults(TAG)
         Assert.assertEquals(3, factory.widgetEntries.size.toLong())
@@ -60,7 +62,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
         val millis = toMillis(iso8601time)
         val title = "DST"
         for (ind in -25..25) {
-            provider!!.addRow(
+            provider.addRow(
                 QueryRow().setEventId(++eventId).setTitle("$title $ind")
                     .setBegin(millis + TimeUnit.HOURS.toMillis(ind.toLong())).setAllDay(1)
             )
@@ -99,9 +101,8 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
      * http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html
      */
     private fun toMillis(iso8601time: String): Long {
-        val date: Date
-        date = try {
-            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz", Locale.GERMANY).parse(iso8601time)
+        val date: Date = try {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz", Locale.GERMANY).parse(iso8601time)!!
         } catch (e: ParseException) {
             throw IllegalArgumentException(iso8601time, e)
         }

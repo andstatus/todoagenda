@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.text.TextUtils
 import androidx.annotation.ColorRes
+import androidx.core.database.getStringOrNull
 import io.vavr.control.Try
 import org.andstatus.todoagenda.BuildConfig
 import org.andstatus.todoagenda.R
@@ -25,21 +26,21 @@ class AstridCloneTasksProvider private constructor(
     override fun queryTasks(): List<TaskEvent> {
         myContentResolver.onQueryEvents()
         val where = whereClause
-        return myContentResolver.foldEvents<ArrayList<TaskEvent>>(TODOAGENDA_URI,
+        return myContentResolver.foldEvents(TODOAGENDA_URI,
             null,
             where,
             null,
             null,
-            ArrayList(),
-            { tasks: ArrayList<TaskEvent> ->
-                Function { cursor: Cursor ->
-                    val task = newTask(cursor)
-                    if (matchedFilter(task)) {
-                        tasks.add(task)
-                    }
-                    tasks
+            ArrayList()
+        ) { tasks: ArrayList<TaskEvent> ->
+            Function { cursor: Cursor ->
+                val task = newTask(cursor)
+                if (matchedFilter(task)) {
+                    tasks.add(task)
                 }
-            })
+                tasks
+            }
+        }
     }
 
     private val whereClause: String
@@ -57,10 +58,10 @@ class AstridCloneTasksProvider private constructor(
             }
             val taskLists: MutableSet<String> = HashSet()
             for (orderedSource in settings.getActiveEventSources(type)) {
-                taskLists.add(Integer.toString(orderedSource.source.id))
+                taskLists.add(orderedSource.source.id.toString())
             }
-            if (!taskLists.isEmpty()) {
-                if (whereBuilder.length > 0) {
+            if (taskLists.isNotEmpty()) {
+                if (whereBuilder.isNotEmpty()) {
                     whereBuilder.append(AND)
                 }
                 whereBuilder
@@ -81,7 +82,7 @@ class AstridCloneTasksProvider private constructor(
         val task = TaskEvent(settings, settings.clock().zone)
         task.setEventSource(source)
         task.setId(cursor.getLong(cursor.getColumnIndex(TASKS_COLUMN_ID)))
-        task.title = cursor.getString(cursor.getColumnIndex(TASKS_COLUMN_TITLE))
+        task.title = cursor.getStringOrNull(cursor.getColumnIndex(TASKS_COLUMN_TITLE)) ?: ""
         val startMillis: Long? = getPositiveLongOrNull(cursor, TASKS_COLUMN_START_DATE)
         val dueMillisRaw: Long? = getPositiveLongOrNull(cursor, TASKS_COLUMN_DUE_DATE)
         task.isAllDay = taskSource.isAllDay(dueMillisRaw)
@@ -106,8 +107,8 @@ class AstridCloneTasksProvider private constructor(
             val source = EventSource(
                 type,
                 cursor.getInt(cursor.getColumnIndex(taskSource.listColumnId)),
-                cursor.getString(cursor.getColumnIndex(taskSource.listColumnTitle)),
-                if (indSummary >= 0) cursor.getString(indSummary) else null,
+                cursor.getStringOrNull(cursor.getColumnIndex(taskSource.listColumnTitle)),
+                if (indSummary >= 0) cursor.getStringOrNull(indSummary) else null,
                 cursor.getInt(cursor.getColumnIndex(taskSource.listColumnListColor)),
                 true
             )
@@ -136,12 +137,12 @@ class AstridCloneTasksProvider private constructor(
 
     companion object {
         const val AUTHORITY = BuildConfig.ORG_TASKS_AUTHORITY
-        const val PERMISSION = AUTHORITY + ".permission.READ_TASKS"
-        private const val CONTENT_URI_STRING = "content://" + AUTHORITY
-        private val TASKS_URI = Uri.parse(CONTENT_URI_STRING + "/tasks")
-        val TASKS_LISTS_URI = Uri.parse(CONTENT_URI_STRING + "/lists")
-        val GOOGLE_LISTS_URI = Uri.parse(CONTENT_URI_STRING + "/google_lists")
-        private val TODOAGENDA_URI = Uri.parse(CONTENT_URI_STRING + "/todoagenda")
+        const val PERMISSION = "$AUTHORITY.permission.READ_TASKS"
+        private const val CONTENT_URI_STRING = "content://$AUTHORITY"
+        private val TASKS_URI = Uri.parse("$CONTENT_URI_STRING/tasks")
+        val TASKS_LISTS_URI: Uri = Uri.parse("$CONTENT_URI_STRING/lists")
+        val GOOGLE_LISTS_URI: Uri = Uri.parse("$CONTENT_URI_STRING/google_lists")
+        private val TODOAGENDA_URI: Uri = Uri.parse("$CONTENT_URI_STRING/todoagenda")
         private val ADD_TASK_INTENT = IntentUtil.newViewIntent()
             .setData(ContentUris.withAppendedId(TASKS_URI, 0))
         private const val TASKS_COLUMN_ID = "_id"

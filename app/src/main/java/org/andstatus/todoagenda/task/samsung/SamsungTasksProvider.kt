@@ -7,6 +7,7 @@ import android.content.Intent
 import android.database.Cursor
 import android.provider.CalendarContract
 import android.text.TextUtils
+import androidx.core.database.getStringOrNull
 import io.vavr.control.Try
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.EventSource
@@ -84,7 +85,7 @@ class SamsungTasksProvider(type: EventProviderType, context: Context, widgetId: 
         task.setEventSource(source)
         task.setId(cursor.getLong(cursor.getColumnIndex(SamsungTasksContract.Tasks.COLUMN_ID)))
         task.title =
-            cursor.getString(cursor.getColumnIndex(SamsungTasksContract.Tasks.COLUMN_TITLE))
+            cursor.getStringOrNull(cursor.getColumnIndex(SamsungTasksContract.Tasks.COLUMN_TITLE)) ?: ""
         val dueMillis: Long? =
             getPositiveLongOrNull(cursor, SamsungTasksContract.Tasks.COLUMN_DUE_DATE)
         task.setDates(null, dueMillis)
@@ -114,7 +115,7 @@ class SamsungTasksProvider(type: EventProviderType, context: Context, widgetId: 
                     val id = cursor.getInt(indId)
                     val source = EventSource(
                         type, id, taskListName,
-                        cursor.getString(indSummary), getColor(cursor, indColor, id), true
+                        cursor.getStringOrNull(indSummary), getColor(cursor, indColor, id), true
                     )
                     eventSources.add(source)
                     eventSources

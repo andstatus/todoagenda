@@ -9,6 +9,7 @@ import android.net.Uri
 import android.provider.CalendarContract
 import android.provider.CalendarContract.Attendees
 import android.util.Log
+import androidx.core.database.getStringOrNull
 import io.vavr.control.Try
 import org.andstatus.todoagenda.RemoteViewsFactory
 import org.andstatus.todoagenda.prefs.EventSource
@@ -191,12 +192,12 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
         event.setEventId(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID)))
         event.status =
             EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.STATUS)))
-        event.setTitle(cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.TITLE)))
+        event.title = cursor.getStringOrNull(cursor.getColumnIndex(CalendarContract.Instances.TITLE)) ?: ""
         event.startMillis = cursor.getLong(cursor.getColumnIndex(CalendarContract.Instances.BEGIN))
         event.endMillis = cursor.getLong(cursor.getColumnIndex(CalendarContract.Instances.END))
-        event.location = cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION))
+        event.location = cursor.getStringOrNull(cursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION)) ?: ""
         event.isAlarmActive = cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.HAS_ALARM)) > 0
-        event.isRecurring = cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.RRULE)) != null
+        event.isRecurring = cursor.getStringOrNull(cursor.getColumnIndex(CalendarContract.Instances.RRULE)) != null
         event.color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.DISPLAY_COLOR)))
         getColumnIndex(cursor, CalendarContract.Instances.CALENDAR_COLOR)
             .map<Int>({ ind: Int? -> getAsOpaque(cursor.getInt(ind!!)) })
@@ -216,8 +217,8 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
                     val indSummary = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)
                     val indColor = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR)
                     val source = EventSource(
-                        type, cursor.getInt(indId), cursor.getString(indTitle),
-                        cursor.getString(indSummary), cursor.getInt(indColor), true
+                        type, cursor.getInt(indId), cursor.getStringOrNull(indTitle),
+                        cursor.getStringOrNull(indSummary), cursor.getInt(indColor), true
                     )
                     eventSources.add(source)
                     eventSources

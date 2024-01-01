@@ -2,6 +2,7 @@ package org.andstatus.todoagenda.provider
 
 import android.database.Cursor
 import android.provider.CalendarContract
+import androidx.core.database.getStringOrNull
 import org.andstatus.todoagenda.provider.QueryRow.TypedValue.CursorFieldType
 import org.json.JSONException
 import org.json.JSONObject
@@ -35,7 +36,7 @@ class QueryRow {
             UNKNOWN(-1),
             STRING(Cursor.FIELD_TYPE_STRING) {
                 override fun columnToObject(cursor: Cursor, columnIndex: Int): Any? {
-                    return cursor.getString(columnIndex)
+                    return cursor.getStringOrNull(columnIndex)
                 }
             },
             INTEGER(Cursor.FIELD_TYPE_INTEGER) {

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.text.TextUtils
+import androidx.core.database.getStringOrNull
 import io.vavr.control.Try
 import org.andstatus.todoagenda.prefs.EventSource
 import org.andstatus.todoagenda.prefs.FilterMode
@@ -90,7 +91,7 @@ class DmfsOpenTasksProvider(type: EventProviderType, context: Context, widgetId:
         task.setEventSource(source)
         task.setId(cursor.getLong(cursor.getColumnIndex(DmfsOpenTasksContract.Tasks.COLUMN_ID)))
         task.title =
-            cursor.getString(cursor.getColumnIndex(DmfsOpenTasksContract.Tasks.COLUMN_TITLE))
+            cursor.getStringOrNull(cursor.getColumnIndex(DmfsOpenTasksContract.Tasks.COLUMN_TITLE)) ?: ""
         val startMillis: Long? =
             getPositiveLongOrNull(cursor, DmfsOpenTasksContract.Tasks.COLUMN_START_DATE)
         val allDayEventIdx = cursor.getColumnIndex(DmfsOpenTasksContract.Tasks.COLUMN_IS_ALLDAY)
@@ -133,8 +134,8 @@ class DmfsOpenTasksProvider(type: EventProviderType, context: Context, widgetId:
                 val indColor = cursor.getColumnIndex(DmfsOpenTasksContract.TaskLists.COLUMN_COLOR)
                 val indSummary = cursor.getColumnIndex(DmfsOpenTasksContract.TaskLists.COLUMN_ACCOUNT_NAME)
                 val source = EventSource(
-                    type, cursor.getInt(indId), cursor.getString(indTitle),
-                    cursor.getString(indSummary), cursor.getInt(indColor), true
+                    type, cursor.getInt(indId), cursor.getStringOrNull(indTitle),
+                    cursor.getStringOrNull(indSummary), cursor.getInt(indColor), true
                 )
                 eventSources.add(source)
                 eventSources

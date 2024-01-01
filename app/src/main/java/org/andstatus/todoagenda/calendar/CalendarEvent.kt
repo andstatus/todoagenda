@@ -24,7 +24,6 @@ class CalendarEvent(
         private set
     override var eventId = 0L
     var title: String = ""
-        private set
     lateinit var startDate: DateTime
         private set
     lateinit var endDate: DateTime
@@ -33,9 +32,6 @@ class CalendarEvent(
     var color = 0
     var calendarColor = Optional.empty<Int>()
     var location: String = ""
-        set(value) {
-            field = StringUtil.notNull(value)
-        }
 
     var isAlarmActive = false
     var isRecurring = false
@@ -100,11 +96,6 @@ class CalendarEvent(
 
     fun setEventId(eventId: Int) {
         this.eventId = eventId.toLong()
-    }
-
-    fun setTitle(title: String?): CalendarEvent {
-        this.title = StringUtil.notNull(title)
-        return this
     }
 
     fun setEndDate(endDate: DateTime) {

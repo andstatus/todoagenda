@@ -19,7 +19,7 @@ class SingleEventTest : BaseWidgetTest() {
         val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
-        event.setTitle("Single Event today with all known attributes")
+        event.title = "Single Event today with all known attributes"
         event.setStartDate(today.plusHours(12))
         event.setEndDate(today.plusHours(13))
         event.color = -0x6d1e40
@@ -40,7 +40,7 @@ class SingleEventTest : BaseWidgetTest() {
         val event = CalendarEvent(settings, provider.context, provider.widgetId, true)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
-        event.setTitle("Single AllDay event today with all known attributes")
+        event.title = "Single AllDay event today with all known attributes"
         event.setStartDate(today.minusDays(1))
         event.setEndDate(today.plusDays(1))
         event.color = -0x6d1e40
@@ -58,7 +58,7 @@ class SingleEventTest : BaseWidgetTest() {
         val event = CalendarEvent(settings, provider.context, provider.widgetId, true)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
-        event.setTitle("Single All day event from millis")
+        event.title = "Single All day event from millis"
         event.startMillis = today.millis
         Assert.assertEquals(event.startDate.toString(), today.millis, event.startMillis)
         Assert.assertEquals(event.endDate.toString(), today.plusDays(1).millis, event.endMillis)
