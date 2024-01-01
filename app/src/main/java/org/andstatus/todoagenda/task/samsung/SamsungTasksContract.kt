@@ -1,34 +1,29 @@
-package org.andstatus.todoagenda.task.samsung;
+package org.andstatus.todoagenda.task.samsung
 
-import android.net.Uri;
+import android.net.Uri
 
-public class SamsungTasksContract {
+object SamsungTasksContract {
+    const val INTENT_EXTRA_TASK = "task"
+    const val INTENT_EXTRA_SELECTED = "selected"
+    const val INTENT_EXTRA_ACTION_VIEW_FOCUS = "action_view_focus"
+    const val INTENT_EXTRA_DETAIL_MODE = "DetailMode"
+    const val INTENT_EXTRA_LAUNCH_FROM_WIDGET = "launch_from_widget"
 
-    public static class Tasks {
-
-        public static final Uri PROVIDER_URI = Uri.parse("content://com.android.calendar/syncTasks");
-
-        public static final String COLUMN_ID = "_id";
-        public static final String COLUMN_TITLE = "subject";
-        public static final String COLUMN_DUE_DATE = "utc_due_date";
-        public static final String COLUMN_COLOR = "secAccountColor";
-        public static final String COLUMN_COMPLETE = "complete";
-        public static final String COLUMN_DELETED = "deleted";
-        public static final String COLUMN_LIST_ID = "accountKey";
+    object Tasks {
+        val PROVIDER_URI = Uri.parse("content://com.android.calendar/syncTasks")
+        const val COLUMN_ID = "_id"
+        const val COLUMN_TITLE = "subject"
+        const val COLUMN_DUE_DATE = "utc_due_date"
+        const val COLUMN_COLOR = "secAccountColor"
+        const val COLUMN_COMPLETE = "complete"
+        const val COLUMN_DELETED = "deleted"
+        const val COLUMN_LIST_ID = "accountKey"
     }
 
-    public static class TaskLists {
-
-        public static final Uri PROVIDER_URI = Uri.parse("content://com.android.calendar/TasksAccounts");
-
-        public static final String COLUMN_ID = "_sync_account_key";
-        public static final String COLUMN_NAME = "displayName";
-        public static final String COLUMN_COLOR = "secAccountColor";
+    object TaskLists {
+        val PROVIDER_URI = Uri.parse("content://com.android.calendar/TasksAccounts")
+        const val COLUMN_ID = "_sync_account_key"
+        const val COLUMN_NAME = "displayName"
+        const val COLUMN_COLOR = "secAccountColor"
     }
-
-    public static final String INTENT_EXTRA_TASK = "task";
-    public static final String INTENT_EXTRA_SELECTED = "selected";
-    public static final String INTENT_EXTRA_ACTION_VIEW_FOCUS = "action_view_focus";
-    public static final String INTENT_EXTRA_DETAIL_MODE = "DetailMode";
-    public static final String INTENT_EXTRA_LAUNCH_FROM_WIDGET = "launch_from_widget";
 }

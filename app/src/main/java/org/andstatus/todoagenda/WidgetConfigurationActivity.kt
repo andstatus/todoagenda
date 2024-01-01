@@ -1,250 +1,230 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import android.appwidget.AppWidgetManager;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
-import android.widget.Toast;
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.ParcelFileDescriptor
+import android.util.Log
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.prefs.RootFragment
+import org.andstatus.todoagenda.prefs.colors.ColorsPreferencesFragment
+import org.andstatus.todoagenda.provider.WidgetData
+import org.andstatus.todoagenda.util.PermissionsUtil
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.Reader
+import java.nio.charset.StandardCharsets
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-
-import org.andstatus.todoagenda.prefs.AllSettings;
-import org.andstatus.todoagenda.prefs.ApplicationPreferences;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.RootFragment;
-import org.andstatus.todoagenda.prefs.colors.ColorsPreferencesFragment;
-import org.andstatus.todoagenda.provider.WidgetData;
-import org.andstatus.todoagenda.util.PermissionsUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-
-public class WidgetConfigurationActivity extends AppCompatActivity implements
-        PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
-    public static final String EXTRA_GOTO_PREFERENCES_SECTION = RemoteViewsFactory.PACKAGE + ".extra.GOTO_COLORS_PREFERENCES";
-    public static final String EXTRA_GOTO_SECTION_COLORS = "colors";
-    private static final String TAG = WidgetConfigurationActivity.class.getSimpleName();
-    public static final String FRAGMENT_TAG = "settings_fragment";
-
-    public static final int REQUEST_ID_RESTORE_SETTINGS = 1;
-    public static final int REQUEST_ID_BACKUP_SETTINGS = 2;
-    private int widgetId = 0;
-    private boolean saveOnPause = true;
-
-    @NonNull
-    public static Intent intentToStartMe(Context context, int widgetId) {
-        Intent intent = new Intent(context, WidgetConfigurationActivity.class)
-            .setData(Uri.parse("intent:configure" + widgetId))
-            .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP + Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
-            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
-        return intent;
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+class WidgetConfigurationActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+    private var widgetId = 0
+    private var saveOnPause = true
+    override fun onPause() {
+        super.onPause()
         if (saveOnPause) {
-            ApplicationPreferences.save(this, widgetId);
-            EnvironmentChangedReceiver.updateWidget(this, widgetId);
+            ApplicationPreferences.save(this, widgetId)
+            EnvironmentChangedReceiver.Companion.updateWidget(this, widgetId)
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        restartIfNeeded();
+    override fun onResume() {
+        super.onResume()
+        restartIfNeeded()
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        if (!openThisActivity(getIntent())) return;
-
-        setContentView(R.layout.activity_settings);
-        super.onCreate(savedInstanceState);
-
-        setTitle(ApplicationPreferences.getWidgetInstanceName(this));
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        if (!openThisActivity(intent)) return
+        setContentView(R.layout.activity_settings)
+        super.onCreate(savedInstanceState)
+        title = ApplicationPreferences.getWidgetInstanceName(this)
         if (savedInstanceState == null) {
             // Create the fragment only when the activity is created for the first time.
             // ie. not after orientation changes
-            Fragment fragment = getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+            var fragment = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG)
             if (fragment == null) {
-                fragment = new RootFragment();
+                fragment = RootFragment()
             }
-
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.settings_container, fragment, FRAGMENT_TAG);
-            ft.commit();
-
-            String gotoSection = getIntent().getStringExtra(EXTRA_GOTO_PREFERENCES_SECTION);
-            if (EXTRA_GOTO_SECTION_COLORS.equals(gotoSection)) {
-                ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.settings_container, new ColorsPreferencesFragment(), FRAGMENT_TAG);
-                ft.commit();
-                ft.addToBackStack(null);
+            var ft = supportFragmentManager.beginTransaction()
+            ft.replace(R.id.settings_container, fragment, FRAGMENT_TAG)
+            ft.commit()
+            val gotoSection = intent.getStringExtra(EXTRA_GOTO_PREFERENCES_SECTION)
+            if (EXTRA_GOTO_SECTION_COLORS == gotoSection) {
+                ft = supportFragmentManager.beginTransaction()
+                ft.replace(R.id.settings_container, ColorsPreferencesFragment(), FRAGMENT_TAG)
+                ft.commit()
+                ft.addToBackStack(null)
             }
         }
     }
 
-    @Override
-    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, Preference pref) {
-        setTitle(pref.getTitle() + " - " + ApplicationPreferences.getWidgetInstanceName(this));
-        return false;
+    override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
+        title = pref.title.toString() + " - " + ApplicationPreferences.getWidgetInstanceName(this)
+        return false
     }
 
-    private boolean openThisActivity(Intent newIntent) {
-        int newWidgetId = newIntent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0);
+    private fun openThisActivity(newIntent: Intent): Boolean {
+        var newWidgetId = newIntent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
         if (newWidgetId == 0) {
-            newWidgetId = ApplicationPreferences.getWidgetId(this);
+            newWidgetId = ApplicationPreferences.getWidgetId(this)
         }
-        Intent restartIntent = null;
+        var restartIntent: Intent? = null
         if (newWidgetId == 0 || !PermissionsUtil.arePermissionsGranted(this)) {
-            restartIntent = MainActivity.intentToStartMe(this);
+            restartIntent = MainActivity.Companion.intentToStartMe(this)
         } else if (widgetId != 0 && widgetId != newWidgetId) {
-            restartIntent = MainActivity.intentToConfigure(this, newWidgetId);
+            restartIntent = MainActivity.Companion.intentToConfigure(this, newWidgetId)
         } else if (widgetId == 0) {
-            widgetId = newWidgetId;
-            ApplicationPreferences.fromInstanceSettings(this, widgetId);
+            widgetId = newWidgetId
+            ApplicationPreferences.fromInstanceSettings(this, widgetId)
         }
         if (restartIntent != null) {
-            widgetId = 0;
-            startActivity(restartIntent);
-            finish();
+            widgetId = 0
+            startActivity(restartIntent)
+            finish()
         }
-        return restartIntent == null;
+        return restartIntent == null
     }
 
-    private void restartIfNeeded() {
+    private fun restartIfNeeded() {
         if (widgetId != ApplicationPreferences.getWidgetId(this) ||
-                !PermissionsUtil.arePermissionsGranted(this)) {
-            widgetId = 0;
-            startActivity(MainActivity.intentToStartMe(this));
-            finish();
+            !PermissionsUtil.arePermissionsGranted(this)
+        ) {
+            widgetId = 0
+            startActivity(MainActivity.Companion.intentToStartMe(this))
+            finish()
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_ID_BACKUP_SETTINGS:
-                if (resultCode == RESULT_OK && data != null) {
-                    backupSettings(data.getData());
-                }
-                break;
-            case REQUEST_ID_RESTORE_SETTINGS:
-                if (resultCode == RESULT_OK && data != null) {
-                    restoreSettings(data.getData());
-                }
-                break;
-            default:
-                super.onActivityResult(requestCode, resultCode, data);
-                break;
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            REQUEST_ID_BACKUP_SETTINGS -> if (resultCode == RESULT_OK && data != null) {
+                backupSettings(data.data)
+            }
+
+            REQUEST_ID_RESTORE_SETTINGS -> if (resultCode == RESULT_OK && data != null) {
+                restoreSettings(data.data)
+            }
+
+            else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    private void backupSettings(Uri uri) {
-        if (uri == null) return;
-
-        InstanceSettings settings = AllSettings.instanceFromId(this, widgetId);
-        String jsonSettings = WidgetData.fromSettings(this, settings).toJsonString();
-        ParcelFileDescriptor pfd = null;
-        FileOutputStream out = null;
+    private fun backupSettings(uri: Uri?) {
+        if (uri == null) return
+        val settings = AllSettings.instanceFromId(this, widgetId)
+        val jsonSettings: String = WidgetData.Companion.fromSettings(this, settings).toJsonString()
+        var pfd: ParcelFileDescriptor? = null
+        var out: FileOutputStream? = null
         try {
-            pfd = this.getContentResolver().openFileDescriptor(uri, "w");
-            out = new FileOutputStream(pfd.getFileDescriptor());
-            out.write(jsonSettings.getBytes());
-        } catch (Exception e) {
-            String msg = "Error while writing " + getText(R.string.app_name) +
-                    " settings to " + uri + "\n" + e.getMessage();
-            Log.w(TAG, msg, e);
-            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            pfd = this.contentResolver.openFileDescriptor(uri, "w")
+            out = FileOutputStream(pfd!!.fileDescriptor)
+            out.write(jsonSettings.toByteArray())
+        } catch (e: Exception) {
+            val msg = """Error while writing ${getText(R.string.app_name)} settings to $uri
+${e.message}"""
+            Log.w(TAG, msg, e)
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
         } finally {
             if (out != null) {
                 try {
-                    out.close();
-                } catch (IOException e2) {
-                    Log.w(TAG, "Error while closing stream", e2);
+                    out.close()
+                } catch (e2: IOException) {
+                    Log.w(TAG, "Error while closing stream", e2)
                 }
             }
             if (pfd != null) {
                 try {
-                    pfd.close();
-                } catch (IOException e2) {
-                    Log.w(TAG, "Error while closing file descriptor", e2);
+                    pfd.close()
+                } catch (e2: IOException) {
+                    Log.w(TAG, "Error while closing file descriptor", e2)
                 }
             }
         }
-        Toast.makeText(this, getText(R.string.backup_settings_title), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getText(R.string.backup_settings_title), Toast.LENGTH_LONG).show()
     }
 
-    private void restoreSettings(Uri uri) {
-        if (uri == null) return;
-
-        JSONObject jsonObject = readJson(uri);
-        if (jsonObject.length() == 0) return;
-
-        if (!AllSettings.restoreWidgetSettings(this, jsonObject, widgetId).isEmpty()) {
-            saveOnPause = false;
-            int duration = 3000;
-            final WidgetConfigurationActivity context = WidgetConfigurationActivity.this;
-            Toast.makeText(context, context.getText(R.string.restore_settings_title), Toast.LENGTH_LONG).show();
-            new Handler().postDelayed(() -> {
-                startActivity(intentToStartMe(context, widgetId));
-                context.finish();
-            }, duration);
+    private fun restoreSettings(uri: Uri?) {
+        if (uri == null) return
+        val jsonObject = readJson(uri)
+        if (jsonObject.length() == 0) return
+        if (!AllSettings.restoreWidgetSettings(this, jsonObject, widgetId).isEmpty) {
+            saveOnPause = false
+            val duration = 3000
+            val context = this@WidgetConfigurationActivity
+            Toast.makeText(context, context.getText(R.string.restore_settings_title), Toast.LENGTH_LONG).show()
+            Handler().postDelayed({
+                startActivity(intentToStartMe(context, widgetId))
+                context.finish()
+            }, duration.toLong())
         }
     }
 
-    private JSONObject readJson(Uri uri) {
-        final int BUFFER_LENGTH = 10000;
-        InputStream in = null;
-        Reader reader = null;
+    private fun readJson(uri: Uri): JSONObject {
+        val BUFFER_LENGTH = 10000
+        var `in`: InputStream? = null
+        var reader: Reader? = null
         try {
-            in = getContentResolver().openInputStream(uri);
-            char[] buffer = new char[BUFFER_LENGTH];
-            StringBuilder builder = new StringBuilder();
-            int count;
-            reader = new InputStreamReader(in, StandardCharsets.UTF_8);
-            while ((count = reader.read(buffer)) != -1) {
-                builder.append(buffer, 0, count);
+            `in` = contentResolver.openInputStream(uri)
+            val buffer = CharArray(BUFFER_LENGTH)
+            val builder = StringBuilder()
+            var count: Int
+            reader = InputStreamReader(`in`, StandardCharsets.UTF_8)
+            while (reader.read(buffer).also { count = it } != -1) {
+                builder.append(buffer, 0, count)
             }
-            return new JSONObject(builder.toString());
-        } catch (IOException | JSONException e) {
-            String msg = "Error while reading " + getText(R.string.app_name) +
-                    " settings from " + uri + "\n" + e.getMessage();
-            Log.w(TAG, msg, e);
-            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            return JSONObject(builder.toString())
+        } catch (e: IOException) {
+            val msg = """Error while reading ${getText(R.string.app_name)} settings from $uri
+${e.message}"""
+            Log.w(TAG, msg, e)
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+        } catch (e: JSONException) {
+            val msg = """Error while reading ${getText(R.string.app_name)} settings from $uri
+${e.message}"""
+            Log.w(TAG, msg, e)
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
         } finally {
-            if (in != null) {
+            if (`in` != null) {
                 try {
-                    in.close();
-                } catch (IOException e) {
-                    Log.w(TAG, "Error while closing stream", e);
+                    `in`.close()
+                } catch (e: IOException) {
+                    Log.w(TAG, "Error while closing stream", e)
                 }
             }
             if (reader != null) {
                 try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.w(TAG, "Error while closing reader", e);
+                    reader.close()
+                } catch (e: IOException) {
+                    Log.w(TAG, "Error while closing reader", e)
                 }
             }
         }
-        return new JSONObject();
+        return JSONObject()
+    }
+
+    companion object {
+        val EXTRA_GOTO_PREFERENCES_SECTION: String =
+            RemoteViewsFactory.Companion.PACKAGE + ".extra.GOTO_COLORS_PREFERENCES"
+        const val EXTRA_GOTO_SECTION_COLORS = "colors"
+        private val TAG = WidgetConfigurationActivity::class.java.simpleName
+        const val FRAGMENT_TAG = "settings_fragment"
+        const val REQUEST_ID_RESTORE_SETTINGS = 1
+        const val REQUEST_ID_BACKUP_SETTINGS = 2
+        fun intentToStartMe(context: Context?, widgetId: Int): Intent {
+            return Intent(context, WidgetConfigurationActivity::class.java)
+                .setData(Uri.parse("intent:configure$widgetId"))
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP + Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        }
     }
 }

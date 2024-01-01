@@ -1,22 +1,20 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-/** The event status */
-public enum EventStatus {
+/** The event status  */
+enum class EventStatus(
+    /** Values of [android.provider.CalendarContract.Instances.STATUS]  */
+    val calendarStatus: Int
+) {
     TENTATIVE(0),
     CONFIRMED(1),
     CANCELED(2);
 
-    /** Values of {@link android.provider.CalendarContract.Instances#STATUS} */
-    final int calendarStatus;
-
-    EventStatus(int calendarStatus) {
-        this.calendarStatus = calendarStatus;
-    }
-
-    public static EventStatus fromCalendarStatus(int calendarStatus) {
-        for(EventStatus status: values()) {
-            if(status.calendarStatus == calendarStatus) return status;
+    companion object {
+        fun fromCalendarStatus(calendarStatus: Int): EventStatus {
+            for (status in entries) {
+                if (status.calendarStatus == calendarStatus) return status
+            }
+            return CONFIRMED
         }
-        return CONFIRMED;
     }
 }

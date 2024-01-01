@@ -1,442 +1,413 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setAlpha;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setBackgroundColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setImageFromAttr;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextSize;
-import static org.andstatus.todoagenda.widget.LastEntry.LastEntryType.NOT_LOADED;
-import static org.andstatus.todoagenda.widget.WidgetEntryPosition.DAY_HEADER;
-import static org.andstatus.todoagenda.widget.WidgetEntryPosition.END_OF_LIST_HEADER;
-import static org.andstatus.todoagenda.widget.WidgetEntryPosition.PAST_AND_DUE_HEADER;
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.util.Log
+import android.view.View
+import android.widget.RemoteViews
+import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.OrderedEventSource
+import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
+import org.andstatus.todoagenda.prefs.colors.Shading
+import org.andstatus.todoagenda.prefs.colors.TextColorPref
+import org.andstatus.todoagenda.util.InstanceId
+import org.andstatus.todoagenda.util.MyClock
+import org.andstatus.todoagenda.util.RemoteViewsUtil
+import org.andstatus.todoagenda.util.StringUtil
+import org.andstatus.todoagenda.widget.DayHeader
+import org.andstatus.todoagenda.widget.DayHeaderVisualizer
+import org.andstatus.todoagenda.widget.LastEntry
+import org.andstatus.todoagenda.widget.LastEntry.LastEntryType
+import org.andstatus.todoagenda.widget.LastEntryVisualizer
+import org.andstatus.todoagenda.widget.TimeSection
+import org.andstatus.todoagenda.widget.WidgetEntry
+import org.andstatus.todoagenda.widget.WidgetEntryPosition
+import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
+import org.andstatus.todoagenda.widget.WidgetHeaderLayout
+import org.joda.time.DateTime
+import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
+import java.util.stream.Collectors
+import kotlin.concurrent.Volatile
 
-import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Build;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
-import android.view.View;
-import android.widget.RemoteViews;
-import android.widget.RemoteViewsService;
+class RemoteViewsFactory(val context: Context, private val widgetId: Int, createdByLauncher: Boolean) :
+    android.widget.RemoteViewsService.RemoteViewsFactory {
+    val instanceId = InstanceId.next()
 
-import androidx.annotation.NonNull;
+    @Volatile
+    var widgetEntries: MutableList<WidgetEntry<*>> = ArrayList()
 
-import org.andstatus.todoagenda.prefs.AllSettings;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
-import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref;
-import org.andstatus.todoagenda.prefs.colors.Shading;
-import org.andstatus.todoagenda.prefs.colors.TextColorPref;
-import org.andstatus.todoagenda.provider.EventProviderType;
-import org.andstatus.todoagenda.util.InstanceId;
-import org.andstatus.todoagenda.util.MyClock;
-import org.andstatus.todoagenda.util.StringUtil;
-import org.andstatus.todoagenda.widget.DayHeader;
-import org.andstatus.todoagenda.widget.DayHeaderVisualizer;
-import org.andstatus.todoagenda.widget.LastEntry;
-import org.andstatus.todoagenda.widget.LastEntryVisualizer;
-import org.andstatus.todoagenda.widget.TimeSection;
-import org.andstatus.todoagenda.widget.WidgetEntry;
-import org.andstatus.todoagenda.widget.WidgetEntryVisualizer;
-import org.andstatus.todoagenda.widget.WidgetHeaderLayout;
-import org.joda.time.DateTime;
+    @Volatile
+    private var visualizers: MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> = ArrayList()
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
-public class RemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
-    private static final String TAG = RemoteViewsFactory.class.getSimpleName();
-    public final static ConcurrentHashMap<Integer, RemoteViewsFactory> factories = new ConcurrentHashMap<>();
-
-    private static final int MAX_NUMBER_OF_WIDGETS = 100;
-    private static final int REQUEST_CODE_ADD_EVENT = 2;
-    static final int REQUEST_CODE_MIDNIGHT_ALARM = REQUEST_CODE_ADD_EVENT + MAX_NUMBER_OF_WIDGETS;
-    static final int REQUEST_CODE_PERIODIC_ALARM = REQUEST_CODE_MIDNIGHT_ALARM + MAX_NUMBER_OF_WIDGETS;
-
-    public static final String PACKAGE = "org.andstatus.todoagenda";
-    static final String ACTION_OPEN_CALENDAR = PACKAGE + ".action.OPEN_CALENDAR";
-    static final String ACTION_GOTO_TODAY = PACKAGE + ".action.GOTO_TODAY";
-    static final String ACTION_ADD_CALENDAR_EVENT = PACKAGE + ".action.ADD_CALENDAR_EVENT";
-    static final String ACTION_ADD_TASK = PACKAGE + ".action.ADD_TASK";
-    static final String ACTION_VIEW_ENTRY = PACKAGE + ".action.VIEW_ENTRY";
-    static final String ACTION_REFRESH = PACKAGE + ".action.REFRESH";
-    public static final String ACTION_CONFIGURE = PACKAGE + ".action.CONFIGURE";
-    static final String ACTION_MIDNIGHT_ALARM = PACKAGE + ".action.MIDNIGHT_ALARM";
-    static final String ACTION_PERIODIC_ALARM = PACKAGE + ".action.PERIODIC_ALARM";
-
-    public final long instanceId = InstanceId.next();
-    public final Context context;
-    private final int widgetId;
-    public final boolean createdByLauncher;
-
-    private volatile List<WidgetEntry> widgetEntries = new ArrayList<>();
-    private volatile List<WidgetEntryVisualizer<? extends WidgetEntry>> visualizers = new ArrayList<>();
-
-    public RemoteViewsFactory(Context context, int widgetId, boolean createdByLauncher) {
-        this.context = context;
-        this.widgetId = widgetId;
-        this.createdByLauncher = createdByLauncher;
-        visualizers.add(new LastEntryVisualizer(context, widgetId));
-        widgetEntries.add(new LastEntry(getSettings(), NOT_LOADED, getSettings().clock().now()));
-        logEvent("Init" + (createdByLauncher ? " by Launcher" : ""));
+    init {
+        visualizers.add(LastEntryVisualizer(context, widgetId))
+        widgetEntries.add(LastEntry(settings, LastEntryType.NOT_LOADED, settings.clock().now()))
+        logEvent("Init" + if (createdByLauncher) " by Launcher" else "")
     }
 
-    private void logEvent(String message) {
-        Log.d(TAG, widgetId + " instance:" + instanceId + " " + message);
+    private fun logEvent(message: String) {
+        Log.d(TAG, "$widgetId instance:$instanceId $message")
     }
 
-    public void onCreate() {
-        logEvent("onCreate");
+    override fun onCreate() {
+        logEvent("onCreate")
     }
 
-    public void onDestroy() {
-        logEvent("onDestroy");
+    override fun onDestroy() {
+        logEvent("onDestroy")
     }
 
-    public int getCount() {
-        logEvent("getCount:" + widgetEntries.size() + " " + InstanceState.get(widgetId).listRedrawn);
+    override fun getCount(): Int {
+        logEvent("getCount:" + widgetEntries.size + " " + InstanceState[widgetId].listRedrawn)
         if (widgetEntries.isEmpty()) {
-            InstanceState.listRedrawn(widgetId);
+            InstanceState.listRedrawn(widgetId)
         }
-        return widgetEntries.size();
+        return widgetEntries.size
     }
 
-    @Override
-    public RemoteViews getViewAt(int position) {
-        if (position < widgetEntries.size()) {
-            WidgetEntry entry = widgetEntries.get(position);
-            WidgetEntryVisualizer<? extends WidgetEntry> visualizer = visualizerFor(entry);
-            if (visualizer != null) {
-                RemoteViews views = visualizer.getRemoteViews(entry, position);
-                views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent());
-                if (position == widgetEntries.size() - 1) {
-                    InstanceState.listRedrawn(widgetId);
+    override fun getViewAt(position: Int): RemoteViews? {
+        if (position < widgetEntries.size) {
+            val entry = widgetEntries[position]
+            val visualizer = visualizerFor(entry)
+            return if (visualizer != null) {
+                val views = visualizer.getRemoteViews(entry, position)
+                views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent())
+                if (position == widgetEntries.size - 1) {
+                    InstanceState.listRedrawn(widgetId)
                 }
-                return views;
+                views
             } else {
-                logEvent("no visualizer at:" + position + " for " + entry);
-                return null;
+                logEvent("no visualizer at:$position for $entry")
+                null
             }
         }
-        logEvent("no view at:" + position + ", size:" + widgetEntries.size());
-        return null;
+        logEvent("no view at:" + position + ", size:" + widgetEntries.size)
+        return null
     }
 
-    private WidgetEntryVisualizer<? extends WidgetEntry> visualizerFor(WidgetEntry entry) {
-        for (WidgetEntryVisualizer<? extends WidgetEntry> visualizer : visualizers) {
-            if (visualizer.isFor(entry)) return visualizer;
+    private fun visualizerFor(entry: WidgetEntry<*>?): WidgetEntryVisualizer<out WidgetEntry<*>>? {
+        for (visualizer in visualizers) {
+            if (visualizer.isFor(entry!!)) return visualizer
         }
-        return null;
+        return null
     }
 
-    public static Intent getOnClickIntent(int widgetId, long entryId) {
-        if (widgetId == 0 || entryId == 0) return null;
+    private val settings: InstanceSettings
+        get() = AllSettings.instanceFromId(context, widgetId)
 
-        RemoteViewsFactory factory = factories.get(widgetId);
-        if (factory == null) return null;
-
-        WidgetEntry entry = factory.getWidgetEntries().stream()
-            .filter(we -> we.entryId == entryId)
-            .findFirst().orElse(null);
-        factory.logEvent("Clicked entryId:" + entryId + ", entry: " + entry);
-        if (entry == null) return null;
-
-        WidgetEntryVisualizer<? extends WidgetEntry> visualizer = factory.visualizerFor(entry);
-        return visualizer == null
-            ? null
-            : visualizer.newViewEntryIntent(entry);
+    override fun onDataSetChanged() {
+        logEvent("onDataSetChanged")
+        reload()
     }
 
-    @NonNull
-    private InstanceSettings getSettings() {
-        return AllSettings.instanceFromId(context, widgetId);
+    private fun reload() {
+        visualizers = getVisualizers()
+        widgetEntries = queryWidgetEntries(settings)
+        InstanceState.listReloaded(widgetId)
+        logEvent("reload, visualizers:" + visualizers.size + ", entries:" + widgetEntries.size)
     }
 
-    @Override
-    public void onDataSetChanged() {
-        logEvent("onDataSetChanged");
-        reload();
+    private fun getVisualizers(): MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> {
+        val visualizers: MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> = ArrayList()
+        val dayHeaderVisualizer = DayHeaderVisualizer(
+            settings.context,
+            widgetId
+        )
+        visualizers.add(dayHeaderVisualizer)
+        for (type in settings.typesOfActiveEventProviders) {
+            visualizers.add(type.getVisualizer(settings.context, widgetId))
+        }
+        visualizers.add(LastEntryVisualizer(context, widgetId))
+        return visualizers
     }
 
-    private void reload() {
-        visualizers = getVisualizers();
-        this.widgetEntries = queryWidgetEntries(getSettings());
-        InstanceState.listReloaded(widgetId);
-        logEvent("reload, visualizers:" + visualizers.size() + ", entries:" + this.widgetEntries.size());
-    }
-
-    static void updateWidget(Context context, int widgetId) {
-        try {
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            if (appWidgetManager == null) {
-                Log.d(TAG, widgetId + " updateWidget, appWidgetManager is null, context:" + context);
-                return;
+    val todaysPosition: Int
+        get() {
+            for (ind in 0 until widgetEntries.size - 1) {
+                if (widgetEntries[ind].timeSection != TimeSection.PAST) return ind
             }
-
-            InstanceSettings settings = AllSettings.instanceFromId(context, widgetId);
-            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_initial);
-
-            settings.clock().updateZone();
-            configureWidgetHeader(settings, rv);
-            configureWidgetEntriesList(settings, rv);
-
-            appWidgetManager.updateAppWidget(widgetId, rv);
-        } catch (Exception e) {
-            Log.w(TAG, widgetId + " Exception in updateWidget, context:" + context, e);
+            return widgetEntries.size - 1
         }
+    val tomorrowsPosition: Int
+        get() {
+            for (ind in 0 until widgetEntries.size - 1) {
+                if (widgetEntries[ind].timeSection == TimeSection.FUTURE) return ind
+            }
+            return if (widgetEntries.isNotEmpty()) 0 else -1
+        }
+
+    private fun queryWidgetEntries(settings: InstanceSettings): MutableList<WidgetEntry<*>> {
+        val eventEntries: MutableList<WidgetEntry<*>> = ArrayList()
+        for (visualizer in visualizers) {
+            eventEntries.addAll(visualizer.queryEventEntries())
+        }
+        eventEntries.sort()
+        val noHidden: MutableList<WidgetEntry<*>> =
+            eventEntries.stream().filter { obj: WidgetEntry<*>? -> obj!!.notHidden() }.collect(Collectors.toList())
+        val deduplicated = if (settings.hideDuplicates) filterOutDuplicates(noHidden) else noHidden
+        val widgetEntries: MutableList<WidgetEntry<*>> =
+            if (settings.showDayHeaders) addDayHeaders(deduplicated) else deduplicated
+        LastEntry.addLast(settings, widgetEntries)
+        return widgetEntries
     }
 
-    private List<WidgetEntryVisualizer<? extends WidgetEntry>> getVisualizers() {
-        List<WidgetEntryVisualizer<? extends WidgetEntry>> visualizers = new ArrayList<>();
-        DayHeaderVisualizer dayHeaderVisualizer = new DayHeaderVisualizer(
-                getSettings().getContext(),
-                widgetId);
-        visualizers.add(dayHeaderVisualizer);
-        for (EventProviderType type : getSettings().getTypesOfActiveEventProviders()) {
-            visualizers.add(type.getVisualizer(getSettings().getContext(), widgetId));
-        }
-        visualizers.add(new LastEntryVisualizer(context, widgetId));
-        return visualizers;
-    }
-
-    int getTodaysPosition() {
-        for (int ind = 0; ind < getWidgetEntries().size() - 1; ind++) {
-            if (getWidgetEntries().get(ind).timeSection != TimeSection.PAST) return ind;
-        }
-        return getWidgetEntries().size() - 1;
-    }
-
-    int getTomorrowsPosition() {
-        for (int ind = 0; ind < getWidgetEntries().size() - 1; ind++) {
-            if (getWidgetEntries().get(ind).timeSection == TimeSection.FUTURE) return ind;
-        }
-        return getWidgetEntries().size() > 0 ? 0 : -1;
-    }
-
-    private List<WidgetEntry> queryWidgetEntries(InstanceSettings settings) {
-        List<WidgetEntry> eventEntries = new ArrayList<>();
-        for (WidgetEntryVisualizer<?> visualizer : visualizers) {
-            eventEntries.addAll(visualizer.queryEventEntries());
-        }
-        Collections.sort(eventEntries);
-        List<WidgetEntry> noHidden = eventEntries.stream().filter(WidgetEntry::notHidden).collect(Collectors.toList());
-        List<WidgetEntry> deduplicated = settings.getHideDuplicates() ? filterOutDuplicates(noHidden) : noHidden;
-        List<WidgetEntry> widgetEntries = settings.getShowDayHeaders() ? addDayHeaders(deduplicated) : deduplicated;
-        LastEntry.addLast(settings, widgetEntries);
-        return widgetEntries;
-    }
-
-    private List<WidgetEntry> filterOutDuplicates(List<WidgetEntry> inputEntries) {
-        List<WidgetEntry> deduplicated = new ArrayList<>();
-        List<WidgetEntry> hidden = new ArrayList<>();
-        for(int ind1 = 0; ind1 < inputEntries.size(); ind1++) {
-            WidgetEntry inputEntry = inputEntries.get(ind1);
+    private fun filterOutDuplicates(inputEntries: List<WidgetEntry<*>>): MutableList<WidgetEntry<*>> {
+        val deduplicated: MutableList<WidgetEntry<*>> = ArrayList()
+        val hidden: MutableList<WidgetEntry<*>> = ArrayList()
+        for (ind1 in inputEntries.indices) {
+            val inputEntry = inputEntries[ind1]
             if (!hidden.contains(inputEntry)) {
-                deduplicated.add(inputEntry);
-                for(int ind2 = ind1 + 1; ind2 < inputEntries.size(); ind2++) {
-                    WidgetEntry entry2 = inputEntries.get(ind2);
+                deduplicated.add(inputEntry)
+                for (ind2 in ind1 + 1 until inputEntries.size) {
+                    val entry2 = inputEntries[ind2]
                     if (!hidden.contains(entry2) && inputEntry.duplicates(entry2)) {
-                        hidden.add(entry2);
+                        hidden.add(entry2)
                     }
                 }
             }
         }
-        return deduplicated;
+        return deduplicated
     }
 
-    private List<WidgetEntry> addDayHeaders(List<WidgetEntry> listIn) {
-        List<WidgetEntry> listOut = new ArrayList<>();
-        if (!listIn.isEmpty()) {
-            InstanceSettings settings = getSettings();
-            DayHeader curDayBucket = new DayHeader(settings, DAY_HEADER, MyClock.DATETIME_MIN);
-            boolean pastEventsHeaderAdded = false;
-            boolean endOfListHeaderAdded = false;
-            for (WidgetEntry entry : listIn) {
-                DateTime nextEntryDay = entry.entryDay;
-                switch (entry.entryPosition) {
-                    case PAST_AND_DUE:
-                        if(!pastEventsHeaderAdded) {
-                            curDayBucket = new DayHeader(settings, PAST_AND_DUE_HEADER, MyClock.DATETIME_MIN);
-                            listOut.add(curDayBucket);
-                            pastEventsHeaderAdded = true;
+    private fun addDayHeaders(listIn: List<WidgetEntry<*>>): MutableList<WidgetEntry<*>> {
+        val listOut: MutableList<WidgetEntry<*>> = ArrayList()
+        if (listIn.isNotEmpty()) {
+            val settings = settings
+            var curDayBucket = DayHeader(settings, WidgetEntryPosition.DAY_HEADER, MyClock.DATETIME_MIN)
+            var pastEventsHeaderAdded = false
+            var endOfListHeaderAdded = false
+            for (entry in listIn) {
+                val nextEntryDay = entry.entryDay
+                when (entry.entryPosition) {
+                    WidgetEntryPosition.PAST_AND_DUE -> if (!pastEventsHeaderAdded) {
+                        curDayBucket =
+                            DayHeader(settings, WidgetEntryPosition.PAST_AND_DUE_HEADER, MyClock.DATETIME_MIN)
+                        listOut.add(curDayBucket)
+                        pastEventsHeaderAdded = true
+                    }
+
+                    WidgetEntryPosition.END_OF_LIST -> if (!endOfListHeaderAdded) {
+                        endOfListHeaderAdded = true
+                        curDayBucket =
+                            DayHeader(settings, WidgetEntryPosition.END_OF_LIST_HEADER, MyClock.DATETIME_MAX)
+                        listOut.add(curDayBucket)
+                    }
+
+                    else -> if (!nextEntryDay.isEqual(curDayBucket.entryDay)) {
+                        if (settings.showDaysWithoutEvents) {
+                            addEmptyDayHeadersBetweenTwoDays(listOut, curDayBucket.entryDay, nextEntryDay)
                         }
-                        break;
-                    case END_OF_LIST:
-                        if (!endOfListHeaderAdded) {
-                            endOfListHeaderAdded = true;
-                            curDayBucket = new DayHeader(settings, END_OF_LIST_HEADER, MyClock.DATETIME_MAX);
-                            listOut.add(curDayBucket);
-                        }
-                        break;
-                    default:
-                        if (!nextEntryDay.isEqual(curDayBucket.entryDay)) {
-                            if (settings.getShowDaysWithoutEvents()) {
-                                addEmptyDayHeadersBetweenTwoDays(listOut, curDayBucket.entryDay, nextEntryDay);
-                            }
-                            curDayBucket = new DayHeader(settings, DAY_HEADER, nextEntryDay);
-                            listOut.add(curDayBucket);
-                        }
+                        curDayBucket = DayHeader(settings, WidgetEntryPosition.DAY_HEADER, nextEntryDay)
+                        listOut.add(curDayBucket)
+                    }
                 }
-                listOut.add(entry);
+                listOut.add(entry)
             }
         }
-        return listOut;
+        return listOut
     }
 
-    public void logWidgetEntries(String tag) {
-        Log.v(tag, "Widget entries: " + getWidgetEntries().size());
-        for (int ind = 0; ind < getWidgetEntries().size(); ind++) {
-            WidgetEntry widgetEntry = getWidgetEntries().get(ind);
-            Log.v(tag, String.format("%02d ", ind) + widgetEntry.toString());
+    fun logWidgetEntries(tag: String?) {
+        Log.v(tag, "Widget entries: " + widgetEntries.size)
+        for (ind in widgetEntries.indices) {
+            val widgetEntry = widgetEntries[ind]
+            Log.v(tag, String.format("%02d ", ind) + widgetEntry.toString())
         }
     }
 
-    List<? extends WidgetEntry> getWidgetEntries() {
-        return widgetEntries;
-    }
-
-    private void addEmptyDayHeadersBetweenTwoDays(List<WidgetEntry> entries, DateTime fromDayExclusive, DateTime toDayExclusive) {
-        DateTime emptyDay = fromDayExclusive.plusDays(1);
-        DateTime today = getSettings().clock().now().withTimeAtStartOfDay();
+    private fun addEmptyDayHeadersBetweenTwoDays(
+        entries: MutableList<WidgetEntry<*>>,
+        fromDayExclusive: DateTime?,
+        toDayExclusive: DateTime?
+    ) {
+        var emptyDay = fromDayExclusive!!.plusDays(1)
+        val today = settings.clock().now().withTimeAtStartOfDay()
         if (emptyDay.isBefore(today)) {
-            emptyDay = today;
+            emptyDay = today
         }
         while (emptyDay.isBefore(toDayExclusive)) {
-            entries.add(new DayHeader(getSettings(), DAY_HEADER, emptyDay));
-            emptyDay = emptyDay.plusDays(1);
+            entries.add(DayHeader(settings, WidgetEntryPosition.DAY_HEADER, emptyDay))
+            emptyDay = emptyDay.plusDays(1)
         }
     }
 
-    public RemoteViews getLoadingView() {
-        return null;
+    override fun getLoadingView(): RemoteViews? {
+        return null
     }
 
-    public int getViewTypeCount() {
-        int result = 14;  // Actually this is maximum number of different layoutIDs
-        logEvent("getViewTypeCount:" + result);
-        return result;
+    override fun getViewTypeCount(): Int {
+        val result = 14 // Actually this is maximum number of different layoutIDs
+        logEvent("getViewTypeCount:$result")
+        return result
     }
 
-    public long getItemId(int position) {
-        logEvent("getItemId: " + position);
-        if (position < widgetEntries.size()) {
-            return position + 1;
+    override fun getItemId(position: Int): Long {
+        logEvent("getItemId: $position")
+        return if (position < widgetEntries.size) {
+            (position + 1).toLong()
+        } else 0
+    }
+
+    override fun hasStableIds(): Boolean {
+        return false
+    }
+
+    companion object {
+        private val TAG = RemoteViewsFactory::class.java.simpleName
+        val factories = ConcurrentHashMap<Int, RemoteViewsFactory>()
+        private const val MAX_NUMBER_OF_WIDGETS = 100
+        private const val REQUEST_CODE_ADD_EVENT = 2
+        const val REQUEST_CODE_MIDNIGHT_ALARM = REQUEST_CODE_ADD_EVENT + MAX_NUMBER_OF_WIDGETS
+        const val REQUEST_CODE_PERIODIC_ALARM = REQUEST_CODE_MIDNIGHT_ALARM + MAX_NUMBER_OF_WIDGETS
+        const val PACKAGE = "org.andstatus.todoagenda"
+        const val ACTION_OPEN_CALENDAR = "$PACKAGE.action.OPEN_CALENDAR"
+        const val ACTION_GOTO_TODAY = "$PACKAGE.action.GOTO_TODAY"
+        const val ACTION_ADD_CALENDAR_EVENT = "$PACKAGE.action.ADD_CALENDAR_EVENT"
+        const val ACTION_ADD_TASK = "$PACKAGE.action.ADD_TASK"
+        const val ACTION_VIEW_ENTRY = "$PACKAGE.action.VIEW_ENTRY"
+        const val ACTION_REFRESH = "$PACKAGE.action.REFRESH"
+        const val ACTION_CONFIGURE = "$PACKAGE.action.CONFIGURE"
+        const val ACTION_MIDNIGHT_ALARM = "$PACKAGE.action.MIDNIGHT_ALARM"
+        const val ACTION_PERIODIC_ALARM = "$PACKAGE.action.PERIODIC_ALARM"
+        fun getOnClickIntent(widgetId: Int, entryId: Long): Intent? {
+            if (widgetId == 0 || entryId == 0L) return null
+            val factory = factories[widgetId] ?: return null
+            val entry = factory.widgetEntries.stream()
+                .filter { we: WidgetEntry<*>? -> we!!.entryId == entryId }
+                .findFirst().orElse(null)
+            factory.logEvent("Clicked entryId:$entryId, entry: $entry")
+            if (entry == null) return null
+            val visualizer = factory.visualizerFor(entry)
+            return visualizer?.newViewEntryIntent(entry)
         }
-        return 0;
-    }
 
-    public boolean hasStableIds() {
-        return false;
-    }
-
-    private static void configureWidgetHeader(InstanceSettings settings, RemoteViews rv) {
-        Log.d(TAG, settings.getWidgetId() + " configureWidgetHeader, layout:" + settings.getWidgetHeaderLayout());
-        rv.removeAllViews(R.id.header_parent);
-
-        if (settings.getWidgetHeaderLayout() != WidgetHeaderLayout.HIDDEN) {
-            RemoteViews headerView = new RemoteViews(settings.getContext().getPackageName(),
-                    settings.getWidgetHeaderLayout().layoutId);
-            rv.addView(R.id.header_parent, headerView);
-
-            setBackgroundColor(rv, R.id.action_bar,
-                    settings.colors().getBackgroundColor(BackgroundColorPref.WIDGET_HEADER));
-            configureCurrentDate(settings, rv);
-            setActionIcons(settings, rv);
-            configureGotoToday(settings, rv);
-            configureAddCalendarEvent(settings, rv);
-            configureAddTask(settings, rv);
-            configureRefresh(settings, rv);
-            configureOverflowMenu(settings, rv);
+        fun updateWidget(context: Context, widgetId: Int) {
+            try {
+                val appWidgetManager = AppWidgetManager.getInstance(context)
+                if (appWidgetManager == null) {
+                    Log.d(TAG, "$widgetId updateWidget, appWidgetManager is null, context:$context")
+                    return
+                }
+                val settings = AllSettings.instanceFromId(context, widgetId)
+                val rv = RemoteViews(context.packageName, R.layout.widget_initial)
+                settings.clock().updateZone()
+                configureWidgetHeader(settings, rv)
+                configureWidgetEntriesList(settings, rv)
+                appWidgetManager.updateAppWidget(widgetId, rv)
+            } catch (e: Exception) {
+                Log.w(TAG, "$widgetId Exception in updateWidget, context:$context", e)
+            }
         }
-    }
 
-    private static void configureCurrentDate(InstanceSettings settings, RemoteViews rv) {
-        int viewId = R.id.calendar_current_date;
-        rv.setOnClickPendingIntent(viewId, getActionPendingIntent(settings, ACTION_OPEN_CALENDAR));
-        String formattedDate = settings.widgetHeaderDateFormatter()
+        private fun configureWidgetHeader(settings: InstanceSettings, rv: RemoteViews) {
+            Log.d(TAG, settings.widgetId.toString() + " configureWidgetHeader, layout:" + settings.widgetHeaderLayout)
+            rv.removeAllViews(R.id.header_parent)
+            if (settings.widgetHeaderLayout != WidgetHeaderLayout.HIDDEN) {
+                val headerView = RemoteViews(
+                    settings.context.packageName,
+                    settings.widgetHeaderLayout.layoutId
+                )
+                rv.addView(R.id.header_parent, headerView)
+                RemoteViewsUtil.setBackgroundColor(
+                    rv, R.id.action_bar,
+                    settings.colors().getBackgroundColor(BackgroundColorPref.WIDGET_HEADER)
+                )
+                configureCurrentDate(settings, rv)
+                setActionIcons(settings, rv)
+                configureGotoToday(settings, rv)
+                configureAddCalendarEvent(settings, rv)
+                configureAddTask(settings, rv)
+                configureRefresh(settings, rv)
+                configureOverflowMenu(settings, rv)
+            }
+        }
+
+        private fun configureCurrentDate(settings: InstanceSettings, rv: RemoteViews) {
+            val viewId = R.id.calendar_current_date
+            rv.setOnClickPendingIntent(viewId, getActionPendingIntent(settings, ACTION_OPEN_CALENDAR))
+            val formattedDate = settings.widgetHeaderDateFormatter()
                 .formatDate(settings.clock().now()).toString()
-                .toUpperCase(Locale.getDefault());
-        rv.setTextViewText(viewId, StringUtil.isEmpty(formattedDate) ? "                    " : formattedDate);
-        setTextSize(settings, rv, viewId, R.dimen.widget_header_title);
-        setTextColor(settings, TextColorPref.WIDGET_HEADER, rv, viewId, R.attr.header);
-    }
-
-    private static void setActionIcons(InstanceSettings settings, RemoteViews rv) {
-        ContextThemeWrapper themeContext = settings.colors().getThemeContext(TextColorPref.WIDGET_HEADER);
-        setImageFromAttr(themeContext, rv, R.id.go_to_today, R.attr.header_action_go_to_today);
-        setImageFromAttr(themeContext, rv, R.id.add_event, R.attr.header_action_add_event);
-        setImageFromAttr(themeContext, rv, R.id.add_task, R.attr.header_action_add_task);
-        setImageFromAttr(themeContext, rv, R.id.refresh, R.attr.header_action_refresh);
-        setImageFromAttr(themeContext, rv, R.id.overflow_menu, R.attr.header_action_overflow);
-        Shading shading = settings.colors().getShading(TextColorPref.WIDGET_HEADER);
-        int alpha = 255;
-        if (shading == Shading.DARK || shading == Shading.LIGHT) {
-            alpha = 154;
+                .uppercase(Locale.getDefault())
+            rv.setTextViewText(viewId, if (StringUtil.isEmpty(formattedDate)) "                    " else formattedDate)
+            RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.widget_header_title)
+            RemoteViewsUtil.setTextColor(settings, TextColorPref.WIDGET_HEADER, rv, viewId, R.attr.header)
         }
-        setAlpha(rv, R.id.go_to_today, alpha);
-        setAlpha(rv, R.id.add_event, alpha);
-        setAlpha(rv, R.id.add_task, alpha);
-        setAlpha(rv, R.id.refresh, alpha);
-        setAlpha(rv, R.id.overflow_menu, alpha);
-    }
 
-    private static void configureAddCalendarEvent(InstanceSettings settings, RemoteViews rv) {
-        if (settings.getFirstSource(true) == OrderedEventSource.EMPTY) {
-            rv.setViewVisibility(R.id.add_event, View.GONE);
-        } else {
-            rv.setViewVisibility(R.id.add_event, View.VISIBLE);
-            rv.setOnClickPendingIntent(R.id.add_event, getActionPendingIntent(settings, ACTION_ADD_CALENDAR_EVENT));
+        private fun setActionIcons(settings: InstanceSettings, rv: RemoteViews) {
+            val themeContext = settings.colors().getThemeContext(TextColorPref.WIDGET_HEADER)
+            RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.go_to_today, R.attr.header_action_go_to_today)
+            RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.add_event, R.attr.header_action_add_event)
+            RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.add_task, R.attr.header_action_add_task)
+            RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.refresh, R.attr.header_action_refresh)
+            RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.overflow_menu, R.attr.header_action_overflow)
+            val shading = settings.colors().getShading(TextColorPref.WIDGET_HEADER)
+            var alpha = 255
+            if (shading == Shading.DARK || shading == Shading.LIGHT) {
+                alpha = 154
+            }
+            RemoteViewsUtil.setAlpha(rv, R.id.go_to_today, alpha)
+            RemoteViewsUtil.setAlpha(rv, R.id.add_event, alpha)
+            RemoteViewsUtil.setAlpha(rv, R.id.add_task, alpha)
+            RemoteViewsUtil.setAlpha(rv, R.id.refresh, alpha)
+            RemoteViewsUtil.setAlpha(rv, R.id.overflow_menu, alpha)
         }
-    }
 
-    private static void configureAddTask(InstanceSettings settings, RemoteViews rv) {
-        if (settings.getFirstSource(false) == OrderedEventSource.EMPTY) {
-            rv.setViewVisibility(R.id.add_task, View.GONE);
-        } else {
-            rv.setViewVisibility(R.id.add_task, View.VISIBLE);
-            rv.setOnClickPendingIntent(R.id.add_task, getActionPendingIntent(settings, ACTION_ADD_TASK));
+        private fun configureAddCalendarEvent(settings: InstanceSettings, rv: RemoteViews) {
+            if (settings.getFirstSource(true) === OrderedEventSource.EMPTY) {
+                rv.setViewVisibility(R.id.add_event, View.GONE)
+            } else {
+                rv.setViewVisibility(R.id.add_event, View.VISIBLE)
+                rv.setOnClickPendingIntent(R.id.add_event, getActionPendingIntent(settings, ACTION_ADD_CALENDAR_EVENT))
+            }
         }
-    }
 
-    private static void configureRefresh(InstanceSettings settings, RemoteViews rv) {
-        rv.setOnClickPendingIntent(R.id.refresh, getActionPendingIntent(settings, ACTION_REFRESH));
-    }
+        private fun configureAddTask(settings: InstanceSettings, rv: RemoteViews) {
+            if (settings.getFirstSource(false) === OrderedEventSource.EMPTY) {
+                rv.setViewVisibility(R.id.add_task, View.GONE)
+            } else {
+                rv.setViewVisibility(R.id.add_task, View.VISIBLE)
+                rv.setOnClickPendingIntent(R.id.add_task, getActionPendingIntent(settings, ACTION_ADD_TASK))
+            }
+        }
 
-    private static void configureOverflowMenu(InstanceSettings settings, RemoteViews rv) {
-        rv.setOnClickPendingIntent(R.id.overflow_menu, getActionPendingIntent(settings, ACTION_CONFIGURE));
-    }
+        private fun configureRefresh(settings: InstanceSettings, rv: RemoteViews) {
+            rv.setOnClickPendingIntent(R.id.refresh, getActionPendingIntent(settings, ACTION_REFRESH))
+        }
 
-    private static void configureWidgetEntriesList(InstanceSettings settings, RemoteViews rv) {
-        Intent intent = new Intent(settings.getContext(), org.andstatus.todoagenda.RemoteViewsService.class);
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.getWidgetId());
-        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));
-        rv.setRemoteAdapter(R.id.event_list, intent);
-        rv.setPendingIntentTemplate(R.id.event_list, getActionPendingIntent(settings, ACTION_VIEW_ENTRY));
-    }
+        private fun configureOverflowMenu(settings: InstanceSettings, rv: RemoteViews) {
+            rv.setOnClickPendingIntent(R.id.overflow_menu, getActionPendingIntent(settings, ACTION_CONFIGURE))
+        }
 
-    private static void configureGotoToday(InstanceSettings settings, RemoteViews rv) {
-        rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY));
-    }
+        private fun configureWidgetEntriesList(settings: InstanceSettings, rv: RemoteViews) {
+            val intent = Intent(settings.context, RemoteViewsService::class.java)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.widgetId)
+            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)))
+            rv.setRemoteAdapter(R.id.event_list, intent)
+            rv.setPendingIntentTemplate(R.id.event_list, getActionPendingIntent(settings, ACTION_VIEW_ENTRY))
+        }
 
-    public static PendingIntent getActionPendingIntent(InstanceSettings settings, String action) {
-        // We need unique request codes for each widget
-        int requestCode = action.hashCode() + settings.getWidgetId();
-        Intent intent = new Intent(settings.getContext().getApplicationContext(), EnvironmentChangedReceiver.class)
+        private fun configureGotoToday(settings: InstanceSettings, rv: RemoteViews) {
+            rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
+        }
+
+        fun getActionPendingIntent(settings: InstanceSettings, action: String): PendingIntent {
+            // We need unique request codes for each widget
+            val requestCode = action.hashCode() + settings.widgetId
+            val intent = Intent(settings.context.applicationContext, EnvironmentChangedReceiver::class.java)
                 .setAction(action)
-                .setData(Uri.parse("intent:" + action.toLowerCase() + settings.getWidgetId()))
-                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.getWidgetId());
-        int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            flags += PendingIntent.FLAG_MUTABLE;
+                .setData(Uri.parse("intent:" + action.lowercase(Locale.getDefault()) + settings.widgetId))
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.widgetId)
+            var flags = PendingIntent.FLAG_UPDATE_CURRENT
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                flags += PendingIntent.FLAG_MUTABLE
+            }
+            return PendingIntent.getBroadcast(settings.context, requestCode, intent, flags)
         }
-        return PendingIntent.getBroadcast(settings.getContext(), requestCode, intent, flags);
     }
-
 }

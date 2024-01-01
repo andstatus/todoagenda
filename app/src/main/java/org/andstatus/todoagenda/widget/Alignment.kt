@@ -1,17 +1,9 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import android.view.Gravity;
+import android.view.Gravity
 
-public enum Alignment {
-
+enum class Alignment(val gravity: Int) {
     LEFT(Gravity.LEFT),
-    CENTER(android.view.Gravity.CENTER),
-    RIGHT(Gravity.RIGHT);
-
-    public final int gravity;
-
-    Alignment(int gravity) {
-        this.gravity = gravity;
-    }
-
+    CENTER(Gravity.CENTER),
+    RIGHT(Gravity.RIGHT)
 }

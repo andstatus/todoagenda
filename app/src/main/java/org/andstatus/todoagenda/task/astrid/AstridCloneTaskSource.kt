@@ -1,95 +1,59 @@
-package org.andstatus.todoagenda.task.astrid;
+package org.andstatus.todoagenda.task.astrid
 
-import android.net.Uri;
+import android.net.Uri
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-interface AstridCloneTaskSource {
-
-  AstridCloneTaskSource GOOGLE_TASKS = new AstridCloneTaskSource() {
-    @Override
-    public Uri getListUri() {
-      return AstridCloneTasksProvider.GOOGLE_LISTS_URI;
+internal interface AstridCloneTaskSource {
+    val listUri: Uri
+    val listColumnId: String
+    val listColumnTitle: String
+    val listColumnListColor: String
+    val listColumnAccount: String
+    fun isAllDay(dueMillisRaw: Long?): Boolean {
+        return false
     }
 
-    @Override
-    public String getListColumnId() {
-      return "gtl_id";
+    fun toDueMillis(dueMillisRaw: Long?, zone: DateTimeZone?): Long? {
+        return dueMillisRaw
     }
 
-    @Override
-    public String getListColumnTitle() {
-      return "gtl_title";
+    companion object {
+        val GOOGLE_TASKS: AstridCloneTaskSource = object : AstridCloneTaskSource {
+            override val listUri: Uri
+                get() = AstridCloneTasksProvider.Companion.GOOGLE_LISTS_URI
+            override val listColumnId: String
+                get() = "gtl_id"
+            override val listColumnTitle: String
+                get() = "gtl_title"
+            override val listColumnListColor: String
+                get() = "gtl_color"
+            override val listColumnAccount: String
+                get() = "gtl_account"
+        }
+        val ASTRID_TASKS: AstridCloneTaskSource = object : AstridCloneTaskSource {
+            override val listUri: Uri
+                get() = AstridCloneTasksProvider.Companion.TASKS_LISTS_URI
+            override val listColumnId: String
+                get() = "cdl_id"
+            override val listColumnTitle: String
+                get() = "cdl_name"
+            override val listColumnListColor: String
+                get() = "cdl_color"
+            override val listColumnAccount: String
+                get() = "cda_name"
+
+            override fun isAllDay(dueMillisRaw: Long?): Boolean {
+                return dueMillisRaw != null && dueMillisRaw % 60000 <= 0
+            }
+
+            override fun toDueMillis(dueMillisRaw: Long?, zone: DateTimeZone?): Long? {
+                return if (!isAllDay(dueMillisRaw)) dueMillisRaw else DateTime(dueMillisRaw, zone)
+                    .withTimeAtStartOfDay().millis
+
+                // Astrid tasks without due times are assigned a time of 12:00:00
+                // see https://github.com/andstatus/todoagenda/issues/2#issuecomment-688866280
+            }
+        }
     }
-
-    @Override
-    public String getListColumnListColor() {
-      return "gtl_color";
-    }
-
-    @Override
-    public String getListColumnAccount() {
-      return "gtl_account";
-    }
-  };
-
-  AstridCloneTaskSource ASTRID_TASKS = new AstridCloneTaskSource() {
-    @Override
-    public Uri getListUri() {
-      return AstridCloneTasksProvider.TASKS_LISTS_URI;
-    }
-
-    @Override
-    public String getListColumnId() {
-      return "cdl_id";
-    }
-
-    @Override
-    public String getListColumnTitle() {
-      return "cdl_name";
-    }
-
-    @Override
-    public String getListColumnListColor() {
-      return "cdl_color";
-    }
-
-    @Override
-    public String getListColumnAccount() {
-      return "cda_name";
-    }
-
-    @Override
-    public boolean isAllDay(Long dueMillisRaw) {
-      return dueMillisRaw != null && dueMillisRaw % 60000 <= 0;
-    }
-
-    @Override
-    public Long toDueMillis(Long dueMillisRaw, DateTimeZone zone) {
-      if (!isAllDay(dueMillisRaw)) return dueMillisRaw;
-
-      // Astrid tasks without due times are assigned a time of 12:00:00
-      // see https://github.com/andstatus/todoagenda/issues/2#issuecomment-688866280
-      return new DateTime(dueMillisRaw, zone).withTimeAtStartOfDay().getMillis();
-    }
-  };
-
-  Uri getListUri();
-
-  String getListColumnId();
-
-  String getListColumnTitle();
-
-  String getListColumnListColor();
-
-  String getListColumnAccount();
-
-  default boolean isAllDay(Long dueMillisRaw) {
-    return false;
-  }
-
-  default Long toDueMillis(Long dueMillisRaw, DateTimeZone zone) {
-    return dueMillisRaw;
-  }
 }

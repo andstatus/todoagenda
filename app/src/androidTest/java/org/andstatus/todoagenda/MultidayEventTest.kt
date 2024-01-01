@@ -23,13 +23,13 @@ class MultidayEventTest : BaseWidgetTest() {
         event.setEventId(++eventId)
         event.setTitle("Event that carry over to the next day, show as ending midnight")
         event.setStartDate(today.plusHours(19))
-        event.endDate = today.plusDays(1).plusHours(7)
-        provider!!.setExecutedAt(today.plusHours(10).plusMinutes(33))
-        provider!!.addRow(event)
-        playResults(BaseWidgetTest.Companion.TAG)
+        event.setEndDate(today.plusDays(1).plusHours(7))
+        provider.setExecutedAt(today.plusHours(10).plusMinutes(33))
+        provider.addRow(event)
+        playResults(TAG)
         var entry1: CalendarEntry? = null
         var entry2: CalendarEntry? = null
-        for (item in getFactory().widgetEntries) {
+        for (item in factory.widgetEntries) {
             if (item is CalendarEntry) {
                 if (entry1 == null) {
                     entry1 = item
@@ -64,13 +64,13 @@ class MultidayEventTest : BaseWidgetTest() {
     @Test
     fun testThreeDaysEvent() {
         val friday = dateTime(2015, 9, 18)
-        val sunday = friday!!.plusDays(2)
+        val sunday = friday.plusDays(2)
         val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
         event.setTitle("Leader's weekend")
         event.setStartDate(friday.plusHours(19))
-        event.endDate = sunday.plusHours(15)
+        event.setEndDate(sunday.plusHours(15))
         assertSundayEntryAt(event, sunday, friday.plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(1).plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(2).plusHours(14))
@@ -87,17 +87,16 @@ class MultidayEventTest : BaseWidgetTest() {
     }
 
     private fun getSundayEntryAt(event: CalendarEvent, currentDateTime: DateTime): CalendarEntry? {
-        provider!!.clear()
-        provider!!.setExecutedAt(currentDateTime)
-        provider!!.addRow(event)
-        playResults(BaseWidgetTest.Companion.TAG)
+        provider.clear()
+        provider.setExecutedAt(currentDateTime)
+        provider.addRow(event)
+        playResults(TAG)
         var sundayEntry: CalendarEntry? = null
-        for (item in getFactory().widgetEntries) {
+        for (item in factory.widgetEntries) {
             if (item is CalendarEntry) {
-                val entry = item
-                if (entry.entryDate.dayOfMonth == 20) {
+                if (item.entryDate.dayOfMonth == 20) {
                     Assert.assertNull(sundayEntry)
-                    sundayEntry = entry
+                    sundayEntry = item
                 }
             }
         }

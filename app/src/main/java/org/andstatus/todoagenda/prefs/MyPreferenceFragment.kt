@@ -1,18 +1,14 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceFragmentCompat
 
-public abstract class MyPreferenceFragment extends PreferenceFragmentCompat {
+abstract class MyPreferenceFragment : PreferenceFragmentCompat() {
+    val settings: InstanceSettings
+        get() = AllSettings.instanceFromId(requireActivity(), widgetId)
+    val widgetId: Int
+        get() = ApplicationPreferences.getWidgetId(activity)
 
-    public InstanceSettings getSettings() {
-        return AllSettings.instanceFromId(getActivity(), getWidgetId());
-    }
-
-    public int getWidgetId() {
-        return ApplicationPreferences.getWidgetId(getActivity());
-    }
-
-    public void saveSettings() {
-        ApplicationPreferences.save(getActivity(), getWidgetId());
+    fun saveSettings() {
+        ApplicationPreferences.save(activity, widgetId)
     }
 }

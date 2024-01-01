@@ -1,108 +1,99 @@
-package org.andstatus.todoagenda.util;
+package org.andstatus.todoagenda.util
 
-import static org.andstatus.todoagenda.util.MyClock.isDateDefined;
+import android.text.TextUtils
+import android.text.format.DateFormat
+import android.text.format.DateUtils
+import android.util.Log
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import java.text.FieldPosition
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Formatter
+import java.util.Locale
+import java.util.function.Supplier
 
-import android.text.TextUtils;
-import android.text.format.DateFormat;
-import android.text.format.DateUtils;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-import java.text.FieldPosition;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.Locale;
-import java.util.function.Supplier;
-
-public class DateUtil {
-    private static final String TWELVE = "12";
-    private static final String AUTO = "auto";
-    public static final String EMPTY_STRING = "";
-
-    public static boolean isMidnight(DateTime date) {
-        return date.isEqual(date.withTimeAtStartOfDay());
+object DateUtil {
+    private const val TWELVE = "12"
+    private const val AUTO = "auto"
+    const val EMPTY_STRING = ""
+    fun isMidnight(date: DateTime): Boolean {
+        return date.isEqual(date.withTimeAtStartOfDay())
     }
 
-    public static String formatTime(Supplier<InstanceSettings> settingsSupplier, @Nullable DateTime time) {
-        if (!isDateDefined(time)) return EMPTY_STRING;
-
-        InstanceSettings settings = settingsSupplier.get();
-        String timeFormat = settings.getTimeFormat();
-        if (!DateFormat.is24HourFormat(settings.getContext()) && timeFormat.equals(AUTO)
-                || timeFormat.equals(TWELVE)) {
-            return formatDateTime(settings, time,
-                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_12HOUR);
-        }
-        return formatDateTime(settings, time,
-                DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_24HOUR);
+    fun formatTime(settingsSupplier: Supplier<InstanceSettings>, time: DateTime?): String {
+        if (!MyClock.isDateDefined(time)) return EMPTY_STRING
+        val settings = settingsSupplier.get()
+        val timeFormat = settings.timeFormat
+        return if (!DateFormat.is24HourFormat(settings.context) && timeFormat == AUTO || timeFormat == TWELVE) {
+            formatDateTime(
+                settings, time,
+                DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_12HOUR
+            )
+        } else formatDateTime(
+            settings, time,
+            DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_24HOUR
+        )
     }
 
-    private static String formatDateTime(InstanceSettings settings, DateTime dateTime, int flags) {
-        return DateUtils.formatDateRange(settings.getContext(),
-                new Formatter(new StringBuilder(50), Locale.getDefault()),
-                dateTime.getMillis(),
-                dateTime.getMillis(),
-                flags,
-                settings.clock().getZone().getID())
-                .toString();
+    private fun formatDateTime(settings: InstanceSettings, dateTime: DateTime?, flags: Int): String {
+        return DateUtils.formatDateRange(
+            settings.context,
+            Formatter(StringBuilder(50), Locale.getDefault()),
+            dateTime!!.millis,
+            dateTime.millis,
+            flags,
+            settings.clock().zone.id
+        )
+            .toString()
     }
 
     /**
      * Returns an empty string in a case supplied ID is not a valid Time Zone ID
      */
-    @NonNull
-    public static String validatedTimeZoneId(String timeZoneId) {
+    fun validatedTimeZoneId(timeZoneId: String?): String {
         if (!TextUtils.isEmpty(timeZoneId)) {
             try {
-                return DateTimeZone.forID(timeZoneId).getID();
-            } catch (IllegalArgumentException e) {
-                Log.w("validatedTimeZoneId", "The time zone is not recognized: '" + timeZoneId + "'");
+                return DateTimeZone.forID(timeZoneId).id
+            } catch (e: IllegalArgumentException) {
+                Log.w("validatedTimeZoneId", "The time zone is not recognized: '$timeZoneId'")
             }
         }
-        return "";
+        return ""
     }
 
-    public static String formatLogDateTime(long time) {
-        for (int ind = 0; ind < 2; ind++) {
+    fun formatLogDateTime(time: Long): String {
+        for (ind in 0..1) {
             // see http://stackoverflow.com/questions/16763968/android-text-format-dateformat-hh-is-not-recognized-like-with-java-text-simple
-            String formatString = ind==0 ? "yyyy-MM-dd-HH-mm-ss-SSS" : "yyyy-MM-dd-kk-mm-ss-SSS";
-            SimpleDateFormat format = new SimpleDateFormat(formatString);
-            StringBuffer buffer = new StringBuffer();
-            format.format(new Date(time), buffer, new FieldPosition(0));
-            String strTime = buffer.toString();
+            val formatString = if (ind == 0) "yyyy-MM-dd-HH-mm-ss-SSS" else "yyyy-MM-dd-kk-mm-ss-SSS"
+            val format = SimpleDateFormat(formatString)
+            val buffer = StringBuffer()
+            format.format(Date(time), buffer, FieldPosition(0))
+            val strTime = buffer.toString()
             if (!strTime.contains("HH")) {
-                return strTime;
+                return strTime
             }
         }
-        return Long.toString(time); // Fallback if above doesn't work
+        return java.lang.Long.toString(time) // Fallback if above doesn't work
     }
 
-    public static boolean isSameDate(@Nullable DateTime date, @Nullable DateTime other) {
-        if (date == null && other == null) return true;
-        if (date == null || other == null) return false;
-
-        return date.equals(other);
+    fun isSameDate(date: DateTime?, other: DateTime?): Boolean {
+        if (date == null && other == null) return true
+        return if (date == null || other == null) false else date == other
     }
 
-    public static boolean isSameDay(@Nullable DateTime date, @Nullable DateTime other) {
-        if (date == null && other == null) return true;
-        if (date == null || other == null) return false;
-
-        return date.year().equals(other.year()) && date.dayOfYear().equals(other.dayOfYear());
+    fun isSameDay(date: DateTime?, other: DateTime?): Boolean {
+        if (date == null && other == null) return true
+        return if (date == null || other == null) false else date.year() == other.year() && date.dayOfYear() == other.dayOfYear()
     }
 
-    public static DateTime exactMinutesPlusMinutes(DateTime nowIn, int periodMinutes) {
-        DateTime now = nowIn.plusMinutes(1);
-        return new DateTime(now.getYear(), now.getMonthOfYear(),
-                now.getDayOfMonth(), now.getHourOfDay(), now.getMinuteOfHour(), now.getZone())
-                .plusMinutes(periodMinutes);
+    fun exactMinutesPlusMinutes(nowIn: DateTime, periodMinutes: Int): DateTime {
+        val now = nowIn.plusMinutes(1)
+        return DateTime(
+            now.year, now.monthOfYear,
+            now.dayOfMonth, now.hourOfDay, now.minuteOfHour, now.zone
+        )
+            .plusMinutes(periodMinutes)
     }
-
 }

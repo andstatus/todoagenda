@@ -16,14 +16,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.vavr.control;
+package io.vavr.control
 
-public class NonFatalException extends RuntimeException {
-
-    private static final long serialVersionUID = 1L;
-
-    NonFatalException(Throwable cause) {
-        super(cause);
+class NonFatalException internal constructor(cause: Throwable?) : RuntimeException(cause) {
+    companion object {
+        private const val serialVersionUID = 1L
     }
-
 }

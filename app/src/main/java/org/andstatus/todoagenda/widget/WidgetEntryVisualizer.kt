@@ -1,156 +1,166 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setBackgroundColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setMultiline;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextSize;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setViewWidth;
-import static org.andstatus.todoagenda.widget.EventEntryLayout.SPACE_PIPE_SPACE;
+import android.content.Context
+import android.content.Intent
+import android.view.View
+import android.widget.RemoteViews
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.colors.TextColorPref
+import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
+import org.andstatus.todoagenda.provider.EventProvider
+import org.andstatus.todoagenda.util.MyStringBuilder
+import org.andstatus.todoagenda.util.RemoteViewsUtil
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.View;
-import android.widget.RemoteViews;
-
-import androidx.annotation.NonNull;
-
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.colors.TextColorPref;
-import org.andstatus.todoagenda.prefs.dateformat.DateFormatType;
-import org.andstatus.todoagenda.provider.EventProvider;
-import org.andstatus.todoagenda.util.MyStringBuilder;
-import org.andstatus.todoagenda.util.RemoteViewsUtil;
-
-import java.util.List;
-
-public abstract class WidgetEntryVisualizer<T extends WidgetEntry<T>> {
-    protected final EventProvider eventProvider;
-
-    public WidgetEntryVisualizer(EventProvider eventProvider) {
-        this.eventProvider = eventProvider;
-    }
-
-    @NonNull
-    public RemoteViews getRemoteViews(WidgetEntry entry, int position) {
-        RemoteViews rv = new RemoteViews(getContext().getPackageName(), getSettings().getEventEntryLayout().layoutId);
-        setTitle(entry, rv);
-        setDetails(entry, rv);
-        setDate(entry, rv);
-        setTime(entry, rv);
-        setTextStrikethrough(entry, rv);
-
-        setIndicators(entry, rv);
-        if (getSettings().isCompactLayout()) {
-            RemoteViewsUtil.setPadding(getSettings(), rv, R.id.event_entry, R.dimen.zero, R.dimen.zero, R.dimen.zero, R.dimen.zero);
+abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProvider: EventProvider) {
+    open fun getRemoteViews(entry: WidgetEntry<*>, position: Int): RemoteViews {
+        val rv = RemoteViews(context!!.packageName, settings.eventEntryLayout.layoutId)
+        setTitle(entry, rv)
+        setDetails(entry, rv)
+        setDate(entry, rv)
+        setTime(entry, rv)
+        setTextStrikethrough(entry, rv)
+        setIndicators(entry, rv)
+        if (settings.isCompactLayout) {
+            RemoteViewsUtil.setPadding(
+                settings,
+                rv,
+                R.id.event_entry,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero
+            )
         } else {
-            RemoteViewsUtil.setPadding(getSettings(), rv, R.id.event_entry, R.dimen.calender_padding, R.dimen.zero, R.dimen.calender_padding, R.dimen.entry_bottom_padding);
+            RemoteViewsUtil.setPadding(
+                settings,
+                rv,
+                R.id.event_entry,
+                R.dimen.calender_padding,
+                R.dimen.zero,
+                R.dimen.calender_padding,
+                R.dimen.entry_bottom_padding
+            )
         }
-        setBackgroundColor(rv, R.id.event_entry, getSettings().colors().getEntryBackgroundColor(entry));
-        return rv;
+        RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors()!!.getEntryBackgroundColor(entry))
+        return rv
     }
 
-    protected void setIndicators(WidgetEntry entry, RemoteViews rv) {
-        for (AlarmIndicatorScaled indicator : AlarmIndicatorScaled.values()) {
-            rv.setViewVisibility(indicator.indicatorResId, View.GONE);
+    protected open fun setIndicators(entry: WidgetEntry<*>?, rv: RemoteViews) {
+        for (indicator in AlarmIndicatorScaled.entries) {
+            rv.setViewVisibility(indicator.indicatorResId, View.GONE)
         }
-        for (RecurringIndicatorScaled indicator : RecurringIndicatorScaled.values()) {
-            rv.setViewVisibility(indicator.indicatorResId, View.GONE);
+        for (indicator in RecurringIndicatorScaled.entries) {
+            rv.setViewVisibility(indicator.indicatorResId, View.GONE)
         }
     }
 
-    @NonNull
-    protected InstanceSettings getSettings() {
-        return eventProvider.getSettings();
+    protected val settings: InstanceSettings
+        protected get() = eventProvider.settings
+    val context: Context
+        get() = eventProvider.context
+
+    abstract fun queryEventEntries(): List<T>
+    protected fun setTitle(entry: WidgetEntry<*>, rv: RemoteViews) {
+        val viewId = R.id.event_entry_title
+        rv.setTextViewText(viewId, getTitleString(entry))
+        RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
+        RemoteViewsUtil.setTextColor(
+            settings,
+            TextColorPref.Companion.forTitle(entry),
+            rv,
+            viewId,
+            R.attr.eventEntryTitle
+        )
+        RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineTitle)
     }
 
-    public Context getContext() {
-        return eventProvider.context;
+    protected fun getTitleString(event: WidgetEntry<*>): CharSequence {
+        return if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) event.title else MyStringBuilder.Companion.of(
+            event.title
+        )
+            .withSeparator(event.locationString, EventEntryLayout.Companion.SPACE_PIPE_SPACE)
     }
 
-    public abstract List<T> queryEventEntries();
-
-    protected void setTitle(WidgetEntry entry, RemoteViews rv) {
-        int viewId = R.id.event_entry_title;
-        rv.setTextViewText(viewId, getTitleString(entry));
-        setTextSize(getSettings(), rv, viewId, R.dimen.event_entry_title);
-        setTextColor(getSettings(), TextColorPref.forTitle(entry), rv, viewId, R.attr.eventEntryTitle);
-        setMultiline(rv, viewId, getSettings().isMultilineTitle());
-    }
-
-    protected CharSequence getTitleString(WidgetEntry event) {
-        return getSettings().getEventEntryLayout() == EventEntryLayout.DEFAULT
-            ? event.getTitle()
-            : MyStringBuilder.of(event.getTitle())
-                .withSeparator(event.getLocationString(), SPACE_PIPE_SPACE);
-    }
-
-    protected void setDetails(WidgetEntry entry, RemoteViews rv) {
-        if (getSettings().getEventEntryLayout() == EventEntryLayout.ONE_LINE) return;
-
-        MyStringBuilder eventDetails = MyStringBuilder
-                .of(entry.formatEntryDate())
-                .withSpace(entry.getEventTimeString())
-                .withSeparator(entry.getLocationString(), SPACE_PIPE_SPACE);
-        int viewId = R.id.event_entry_details;
-        if (eventDetails.isEmpty()) {
-            rv.setViewVisibility(viewId, View.GONE);
+    protected fun setDetails(entry: WidgetEntry<*>, rv: RemoteViews) {
+        if (settings.eventEntryLayout == EventEntryLayout.ONE_LINE) return
+        val eventDetails: MyStringBuilder = MyStringBuilder.Companion.of(entry.formatEntryDate())
+            .withSpace(entry.eventTimeString)
+            .withSeparator(entry.locationString, EventEntryLayout.Companion.SPACE_PIPE_SPACE)
+        val viewId = R.id.event_entry_details
+        if (eventDetails.isEmpty) {
+            rv.setViewVisibility(viewId, View.GONE)
         } else {
-            rv.setViewVisibility(viewId, View.VISIBLE);
-            rv.setTextViewText(viewId, eventDetails);
-            setTextSize(getSettings(), rv, viewId, R.dimen.event_entry_details);
-            setTextColor(getSettings(), TextColorPref.forDetails(entry), rv, viewId, R.attr.dayHeaderTitle);
-            setMultiline(rv, viewId, getSettings().isMultilineDetails());
+            rv.setViewVisibility(viewId, View.VISIBLE)
+            rv.setTextViewText(viewId, eventDetails)
+            RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_details)
+            RemoteViewsUtil.setTextColor(
+                settings,
+                TextColorPref.Companion.forDetails(entry),
+                rv,
+                viewId,
+                R.attr.dayHeaderTitle
+            )
+            RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineDetails)
         }
     }
 
-    protected void setTextStrikethrough(WidgetEntry entry, RemoteViews rv) {
-        int viewId = R.id.event_entry_title;
-        RemoteViewsUtil.setTextStrikethrough(rv, viewId, entry.getStatus() == EventStatus.CANCELED);
+    protected fun setTextStrikethrough(entry: WidgetEntry<*>, rv: RemoteViews) {
+        val viewId = R.id.event_entry_title
+        RemoteViewsUtil.setTextStrikethrough(rv, viewId, entry.status == EventStatus.CANCELED)
     }
 
-    protected void setDate(WidgetEntry entry, RemoteViews rv) {
-        if (getSettings().getEventEntryLayout() == EventEntryLayout.DEFAULT) return;
-
-        if (getSettings().getEntryDateFormat().type == DateFormatType.HIDDEN) {
-            rv.setViewVisibility(R.id.event_entry_days, View.GONE);
-            rv.setViewVisibility(R.id.event_entry_days_right, View.GONE);
+    protected fun setDate(entry: WidgetEntry<*>, rv: RemoteViews) {
+        if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) return
+        if (settings.entryDateFormat.type == DateFormatType.HIDDEN) {
+            rv.setViewVisibility(R.id.event_entry_days, View.GONE)
+            rv.setViewVisibility(R.id.event_entry_days_right, View.GONE)
         } else {
-            int days = getSettings().clock().getNumberOfDaysTo(entry.entryDate);
-            boolean daysAsText = getSettings().getEntryDateFormat().type != DateFormatType.NUMBER_OF_DAYS ||
-                    (days > -2 && days < 2);
-
-            int viewToShow = daysAsText ? R.id.event_entry_days : R.id.event_entry_days_right;
-            int viewToHide = daysAsText ? R.id.event_entry_days_right : R.id.event_entry_days;
-            rv.setViewVisibility(viewToHide, View.GONE);
-            rv.setViewVisibility(viewToShow, View.VISIBLE);
-
-            rv.setTextViewText(viewToShow, entry.formatEntryDate());
-            setViewWidth(getSettings(), rv, viewToShow, daysAsText
-                    ? R.dimen.days_to_event_width
-                    : R.dimen.days_to_event_right_width);
-            setTextSize(getSettings(), rv, viewToShow, R.dimen.event_entry_details);
-            setTextColor(getSettings(), TextColorPref.forDetails(entry), rv, viewToShow, R.attr.dayHeaderTitle);
+            val days = settings.clock().getNumberOfDaysTo(entry.entryDate)
+            val daysAsText = settings.entryDateFormat.type != DateFormatType.NUMBER_OF_DAYS || days > -2 && days < 2
+            val viewToShow = if (daysAsText) R.id.event_entry_days else R.id.event_entry_days_right
+            val viewToHide = if (daysAsText) R.id.event_entry_days_right else R.id.event_entry_days
+            rv.setViewVisibility(viewToHide, View.GONE)
+            rv.setViewVisibility(viewToShow, View.VISIBLE)
+            rv.setTextViewText(viewToShow, entry.formatEntryDate())
+            RemoteViewsUtil.setViewWidth(
+                settings,
+                rv,
+                viewToShow,
+                if (daysAsText) R.dimen.days_to_event_width else R.dimen.days_to_event_right_width
+            )
+            RemoteViewsUtil.setTextSize(settings, rv, viewToShow, R.dimen.event_entry_details)
+            RemoteViewsUtil.setTextColor(
+                settings,
+                TextColorPref.Companion.forDetails(entry),
+                rv,
+                viewToShow,
+                R.attr.dayHeaderTitle
+            )
         }
     }
 
-    protected void setTime(WidgetEntry entry, RemoteViews rv) {
-        if (getSettings().getEventEntryLayout() == EventEntryLayout.DEFAULT) return;
-
-        int viewId = R.id.event_entry_time;
-        RemoteViewsUtil.setMultiline(rv, viewId, getSettings().getShowEndTime());
-        rv.setTextViewText(viewId, entry.getEventTimeString().replace(CalendarEntry
-                .SPACE_DASH_SPACE, "\n"));
-        setViewWidth(getSettings(), rv, viewId, R.dimen.event_time_width);
-        setTextSize(getSettings(), rv, viewId, R.dimen.event_entry_details);
-        setTextColor(getSettings(), TextColorPref.forDetails(entry), rv, viewId, R.attr.dayHeaderTitle);
+    protected fun setTime(entry: WidgetEntry<*>, rv: RemoteViews) {
+        if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) return
+        val viewId = R.id.event_entry_time
+        RemoteViewsUtil.setMultiline(rv, viewId, settings.showEndTime)
+        rv.setTextViewText(viewId, entry.eventTimeString.replace(CalendarEntry.Companion.SPACE_DASH_SPACE, "\n"))
+        RemoteViewsUtil.setViewWidth(settings, rv, viewId, R.dimen.event_time_width)
+        RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_details)
+        RemoteViewsUtil.setTextColor(
+            settings,
+            TextColorPref.Companion.forDetails(entry),
+            rv,
+            viewId,
+            R.attr.dayHeaderTitle
+        )
     }
 
-    public boolean isFor(WidgetEntry entry) {
-        return entry.getSource().source.providerType == eventProvider.type;
+    fun isFor(entry: WidgetEntry<*>): Boolean {
+        return entry.source.source.providerType === eventProvider.type
     }
 
-    public Intent newViewEntryIntent(WidgetEntry entry) {
-        return null;
+    open fun newViewEntryIntent(entry: WidgetEntry<*>): Intent? {
+        return null
     }
 }

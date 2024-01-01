@@ -22,12 +22,12 @@ class OngoingEventTest : BaseWidgetTest() {
         event.setEventId(++eventId)
         event.setTitle("Ongoing event shows original start time")
         event.setStartDate(today.plusHours(9))
-        event.endDate = today.plusHours(12)
-        provider!!.setExecutedAt(today.plusHours(10).plusMinutes(33))
-        provider!!.addRow(event)
-        playResults(BaseWidgetTest.Companion.TAG)
+        event.setEndDate(today.plusHours(12))
+        provider.setExecutedAt(today.plusHours(10).plusMinutes(33))
+        provider.addRow(event)
+        playResults(TAG)
         var entry: CalendarEntry? = null
-        for (item in getFactory().widgetEntries) {
+        for (item in factory.widgetEntries) {
             if (item is CalendarEntry) {
                 entry = item
             }
@@ -50,12 +50,12 @@ class OngoingEventTest : BaseWidgetTest() {
         event.setEventId(++eventId)
         event.setTitle("Ongoing event, which started yesterday, shows no start time")
         event.setStartDate(today.minusDays(1).plusHours(9))
-        event.endDate = today.plusHours(12)
-        provider!!.setExecutedAt(today.plusHours(10).plusMinutes(33))
-        provider!!.addRow(event)
-        playResults(BaseWidgetTest.Companion.TAG)
+        event.setEndDate(today.plusHours(12))
+        provider.setExecutedAt(today.plusHours(10).plusMinutes(33))
+        provider.addRow(event)
+        playResults(TAG)
         var entry: CalendarEntry? = null
-        for (item in getFactory().widgetEntries) {
+        for (item in factory.widgetEntries) {
             if (item is CalendarEntry) {
                 entry = item
             }
@@ -77,12 +77,12 @@ class OngoingEventTest : BaseWidgetTest() {
         event.setEventId(++eventId)
         event.setTitle("Event that carry over to the next day, show as ending midnight")
         event.setStartDate(today.plusHours(19))
-        event.endDate = today.plusDays(1).plusHours(7)
-        provider!!.setExecutedAt(today.plusHours(20).plusMinutes(33))
-        provider!!.addRow(event)
-        playResults(BaseWidgetTest.Companion.TAG)
+        event.setEndDate(today.plusDays(1).plusHours(7))
+        provider.setExecutedAt(today.plusHours(20).plusMinutes(33))
+        provider.addRow(event)
+        playResults(TAG)
         var entry: CalendarEntry? = null
-        for (item in getFactory().widgetEntries) {
+        for (item in factory.widgetEntries) {
             if (item is CalendarEntry) {
                 entry = item
                 break

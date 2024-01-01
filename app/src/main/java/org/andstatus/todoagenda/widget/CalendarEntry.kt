@@ -1,169 +1,135 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import static org.andstatus.todoagenda.util.MyClock.isDateDefined;
+import android.content.Context
+import android.text.TextUtils
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.calendar.CalendarEvent
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.OrderedEventSource
+import org.andstatus.todoagenda.util.DateUtil
+import org.andstatus.todoagenda.util.MyClock
+import org.andstatus.todoagenda.util.StringUtil
+import org.joda.time.DateTime
 
-import android.content.Context;
-import android.text.TextUtils;
+class CalendarEntry private constructor(
+    settings: InstanceSettings,
+    override val event: CalendarEvent,
+    entryDate: DateTime
+) : WidgetEntry<CalendarEntry>(
+    settings, getEntryPosition(settings, event.isAllDay, entryDate, event.endDate),
+    entryDate, event.isAllDay, event.endDate
+) {
 
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.calendar.CalendarEvent;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
-import org.andstatus.todoagenda.util.DateUtil;
-import org.andstatus.todoagenda.util.StringUtil;
-import org.joda.time.DateTime;
-
-public class CalendarEntry extends WidgetEntry<CalendarEntry> {
-
-    private static final String ARROW = "→";
-    private static final String SPACE = " ";
-    static final String SPACE_DASH_SPACE = " - ";
-
-    private CalendarEvent event;
-
-    public static CalendarEntry fromEvent(InstanceSettings settings, CalendarEvent event, DateTime entryDate) {
-        return new CalendarEntry(settings, event, entryDate);
-    }
-
-    private CalendarEntry(InstanceSettings settings, CalendarEvent event, DateTime entryDate) {
-        super(settings, WidgetEntry.getEntryPosition(settings, event.isAllDay(), entryDate, event.getEndDate()),
-                entryDate, event.isAllDay(), event.getEndDate());
-        this.event = event;
-    }
-
-    @Override
-    public String getTitle() {
-        String title = event.getTitle();
-        if (TextUtils.isEmpty(title)) {
-            title = getContext().getResources().getString(R.string.no_title);
-        }
-        return title;
-    }
-
-    @Override
-    public EventStatus getStatus() {
-        return event.getStatus();
-    }
-
-    public int getColor() {
-        return event.getColor();
-    }
-
-    @Override
-    public String getLocation() {
-        return event.getLocation();
-    }
-
-    public boolean isAlarmActive() {
-        return event.isAlarmActive();
-    }
-
-    public boolean isRecurring() {
-        return event.isRecurring();
-    }
-
-    public boolean isPartOfMultiDayEvent() {
-        return getEvent().isPartOfMultiDayEvent();
-    }
-
-    public boolean isStartOfMultiDayEvent() {
-        return isPartOfMultiDayEvent() && !getEvent().getStartDate().isBefore(entryDate);
-    }
-
-    public boolean isEndOfMultiDayEvent() {
-        return isPartOfMultiDayEvent() && isLastEntryOfEvent();
-    }
-
-    public boolean spansOneFullDay() {
-        return entryDate.plusDays(1).isEqual(event.getEndDate());
-    }
-
-    public CalendarEvent getEvent() {
-        return event;
-    }
-
-    @Override
-    public String getEventTimeString() {
-        return hideEventTime() ? "" : getTimeSpanString();
-    }
-
-    private boolean hideEventTime() {
-        return spansOneFullDay() && !(isStartOfMultiDayEvent() || isEndOfMultiDayEvent()) ||
-                allDay;
-    }
-
-    private String getTimeSpanString() {
-        String startStr;
-        String endStr;
-        String separator = SPACE_DASH_SPACE;
-        if (!isDateDefined(entryDate) || (isPartOfMultiDayEvent() && DateUtil.isMidnight(entryDate)
-                && !isStartOfMultiDayEvent())) {
-            startStr = ARROW;
-            separator = SPACE;
-        } else {
-            startStr = DateUtil.formatTime(this::getSettings, entryDate);
-        }
-        if (getSettings().getShowEndTime()) {
-            if (!isDateDefined(event.getEndDate()) || (isPartOfMultiDayEvent() && !isLastEntryOfEvent())) {
-                endStr = ARROW;
-                separator = SPACE;
-            } else {
-                endStr = DateUtil.formatTime(this::getSettings, event.getEndDate());
+    override val title: String
+        get() {
+            var title = event.title
+            if (TextUtils.isEmpty(title)) {
+                title = context.resources.getString(R.string.no_title)
             }
-        } else {
-            separator = DateUtil.EMPTY_STRING;
-            endStr = DateUtil.EMPTY_STRING;
+            return title
         }
+    override val status: EventStatus
+        get() = event.status
+    val color: Int
+        get() = event.color
+    override val location: String?
+        get() = event.location
+    val isAlarmActive: Boolean
+        get() = event.isAlarmActive
+    val isRecurring: Boolean
+        get() = event.isRecurring
+    val isPartOfMultiDayEvent: Boolean
+        get() = event.isPartOfMultiDayEvent
+    val isStartOfMultiDayEvent: Boolean
+        get() = isPartOfMultiDayEvent && !event.startDate.isBefore(entryDate)
+    val isEndOfMultiDayEvent: Boolean
+        get() = isPartOfMultiDayEvent && isLastEntryOfEvent
 
-        if (startStr.equals(endStr)) {
-            return startStr;
+    fun spansOneFullDay(): Boolean {
+        return entryDate.plusDays(1).isEqual(event.endDate)
+    }
+
+    override val eventTimeString: String
+        get() = if (hideEventTime()) "" else timeSpanString
+
+    private fun hideEventTime(): Boolean {
+        return spansOneFullDay() && !(isStartOfMultiDayEvent || isEndOfMultiDayEvent) ||
+            allDay
+    }
+
+    private val timeSpanString: String
+        get() {
+            val startStr: String?
+            val endStr: String?
+            var separator = SPACE_DASH_SPACE
+            if (!MyClock.isDateDefined(entryDate) || (isPartOfMultiDayEvent && DateUtil.isMidnight(entryDate)
+                    && !isStartOfMultiDayEvent)
+            ) {
+                startStr = ARROW
+                separator = SPACE
+            } else {
+                startStr = DateUtil.formatTime({ this.settings }, entryDate)
+            }
+            if (this.settings.showEndTime) {
+                if (!MyClock.isDateDefined(event.endDate) || isPartOfMultiDayEvent && !isLastEntryOfEvent) {
+                    endStr = ARROW
+                    separator = SPACE
+                } else {
+                    endStr = DateUtil.formatTime({ this.settings }, event.endDate)
+                }
+            } else {
+                separator = DateUtil.EMPTY_STRING
+                endStr = DateUtil.EMPTY_STRING
+            }
+            return if (startStr == endStr) {
+                startStr
+            } else startStr + separator + endStr
         }
+    val context: Context
+        get() = event.context
 
-        return startStr + separator + endStr;
+
+//  TODO: Delete?
+//    override val settings: InstanceSettings
+//        get() = event.settings
+    override val source: OrderedEventSource
+        get() = event.eventSource
+
+    override fun toString(): String {
+        val timeString = eventTimeString
+        val locationString = locationString
+        return (super.toString() + " CalendarEntry ["
+            + (if (allDay) "allDay" else "")
+            + (if (StringUtil.nonEmpty(timeString)) ", time=$timeString" else "")
+            + (if (StringUtil.nonEmpty(locationString)) ", location=$locationString" else "")
+            + ", event=" + event
+            + "]")
     }
 
-    public Context getContext() {
-        return event.getContext();
-    }
-
-    public InstanceSettings getSettings() {
-        return event.getSettings();
-    }
-
-    @Override
-    public OrderedEventSource getSource() {
-        return event.getEventSource();
-    }
-
-    @Override
-    public String toString() {
-        String timeString = getEventTimeString();
-        String locationString = getLocationString();
-        return super.toString() + " CalendarEntry ["
-                + (allDay ? "allDay" : "")
-                + (StringUtil.nonEmpty(timeString) ? ", time=" + timeString : "")
-                + (StringUtil.nonEmpty(locationString) ? ", location=" + locationString : "")
-                + ", event=" + event
-                + "]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+        if (other == null || javaClass != other.javaClass) {
+            return false
         }
-        CalendarEntry that = (CalendarEntry) o;
-        return event.equals(that.event) && entryDate.equals(that.entryDate);
+        val that = other as CalendarEntry
+        return event == that.event && entryDate == that.entryDate
     }
 
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result += 31 * event.hashCode();
-        result += 31 * entryDate.hashCode();
-        return result;
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result += 31 * event.hashCode()
+        result += 31 * entryDate.hashCode()
+        return result
+    }
+
+    companion object {
+        private const val ARROW = "→"
+        private const val SPACE = " "
+        const val SPACE_DASH_SPACE = " - "
+        fun fromEvent(settings: InstanceSettings, event: CalendarEvent, entryDate: DateTime): CalendarEntry {
+            return CalendarEntry(settings, event, entryDate)
+        }
     }
 }

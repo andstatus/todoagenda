@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.andstatus.todoagenda.util
 
-package org.andstatus.todoagenda.util;
-
-public interface IsEmpty {
-    boolean isEmpty();
-
-    default boolean nonEmpty() {
-        return !isEmpty();
+interface IsEmpty {
+    val isEmpty: Boolean
+    fun nonEmpty(): Boolean {
+        return !isEmpty
     }
 }

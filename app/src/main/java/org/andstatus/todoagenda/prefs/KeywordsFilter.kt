@@ -1,104 +1,96 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import android.text.TextUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import android.text.TextUtils
 
 /**
  * Filter String by keywords or phrases, enclosed in single or double quotes
  *
  * @author yvolk@yurivolkov.com
  */
-public class KeywordsFilter {
+class KeywordsFilter(private val matchOnNoKeywords: Boolean, text: String?) {
+    val keywords: MutableList<String> = ArrayList()
 
-    private final boolean matchOnNoKeywords;
-    protected final List<String> keywords = new ArrayList<>();
-    private static final char DOUBLE_QUOTE = '"';
-    private static final char SINGLE_QUOTE = '\'';
-
-    public KeywordsFilter(boolean matchOnNoKeywords, String text) {
-        this.matchOnNoKeywords = matchOnNoKeywords;
-        if (TextUtils.isEmpty(text)) {
-            return;
-        }
-        boolean inQuote = false;
-        char quote = ' ';
-        for (int atPos = 0; atPos < text.length(); ) {
-            int separatorInd = inQuote ? nextQuote(text, quote, atPos) : nextSeparatorInd(text, atPos);
-            if (atPos > separatorInd) {
-                break;
+    init {
+        if (!TextUtils.isEmpty(text)) {
+            var inQuote = false
+            var quote = ' '
+            var atPos = 0
+            while (atPos < text!!.length) {
+                val separatorInd = if (inQuote) nextQuote(text, quote, atPos) else nextSeparatorInd(text, atPos)
+                if (atPos > separatorInd) {
+                    break
+                }
+                val item = text.substring(atPos, separatorInd)
+                if (!TextUtils.isEmpty(item) && !keywords.contains(item)) {
+                    keywords.add(item)
+                }
+                if (separatorInd < text.length && isQuote(text, separatorInd)) {
+                    inQuote = !inQuote
+                    quote = text[separatorInd]
+                }
+                atPos = separatorInd + 1
             }
-            String item = text.substring(atPos, separatorInd);
-            if (!TextUtils.isEmpty(item) && !keywords.contains(item)) {
-                keywords.add(item);
-            }
-            if (separatorInd < text.length() && isQuote(text, separatorInd)) {
-                inQuote = !inQuote;
-                quote = text.charAt(separatorInd);
-            }
-            atPos = separatorInd + 1;
         }
     }
 
-    private boolean isQuote(String text, int index) {
-        switch (text.charAt(index)) {
-            case DOUBLE_QUOTE:
-            case SINGLE_QUOTE:
-                return true;
-            default:
-                return false;
+    private fun isQuote(text: String?, index: Int): Boolean {
+        return when (text!![index]) {
+            DOUBLE_QUOTE, SINGLE_QUOTE -> true
+            else -> false
         }
     }
 
-    private int nextQuote(String text, char quote, int atPos) {
-        for (int ind = atPos; ind < text.length(); ind++) {
-            if (quote == text.charAt(ind)) {
-                return ind;
+    private fun nextQuote(text: String?, quote: Char, atPos: Int): Int {
+        for (ind in atPos until text!!.length) {
+            if (quote == text[ind]) {
+                return ind
             }
         }
-        return text.length();
+        return text.length
     }
 
-    private int nextSeparatorInd(String text, int atPos) {
-        final String SEPARATORS = ", " + DOUBLE_QUOTE + SINGLE_QUOTE;
-        for (int ind = atPos; ind < text.length(); ind++) {
-            if (SEPARATORS.indexOf(text.charAt(ind)) >= 0) {
-                return ind;
+    private fun nextSeparatorInd(text: String?, atPos: Int): Int {
+        val SEPARATORS = ", " + DOUBLE_QUOTE + SINGLE_QUOTE
+        for (ind in atPos until text!!.length) {
+            if (SEPARATORS.indexOf(text[ind]) >= 0) {
+                return ind
             }
         }
-        return text.length();
+        return text.length
     }
 
-    public boolean matched(String s) {
+    fun matched(s: String?): Boolean {
         if (keywords.isEmpty()) {
-            return matchOnNoKeywords;
+            return matchOnNoKeywords
         }
         if (TextUtils.isEmpty(s)) {
-            return false;
+            return false
         }
-        for (String keyword : keywords) {
-            if (s.contains(keyword)) {
-                return true;
+        for (keyword in keywords) {
+            if (s!!.contains(keyword)) {
+                return true
             }
         }
-        return false;
+        return false
     }
 
-    public boolean isEmpty() {
-        return keywords.isEmpty();
-    }
+    val isEmpty: Boolean
+        get() = keywords.isEmpty()
 
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (String keyword : keywords) {
-            if (builder.length() > 0) {
-                builder.append(", ");
+    override fun toString(): String {
+        val builder = StringBuilder()
+        for (keyword in keywords) {
+            if (builder.length > 0) {
+                builder.append(", ")
             }
-            char quote = keyword.contains(String.valueOf(DOUBLE_QUOTE)) ? SINGLE_QUOTE : DOUBLE_QUOTE;
-            builder.append(quote + keyword + quote);
+            val quote = if (keyword.contains(DOUBLE_QUOTE.toString())) SINGLE_QUOTE else DOUBLE_QUOTE
+            builder.append(quote.toString() + keyword + quote)
         }
-        return builder.toString();
+        return builder.toString()
+    }
+
+    companion object {
+        private const val DOUBLE_QUOTE = '"'
+        private const val SINGLE_QUOTE = '\''
     }
 }

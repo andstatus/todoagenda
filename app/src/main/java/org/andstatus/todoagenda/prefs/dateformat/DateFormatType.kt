@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.andstatus.todoagenda.prefs.dateformat
 
-package org.andstatus.todoagenda.prefs.dateformat;
+import android.content.Context
+import androidx.annotation.StringRes
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.util.StringUtil
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.StringRes;
-
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.util.LazyVal;
-import org.andstatus.todoagenda.util.StringUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-
-/** See https://github.com/andstatus/todoagenda/issues/7 */
-public enum DateFormatType {
+/** See https://github.com/andstatus/todoagenda/issues/7  */
+enum class DateFormatType(val code: String, @field:StringRes val titleResourceId: Int, val pattern: String) {
     HIDDEN("hidden", R.string.hidden, ""),
     DEVICE_DEFAULT("deviceDefault", R.string.device_default, ""),
     DEFAULT_WEEKDAY("defaultWeekday", R.string.date_format_default_weekday, ""),
@@ -45,85 +37,71 @@ public enum DateFormatType {
     CUSTOM("custom-01", R.string.custom_pattern, ""),
     UNKNOWN("unknown", R.string.not_found, "");
 
-    public final String code;
-    @StringRes
-    public final int titleResourceId;
-    public final String pattern;
-
-    public final static DateFormatType DEFAULT = DEFAULT_WEEKDAY;
-
-    private final LazyVal<DateFormatValue> defaultValue = LazyVal.of( () ->
-            new DateFormatValue(DateFormatType.this, ""));
-
-    DateFormatType(String code, int titleResourceId, String pattern) {
-        this.code = code;
-        this.titleResourceId = titleResourceId;
-        this.pattern = pattern;
+    val defaultValue: DateFormatValue by lazy {
+        DateFormatValue(this@DateFormatType, "")
     }
 
-    @NonNull
-    public static DateFormatValue load(String storedValue, @NonNull DateFormatValue defaultValue) {
-        DateFormatType formatType = DateFormatType.load(storedValue, UNKNOWN);
-        switch (formatType) {
-            case UNKNOWN:
-                return defaultValue;
-            case CUSTOM:
-                return new DateFormatValue(formatType, storedValue.substring(CUSTOM.code.length() + 1));
-            default:
-                return formatType.defaultValue();
+    val spinnerPosition: Int
+        get() {
+            for (position in entries.toTypedArray().indices) {
+                val type = entries[position]
+                if (type == UNKNOWN) break
+                if (type == this) return position
+            }
+            return 0
         }
+
+    fun hasPattern(): Boolean {
+        return StringUtil.nonEmpty(pattern)
     }
 
-    @NonNull
-    private static DateFormatType load(String storedValue, @NonNull DateFormatType defaultType) {
-        if (storedValue == null) return defaultType;
+    val isPatternExample: Boolean
+        get() = titleResourceId == R.string.pattern_example
+    val isCustomPattern: Boolean
+        get() = isPatternExample || this == CUSTOM
 
-        for (DateFormatType type: values()) {
-            if (storedValue.startsWith( type.code + ":")) return type;
+    fun toSave(): DateFormatType {
+        return if (isCustomPattern) CUSTOM else this
+    }
+
+    companion object {
+        val DEFAULT = DEFAULT_WEEKDAY
+        fun load(storedValue: String?, defaultValue: DateFormatValue): DateFormatValue {
+            val formatType = load(storedValue, UNKNOWN)
+            return when (formatType) {
+                UNKNOWN -> defaultValue
+                CUSTOM -> DateFormatValue(
+                    formatType,
+                    storedValue!!.substring(CUSTOM.code.length + 1)
+                )
+
+                else -> formatType.defaultValue
+            }
         }
-        return defaultType;
-    }
 
-    public static DateFormatValue unknownValue() {
-        return UNKNOWN.defaultValue();
-    }
-
-    public static List<CharSequence> getSpinnerEntryList(Context context) {
-        List<CharSequence> list = new ArrayList<>();
-        int exampleInd = 0;
-        for (DateFormatType type: values()) {
-            if (type == UNKNOWN) break;
-            list.add(context.getText(type.titleResourceId) + (type.isPatternExample() ? " " + (++exampleInd) : ""));
+        private fun load(storedValue: String?, defaultType: DateFormatType): DateFormatType {
+            if (storedValue == null) return defaultType
+            for (type in entries) {
+                if (storedValue.startsWith(type.code + ":")) return type
+            }
+            return defaultType
         }
-        return list;
-    }
 
-    public DateFormatValue defaultValue() {
-        return defaultValue.get();
-    }
-
-    public int getSpinnerPosition() {
-        for (int position = 0; position < values().length; position++) {
-            DateFormatType type = values()[position];
-            if (type == UNKNOWN) break;
-            if (type == this) return position;
+        fun unknownValue(): DateFormatValue {
+            return UNKNOWN.defaultValue
         }
-        return 0;
-    }
 
-    public boolean hasPattern() {
-        return StringUtil.nonEmpty(pattern);
-    }
-
-    public boolean isPatternExample() {
-        return titleResourceId == R.string.pattern_example;
-    }
-
-    public boolean isCustomPattern() {
-        return isPatternExample() || this == CUSTOM;
-    }
-
-    public DateFormatType toSave() {
-        return isCustomPattern() ? CUSTOM : this;
+        fun getSpinnerEntryList(context: Context): List<CharSequence> {
+            val list: MutableList<CharSequence> = ArrayList()
+            var exampleInd = 0
+            for (type in entries) {
+                if (type == UNKNOWN) break
+                list.add(
+                    context.getText(type.titleResourceId)
+                        .toString() + if (type.isPatternExample) " " + ++exampleInd else ""
+                )
+            }
+            return list
+        }
     }
 }

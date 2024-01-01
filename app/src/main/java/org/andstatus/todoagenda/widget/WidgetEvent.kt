@@ -1,8 +1,8 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
+import org.andstatus.todoagenda.prefs.OrderedEventSource
 
-public interface WidgetEvent {
-    OrderedEventSource getEventSource();
-    long getEventId();
+interface WidgetEvent {
+    val eventSource: OrderedEventSource
+    val eventId: Long
 }

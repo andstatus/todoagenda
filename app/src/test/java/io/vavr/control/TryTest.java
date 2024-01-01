@@ -73,12 +73,12 @@ class TryTest {
 
     @Test
     void shouldCreateSuccessWhenCallingTryOfCallable() {
-        assertTrue(Try.of(() -> SUCCESS_VALUE).isSuccess());
+        assertTrue(Try.of(() -> SUCCESS_VALUE).isSuccess);
     }
 
     @Test
     void shouldCreateFailureWhenCallingTryOfCallable() {
-        assertTrue(Try.of(() -> { throw FAILURE_CAUSE; }).isFailure());
+        assertTrue(Try.of(() -> { throw FAILURE_CAUSE; }).isFailure);
     }
 
     @Test
@@ -125,9 +125,9 @@ class TryTest {
                 FAILURE_CAUSE,
                 assertThrows(NonFatalException.class, failure2::get).getCause()
         );
-        assertSame(failure1.getCause(), failure2.getCause());
-        assertEquals(failure1.isFailure(), failure2.isFailure());
-        assertEquals(failure1.isSuccess(), failure2.isSuccess());
+        assertSame(failure1.cause, failure2.cause);
+        assertEquals(failure1.isFailure, failure2.isFailure);
+        assertEquals(failure1.isSuccess, failure2.isSuccess);
         assertEquals(failure1, failure2);
         assertEquals(failure1.hashCode(), failure2.hashCode());
         assertEquals(failure1.toString(), failure2.toString());
@@ -140,8 +140,8 @@ class TryTest {
         assertSame(success1.get(), success2.get());
         assertThrows(UnsupportedOperationException.class, success1::getCause);
         assertThrows(UnsupportedOperationException.class, success2::getCause);
-        assertEquals(success1.isFailure(), success2.isFailure());
-        assertEquals(success1.isSuccess(), success2.isSuccess());
+        assertEquals(success1.isFailure, success2.isFailure);
+        assertEquals(success1.isSuccess, success2.isSuccess);
         assertEquals(success1, success2);
         assertEquals(success1.hashCode(), success2.hashCode());
         assertEquals(success1.toString(), success2.toString());
@@ -151,12 +151,12 @@ class TryTest {
 
     @Test
     void shouldCreateSuccessWhenCallingTryRunCheckedRunnable() {
-        assertTrue(Try.run(() -> {}).isSuccess());
+        assertTrue(Try.run(() -> {}).isSuccess);
     }
 
     @Test
     void shouldCreateFailureWhenCallingTryRunCheckedRunnable() {
-        assertTrue(Try.run(() -> { throw ERROR; }).isFailure());
+        assertTrue(Try.run(() -> { throw ERROR; }).isFailure);
     }
 
     @Test
@@ -210,8 +210,8 @@ class TryTest {
                 "getCause() on Success",
                 assertThrows(UnsupportedOperationException.class, SUCCESS::getCause).getMessage()
         );
-        assertFalse(SUCCESS.isFailure());
-        assertTrue(SUCCESS.isSuccess());
+        assertFalse(SUCCESS.isFailure);
+        assertTrue(SUCCESS.isSuccess);
         assertEquals(Try.success(SUCCESS_VALUE), SUCCESS);
         assertEquals(31 + Objects.hashCode(SUCCESS_VALUE), SUCCESS.hashCode());
         assertEquals("Success(" + SUCCESS_VALUE + ")", SUCCESS.toString());
@@ -235,9 +235,9 @@ class TryTest {
                 FAILURE_CAUSE,
                 assertThrows(RuntimeException.class, FAILURE::get).getCause()
         );
-        assertSame(FAILURE_CAUSE, FAILURE.getCause());
-        assertFalse(FAILURE.isSuccess());
-        assertTrue(FAILURE.isFailure());
+        assertSame(FAILURE_CAUSE, FAILURE.cause);
+        assertFalse(FAILURE.isSuccess);
+        assertTrue(FAILURE.isFailure);
         assertEquals(Try.failure(FAILURE_CAUSE), FAILURE);
         assertEquals(Objects.hashCode(FAILURE_CAUSE), FAILURE.hashCode());
         assertEquals("Failure(" + FAILURE_CAUSE + ")", FAILURE.toString());
@@ -284,9 +284,9 @@ class TryTest {
     @Test
     void shouldInvertSuccessByCallingFailed() {
         final Try<Throwable> testee = SUCCESS.failed();
-        assertTrue(testee.isFailure());
-        assertEquals(UnsupportedOperationException.class, testee.getCause().getClass());
-        assertEquals("Success.failed()", testee.getCause().getMessage());
+        assertTrue(testee.isFailure);
+        assertEquals(UnsupportedOperationException.class, testee.cause.getClass());
+        assertEquals("Success.failed()", testee.cause.getMessage());
     }
 
     @Test
@@ -329,16 +329,16 @@ class TryTest {
     @Test
     void shouldFilterNonMatchingPredicateOnSuccess() {
         final Try<String> testee = SUCCESS.filter(s -> false);
-        assertTrue(testee.isFailure());
-        assertEquals(NoSuchElementException.class, testee.getCause().getClass());
-        assertEquals("Predicate does not hold for " + SUCCESS_VALUE, testee.getCause().getMessage());
+        assertTrue(testee.isFailure);
+        assertEquals(NoSuchElementException.class, testee.cause.getClass());
+        assertEquals("Predicate does not hold for " + SUCCESS_VALUE, testee.cause.getMessage());
     }
 
     @Test
     void shouldFilterWithExceptionOnSuccess() {
         final Try<String> testee = SUCCESS.filter(t -> { throw ERROR; });
-        assertTrue(testee.isFailure());
-        assertSame(ERROR, testee.getCause());
+        assertTrue(testee.isFailure);
+        assertSame(ERROR, testee.cause);
     }
 
     @Test
@@ -548,12 +548,12 @@ class TryTest {
 
     @Test
     void shouldGetCauseOnFailureWhenCauseIsNull() {
-        assertNull(Try.failure(null).getCause());
+        assertNull(Try.failure(null).cause);
     }
     
     @Test
     void shouldGetCauseOnFailure() {
-        assertSame(FAILURE_CAUSE, FAILURE.getCause());
+        assertSame(FAILURE_CAUSE, FAILURE.cause);
     }
 
     @Test
@@ -623,24 +623,24 @@ class TryTest {
 
     @Test
     void shouldDetectFailureIfFailure() {
-        assertTrue(FAILURE.isFailure());
+        assertTrue(FAILURE.isFailure);
     }
 
     @Test
     void shouldDetectNonFailureIfSuccess() {
-        assertFalse(SUCCESS.isFailure());
+        assertFalse(SUCCESS.isFailure);
     }
 
     // -- .isSuccess()
 
     @Test
     void shouldDetectSuccessIfSuccess() {
-        assertTrue(SUCCESS.isSuccess());
+        assertTrue(SUCCESS.isSuccess);
     }
 
     @Test
     void shouldDetectNonSuccessIfSuccess() {
-        assertFalse(FAILURE.isSuccess());
+        assertFalse(FAILURE.isSuccess);
     }
 
     // -- .iterator()
@@ -827,7 +827,7 @@ class TryTest {
 
     @Test
     void shouldCaptureErrorOnOrElseIfFailure() {
-        assertSame(ERROR, FAILURE.orElse(() -> { throw ERROR; }).getCause());
+        assertSame(ERROR, FAILURE.orElse(() -> { throw ERROR; }).cause);
     }
 
     @Test
@@ -1155,8 +1155,8 @@ class TryTest {
     @Test
     void shouldSerializeFailure() throws IOException, ClassNotFoundException {
         final Try<String> testee = deserialize(serialize(FAILURE));
-        assertSame(FAILURE.getCause().getClass(), testee.getCause().getClass());
-        assertEquals(FAILURE.getCause().getMessage(), testee.getCause().getMessage());
+        assertSame(FAILURE.cause.getClass(), testee.cause.getClass());
+        assertEquals(FAILURE.cause.getMessage(), testee.cause.getMessage());
     }
 
     @Test

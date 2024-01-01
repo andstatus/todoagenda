@@ -15,7 +15,6 @@ import org.andstatus.todoagenda.prefs.SnapshotMode
 import org.andstatus.todoagenda.util.RawResourceUtils
 import org.joda.time.DateTime
 import org.json.JSONObject
-import org.junit.Assert
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.Volatile
 
@@ -49,23 +48,23 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
         AllSettings.addNew(TAG, context, settings)
     }
 
-    fun updateAppSettings(tag: String?) {
-        settings!!.resultsStorage = results
+    fun updateAppSettings(tag: String) {
+        settings.resultsStorage = results
         if (!results.results.isEmpty()) {
-            settings!!.clock().setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
+            settings.clock().setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
         }
         AllSettings.addNew(tag, context, settings)
         if (results.results.size > 0) {
-            Log.d(tag, "Results executed at " + settings!!.clock().now())
+            Log.d(tag, "Results executed at " + settings.clock().now())
         }
     }
 
-    fun addResults(newResults: QueryResultsStorage?) {
+    fun addResults(newResults: QueryResultsStorage) {
         results.addResults(newResults)
     }
 
     fun setExecutedAt(executedAt: DateTime?) {
-        results.executedAt = executedAt
+        results.executedAt.set(executedAt)
     }
 
     fun addRow(event: CalendarEvent) {
@@ -84,7 +83,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
         )
     }
 
-    fun addRow(queryRow: QueryRow?) {
+    fun addRow(queryRow: QueryRow) {
         val providerType = EventProviderType.CALENDAR
         val result = results.findLast(providerType).orElseGet { addFirstQueryResult(providerType) }
         result.addRow(queryRow)
@@ -92,23 +91,23 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
 
     private fun addFirstQueryResult(providerType: EventProviderType): QueryResult {
         ensureOneActiveEventSource(providerType)
-        val r2 = QueryResult(providerType, settings!!.widgetId, settings!!.clock().now())
+        val r2 = QueryResult(providerType, settings.widgetId, settings.clock().now())
         results.addResult(r2)
         return r2
     }
 
     private fun ensureOneActiveEventSource(type: EventProviderType) {
-        if (settings!!.activeEventSources.stream()
+        if (settings.activeEventSources.stream()
                 .noneMatch { source: OrderedEventSource -> source.source.providerType === type }
         ) {
-            val sourceId = settings!!.activeEventSources.size + 1
+            val sourceId = settings.activeEventSources.size + 1
             val source = EventSource(
                 type, sourceId,
                 "(Mocked $type #$sourceId)",
                 "", 0, true
             )
             val newSource = OrderedEventSource(source, 1)
-            settings!!.activeEventSources.add(newSource)
+            settings.activeEventSources.add(newSource)
         }
     }
 
@@ -125,7 +124,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
         settings = AllSettings.instanceFromId(context, widgetId)
     }
 
-    fun loadResultsAndSettings(@RawRes jsonResId: Int): QueryResultsStorage? {
+    fun loadResultsAndSettings(@RawRes jsonResId: Int): QueryResultsStorage {
         try {
             val json =
                 JSONObject(RawResourceUtils.getString(InstrumentationRegistry.getInstrumentation().context, jsonResId))
@@ -133,11 +132,10 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
             val widgetData = WidgetData.fromJson(json)
             val settings = widgetData.getSettingsForWidget(context, settings, widgetId)
             setSettings1(settings)
-            return settings.resultsStorage
+            return settings.resultsStorage ?: throw IllegalStateException("No results storage")
         } catch (e: Exception) {
-            Assert.fail("loadResultsAndSettings" + e.message)
+            throw IllegalStateException("loadResultsAndSettings" + e.message)
         }
-        return null
     }
 
     val firstActiveEventSource: OrderedEventSource
@@ -162,7 +160,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
 
         fun tearDown() {
             val toDelete: MutableList<Int> = ArrayList()
-            val instances = AllSettings.getLoadedInstances()
+            val instances = AllSettings.loadedInstances
             for (settings in instances.values) {
                 if (settings.widgetId >= TEST_WIDGET_ID_MIN) {
                     toDelete.add(settings.widgetId)

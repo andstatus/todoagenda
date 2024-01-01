@@ -1,9 +1,9 @@
-package org.andstatus.todoagenda.task;
+package org.andstatus.todoagenda.task
 
-public enum TaskStatus {
+enum class TaskStatus {
     NEEDS_ACTION,
     IN_PROGRESS,
     COMPLETED,
     CANCELLED,
-    UNKNOWN;
+    UNKNOWN
 }

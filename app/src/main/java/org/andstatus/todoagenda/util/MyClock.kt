@@ -1,156 +1,146 @@
-package org.andstatus.todoagenda.util;
+package org.andstatus.todoagenda.util
 
-import androidx.annotation.Nullable;
-
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.SnapshotMode;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Days;
-import org.joda.time.Minutes;
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.SnapshotMode
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.Days
+import org.joda.time.Minutes
+import java.util.TimeZone
+import kotlin.concurrent.Volatile
 
 /**
  * A clock, the can be changed independently from a Device clock
  *
  * @author yvolk@yurivolkov.com
  */
-public class MyClock {
-    public static final DateTime DATETIME_MIN = new DateTime(0, DateTimeZone.UTC).withTimeAtStartOfDay();
-    public static final DateTime DATETIME_MAX = new DateTime(5000, 1, 1, 0, 0, DateTimeZone.UTC).withTimeAtStartOfDay();
+class MyClock {
+    @Volatile
+    var snapshotMode: SnapshotMode = SnapshotMode.Companion.defaultValue
+        private set
 
-    private volatile SnapshotMode snapshotMode = SnapshotMode.defaultValue;
-    private volatile DateTime snapshotDate = null;
-    private volatile DateTime snapshotDateSetAt = null;
-    private volatile String lockedTimeZoneId = "";
-    private static volatile DateTimeZone defaultTimeZone = null;
-    private volatile DateTimeZone zone = getDefaultTimeZone();
+    @Volatile
+    private var snapshotDate: DateTime? = null
 
+    @Volatile
+    private var snapshotDateSetAt: DateTime? = null
 
-    public static void setDefaultTimeZone(DateTimeZone zone) {
-        defaultTimeZone = zone;
-    }
-
-    public static DateTimeZone getDefaultTimeZone() {
-        return defaultTimeZone != null ? defaultTimeZone : DateTimeZone.forTimeZone(java.util.TimeZone.getDefault());
-    }
-
-    public void setSnapshotMode(SnapshotMode snapshotModeIn, InstanceSettings settings) {
-        snapshotMode = snapshotModeIn.isSnapshotMode() && !settings.hasResults()
-            ? SnapshotMode.LIVE_DATA
-            : snapshotModeIn;
-        if (snapshotMode.isSnapshotMode()) {
-            setSnapshotDate(settings.getResultsStorage().getExecutedAt());
+    @Volatile
+    var lockedTimeZoneId = ""
+        set(value) {
+            field = DateUtil.validatedTimeZoneId(value)
+            updateZone()
         }
-        updateZone();
+
+    @Volatile
+    var zone = defaultTimeZone
+        private set
+
+    fun setSnapshotMode(snapshotModeIn: SnapshotMode?, settings: InstanceSettings) {
+        snapshotMode =
+            if (snapshotModeIn!!.isSnapshotMode && !settings.hasResults()) SnapshotMode.LIVE_DATA else snapshotModeIn
+        if (snapshotMode.isSnapshotMode) {
+            setSnapshotDate(settings.resultsStorage!!.executedAt.get())
+        }
+        updateZone()
     }
 
-    private void setSnapshotDate(DateTime snapshotDate) {
-        this.snapshotDate = snapshotDate;
-        snapshotDateSetAt = DateTime.now();
+    private fun setSnapshotDate(snapshotDate: DateTime?) {
+        this.snapshotDate = snapshotDate
+        snapshotDateSetAt = DateTime.now()
     }
 
-    public void setLockedTimeZoneId(String timeZoneId) {
-        lockedTimeZoneId = DateUtil.validatedTimeZoneId(timeZoneId);
-        updateZone();
-    }
-
-    public void updateZone() {
-        if (snapshotMode == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
-            zone = snapshotDate.getZone();
+    fun updateZone() {
+        zone = if (snapshotMode == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
+            snapshotDate!!.zone
         } else if (StringUtil.nonEmpty(lockedTimeZoneId)) {
-            zone = DateTimeZone.forID(lockedTimeZoneId);
+            DateTimeZone.forID(lockedTimeZoneId)
         } else {
-            zone = getDefaultTimeZone();
+            defaultTimeZone
         }
-    }
-
-    public String getLockedTimeZoneId() {
-        return lockedTimeZoneId;
-    }
-
-    public SnapshotMode getSnapshotMode() {
-        return snapshotMode;
     }
 
     /**
      * Usually returns real "now", but may be #setNow to some other time for testing purposes
      */
-    public DateTime now() {
-        return now(zone);
-    }
-
-    public DateTime now(DateTimeZone zone) {
-        DateTime snapshotDate = this.snapshotDate;
-        if (getSnapshotMode() == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
-            return PermissionsUtil.isTestMode()
-                ? getTimeMachineDate(zone)
-                : snapshotDate.withZone(zone);
+    @JvmOverloads
+    fun now(zone: DateTimeZone? = this.zone): DateTime {
+        val snapshotDate = snapshotDate
+        return if (snapshotMode == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
+            if (PermissionsUtil.isTestMode) getTimeMachineDate(zone) else snapshotDate.withZone(zone)
         } else {
-            return DateTime.now(zone);
+            DateTime.now(zone)
         }
     }
 
-    private DateTime getTimeMachineDate(DateTimeZone zone) {
-        DateTime nowSetAt = null;
-        DateTime now = null;
+    private fun getTimeMachineDate(zone: DateTimeZone?): DateTime {
+        var nowSetAt: DateTime?
+        var now: DateTime?
         do {
-            nowSetAt = snapshotDateSetAt;
-            now = snapshotDate;
-        } while (nowSetAt != snapshotDateSetAt); // Ensure concurrent consistency
-
-        if (now == null) {
-            return DateTime.now(zone);
+            nowSetAt = snapshotDateSetAt
+            now = snapshotDate
+        } while (nowSetAt !== snapshotDateSetAt) // Ensure concurrent consistency
+        return if (now == null) {
+            DateTime.now(zone)
         } else {
-            long diffL = DateTime.now().getMillis() - nowSetAt.getMillis();
-            int diff = 0;
-            if (diffL > 0 && diffL < Integer.MAX_VALUE) {
-                diff = (int) diffL;
+            val diffL = DateTime.now().millis - nowSetAt!!.millis
+            var diff = 0
+            if (diffL > 0 && diffL < Int.MAX_VALUE) {
+                diff = diffL.toInt()
             }
-            return new DateTime(now, zone).plusMillis(diff);
+            DateTime(now, zone).plusMillis(diff)
         }
     }
 
-    public DateTimeZone getZone() {
-        return zone;
+    fun isToday(date: DateTime?): Boolean {
+        return isDateDefined(date) && !isBeforeToday(date) && date!!.isBefore(
+            now(date.zone).plusDays(1).withTimeAtStartOfDay()
+        )
     }
 
-    public boolean isToday(@Nullable DateTime date) {
-        return isDateDefined(date) && !isBeforeToday(date) && date.isBefore(now(date.getZone()).plusDays(1).withTimeAtStartOfDay());
+    fun isBeforeToday(date: DateTime?): Boolean {
+        return isDateDefined(date) && date!!.isBefore(now(date.zone).withTimeAtStartOfDay())
     }
 
-    public boolean isBeforeToday(@Nullable DateTime date) {
-        return isDateDefined(date) && date.isBefore(now(date.getZone()).withTimeAtStartOfDay());
+    fun isAfterToday(date: DateTime?): Boolean {
+        return isDateDefined(date) && !date!!.isBefore(now(date.zone).withTimeAtStartOfDay().plusDays(1))
     }
 
-    public boolean isAfterToday(@Nullable DateTime date) {
-        return isDateDefined(date) && !date.isBefore(now(date.getZone()).withTimeAtStartOfDay().plusDays(1));
+    fun isBeforeNow(date: DateTime?): Boolean {
+        return isDateDefined(date) && date!!.isBefore(now(date.zone))
     }
 
-    public boolean isBeforeNow(@Nullable DateTime date) {
-        return isDateDefined(date) && date.isBefore(now(date.getZone()));
-    }
-
-    public int getNumberOfDaysTo(DateTime date) {
+    fun getNumberOfDaysTo(date: DateTime?): Int {
         return Days.daysBetween(
-                now(date.getZone()).withTimeAtStartOfDay(),
-                date.withTimeAtStartOfDay())
-            .getDays();
+            now(date!!.zone).withTimeAtStartOfDay(),
+            date.withTimeAtStartOfDay()
+        )
+            .days
     }
 
-    public int getNumberOfMinutesTo(DateTime date) {
-        return Minutes.minutesBetween(now(date.getZone()), date)
-            .getMinutes();
+    fun getNumberOfMinutesTo(date: DateTime?): Int {
+        return Minutes.minutesBetween(now(date!!.zone), date)
+            .minutes
     }
 
-    public DateTime startOfTomorrow() {
-        return startOfNextDay(now(zone));
+    fun startOfTomorrow(): DateTime {
+        return startOfNextDay(now(zone))
     }
 
-    public static DateTime startOfNextDay(DateTime date) {
-        return date.plusDays(1).withTimeAtStartOfDay();
-    }
+    companion object {
+        val DATETIME_MIN = DateTime(0, DateTimeZone.UTC).withTimeAtStartOfDay()
+        val DATETIME_MAX = DateTime(5000, 1, 1, 0, 0, DateTimeZone.UTC).withTimeAtStartOfDay()
 
-    public static boolean isDateDefined(@Nullable DateTime dateTime) {
-        return dateTime != null && dateTime.isAfter(DATETIME_MIN) && dateTime.isBefore(DATETIME_MAX);
+        @Volatile
+        var myDefaultTimeZone: DateTimeZone? = null
+        val defaultTimeZone: DateTimeZone get() = myDefaultTimeZone ?: DateTimeZone.forTimeZone(TimeZone.getDefault())
+
+        fun startOfNextDay(date: DateTime?): DateTime {
+            return date!!.plusDays(1).withTimeAtStartOfDay()
+        }
+
+        fun isDateDefined(dateTime: DateTime?): Boolean {
+            return dateTime != null && dateTime.isAfter(DATETIME_MIN) && dateTime.isBefore(DATETIME_MAX)
+        }
     }
 }

@@ -13,189 +13,182 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.andstatus.todoagenda.prefs.dateformat
 
-package org.andstatus.todoagenda.prefs.dateformat;
+import android.content.Context
+import android.text.format.DateUtils
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.util.StringUtil
+import org.joda.time.DateTime
+import org.joda.time.Days
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Formatter
+import java.util.Locale
 
-import android.content.Context;
-import android.text.format.DateUtils;
-
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.util.StringUtil;
-import org.joda.time.DateTime;
-import org.joda.time.Days;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.Locale;
-
-public class DateFormatter {
-    private static final char NUMBER_OF_DAYS_LOWER_LETTER = 'b';
-    private static final char NUMBER_OF_DAYS_UPPER_LETTER = 'B';
-
-    private final Context context;
-    private final DateFormatValue dateFormatValue;
-    private final DateTime now;
-    Locale locale = Locale.getDefault();
-
-    public DateFormatter(Context context, DateFormatValue dateFormatValue, DateTime now) {
-        this.context = context;
-        this.dateFormatValue = dateFormatValue;
-        this.now = now;
-    }
-
-    public CharSequence formatDate(DateTime date) {
-        try {
-            if(dateFormatValue.hasPattern()) {
-                return formatDateCustom(date, dateFormatValue.getPattern());
+class DateFormatter(
+    private val context: Context?,
+    private val dateFormatValue: DateFormatValue?,
+    private val now: DateTime?
+) {
+    var locale = Locale.getDefault()
+    fun formatDate(date: DateTime?): CharSequence {
+        return try {
+            if (dateFormatValue!!.hasPattern()) {
+                return formatDateCustom(date, dateFormatValue.pattern)
             }
+            when (dateFormatValue.type) {
+                DateFormatType.HIDDEN -> ""
+                DateFormatType.DEVICE_DEFAULT -> formatDateTime(date, DateUtils.FORMAT_SHOW_DATE)
+                DateFormatType.DEFAULT_WEEKDAY -> formatDateTime(
+                    date,
+                    DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_WEEKDAY
+                )
 
-            switch (dateFormatValue.type) {
-                case HIDDEN:
-                    return "";
-                case DEVICE_DEFAULT:
-                    return formatDateTime(date, DateUtils.FORMAT_SHOW_DATE);
-                case DEFAULT_WEEKDAY:
-                    return formatDateTime(date, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY);
-                case ABBREVIATED:
-                    return formatDateTime(date, DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE |
-                            DateUtils.FORMAT_SHOW_WEEKDAY);
-                case DEFAULT_DAYS:
-                    return formatDefaultWithNumberOfDaysToEvent(date);
-                case DEFAULT_YTT:
-                    CharSequence str1 = formatNumberOfDaysToEventText(context, 3, getNumberOfDaysToEvent(date));
-                    return (str1.length() == 0 ? "" : str1 + ", ") + formatDateTime(date, DateUtils.FORMAT_SHOW_DATE);
-                case NUMBER_OF_DAYS:
-                    return formatNumberOfDaysToEvent(context, 5, getNumberOfDaysToEvent(date));
-                default:
-                    return "(not implemented: " + dateFormatValue.getSummary(context) + ")";
+                DateFormatType.ABBREVIATED -> formatDateTime(
+                    date, DateUtils.FORMAT_ABBREV_ALL or DateUtils.FORMAT_SHOW_DATE or
+                        DateUtils.FORMAT_SHOW_WEEKDAY
+                )
+
+                DateFormatType.DEFAULT_DAYS -> formatDefaultWithNumberOfDaysToEvent(date)
+                DateFormatType.DEFAULT_YTT -> {
+                    val str1 = formatNumberOfDaysToEventText(
+                        context, 3, getNumberOfDaysToEvent(date)
+                    )
+                    (if (str1.length == 0) "" else "$str1, ") + formatDateTime(date, DateUtils.FORMAT_SHOW_DATE)
+                }
+
+                DateFormatType.NUMBER_OF_DAYS -> formatNumberOfDaysToEvent(
+                    context, 5, getNumberOfDaysToEvent(date)
+                )
+
+                else -> "(not implemented: " + dateFormatValue.getSummary(context) + ")"
             }
-        } catch (Exception e) {
-            return e.getLocalizedMessage();
+        } catch (e: Exception) {
+            e.localizedMessage
         }
     }
 
-    private CharSequence formatDefaultWithNumberOfDaysToEvent(DateTime date) {
-        String dateStub = "dateStub";
-        return formatDateCustom(date, "BBB, '" + dateStub + "', BBBB")
-                .replace(dateStub, formatDateTime(date, DateUtils.FORMAT_SHOW_DATE));
+    private fun formatDefaultWithNumberOfDaysToEvent(date: DateTime?): CharSequence {
+        val dateStub = "dateStub"
+        return formatDateCustom(date, "BBB, '$dateStub', BBBB")
+            .replace(dateStub, formatDateTime(date, DateUtils.FORMAT_SHOW_DATE))
     }
 
-    private String formatDateTime(DateTime date, int flags) {
-        long millis = toJavaDate(date).getTime();
-        return DateUtils.formatDateRange(context,
-                new Formatter(new StringBuilder(50), locale),
-                millis,
-                millis,
-                flags,
-                date.getZone().getID())
-                .toString();
+    private fun formatDateTime(date: DateTime?, flags: Int): String {
+        val millis = toJavaDate(date).time
+        return DateUtils.formatDateRange(
+            context,
+            Formatter(StringBuilder(50), locale),
+            millis,
+            millis,
+            flags,
+            date!!.zone.id
+        )
+            .toString()
     }
 
-    public static Date toJavaDate(DateTime date) {
-        return new Date(date.getYearOfEra() - 1900, date.getMonthOfYear() - 1, date.getDayOfMonth());
-    }
-
-    public static CharSequence formatNumberOfDaysToEvent(Context context, int formatLength, int daysToEvent) {
-        if (formatLength >= 4) {
-            CharSequence ytt = getYtt(context, daysToEvent);
-            if (ytt.length() > 0) return ytt;
-        }
-        if (Math.abs(daysToEvent) > 9999) return "...";
-
-        CharSequence days1 = Integer.toString(daysToEvent);
-        if (days1.length() > formatLength || formatLength >= 4) return days1;
-
-        return String.format("%0" + formatLength + "d", daysToEvent);
-    }
-
-    public static CharSequence formatNumberOfDaysToEventText(Context context, int formatLength, int daysToEvent) {
-        CharSequence ytt = getYtt(context, daysToEvent);
-        if (ytt.length() > 0) return ytt;
-
-        if (formatLength < 4) return "";
-
-        return String.format(context.getText(daysToEvent < 0 ? R.string.N_days_ago : R.string.in_N_days).toString(),
-                Math.abs(daysToEvent));
-    }
-
-    public static CharSequence getYtt(Context context, int daysToEvent) {
-        switch (daysToEvent) {
-            case -1:
-                return context.getText(R.string.yesterday);
-            case 0:
-                return context.getText(R.string.today);
-            case 1:
-                return context.getText(R.string.tomorrow);
-            default:
-                return "";
-        }
-    }
-
-    private int getNumberOfDaysToEvent(DateTime date) {
+    private fun getNumberOfDaysToEvent(date: DateTime?): Int {
         return Days.daysBetween(
-                now.withZone(date.getZone()).withTimeAtStartOfDay(),
-                date.withTimeAtStartOfDay())
-            .getDays();
+            now!!.withZone(date!!.zone).withTimeAtStartOfDay(),
+            date.withTimeAtStartOfDay()
+        )
+            .days
     }
 
-    private String formatDateCustom(DateTime date, String pattern) {
-        if (StringUtil.isEmpty(pattern)) return "";
-
-        try {
-            String pattern2 = preProcessNumberOfDaysToEvent(date, pattern);
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern2, locale);
-            return simpleDateFormat.format(toJavaDate(date));
-        } catch (Exception e) {
-            return e.getLocalizedMessage();
+    private fun formatDateCustom(date: DateTime?, pattern: String?): String {
+        return if (StringUtil.isEmpty(pattern)) "" else try {
+            val pattern2 = preProcessNumberOfDaysToEvent(date, pattern)
+            val simpleDateFormat = SimpleDateFormat(pattern2, locale)
+            simpleDateFormat.format(toJavaDate(date))
+        } catch (e: Exception) {
+            e.localizedMessage
         }
     }
 
-    private String preProcessNumberOfDaysToEvent(DateTime date, String pattern) {
-        return preProcessNumberOfDaysToEvent(date, pattern, 0, false);
-    }
-
-    private String preProcessNumberOfDaysToEvent(DateTime date, String pattern, int startIndex, boolean alreadyShown) {
-        int ind1 = getIndexOfNumberOfDaysLetter(pattern, startIndex);
-        if (ind1 < startIndex) return pattern;
-
-        char patternLetter = pattern.charAt(ind1);
-        int ind2 = ind1;
-        while (ind2 < pattern.length() && pattern.charAt(ind2) == patternLetter) {
-            ind2++;
+    private fun preProcessNumberOfDaysToEvent(
+        date: DateTime?,
+        pattern: String?,
+        startIndex: Int = 0,
+        alreadyShown: Boolean = false
+    ): String? {
+        val ind1 = getIndexOfNumberOfDaysLetter(pattern, startIndex)
+        if (ind1 < startIndex) return pattern
+        val patternLetter = pattern!![ind1]
+        var ind2 = ind1
+        while (ind2 < pattern.length && pattern[ind2] == patternLetter) {
+            ind2++
         }
-        CharSequence numberOfDaysFormatted = alreadyShown
-            ? ""
-            : patternLetter == NUMBER_OF_DAYS_LOWER_LETTER
-                ? formatNumberOfDaysToEvent(context, ind2 - ind1, getNumberOfDaysToEvent(date))
-                : formatNumberOfDaysToEventText(context, ind2 - ind1, getNumberOfDaysToEvent(date));
-        String replacement = numberOfDaysFormatted.length() == 0 ? "" : "'" + numberOfDaysFormatted + "'";
-        String pattern2 = (ind1 > 0 ? pattern.substring(0, ind1) : "") +
-                replacement +
-                (ind2 < pattern.length() ? pattern.substring(ind2) : "");
-
-        return preProcessNumberOfDaysToEvent(date, trimPattern(pattern2), startIndex + replacement.length(),
-                alreadyShown || replacement.length() > 0);
+        val numberOfDaysFormatted =
+            if (alreadyShown) "" else if (patternLetter == NUMBER_OF_DAYS_LOWER_LETTER) formatNumberOfDaysToEvent(
+                context, ind2 - ind1, getNumberOfDaysToEvent(date)
+            ) else formatNumberOfDaysToEventText(
+                context, ind2 - ind1, getNumberOfDaysToEvent(date)
+            )
+        val replacement = if (numberOfDaysFormatted.length == 0) "" else "'$numberOfDaysFormatted'"
+        val pattern2 = (if (ind1 > 0) pattern.substring(0, ind1) else "") +
+            replacement +
+            if (ind2 < pattern.length) pattern.substring(ind2) else ""
+        return preProcessNumberOfDaysToEvent(
+            date, trimPattern(pattern2), startIndex + replacement.length,
+            alreadyShown || replacement.length > 0
+        )
     }
 
-    private String trimPattern(String pattern) {
-        String pattern2 = pattern.trim();
-        if (pattern2.endsWith(",")) pattern2 = pattern2.substring(0, pattern2.length()-1);
-        if (pattern2.startsWith(",")) pattern2 = pattern2.substring(1);
-        if (pattern2.equals(pattern)) return pattern;
-
-        return trimPattern(pattern2);
+    private fun trimPattern(pattern: String): String {
+        var pattern2 = pattern.trim { it <= ' ' }
+        if (pattern2.endsWith(",")) pattern2 = pattern2.substring(0, pattern2.length - 1)
+        if (pattern2.startsWith(",")) pattern2 = pattern2.substring(1)
+        return if (pattern2 == pattern) pattern else trimPattern(pattern2)
     }
 
-    private int getIndexOfNumberOfDaysLetter(String pattern, int startIndex) {
-        boolean inQuotes = false;
-        for (int ind = startIndex; ind < pattern.length(); ind++) {
-            if ((pattern.charAt(ind) == NUMBER_OF_DAYS_LOWER_LETTER || pattern.charAt(ind) == NUMBER_OF_DAYS_UPPER_LETTER)
-                    && !inQuotes) return ind;
-
-            if (pattern.charAt(ind) == '\'') inQuotes = !inQuotes;
+    private fun getIndexOfNumberOfDaysLetter(pattern: String?, startIndex: Int): Int {
+        var inQuotes = false
+        for (ind in startIndex until pattern!!.length) {
+            if ((pattern[ind] == NUMBER_OF_DAYS_LOWER_LETTER || pattern[ind] == NUMBER_OF_DAYS_UPPER_LETTER)
+                && !inQuotes
+            ) return ind
+            if (pattern[ind] == '\'') inQuotes = !inQuotes
         }
-        return -1;
+        return -1
     }
 
+    companion object {
+        private const val NUMBER_OF_DAYS_LOWER_LETTER = 'b'
+        private const val NUMBER_OF_DAYS_UPPER_LETTER = 'B'
+        fun toJavaDate(date: DateTime?): Date {
+            return Date(date!!.yearOfEra - 1900, date.monthOfYear - 1, date.dayOfMonth)
+        }
+
+        fun formatNumberOfDaysToEvent(context: Context?, formatLength: Int, daysToEvent: Int): CharSequence {
+            if (formatLength >= 4) {
+                val ytt = getYtt(context, daysToEvent)
+                if (ytt.length > 0) return ytt
+            }
+            if (Math.abs(daysToEvent) > 9999) return "..."
+            val days1: CharSequence = Integer.toString(daysToEvent)
+            return if (days1.length > formatLength || formatLength >= 4) days1 else String.format(
+                "%0" + formatLength + "d",
+                daysToEvent
+            )
+        }
+
+        fun formatNumberOfDaysToEventText(context: Context?, formatLength: Int, daysToEvent: Int): CharSequence {
+            val ytt = getYtt(context, daysToEvent)
+            if (ytt.length > 0) return ytt
+            return if (formatLength < 4) "" else String.format(
+                context!!.getText(if (daysToEvent < 0) R.string.N_days_ago else R.string.in_N_days).toString(),
+                Math.abs(daysToEvent)
+            )
+        }
+
+        fun getYtt(context: Context?, daysToEvent: Int): CharSequence {
+            return when (daysToEvent) {
+                -1 -> context!!.getText(R.string.yesterday)
+                0 -> context!!.getText(R.string.today)
+                1 -> context!!.getText(R.string.tomorrow)
+                else -> ""
+            }
+        }
+    }
 }

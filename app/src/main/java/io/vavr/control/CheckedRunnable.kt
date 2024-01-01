@@ -16,19 +16,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.vavr.control;
+package io.vavr.control
 
 /**
- * A {@linkplain Runnable} which may throw.
+ * A [Runnable] which may throw.
  */
-@FunctionalInterface
-public interface CheckedRunnable {
-
+fun interface CheckedRunnable {
     /**
      * Performs side-effects.
      *
      * @throws Exception if an error occurs
      */
-    void run() throws Exception;
-    
+    @Throws(Exception::class)
+    fun run()
 }

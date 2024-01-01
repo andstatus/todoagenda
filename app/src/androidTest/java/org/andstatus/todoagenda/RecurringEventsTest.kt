@@ -20,17 +20,17 @@ class RecurringEventsTest : BaseWidgetTest() {
     @Test
     fun testShowRecurringEvents() {
         generateEventInstances()
-        Assert.assertEquals("Entries: " + getFactory().widgetEntries.size, 15, countCalendarEntries().toLong())
+        Assert.assertEquals("Entries: " + factory.widgetEntries.size, 15, countCalendarEntries().toLong())
         provider!!.startEditingPreferences()
         ApplicationPreferences.setShowOnlyClosestInstanceOfRecurringEvent(provider.context, true)
         provider!!.savePreferences()
         generateEventInstances()
-        Assert.assertEquals("Entries: " + getFactory().widgetEntries.size, 1, countCalendarEntries().toLong())
+        Assert.assertEquals("Entries: " + factory.widgetEntries.size, 1, countCalendarEntries().toLong())
     }
 
     fun countCalendarEntries(): Int {
         var count = 0
-        for (widgetEntry in getFactory().widgetEntries) {
+        for (widgetEntry in factory.widgetEntries) {
             if (CalendarEntry::class.java.isAssignableFrom(widgetEntry.javaClass)) {
                 count++
             }

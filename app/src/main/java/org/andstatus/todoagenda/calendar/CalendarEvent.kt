@@ -1,269 +1,196 @@
-package org.andstatus.todoagenda.calendar;
+package org.andstatus.todoagenda.calendar
 
-import static org.andstatus.todoagenda.util.StringUtil.nonEmpty;
-import static org.andstatus.todoagenda.util.StringUtil.notNull;
+import android.content.Context
+import android.util.Log
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.OrderedEventSource
+import org.andstatus.todoagenda.util.StringUtil
+import org.andstatus.todoagenda.widget.EventStatus
+import org.andstatus.todoagenda.widget.WidgetEvent
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.IllegalInstantException
+import org.joda.time.LocalDateTime
+import java.util.Optional
+import kotlin.concurrent.Volatile
 
-import android.content.Context;
-import android.util.Log;
+class CalendarEvent(
+    val settings: InstanceSettings,
+    val context: Context,
+    private val widgetId: Int,
+    val isAllDay: Boolean
+) : WidgetEvent {
+    override lateinit var eventSource: OrderedEventSource
+        private set
+    override var eventId = 0L
+    var title: String = ""
+        private set
+    lateinit var startDate: DateTime
+        private set
+    lateinit var endDate: DateTime
+        private set
 
-import org.andstatus.todoagenda.prefs.AllSettings;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
-import org.andstatus.todoagenda.widget.EventStatus;
-import org.andstatus.todoagenda.widget.WidgetEvent;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
+    var color = 0
+    var calendarColor = Optional.empty<Int>()
+    var location: String = ""
+        set(value) {
+            field = StringUtil.notNull(value)
+        }
 
-import java.util.Optional;
-
-public class CalendarEvent implements WidgetEvent {
-
-    private final InstanceSettings settings;
-    private final Context context;
-    private final int widgetId;
-    private final boolean allDay;
-
-    private OrderedEventSource eventSource;
-    private int eventId;
-    private String title = "";
-    private DateTime startDate;
-    private DateTime endDate;
-    private int color;
-    private Optional<Integer> calendarColor = Optional.empty();
-    private String location = "";
-    private boolean alarmActive;
-    private boolean recurring;
-    private EventStatus status = EventStatus.CONFIRMED;
-
-    public CalendarEvent(InstanceSettings settings, Context context, int widgetId, boolean allDay) {
-        this.settings = settings;
-        this.context = context;
-        this.widgetId = widgetId;
-        this.allDay = allDay;
+    var isAlarmActive = false
+    var isRecurring = false
+    var status = EventStatus.CONFIRMED
+    fun setEventSource(eventSource: OrderedEventSource): CalendarEvent {
+        this.eventSource = eventSource
+        return this
     }
 
-    @Override
-    public OrderedEventSource getEventSource() {
-        return eventSource;
+    fun setStartDate(startDate: DateTime): CalendarEvent {
+        this.startDate = if (isAllDay) startDate.withTimeAtStartOfDay() else startDate
+        fixEndDate()
+        return this
     }
 
-    public CalendarEvent setEventSource(OrderedEventSource eventSource) {
-        this.eventSource = eventSource;
-        return this;
+    var startMillis: Long
+        get() = dateToMillis(startDate)
+        set(startMillis) {
+            startDate = dateFromMillis(startMillis)
+            fixEndDate()
+        }
+
+    private fun dateFromMillis(millis: Long): DateTime {
+        return if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.clock().zone)
     }
 
-    public DateTime getStartDate() {
-        return startDate;
-    }
-
-    public CalendarEvent setStartDate(DateTime startDate) {
-        this.startDate = allDay ? startDate.withTimeAtStartOfDay() : startDate;
-        fixEndDate();
-        return this;
-    }
-
-    public void setStartMillis(long startMillis) {
-        this.startDate = dateFromMillis(startMillis);
-        fixEndDate();
-    }
-
-    public long getStartMillis() {
-        return dateToMillis(startDate);
-    }
-
-    private DateTime dateFromMillis(long millis) {
-        return allDay ? fromAllDayMillis(millis) : new DateTime(millis, getSettings().clock().getZone());
-    }
-
-    private static volatile long fixTimeOfAllDayEventLoggedAt = 0;
     /**
      * Implemented based on this answer: http://stackoverflow.com/a/5451245/297710
      */
-    private DateTime fromAllDayMillis(long millis) {
-        String msgLog = "millis=" + millis;
-        DateTime fixed;
+    private fun fromAllDayMillis(millis: Long): DateTime {
+        var msgLog = "millis=$millis"
+        val fixed: DateTime
         try {
-            DateTime utcDate = new DateTime(millis, DateTimeZone.UTC);
-            LocalDateTime ldt = new LocalDateTime()
-                    .withYear(utcDate.getYear())
-                    .withMonthOfYear(utcDate.getMonthOfYear())
-                    .withDayOfMonth(utcDate.getDayOfMonth())
-                    .withMillisOfDay(0);
-            int hour = 0;
-            while (getSettings().clock().getZone().isLocalDateTimeGap(ldt)) {
-                Log.v("fixTimeOfAllDayEvent", "Local Date Time Gap: " + ldt + "; " + msgLog);
-                ldt = ldt.withHourOfDay(++hour);
+            val utcDate = DateTime(millis, DateTimeZone.UTC)
+            var ldt = LocalDateTime()
+                .withYear(utcDate.year)
+                .withMonthOfYear(utcDate.monthOfYear)
+                .withDayOfMonth(utcDate.dayOfMonth)
+                .withMillisOfDay(0)
+            var hour = 0
+            while (settings.clock().zone.isLocalDateTimeGap(ldt)) {
+                Log.v("fixTimeOfAllDayEvent", "Local Date Time Gap: $ldt; $msgLog")
+                ldt = ldt.withHourOfDay(++hour)
             }
-            fixed = ldt.toDateTime(getSettings().clock().getZone());
-            msgLog += " -> " + fixed;
+            fixed = ldt.toDateTime(settings.clock().zone)
+            msgLog += " -> $fixed"
             if (Math.abs(System.currentTimeMillis() - fixTimeOfAllDayEventLoggedAt) > 1000) {
-                fixTimeOfAllDayEventLoggedAt = System.currentTimeMillis();
-                Log.v("fixTimeOfAllDayEvent", msgLog);
+                fixTimeOfAllDayEventLoggedAt = System.currentTimeMillis()
+                Log.v("fixTimeOfAllDayEvent", msgLog)
             }
-        } catch (org.joda.time.IllegalInstantException e) {
-            throw new org.joda.time.IllegalInstantException(msgLog + " caused by: " + e);
+        } catch (e: IllegalInstantException) {
+            throw IllegalInstantException("$msgLog caused by: $e")
         }
-        return fixed;
+        return fixed
     }
 
-    private void fixEndDate() {
-        if (endDate == null || !endDate.isAfter(startDate)) {
-            endDate = allDay ? startDate.plusDays(1) : startDate.plusSeconds(1);
+    private fun fixEndDate() {
+        if (!this::endDate.isInitialized || !endDate.isAfter(startDate)) {
+            endDate = if (isAllDay) startDate.plusDays(1) else startDate.plusSeconds(1)
         }
     }
 
-    @Override
-    public long getEventId() {
-        return eventId;
+    fun setEventId(eventId: Int) {
+        this.eventId = eventId.toLong()
     }
 
-    public void setEventId(int eventId) {
-        this.eventId = eventId;
+    fun setTitle(title: String?): CalendarEvent {
+        this.title = StringUtil.notNull(title)
+        return this
     }
 
-    public String getTitle() {
-        return title;
+    fun setEndDate(endDate: DateTime) {
+        this.endDate = if (isAllDay) endDate.withTimeAtStartOfDay() else endDate
+        fixEndDate()
     }
 
-    public CalendarEvent setTitle(String title) {
-        this.title = notNull(title);
-        return this;
-    }
-
-    public EventStatus getStatus() { return this.status; }
-
-    public void setStatus(EventStatus status) { this.status = status; }
-
-    public DateTime getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(DateTime endDate) {
-        this.endDate = allDay ? endDate.withTimeAtStartOfDay() : endDate;
-        fixEndDate();
-    }
-
-    public void setEndMillis(long endMillis) {
-        this.endDate = dateFromMillis(endMillis);
-        fixEndDate();
-    }
-
-    public long getEndMillis() {
-        return dateToMillis(endDate);
-    }
-
-    private long dateToMillis(DateTime date) {
-        return allDay ? toAllDayMillis(date) : date.getMillis();
-    }
-
-    private long toAllDayMillis(DateTime date) {
-        DateTime utcDate = new DateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), 0, 0,
-                DateTimeZone.UTC);
-        return utcDate.getMillis();
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public int getCalendarColor() {
-        return calendarColor.orElse(color);
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public void setCalendarColor(int color) {
-        this.calendarColor = Optional.of(color);
-    }
-
-    public boolean hasDefaultCalendarColor() {
-        return calendarColor.map(cc -> cc == color).orElse(true);
-    }
-
-    public boolean isAllDay() {
-        return allDay;
-    }
-
-    public void setLocation(String location) {
-        this.location = notNull(location);
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setAlarmActive(boolean active) {
-        this.alarmActive = active;
-    }
-
-    public boolean isAlarmActive() {
-        return alarmActive;
-    }
-
-    public void setRecurring(boolean recurring) {
-        this.recurring = recurring;
-    }
-
-    public boolean isRecurring() {
-        return recurring;
-    }
-
-    @Override
-    public String toString() {
-        return "CalendarEvent [eventId=" + eventId
-                + (nonEmpty(title) ? ", title=" + title : "")
-                + ", startDate=" + getStartDate()
-                + (endDate != null ? ", endDate=" + endDate : "")
-                + ", color=" + color
-                + (hasDefaultCalendarColor()
-                    ? " is default"
-                    : (", calendarColor=" + calendarColor.map(String::valueOf).orElse("???")))
-                + ", allDay=" + allDay
-                + ", alarmActive=" + alarmActive
-                + ", recurring=" + recurring
-                + (nonEmpty(location) ? ", location=" + location : "") +
-                "; Source [" + eventSource + "]]";
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+    var endMillis: Long
+        get() = dateToMillis(endDate)
+        set(endMillis) {
+            endDate = dateFromMillis(endMillis)
+            fixEndDate()
         }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
+
+    private fun dateToMillis(date: DateTime?): Long {
+        return if (isAllDay) toAllDayMillis(date) else date!!.millis
+    }
+
+    private fun toAllDayMillis(date: DateTime?): Long {
+        val utcDate = DateTime(
+            date!!.year, date.monthOfYear, date.dayOfMonth, 0, 0,
+            DateTimeZone.UTC
+        )
+        return utcDate.millis
+    }
+
+    fun getCalendarColor(): Int {
+        return calendarColor.orElse(color)
+    }
+
+    fun setCalendarColor(color: Int) {
+        calendarColor = Optional.of(color)
+    }
+
+    fun hasDefaultCalendarColor(): Boolean {
+        return calendarColor.map { cc: Int -> cc == color }.orElse(true)
+    }
+
+    override fun toString(): String {
+        return ("CalendarEvent [eventId=" + eventId
+            + (if (StringUtil.nonEmpty(title)) ", title=$title" else "")
+            + ", startDate=" + startDate
+            + (", endDate=$endDate")
+            + ", color=" + color
+            + (if (hasDefaultCalendarColor()) " is default" else ", calendarColor=" + calendarColor.map { obj: Int? ->
+            java.lang.String.valueOf(
+                obj
+            )
         }
-        CalendarEvent that = (CalendarEvent) o;
-        if (eventId != that.eventId || !startDate.equals(that.startDate)) {
-            return false;
+            .orElse("???"))
+            + ", allDay=" + isAllDay
+            + ", alarmActive=" + isAlarmActive
+            + ", recurring=" + isRecurring
+            + (if (StringUtil.nonEmpty(location)) ", location=$location" else "") +
+            "; Source [" + eventSource + "]]")
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
         }
-        return true;
+        if (other == null || javaClass != other.javaClass) {
+            return false
+        }
+        val that = other as CalendarEvent
+        return if (eventId != that.eventId || startDate != that.startDate) {
+            false
+        } else true
     }
 
-    @Override
-    public int hashCode() {
-        int result = eventId;
-        result += 31 * startDate.hashCode();
-        return result;
+    override fun hashCode(): Int {
+        var result = eventId.toInt()
+        result += 31 * startDate.hashCode()
+        return result
     }
 
-    public boolean isActive() {
-        DateTime now = settings.clock().now();
-        return startDate.isBefore(now) && endDate.isAfter(now);
-    }
+    val isActive: Boolean
+        get() {
+            val now = settings.clock().now()
+            return startDate.isBefore(now) && endDate.isAfter(now)
+        }
+    val isPartOfMultiDayEvent: Boolean
+        get() = endDate.withTimeAtStartOfDay().isAfter(startDate.withTimeAtStartOfDay())
 
-    public boolean isPartOfMultiDayEvent() {
-        return endDate.withTimeAtStartOfDay().isAfter(startDate.withTimeAtStartOfDay());
-    }
-
-    public InstanceSettings getSettings() {
-        return AllSettings.instanceFromId(context, widgetId);
-    }
-
-    public Context getContext() {
-        return context;
+    companion object {
+        @Volatile
+        private var fixTimeOfAllDayEventLoggedAt: Long = 0
     }
 }

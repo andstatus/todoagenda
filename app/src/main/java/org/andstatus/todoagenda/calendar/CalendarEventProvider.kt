@@ -1,278 +1,276 @@
-package org.andstatus.todoagenda.calendar;
+package org.andstatus.todoagenda.calendar
 
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.CalendarContract;
-import android.provider.CalendarContract.Attendees;
-import android.provider.CalendarContract.Instances;
-import android.util.Log;
+import android.annotation.SuppressLint
+import android.content.ContentUris
+import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
+import android.provider.CalendarContract
+import android.provider.CalendarContract.Attendees
+import android.util.Log
+import io.vavr.control.Try
+import org.andstatus.todoagenda.RemoteViewsFactory
+import org.andstatus.todoagenda.prefs.EventSource
+import org.andstatus.todoagenda.prefs.FilterMode
+import org.andstatus.todoagenda.prefs.OrderedEventSource
+import org.andstatus.todoagenda.provider.EventProvider
+import org.andstatus.todoagenda.provider.EventProviderType
+import org.andstatus.todoagenda.util.CalendarIntentUtil
+import org.andstatus.todoagenda.util.IntentUtil
+import org.andstatus.todoagenda.util.MyClock
+import org.andstatus.todoagenda.widget.EventStatus
+import org.joda.time.DateTime
+import java.util.Optional
+import java.util.function.Function
+import java.util.stream.Collectors
 
-import androidx.annotation.NonNull;
-
-import org.andstatus.todoagenda.RemoteViewsFactory;
-import org.andstatus.todoagenda.prefs.EventSource;
-import org.andstatus.todoagenda.prefs.FilterMode;
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
-import org.andstatus.todoagenda.provider.EventProvider;
-import org.andstatus.todoagenda.provider.EventProviderType;
-import org.andstatus.todoagenda.util.CalendarIntentUtil;
-import org.andstatus.todoagenda.util.IntentUtil;
-import org.andstatus.todoagenda.util.MyClock;
-import org.andstatus.todoagenda.widget.EventStatus;
-import org.joda.time.DateTime;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import io.vavr.control.Try;
-
-public class CalendarEventProvider extends EventProvider {
-    private static final String TAG = CalendarEventProvider.class.getSimpleName();
-    private static final String[] EVENT_SOURCES_PROJECTION = new String[]{CalendarContract.Calendars._ID,
-            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, CalendarContract.Calendars.CALENDAR_COLOR,
-            CalendarContract.Calendars.ACCOUNT_NAME};
-
-    public static final String EVENT_SORT_ORDER = "startDay ASC, allDay DESC, begin ASC ";
-    private static final String EVENT_SELECTION = Instances.SELF_ATTENDEE_STATUS + "!="
-            + Attendees.ATTENDEE_STATUS_DECLINED;
-
-    public CalendarEventProvider(EventProviderType type, Context context, int widgetId) {
-        super(type, context, widgetId);
-    }
-
-    List<CalendarEvent> queryEvents() {
-        initialiseParameters();
-        myContentResolver.onQueryEvents();
+class CalendarEventProvider(type: EventProviderType, context: Context, widgetId: Int) :
+    EventProvider(type, context, widgetId) {
+    fun queryEvents(): List<CalendarEvent> {
+        initialiseParameters()
+        myContentResolver.onQueryEvents()
         if (myContentResolver.isPermissionNeeded(context, type.permission) ||
-                getSettings().getActiveEventSources(type).isEmpty()) {
-            return Collections.emptyList();
+            settings.getActiveEventSources(type).isEmpty()
+        ) {
+            return emptyList()
         }
-        List<CalendarEvent> eventList = getTimeFilteredEventList();
-        if (getSettings().getShowPastEventsWithDefaultColor()) {
-            addPastEventsWithDefaultColor(eventList);
+        val eventList = timeFilteredEventList
+        if (settings.showPastEventsWithDefaultColor) {
+            addPastEventsWithDefaultColor(eventList)
         }
-
-        if (getSettings().getFilterMode() != FilterMode.NO_FILTERING) {
-            if (getSettings().getShowOnlyClosestInstanceOfRecurringEvent()) {
-                filterShowOnlyClosestInstanceOfRecurringEvent(eventList);
+        if (settings.filterMode != FilterMode.NO_FILTERING) {
+            if (settings.showOnlyClosestInstanceOfRecurringEvent) {
+                filterShowOnlyClosestInstanceOfRecurringEvent(eventList)
             }
         }
-        return eventList;
+        return eventList
     }
 
-    private void addPastEventsWithDefaultColor(List<CalendarEvent> eventList) {
-        for (CalendarEvent event : getPastEventsWithColorList()) {
+    private fun addPastEventsWithDefaultColor(eventList: MutableList<CalendarEvent>) {
+        for (event in pastEventsWithColorList) {
             if (eventList.contains(event)) {
-                eventList.remove(event);
+                eventList.remove(event)
             }
-            eventList.add(event);
+            eventList.add(event)
         }
     }
 
-    private void filterShowOnlyClosestInstanceOfRecurringEvent(@NonNull List<CalendarEvent> eventList) {
-        Map<Long, CalendarEvent> eventIds = new HashMap<>();
-        List<CalendarEvent> toRemove = new ArrayList<>();
-        for (CalendarEvent event : eventList) {
-            CalendarEvent otherEvent = eventIds.get(event.getEventId());
+    private fun filterShowOnlyClosestInstanceOfRecurringEvent(eventList: MutableList<CalendarEvent>) {
+        val eventIds: MutableMap<Long, CalendarEvent> = HashMap()
+        val toRemove: MutableList<CalendarEvent> = ArrayList()
+        for (event in eventList) {
+            val otherEvent = eventIds[event.eventId]
             if (otherEvent == null) {
-                eventIds.put(event.getEventId(), event);
-            } else if (Math.abs(getSettings().clock().getNumberOfMinutesTo(event.getStartDate())) <
-                    Math.abs(getSettings().clock().getNumberOfMinutesTo(otherEvent.getStartDate()))) {
-                toRemove.add(otherEvent);
-                eventIds.put(event.getEventId(), event);
+                eventIds[event.eventId] = event
+            } else if (Math.abs(settings.clock().getNumberOfMinutesTo(event.startDate)) <
+                Math.abs(settings.clock().getNumberOfMinutesTo(otherEvent.startDate))
+            ) {
+                toRemove.add(otherEvent)
+                eventIds[event.eventId] = event
             } else {
-                toRemove.add(event);
+                toRemove.add(event)
             }
         }
-        eventList.removeAll(toRemove);
+        eventList.removeAll(toRemove)
     }
 
-    public DateTime getEndOfTimeRange() {
-        return mEndOfTimeRange;
-    }
-
-    public DateTime getStartOfTimeRange() {
-        return mStartOfTimeRange;
-    }
-
-    private List<CalendarEvent> getTimeFilteredEventList() {
-        FilterMode filterMode = getSettings().getFilterMode();
-
-        Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
-        DateTime startDateForQuery = filterMode == FilterMode.NORMAL_FILTER
-                ? correctStartOfTimeRangeForQuery(mStartOfTimeRange) : MyClock.DATETIME_MIN;
-        ContentUris.appendId(builder, startDateForQuery.getMillis());
-        DateTime endDateForQuery = filterMode == FilterMode.NORMAL_FILTER
-                ? mEndOfTimeRange : MyClock.DATETIME_MAX;
-        ContentUris.appendId(builder, endDateForQuery.getMillis());
-        List<CalendarEvent> eventList = queryList(builder.build(), getCalendarSelection());
-
-        if (getSettings().isForTestsReplaying()) {
-            String tag = "eventsQuerying";
-            Log.d(tag, "widget " + widgetId + ", start: " + startDateForQuery +
-                    ", (before correction: " + mStartOfTimeRange + ")" +
-                    ", end: " + endDateForQuery +
-                    ", got " + eventList.size() + " events");
-            RemoteViewsFactory factory = RemoteViewsFactory.factories.get(widgetId);
-            if (factory != null) {
-                factory.logWidgetEntries(tag);
+    val endOfTimeRange: DateTime
+        get() = mEndOfTimeRange
+    val startOfTimeRange: DateTime
+        get() = mStartOfTimeRange!!
+    private val timeFilteredEventList: MutableList<CalendarEvent>
+        get() {
+            val filterMode = settings.filterMode
+            val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            val startDateForQuery = if (filterMode == FilterMode.NORMAL_FILTER) correctStartOfTimeRangeForQuery(
+                mStartOfTimeRange!!
+            ) else MyClock.DATETIME_MIN
+            ContentUris.appendId(builder, startDateForQuery.millis)
+            val endDateForQuery =
+                if (filterMode == FilterMode.NORMAL_FILTER) mEndOfTimeRange else MyClock.DATETIME_MAX
+            ContentUris.appendId(builder, endDateForQuery.millis)
+            val eventList = queryList(builder.build(), calendarSelection)
+            if (settings.isForTestsReplaying) {
+                val tag = "eventsQuerying"
+                Log.d(
+                    tag, "widget " + widgetId + ", start: " + startDateForQuery +
+                        ", (before correction: " + mStartOfTimeRange + ")" +
+                        ", end: " + endDateForQuery +
+                        ", got " + eventList.size + " events"
+                )
+                val factory: RemoteViewsFactory? = RemoteViewsFactory.factories.get(widgetId)
+                if (factory != null) {
+                    factory.logWidgetEntries(tag)
+                }
             }
-        }
-
-        switch (filterMode) {   // TODO: Implement fully...
-            case NO_FILTERING:
-                break;
-            default:
-                // Filters in a query are not exactly correct for AllDay events:
-                // for them we are selecting events some days/time before what is defined in settings.
-                // This is why we need to do additional filtering after querying a Content Provider:
-                for (Iterator<CalendarEvent> it = eventList.iterator(); it.hasNext(); ) {
-                    CalendarEvent event = it.next();
-                    if (!event.getEndDate().isAfter(mStartOfTimeRange)
-                            || !mEndOfTimeRange.isAfter(event.getStartDate())) {
-                        // We remove using Iterator to avoid ConcurrentModificationException
-                        it.remove();
+            when (filterMode) {
+                FilterMode.NO_FILTERING -> {}
+                else ->                 // Filters in a query are not exactly correct for AllDay events:
+                    // for them we are selecting events some days/time before what is defined in settings.
+                    // This is why we need to do additional filtering after querying a Content Provider:
+                {
+                    val it = eventList.iterator()
+                    while (it.hasNext()) {
+                        val event = it.next()
+                        if (!event.endDate.isAfter(mStartOfTimeRange)
+                            || !mEndOfTimeRange.isAfter(event.startDate)
+                        ) {
+                            // We remove using Iterator to avoid ConcurrentModificationException
+                            it.remove()
+                        }
                     }
                 }
-                break;
-        }
-        return eventList;
-    }
-
-    public static DateTime correctStartOfTimeRangeForQuery(DateTime startDateIn) {
-        if (startDateIn.isAfter(MyClock.DATETIME_MIN)) {
-            return startDateIn.minusDays(2);
-        } else {
-            return startDateIn;
-        }
-    }
-
-    private String getCalendarSelection() {
-        List<OrderedEventSource> activeSources = getSettings().getActiveEventSources(type);
-        StringBuilder stringBuilder = new StringBuilder(EVENT_SELECTION);
-        if (!activeSources.isEmpty()) {
-            stringBuilder.append(AND_BRACKET);
-            Iterator<OrderedEventSource> iterator = activeSources.iterator();
-            while (iterator.hasNext()) {
-                EventSource source = iterator.next().source;
-                stringBuilder.append(Instances.CALENDAR_ID);
-                stringBuilder.append(EQUALS);
-                stringBuilder.append(source.getId());
-                if (iterator.hasNext()) {
-                    stringBuilder.append(OR);
-                }
             }
-            stringBuilder.append(CLOSING_BRACKET);
+            return eventList
         }
-        return stringBuilder.toString();
-    }
+    private val calendarSelection: String
+        get() {
+            val activeSources = settings.getActiveEventSources(type)
+            val stringBuilder = StringBuilder(EVENT_SELECTION)
+            if (!activeSources.isEmpty()) {
+                stringBuilder.append(AND_BRACKET)
+                val iterator: Iterator<OrderedEventSource> = activeSources.iterator()
+                while (iterator.hasNext()) {
+                    val source = iterator.next().source
+                    stringBuilder.append(CalendarContract.Instances.CALENDAR_ID)
+                    stringBuilder.append(EQUALS)
+                    stringBuilder.append(source.id)
+                    if (iterator.hasNext()) {
+                        stringBuilder.append(OR)
+                    }
+                }
+                stringBuilder.append(CLOSING_BRACKET)
+            }
+            return stringBuilder.toString()
+        }
 
-    private List<CalendarEvent> queryList(Uri uri, String selection) {
-        return myContentResolver.foldEvents(uri, getProjection(), selection, null, EVENT_SORT_ORDER,
-                new ArrayList<>(), eventList -> cursor -> {
-                    CalendarEvent event = newCalendarEvent(cursor);
+    private fun queryList(uri: Uri, selection: String): MutableList<CalendarEvent> {
+        return myContentResolver.foldEvents<ArrayList<CalendarEvent>>(uri,
+            projection,
+            selection,
+            null,
+            EVENT_SORT_ORDER,
+            ArrayList(),
+            { eventList: ArrayList<CalendarEvent> ->
+                Function { cursor: Cursor ->
+                    val event = newCalendarEvent(cursor)
                     if (!eventList.contains(event) &&
-                        !hideBasedOnKeywordsFilter.matched(event.getTitle()) &&
-                        showBasedOnKeywordsFilter.matched(event.getTitle())
+                        !hideBasedOnKeywordsFilter!!.matched(event.title) &&
+                        showBasedOnKeywordsFilter!!.matched(event.title)
                     ) {
-                        eventList.add(event);
+                        eventList.add(event)
                     }
-                    return eventList;
-                });
+                    eventList
+                }
+            })
     }
 
-    public static String[] getProjection() {
-        List<String> columnNames = new ArrayList<>();
-        columnNames.add(Instances.CALENDAR_ID);
-        columnNames.add(Instances.EVENT_ID);
-        columnNames.add(Instances.STATUS);
-        columnNames.add(Instances.TITLE);
-        columnNames.add(Instances.BEGIN);
-        columnNames.add(Instances.END);
-        columnNames.add(Instances.ALL_DAY);
-        columnNames.add(Instances.EVENT_LOCATION);
-        columnNames.add(Instances.HAS_ALARM);
-        columnNames.add(Instances.RRULE);
-        columnNames.add(Instances.DISPLAY_COLOR);
-        columnNames.add(Instances.CALENDAR_COLOR);
-        return columnNames.toArray(new String[0]);
-    }
-
-    private List<CalendarEvent> getPastEventsWithColorList() {
-        Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
-        ContentUris.appendId(builder, 0);
-        ContentUris.appendId(builder, getSettings().clock().now().getMillis());
-        return queryList(builder.build(), getPastEventsWithColorSelection()).stream()
-            .filter(ev -> getSettings().getFilterMode() != FilterMode.DEBUG_FILTER || ev.hasDefaultCalendarColor())
-            .collect(Collectors.toList());
-    }
-
-    private String getPastEventsWithColorSelection() {
-        return getCalendarSelection() +
+    private val pastEventsWithColorList: List<CalendarEvent>
+        get() {
+            val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            ContentUris.appendId(builder, 0)
+            ContentUris.appendId(builder, settings.clock().now().millis)
+            return queryList(builder.build(), pastEventsWithColorSelection).stream()
+                .filter { ev: CalendarEvent -> settings.filterMode != FilterMode.DEBUG_FILTER || ev.hasDefaultCalendarColor() }
+                .collect(Collectors.toList())
+        }
+    private val pastEventsWithColorSelection: String
+        get() = calendarSelection +
             AND_BRACKET +
-                Instances.DISPLAY_COLOR + EQUALS + Instances.CALENDAR_COLOR +
-            CLOSING_BRACKET;
+            CalendarContract.Instances.DISPLAY_COLOR + EQUALS + CalendarContract.Instances.CALENDAR_COLOR +
+            CLOSING_BRACKET
+
+    @SuppressLint("Range")
+    private fun newCalendarEvent(cursor: Cursor): CalendarEvent {
+        val source = settings
+            .getActiveEventSource(type, cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_ID)))
+        val allDay = cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY)) > 0
+        val event = CalendarEvent(settings, context, widgetId, allDay)
+        event.setEventSource(source)
+        event.setEventId(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID)))
+        event.status =
+            EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.STATUS)))
+        event.setTitle(cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.TITLE)))
+        event.startMillis = cursor.getLong(cursor.getColumnIndex(CalendarContract.Instances.BEGIN))
+        event.endMillis = cursor.getLong(cursor.getColumnIndex(CalendarContract.Instances.END))
+        event.location = cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION))
+        event.isAlarmActive = cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.HAS_ALARM)) > 0
+        event.isRecurring = cursor.getString(cursor.getColumnIndex(CalendarContract.Instances.RRULE)) != null
+        event.color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.DISPLAY_COLOR)))
+        getColumnIndex(cursor, CalendarContract.Instances.CALENDAR_COLOR)
+            .map<Int>({ ind: Int? -> getAsOpaque(cursor.getInt(ind!!)) })
+            .ifPresent({ color: Int -> event.calendarColor = Optional.of(color) })
+        return event
     }
 
-    private CalendarEvent newCalendarEvent(Cursor cursor) {
-        OrderedEventSource source = getSettings()
-            .getActiveEventSource(type, cursor.getInt(cursor.getColumnIndex(Instances.CALENDAR_ID)));
-
-        boolean allDay = cursor.getInt(cursor.getColumnIndex(Instances.ALL_DAY)) > 0;
-        CalendarEvent event = new CalendarEvent(getSettings(), context, widgetId, allDay);
-        event.setEventSource(source);
-        event.setEventId(cursor.getInt(cursor.getColumnIndex(Instances.EVENT_ID)));
-        event.setStatus(EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(Instances.STATUS))));
-        event.setTitle(cursor.getString(cursor.getColumnIndex(Instances.TITLE)));
-        event.setStartMillis(cursor.getLong(cursor.getColumnIndex(Instances.BEGIN)));
-        event.setEndMillis(cursor.getLong(cursor.getColumnIndex(Instances.END)));
-        event.setLocation(cursor.getString(cursor.getColumnIndex(Instances.EVENT_LOCATION)));
-        event.setAlarmActive(cursor.getInt(cursor.getColumnIndex(Instances.HAS_ALARM)) > 0);
-        event.setRecurring(cursor.getString(cursor.getColumnIndex(Instances.RRULE)) != null);
-        event.setColor(getAsOpaque(cursor.getInt(cursor.getColumnIndex(Instances.DISPLAY_COLOR))));
-        getColumnIndex(cursor, Instances.CALENDAR_COLOR)
-                .map(ind -> getAsOpaque(cursor.getInt(ind)))
-                .ifPresent(event::setCalendarColor);
-
-        return event;
+    override fun fetchAvailableSources(): Try<MutableList<EventSource>> {
+        return myContentResolver.foldAvailableSources<MutableList<EventSource>>(
+            CalendarContract.Calendars.CONTENT_URI.buildUpon().build(),
+            EVENT_SOURCES_PROJECTION,
+            ArrayList<EventSource>(),
+            { eventSources: MutableList<EventSource> ->
+                { cursor: Cursor ->
+                    val indId = cursor.getColumnIndex(CalendarContract.Calendars._ID)
+                    val indTitle = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
+                    val indSummary = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)
+                    val indColor = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR)
+                    val source = EventSource(
+                        type, cursor.getInt(indId), cursor.getString(indTitle),
+                        cursor.getString(indSummary), cursor.getInt(indColor), true
+                    )
+                    eventSources.add(source)
+                    eventSources
+                }
+            })
     }
 
-    @Override
-    public Try<List<EventSource>> fetchAvailableSources() {
-        return myContentResolver.foldAvailableSources(
-                CalendarContract.Calendars.CONTENT_URI.buildUpon().build(),
-                EVENT_SOURCES_PROJECTION,
-                new ArrayList<>(),
-                eventSources -> cursor -> {
-                    int indId = cursor.getColumnIndex(CalendarContract.Calendars._ID);
-                    int indTitle = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
-                    int indSummary = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME);
-                    int indColor = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR);
-                    EventSource source = new EventSource(type, cursor.getInt(indId), cursor.getString(indTitle),
-                            cursor.getString(indSummary), cursor.getInt(indColor), true);
-                    eventSources.add(source);
-                    return eventSources;
-                });
+    fun newViewEventIntent(event: CalendarEvent): Intent {
+        val intent = IntentUtil.newViewIntent()
+        intent.setData(ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.eventId))
+        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.startMillis)
+        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.endMillis)
+        return intent
     }
 
-    public Intent newViewEventIntent(CalendarEvent event) {
-        Intent intent = IntentUtil.newViewIntent();
-        intent.setData(ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.getEventId()));
-        intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.getStartMillis());
-        intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.getEndMillis());
-        return intent;
-    }
+    override val addEventIntent: Intent
+        get() = CalendarIntentUtil.newAddCalendarEventIntent(settings.clock().zone)
 
-    @Override
-    public Intent getAddEventIntent() {
-        return CalendarIntentUtil.newAddCalendarEventIntent(getSettings().clock().getZone());
+    companion object {
+        private val TAG = CalendarEventProvider::class.java.simpleName
+        private val EVENT_SOURCES_PROJECTION = arrayOf<String>(
+            CalendarContract.Calendars._ID,
+            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, CalendarContract.Calendars.CALENDAR_COLOR,
+            CalendarContract.Calendars.ACCOUNT_NAME
+        )
+        const val EVENT_SORT_ORDER = "startDay ASC, allDay DESC, begin ASC "
+        private const val EVENT_SELECTION = (CalendarContract.Instances.SELF_ATTENDEE_STATUS + "!="
+            + Attendees.ATTENDEE_STATUS_DECLINED)
+
+        fun correctStartOfTimeRangeForQuery(startDateIn: DateTime): DateTime {
+            return if (startDateIn.isAfter(MyClock.DATETIME_MIN)) {
+                startDateIn.minusDays(2)
+            } else {
+                startDateIn
+            }
+        }
+
+        val projection: Array<String>
+            get() {
+                val columnNames: MutableList<String> = ArrayList()
+                columnNames.add(CalendarContract.Instances.CALENDAR_ID)
+                columnNames.add(CalendarContract.Instances.EVENT_ID)
+                columnNames.add(CalendarContract.Instances.STATUS)
+                columnNames.add(CalendarContract.Instances.TITLE)
+                columnNames.add(CalendarContract.Instances.BEGIN)
+                columnNames.add(CalendarContract.Instances.END)
+                columnNames.add(CalendarContract.Instances.ALL_DAY)
+                columnNames.add(CalendarContract.Instances.EVENT_LOCATION)
+                columnNames.add(CalendarContract.Instances.HAS_ALARM)
+                columnNames.add(CalendarContract.Instances.RRULE)
+                columnNames.add(CalendarContract.Instances.DISPLAY_COLOR)
+                columnNames.add(CalendarContract.Instances.CALENDAR_COLOR)
+                return columnNames.toTypedArray<String>()
+            }
     }
 }

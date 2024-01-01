@@ -19,10 +19,10 @@ class WrongDatesLostEventsTest : BaseWidgetTest() {
         )
         provider!!.addResults(inputs)
         playResults(method)
-        Assert.assertEquals("Number of entries", 11, getFactory().widgetEntries.size.toLong())
-        Assert.assertEquals("On Saturday", "Maker Fair", (getFactory().widgetEntries[4] as CalendarEntry).event.title)
-        Assert.assertEquals("On Saturday", 6, getFactory().widgetEntries[4].entryDate.dayOfWeek.toLong())
-        Assert.assertEquals("On Sunday", "Ribakovs", (getFactory().widgetEntries[7] as CalendarEntry).event.title)
-        Assert.assertEquals("On Sunday", 7, getFactory().widgetEntries[7].entryDate.dayOfWeek.toLong())
+        Assert.assertEquals("Number of entries", 11, factory.widgetEntries.size.toLong())
+        Assert.assertEquals("On Saturday", "Maker Fair", (factory.widgetEntries[4] as CalendarEntry).event.title)
+        Assert.assertEquals("On Saturday", 6, factory.widgetEntries[4].entryDate.dayOfWeek.toLong())
+        Assert.assertEquals("On Sunday", "Ribakovs", (factory.widgetEntries[7] as CalendarEntry).event.title)
+        Assert.assertEquals("On Sunday", 7, factory.widgetEntries[7].entryDate.dayOfWeek.toLong())
     }
 }

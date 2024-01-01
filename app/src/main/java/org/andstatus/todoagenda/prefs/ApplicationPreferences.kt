@@ -1,463 +1,487 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_ACTIVE_SOURCES;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_COMPACT_LAYOUT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_DAY_HEADER_ALIGNMENT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_ENTRY_DATE_FORMAT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_ENTRY_DATE_FORMAT_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_EVENTS_ENDED;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_EVENT_ENTRY_LAYOUT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_EVENT_RANGE;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_EVENT_RANGE_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_FILL_ALL_DAY;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_FILL_ALL_DAY_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_FILTER_MODE;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HIDE_DUPLICATES;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_INDICATE_ALERTS;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_INDICATE_RECURRING;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_LOCKED_TIME_ZONE_ID;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_MULTILINE_DETAILS;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_MULTILINE_DETAILS_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_MULTILINE_TITLE;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_MULTILINE_TITLE_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_REFRESH_PERIOD_MINUTES;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_REFRESH_PERIOD_MINUTES_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_DAY_HEADERS;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_END_TIME;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_END_TIME_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_EVENT_ICON;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_LOCATION;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_LOCATION_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_SNAPSHOT_MODE;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_TASK_SCHEDULING;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_TASK_WITHOUT_DATES;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_TEXT_SIZE_SCALE;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_TIME_FORMAT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_TIME_FORMAT_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_HEADER_LAYOUT;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_ID;
-import static org.andstatus.todoagenda.prefs.InstanceSettings.PREF_WIDGET_INSTANCE_NAME;
-import static org.andstatus.todoagenda.prefs.colors.ThemeColors.PREF_TEXT_COLOR_SOURCE;
-import static org.andstatus.todoagenda.util.StringUtil.isEmpty;
+import android.content.Context
+import android.text.TextUtils
+import androidx.preference.PreferenceManager
+import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
+import org.andstatus.todoagenda.prefs.colors.ColorThemeType
+import org.andstatus.todoagenda.prefs.colors.TextColorPref
+import org.andstatus.todoagenda.prefs.colors.TextColorSource
+import org.andstatus.todoagenda.prefs.colors.ThemeColors
+import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
+import org.andstatus.todoagenda.util.StringUtil
+import org.andstatus.todoagenda.widget.EventEntryLayout
+import org.andstatus.todoagenda.widget.WidgetHeaderLayout
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.text.TextUtils;
-
-import androidx.preference.PreferenceManager;
-
-import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref;
-import org.andstatus.todoagenda.prefs.colors.ColorThemeType;
-import org.andstatus.todoagenda.prefs.colors.TextColorPref;
-import org.andstatus.todoagenda.prefs.colors.TextColorSource;
-import org.andstatus.todoagenda.prefs.colors.ThemeColors;
-import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue;
-import org.andstatus.todoagenda.widget.EventEntryLayout;
-import org.andstatus.todoagenda.widget.WidgetHeaderLayout;
-
-import java.util.List;
-
-public class ApplicationPreferences {
-    public static final String PREF_DIFFERENT_COLORS_FOR_DARK = "differentColorsForDark";
-    private static final String PREF_COLOR_THEME_TYPE = "colorThemeType";
-
-    private ApplicationPreferences() {
-        // prohibit instantiation
-    }
-
-    public static void fromInstanceSettings(Context context, Integer widgetId) {
-        synchronized (ApplicationPreferences.class) {
-            InstanceSettings settings = AllSettings.instanceFromId(context, widgetId);
-            setWidgetId(context, widgetId == 0 ? settings.getWidgetId() : widgetId);
-            setDateFormat(context, PREF_WIDGET_HEADER_DATE_FORMAT, settings.getWidgetHeaderDateFormat());
-            setString(context, PREF_WIDGET_INSTANCE_NAME, settings.getWidgetInstanceName());
-            setActiveEventSources(context, settings.getActiveEventSources());
-            setEventRange(context, settings.eventRange);
-            setEventsEnded(context, settings.getEventsEnded());
-            setFillAllDayEvents(context, settings.getFillAllDayEvents());
-            setHideBasedOnKeywords(context, settings.getHideBasedOnKeywords());
-            setShowBasedOnKeywords(context, settings.getShowBasedOnKeywords());
-
-            ThemeColors colors = settings.colors();
-            setString(context, PREF_COLOR_THEME_TYPE, colors.colorThemeType.value);
-            setBoolean(context, PREF_DIFFERENT_COLORS_FOR_DARK, colors.colorThemeType != ColorThemeType.SINGLE);
-            for (BackgroundColorPref pref: BackgroundColorPref.values()) {
-                setInt(context, pref.colorPreferenceName, colors.getBackground(pref).color);
+object ApplicationPreferences {
+    const val PREF_DIFFERENT_COLORS_FOR_DARK = "differentColorsForDark"
+    private const val PREF_COLOR_THEME_TYPE = "colorThemeType"
+    fun fromInstanceSettings(context: Context, widgetId: Int) {
+        synchronized(ApplicationPreferences::class.java) {
+            val settings = AllSettings.instanceFromId(context, widgetId)
+            setWidgetId(context, if (widgetId == 0) settings.widgetId else widgetId)
+            setDateFormat(
+                context,
+                InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT,
+                settings.widgetHeaderDateFormat
+            )
+            setString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, settings.widgetInstanceName)
+            setActiveEventSources(context, settings.activeEventSources)
+            setEventRange(context, settings.eventRange)
+            setEventsEnded(context, settings.eventsEnded)
+            setFillAllDayEvents(context, settings.fillAllDayEvents)
+            setHideBasedOnKeywords(context, settings.hideBasedOnKeywords)
+            setShowBasedOnKeywords(context, settings.showBasedOnKeywords)
+            val colors = settings.colors()
+            setString(context, PREF_COLOR_THEME_TYPE, colors.colorThemeType.value)
+            setBoolean(context, PREF_DIFFERENT_COLORS_FOR_DARK, colors.colorThemeType != ColorThemeType.SINGLE)
+            for (pref in BackgroundColorPref.entries) {
+                setInt(context, pref.colorPreferenceName, colors.getBackground(pref).color)
             }
-            setString(context, PREF_TEXT_COLOR_SOURCE, colors.textColorSource.value);
-            for (TextColorPref pref: TextColorPref.values()) {
-                setString(context, pref.shadingPreferenceName, colors.getTextShadingStored(pref).shading.themeName);
-                setInt(context, pref.colorPreferenceName, colors.getTextColorStored(pref).color);
+            setString(context, ThemeColors.PREF_TEXT_COLOR_SOURCE, colors.textColorSource!!.value)
+            for (pref in TextColorPref.entries) {
+                setString(context, pref.shadingPreferenceName, colors.getTextShadingStored(pref).shading.themeName)
+                setInt(context, pref.colorPreferenceName, colors.getTextColorStored(pref).color)
             }
-
-            setShowDaysWithoutEvents(context, settings.getShowDaysWithoutEvents());
-            setShowDayHeaders(context, settings.getShowDayHeaders());
-            setDateFormat(context, PREF_DAY_HEADER_DATE_FORMAT, settings.getDayHeaderDateFormat());
-            setHorizontalLineBelowDayHeader(context, settings.getHorizontalLineBelowDayHeader());
-            setShowPastEventsUnderOneHeader(context, settings.getShowPastEventsUnderOneHeader());
-            setShowPastEventsWithDefaultColor(context, settings.getShowPastEventsWithDefaultColor());
-            setShowEventIcon(context, settings.getShowEventIcon());
-            setDateFormat(context, PREF_ENTRY_DATE_FORMAT, settings.getEntryDateFormat());
-            setBoolean(context, PREF_SHOW_END_TIME, settings.getShowEndTime());
-            setBoolean(context, PREF_SHOW_LOCATION, settings.getShowLocation());
-            setString(context, PREF_TIME_FORMAT, settings.getTimeFormat());
-            setLockedTimeZoneId(context, settings.clock().getLockedTimeZoneId());
-            setRefreshPeriodMinutes(context, settings.getRefreshPeriodMinutes());
-            setString(context, PREF_EVENT_ENTRY_LAYOUT, settings.getEventEntryLayout().value);
-            setBoolean(context, PREF_MULTILINE_TITLE, settings.isMultilineTitle());
-            setBoolean(context, PREF_MULTILINE_DETAILS, settings.isMultilineDetails());
-            setBoolean(context, PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, settings
-                    .getShowOnlyClosestInstanceOfRecurringEvent());
-            setHideDuplicates(context, settings.getHideDuplicates());
-            setString(context, PREF_TASK_SCHEDULING, settings.getTaskScheduling().value);
-            setString(context, PREF_TASK_WITHOUT_DATES, settings.getTaskWithoutDates().value);
-            setString(context, PREF_FILTER_MODE, settings.getFilterMode().value);
-            setBoolean(context, PREF_INDICATE_ALERTS, settings.getIndicateAlerts());
-            setBoolean(context, PREF_INDICATE_RECURRING, settings.getIndicateRecurring());
-            setBoolean(context, PREF_COMPACT_LAYOUT, settings.isCompactLayout());
-            setString(context, PREF_WIDGET_HEADER_LAYOUT, settings.getWidgetHeaderLayout().value);
-            setString(context, PREF_TEXT_SIZE_SCALE, settings.getTextSizeScale().preferenceValue);
-            setString(context, PREF_DAY_HEADER_ALIGNMENT, settings.getDayHeaderAlignment());
+            setShowDaysWithoutEvents(context, settings.showDaysWithoutEvents)
+            setShowDayHeaders(context, settings.showDayHeaders)
+            setDateFormat(context, InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT, settings.dayHeaderDateFormat)
+            setHorizontalLineBelowDayHeader(context, settings.horizontalLineBelowDayHeader)
+            setShowPastEventsUnderOneHeader(context, settings.showPastEventsUnderOneHeader)
+            setShowPastEventsWithDefaultColor(context, settings.showPastEventsWithDefaultColor)
+            setShowEventIcon(context, settings.showEventIcon)
+            setDateFormat(context, InstanceSettings.PREF_ENTRY_DATE_FORMAT, settings.entryDateFormat)
+            setBoolean(context, InstanceSettings.PREF_SHOW_END_TIME, settings.showEndTime)
+            setBoolean(context, InstanceSettings.PREF_SHOW_LOCATION, settings.showLocation)
+            setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
+            setLockedTimeZoneId(context, settings.clock().lockedTimeZoneId)
+            setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
+            setString(context, InstanceSettings.PREF_EVENT_ENTRY_LAYOUT, settings.eventEntryLayout.value)
+            setBoolean(context, InstanceSettings.PREF_MULTILINE_TITLE, settings.isMultilineTitle)
+            setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
+            setBoolean(
+                context, InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, settings
+                    .showOnlyClosestInstanceOfRecurringEvent
+            )
+            setHideDuplicates(context, settings.hideDuplicates)
+            setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
+            setString(context, InstanceSettings.PREF_TASK_WITHOUT_DATES, settings.taskWithoutDates.value)
+            setString(context, InstanceSettings.PREF_FILTER_MODE, settings.filterMode.value)
+            setBoolean(context, InstanceSettings.PREF_INDICATE_ALERTS, settings.indicateAlerts)
+            setBoolean(context, InstanceSettings.PREF_INDICATE_RECURRING, settings.indicateRecurring)
+            setBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, settings.isCompactLayout)
+            setString(context, InstanceSettings.PREF_WIDGET_HEADER_LAYOUT, settings.widgetHeaderLayout.value)
+            setString(context, InstanceSettings.PREF_TEXT_SIZE_SCALE, settings.textSizeScale.preferenceValue)
+            setString(context, InstanceSettings.PREF_DAY_HEADER_ALIGNMENT, settings.dayHeaderAlignment)
         }
     }
 
-    public static void save(Context context, int wigdetId) {
+    fun save(context: Context?, wigdetId: Int) {
         if (context != null && wigdetId != 0 && wigdetId == getWidgetId(context)) {
-            AllSettings.saveFromApplicationPreferences(context, wigdetId);
+            AllSettings.saveFromApplicationPreferences(context, wigdetId)
         }
     }
 
-    public static int getWidgetId(Context context) {
-        return context == null ? 0 : getInt(context, PREF_WIDGET_ID, 0);
+    fun getWidgetId(context: Context?): Int {
+        return if (context == null) 0 else getInt(context, InstanceSettings.PREF_WIDGET_ID, 0)
     }
 
-    public static void setWidgetId(Context context, int value) {
-        setInt(context, PREF_WIDGET_ID, value);
+    fun setWidgetId(context: Context?, value: Int) {
+        setInt(context, InstanceSettings.PREF_WIDGET_ID, value)
     }
 
-    public static void setWidgetHeaderDateFormat(Context context, DateFormatValue dateFormatValue) {
-        setDateFormat(context, PREF_WIDGET_HEADER_DATE_FORMAT, dateFormatValue);
+    fun setWidgetHeaderDateFormat(context: Context?, dateFormatValue: DateFormatValue?) {
+        setDateFormat(context, InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT, dateFormatValue)
     }
 
-    public static boolean noTaskSources(Context context) {
-        List<OrderedEventSource> sources = getActiveEventSources(context);
-        for(OrderedEventSource orderedSource: sources) {
-            if (!orderedSource.source.providerType.isCalendar) return false;
+    fun noTaskSources(context: Context): Boolean {
+        val sources = getActiveEventSources(context)
+        for (orderedSource in sources) {
+            if (!orderedSource.source.providerType.isCalendar) return false
         }
-        return true;
+        return true
     }
 
-    public static List<OrderedEventSource> getActiveEventSources(Context context) {
-        return OrderedEventSource.fromJsonString(getString(context, PREF_ACTIVE_SOURCES, null));
+    fun getActiveEventSources(context: Context): MutableList<OrderedEventSource> {
+        return OrderedEventSource.fromJsonString(
+            getString(context, InstanceSettings.PREF_ACTIVE_SOURCES)
+        )
     }
 
-    public static void setActiveEventSources(Context context, List<OrderedEventSource> sources) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(PREF_ACTIVE_SOURCES, OrderedEventSource.toJsonString(sources));
-        editor.apply();
+    fun setActiveEventSources(context: Context?, sources: List<OrderedEventSource>?) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        val editor = prefs.edit()
+        editor.putString(
+            InstanceSettings.PREF_ACTIVE_SOURCES,
+            OrderedEventSource.toJsonString(sources)
+        )
+        editor.apply()
     }
 
-    public static int getEventRange(Context context) {
-        return parseIntSafe(getString(context, PREF_EVENT_RANGE, PREF_EVENT_RANGE_DEFAULT));
+    fun getEventRange(context: Context): Int {
+        return parseIntSafe(
+            getString(
+                context,
+                InstanceSettings.PREF_EVENT_RANGE,
+                InstanceSettings.PREF_EVENT_RANGE_DEFAULT
+            )
+        )
     }
 
-    public static void setEventRange(Context context, int value) {
-        setString(context, PREF_EVENT_RANGE, Integer.toString(value));
+    fun setEventRange(context: Context?, value: Int) {
+        setString(context, InstanceSettings.PREF_EVENT_RANGE, value.toString())
     }
 
-    public static EndedSomeTimeAgo getEventsEnded(Context context) {
-        return EndedSomeTimeAgo.fromValue(getString(context, PREF_EVENTS_ENDED, ""));
+    fun getEventsEnded(context: Context): EndedSomeTimeAgo {
+        return EndedSomeTimeAgo.fromValue(
+            getString(context, InstanceSettings.PREF_EVENTS_ENDED)
+        )
     }
 
-    public static void setEventsEnded(Context context, EndedSomeTimeAgo value) {
-        setString(context, PREF_EVENTS_ENDED, value.save());
+    fun setEventsEnded(context: Context?, value: EndedSomeTimeAgo?) {
+        setString(context, InstanceSettings.PREF_EVENTS_ENDED, value!!.save())
     }
 
-    public static boolean getFillAllDayEvents(Context context) {
-        return getBoolean(context, PREF_FILL_ALL_DAY, PREF_FILL_ALL_DAY_DEFAULT);
+    fun getFillAllDayEvents(context: Context?): Boolean {
+        return getBoolean(
+            context,
+            InstanceSettings.PREF_FILL_ALL_DAY,
+            InstanceSettings.PREF_FILL_ALL_DAY_DEFAULT
+        )
     }
 
-    private static void setFillAllDayEvents(Context context, boolean value) {
-        setBoolean(context, PREF_FILL_ALL_DAY, value);
+    private fun setFillAllDayEvents(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_FILL_ALL_DAY, value)
     }
 
-    public static String getHideBasedOnKeywords(Context context) {
-        return getString(context, PREF_HIDE_BASED_ON_KEYWORDS, "");
+    fun getHideBasedOnKeywords(context: Context): String {
+        return getString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS)
     }
 
-    private static void setHideBasedOnKeywords(Context context, String value) {
-        setString(context, PREF_HIDE_BASED_ON_KEYWORDS, value);
+    private fun setHideBasedOnKeywords(context: Context?, value: String?) {
+        setString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS, value)
     }
 
-    public static String getShowBasedOnKeywords(Context context) {
-        return getString(context, PREF_SHOW_BASED_ON_KEYWORDS, "");
+    fun getShowBasedOnKeywords(context: Context): String {
+        return getString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, "")
     }
 
-    private static void setShowBasedOnKeywords(Context context, String value) {
-        setString(context, PREF_SHOW_BASED_ON_KEYWORDS, value);
+    private fun setShowBasedOnKeywords(context: Context?, value: String?) {
+        setString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, value)
     }
 
-    public static boolean areDifferentColorsForDark(Context context) {
-        return getBoolean(context, PREF_DIFFERENT_COLORS_FOR_DARK, false);
+    fun areDifferentColorsForDark(context: Context?): Boolean {
+        return getBoolean(context, PREF_DIFFERENT_COLORS_FOR_DARK, false)
     }
 
-    public static ColorThemeType getEditingColorThemeType(Context context) {
-        return getColorThemeType(context).fromEditor(context, areDifferentColorsForDark(context));
+    fun getEditingColorThemeType(context: Context): ColorThemeType {
+        return getColorThemeType(context).fromEditor(context, areDifferentColorsForDark(context))
     }
 
-    public static ColorThemeType getColorThemeType(Context context) {
-        return ColorThemeType.fromValue(getString(context, PREF_COLOR_THEME_TYPE, ""));
+    fun getColorThemeType(context: Context): ColorThemeType {
+        return ColorThemeType.fromValue(getString(context, PREF_COLOR_THEME_TYPE))
     }
 
-    public static int getBackgroundColor(BackgroundColorPref pref, Context context) {
-        return getInt(context, pref.colorPreferenceName, pref.defaultColor);
+    fun getBackgroundColor(pref: BackgroundColorPref, context: Context?): Int {
+        return getInt(context, pref.colorPreferenceName, pref.defaultColor)
     }
 
-    public static TextColorSource getTextColorSource(Context context) {
-        return TextColorSource.fromValue(getString(context, PREF_TEXT_COLOR_SOURCE, TextColorSource.defaultValue.value));
+    fun getTextColorSource(context: Context): TextColorSource {
+        return TextColorSource.fromValue(
+            getString(
+                context,
+                ThemeColors.PREF_TEXT_COLOR_SOURCE,
+                TextColorSource.defaultValue.value
+            )
+        )
     }
 
-    public static boolean getHorizontalLineBelowDayHeader(Context context) {
-        return getBoolean(context, PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, false);
+    fun getHorizontalLineBelowDayHeader(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, false)
     }
 
-    private static void setHorizontalLineBelowDayHeader(Context context, boolean value) {
-        setBoolean(context, PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, value);
+    private fun setHorizontalLineBelowDayHeader(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, value)
     }
 
-    public static boolean getShowDaysWithoutEvents(Context context) {
-        return getBoolean(context, PREF_SHOW_DAYS_WITHOUT_EVENTS, false);
+    fun getShowDaysWithoutEvents(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS, false)
     }
 
-    private static void setShowDaysWithoutEvents(Context context, boolean value) {
-        setBoolean(context, PREF_SHOW_DAYS_WITHOUT_EVENTS, value);
+    private fun setShowDaysWithoutEvents(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS, value)
     }
 
-    public static boolean getShowDayHeaders(Context context) {
-        return getBoolean(context, PREF_SHOW_DAY_HEADERS, true);
+    fun getShowDayHeaders(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_SHOW_DAY_HEADERS, true)
     }
 
-    private static void setShowDayHeaders(Context context, boolean value) {
-        setBoolean(context, PREF_SHOW_DAY_HEADERS, value);
+    private fun setShowDayHeaders(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_SHOW_DAY_HEADERS, value)
     }
 
-    public static boolean getShowPastEventsUnderOneHeader(Context context) {
-        return getBoolean(context, PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, false);
+    fun getShowPastEventsUnderOneHeader(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, false)
     }
 
-    private static void setShowPastEventsUnderOneHeader(Context context, boolean value) {
-        setBoolean(context, PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, value);
+    private fun setShowPastEventsUnderOneHeader(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, value)
     }
 
-    public static boolean getShowEventIcon(Context context) {
-        return getBoolean(context, PREF_SHOW_EVENT_ICON, false);
+    fun getShowEventIcon(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_SHOW_EVENT_ICON, false)
     }
 
-    public static void setShowEventIcon(Context context, boolean value) {
-        setBoolean(context, PREF_SHOW_EVENT_ICON, value);
+    fun setShowEventIcon(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_SHOW_EVENT_ICON, value)
     }
 
-    public static boolean getShowPastEventsWithDefaultColor(Context context) {
-        return getBoolean(context, PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, false);
+    fun getShowPastEventsWithDefaultColor(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, false)
     }
 
-    public static void setShowPastEventsWithDefaultColor(Context context, boolean value) {
-        setBoolean(context, PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, value);
+    fun setShowPastEventsWithDefaultColor(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, value)
     }
 
-    public static boolean getShowEndTime(Context context) {
-        return getBoolean(context, PREF_SHOW_END_TIME, PREF_SHOW_END_TIME_DEFAULT);
+    fun getShowEndTime(context: Context?): Boolean {
+        return getBoolean(
+            context,
+            InstanceSettings.PREF_SHOW_END_TIME,
+            InstanceSettings.PREF_SHOW_END_TIME_DEFAULT
+        )
     }
 
-    public static boolean getShowLocation(Context context) {
-        return getBoolean(context, PREF_SHOW_LOCATION, PREF_SHOW_LOCATION_DEFAULT);
+    fun getShowLocation(context: Context?): Boolean {
+        return getBoolean(
+            context,
+            InstanceSettings.PREF_SHOW_LOCATION,
+            InstanceSettings.PREF_SHOW_LOCATION_DEFAULT
+        )
     }
 
-    public static DateFormatValue getDayHeaderDateFormat(Context context) {
-        return getDateFormat(context, PREF_DAY_HEADER_DATE_FORMAT, PREF_DAY_HEADER_DATE_FORMAT_DEFAULT);
+    fun getDayHeaderDateFormat(context: Context): DateFormatValue {
+        return getDateFormat(
+            context,
+            InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT,
+            InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT_DEFAULT
+        )
     }
 
-    public static DateFormatValue getWidgetHeaderDateFormat(Context context) {
-        return getDateFormat(context, PREF_WIDGET_HEADER_DATE_FORMAT, PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT);
+    fun getWidgetHeaderDateFormat(context: Context): DateFormatValue {
+        return getDateFormat(
+            context,
+            InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT,
+            InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
+        )
     }
 
-    public static DateFormatValue getEntryDateFormat(Context context) {
-        return getDateFormat(context, PREF_ENTRY_DATE_FORMAT, PREF_ENTRY_DATE_FORMAT_DEFAULT);
+    fun getEntryDateFormat(context: Context): DateFormatValue {
+        return getDateFormat(
+            context,
+            InstanceSettings.PREF_ENTRY_DATE_FORMAT,
+            InstanceSettings.PREF_ENTRY_DATE_FORMAT_DEFAULT
+        )
     }
 
-    public static void setDateFormat(Context context, String key, DateFormatValue value) {
-        setString(context, key, value.save());
+    fun setDateFormat(context: Context?, key: String?, value: DateFormatValue?) {
+        setString(context, key, value!!.save())
     }
 
-    public static DateFormatValue getDateFormat(Context context, String key, DateFormatValue defaultValue) {
-        return DateFormatValue.load(getString(context, key, ""), defaultValue);
+    fun getDateFormat(context: Context, key: String?, defaultValue: DateFormatValue?): DateFormatValue {
+        return DateFormatValue.load(getString(context, key), defaultValue!!)
     }
 
-    public static String getTimeFormat(Context context) {
-        return getString(context, PREF_TIME_FORMAT, PREF_TIME_FORMAT_DEFAULT);
+    fun getTimeFormat(context: Context): String {
+        return getString(
+            context,
+            InstanceSettings.PREF_TIME_FORMAT,
+            InstanceSettings.PREF_TIME_FORMAT_DEFAULT
+        )
     }
 
-    public static String getLockedTimeZoneId(Context context) {
-        return getString(context, PREF_LOCKED_TIME_ZONE_ID, "");
+    fun getLockedTimeZoneId(context: Context): String {
+        return getString(context, InstanceSettings.PREF_LOCKED_TIME_ZONE_ID, "")
     }
 
-    public static void setLockedTimeZoneId(Context context, String value) {
-        setString(context, PREF_LOCKED_TIME_ZONE_ID, value);
+    fun setLockedTimeZoneId(context: Context?, value: String?) {
+        setString(context, InstanceSettings.PREF_LOCKED_TIME_ZONE_ID, value)
     }
 
-    public static SnapshotMode getSnapshotMode(Context context) {
-        return SnapshotMode.fromValue(getString(context, PREF_SNAPSHOT_MODE, ""));
+    fun getSnapshotMode(context: Context): SnapshotMode {
+        return SnapshotMode.fromValue(getString(context, InstanceSettings.PREF_SNAPSHOT_MODE, ""))
     }
 
-    public static void setRefreshPeriodMinutes(Context context, int value) {
-        setString(context, PREF_REFRESH_PERIOD_MINUTES, Integer.toString(value > 0
-                ? value
-                : PREF_REFRESH_PERIOD_MINUTES_DEFAULT));
+    fun setRefreshPeriodMinutes(context: Context?, value: Int) {
+        setString(
+            context,
+            InstanceSettings.PREF_REFRESH_PERIOD_MINUTES,
+            Integer.toString(if (value > 0) value else InstanceSettings.PREF_REFRESH_PERIOD_MINUTES_DEFAULT)
+        )
     }
 
-    public static int getRefreshPeriodMinutes(Context context) {
-        int stored = getIntStoredAsString(context, PREF_REFRESH_PERIOD_MINUTES, PREF_REFRESH_PERIOD_MINUTES_DEFAULT);
-        return stored > 0 ? stored : PREF_REFRESH_PERIOD_MINUTES_DEFAULT;
+    fun getRefreshPeriodMinutes(context: Context): Int {
+        val stored = getIntStoredAsString(
+            context,
+            InstanceSettings.PREF_REFRESH_PERIOD_MINUTES,
+            InstanceSettings.PREF_REFRESH_PERIOD_MINUTES_DEFAULT
+        )
+        return if (stored > 0) stored else InstanceSettings.PREF_REFRESH_PERIOD_MINUTES_DEFAULT
     }
 
-    public static boolean isTimeZoneLocked(Context context) {
-        return !TextUtils.isEmpty(getLockedTimeZoneId(context));
+    fun isTimeZoneLocked(context: Context): Boolean {
+        return !TextUtils.isEmpty(getLockedTimeZoneId(context))
     }
 
-    public static EventEntryLayout getEventEntryLayout(Context context) {
-        return EventEntryLayout.fromValue(getString(context, PREF_EVENT_ENTRY_LAYOUT, ""));
+    fun getEventEntryLayout(context: Context): EventEntryLayout {
+        return EventEntryLayout.fromValue(
+            getString(
+                context,
+                InstanceSettings.PREF_EVENT_ENTRY_LAYOUT,
+                ""
+            )
+        )
     }
 
-    public static boolean isMultilineTitle(Context context) {
-        return getBoolean(context, PREF_MULTILINE_TITLE, PREF_MULTILINE_TITLE_DEFAULT);
+    fun isMultilineTitle(context: Context?): Boolean {
+        return getBoolean(
+            context,
+            InstanceSettings.PREF_MULTILINE_TITLE,
+            InstanceSettings.PREF_MULTILINE_TITLE_DEFAULT
+        )
     }
 
-    public static boolean isMultilineDetails(Context context) {
-        return getBoolean(context, PREF_MULTILINE_DETAILS, PREF_MULTILINE_DETAILS_DEFAULT);
+    fun isMultilineDetails(context: Context?): Boolean {
+        return getBoolean(
+            context,
+            InstanceSettings.PREF_MULTILINE_DETAILS,
+            InstanceSettings.PREF_MULTILINE_DETAILS_DEFAULT
+        )
     }
 
-    public static boolean getShowOnlyClosestInstanceOfRecurringEvent(Context context) {
-        return getBoolean(context, PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, false);
+    fun getShowOnlyClosestInstanceOfRecurringEvent(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, false)
     }
 
-    public static void setShowOnlyClosestInstanceOfRecurringEvent(Context context, boolean value) {
-        setBoolean(context, PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, value);
+    fun setShowOnlyClosestInstanceOfRecurringEvent(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, value)
     }
 
-    public static boolean getHideDuplicates(Context context) {
-        return getBoolean(context, PREF_HIDE_DUPLICATES, false);
+    fun getHideDuplicates(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, false)
     }
 
-    public static void setHideDuplicates(Context context, boolean value) {
-        setBoolean(context, PREF_HIDE_DUPLICATES, value);
+    fun setHideDuplicates(context: Context?, value: Boolean) {
+        setBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, value)
     }
 
-    public static void setAllDayEventsPlacement(Context context, AllDayEventsPlacement value) {
-        setString(context, PREF_ALL_DAY_EVENTS_PLACEMENT, value.value);
+    fun setAllDayEventsPlacement(context: Context?, value: AllDayEventsPlacement) {
+        setString(context, InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT, value.value)
     }
 
-    public static AllDayEventsPlacement getAllDayEventsPlacement(Context context) {
-        return AllDayEventsPlacement.fromValue(getString(context, PREF_ALL_DAY_EVENTS_PLACEMENT, ""));
+    fun getAllDayEventsPlacement(context: Context): AllDayEventsPlacement {
+        return AllDayEventsPlacement.fromValue(
+            getString(
+                context,
+                InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT
+            )
+        )
     }
 
-    public static TaskScheduling getTaskScheduling(Context context) {
-        return TaskScheduling.fromValue(getString(context, PREF_TASK_SCHEDULING, ""));
+    fun getTaskScheduling(context: Context): TaskScheduling {
+        return TaskScheduling.fromValue(
+            getString(
+                context,
+                InstanceSettings.PREF_TASK_SCHEDULING
+            )
+        )
     }
 
-    public static TasksWithoutDates getTasksWithoutDates(Context context) {
-        return TasksWithoutDates.fromValue(getString(context, PREF_TASK_WITHOUT_DATES, ""));
+    fun getTasksWithoutDates(context: Context): TasksWithoutDates {
+        return TasksWithoutDates.fromValue(
+            getString(
+                context,
+                InstanceSettings.PREF_TASK_WITHOUT_DATES
+            )
+        )
     }
 
-    public static FilterMode getFilterMode(Context context) {
-        return FilterMode.fromValue(getString(context, PREF_FILTER_MODE, ""));
+    fun getFilterMode(context: Context): FilterMode {
+        return FilterMode.fromValue(getString(context, InstanceSettings.PREF_FILTER_MODE))
     }
 
-    private static void setString(Context context, String key, String value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(key, value);
-        editor.apply();
+    private fun setString(context: Context?, key: String?, value: String?) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        val editor = prefs.edit()
+        editor.putString(key, value)
+        editor.apply()
     }
 
-    public static int getIntStoredAsString(Context context, String key, int defaultValue) {
-        try {
-            String stringValue = getString(context, key, "");
-            if (TextUtils.isEmpty(stringValue)) return defaultValue;
-
-            return Integer.parseInt(stringValue);
-        } catch (Exception e) {
-            return defaultValue;
+    fun getIntStoredAsString(context: Context, key: String?, defaultValue: Int): Int {
+        return try {
+            val stringValue = getString(context, key)
+            if (TextUtils.isEmpty(stringValue)) defaultValue else stringValue.toInt()
+        } catch (e: Exception) {
+            defaultValue
         }
     }
 
-    public static String getString(Context context, String key, String defaultValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs == null ? defaultValue : prefs.getString(key, defaultValue);
+    // TODO: is return type nullable?
+    fun getString(context: Context, key: String?, defaultValue: String = ""): String {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        return (if (prefs == null) defaultValue
+        else prefs.getString(key, defaultValue)) ?: ""
     }
 
-    private static void setBoolean(Context context, String key, boolean value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(key, value);
-        editor.apply();
+    private fun setBoolean(context: Context?, key: String, value: Boolean) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        val editor = prefs.edit()
+        editor.putBoolean(key, value)
+        editor.apply()
     }
 
-    public static boolean getBoolean(Context context, String key, boolean defaultValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs == null ? defaultValue : prefs.getBoolean(key, defaultValue);
+    fun getBoolean(context: Context?, key: String?, defaultValue: Boolean): Boolean {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        return prefs?.getBoolean(key, defaultValue) ?: defaultValue
     }
 
-    private static void setInt(Context context, String key, int value) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(key, value);
-        editor.apply();
+    private fun setInt(context: Context?, key: String?, value: Int) {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        val editor = prefs.edit()
+        editor.putInt(key, value)
+        editor.apply()
     }
 
-    public static int getInt(Context context, String key, int defaultValue) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs == null ? defaultValue : prefs.getInt(key, defaultValue);
+    fun getInt(context: Context?, key: String?, defaultValue: Int): Int {
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        return prefs?.getInt(key, defaultValue) ?: defaultValue
     }
 
-    public static String getWidgetInstanceName(Context context) {
-        return getString(context, PREF_WIDGET_INSTANCE_NAME, "");
+    fun getWidgetInstanceName(context: Context): String {
+        return getString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, "")
     }
 
-    public static boolean isCompactLayout(Context context) {
-        return getBoolean(context, PREF_COMPACT_LAYOUT, false);
+    fun isCompactLayout(context: Context?): Boolean {
+        return getBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, false)
     }
 
-    public static WidgetHeaderLayout getWidgetHeaderLayout(Context context) {
-        return WidgetHeaderLayout.fromValue(getString(context, PREF_WIDGET_HEADER_LAYOUT, ""));
+    fun getWidgetHeaderLayout(context: Context): WidgetHeaderLayout {
+        return WidgetHeaderLayout.fromValue(
+            getString(context, InstanceSettings.PREF_WIDGET_HEADER_LAYOUT, "")
+        )
     }
 
-    public static boolean noPastEvents(Context context) {
+    fun noPastEvents(context: Context?): Boolean {
         return context != null &&
-                !getShowPastEventsWithDefaultColor(context) &&
-                getEventsEnded(context) == EndedSomeTimeAgo.NONE &&
-                noTaskSources(context);
+            !getShowPastEventsWithDefaultColor(context) && getEventsEnded(context) === EndedSomeTimeAgo.NONE &&
+            noTaskSources(context)
     }
 
-    public static int parseIntSafe(String value) {
-        if (isEmpty(value)) return 0;
-
-        try {
-            return Integer.parseInt(value);
-        } catch (Exception e) {
-            return 0;
+    fun parseIntSafe(value: String?): Int {
+        return if (StringUtil.isEmpty(value)) 0 else try {
+            value!!.toInt()
+        } catch (e: Exception) {
+            0
         }
     }
 }

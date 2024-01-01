@@ -1,119 +1,116 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.ContextThemeWrapper;
-import android.view.View;
-import android.widget.RemoteViews;
+import android.content.Context
+import android.content.Intent
+import android.view.ContextThemeWrapper
+import android.view.View
+import android.widget.RemoteViews
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.colors.TextColorPref
+import org.andstatus.todoagenda.provider.EventProvider
+import org.andstatus.todoagenda.provider.EventProviderType
+import org.andstatus.todoagenda.util.CalendarIntentUtil
+import org.andstatus.todoagenda.util.MyClock
+import org.andstatus.todoagenda.util.RemoteViewsUtil
+import java.util.Locale
 
-import androidx.annotation.NonNull;
+class DayHeaderVisualizer(context: Context, widgetId: Int) :
+    WidgetEntryVisualizer<DayHeader>(EventProvider(EventProviderType.DAY_HEADER, context, widgetId)) {
+    private val alignment: Alignment
+    private val horizontalLineBelowDayHeader: Boolean
 
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.prefs.colors.TextColorPref;
-import org.andstatus.todoagenda.provider.EventProvider;
-import org.andstatus.todoagenda.provider.EventProviderType;
-import org.andstatus.todoagenda.util.MyClock;
-import org.andstatus.todoagenda.util.RemoteViewsUtil;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import static org.andstatus.todoagenda.util.CalendarIntentUtil.newOpenCalendarAtDayIntent;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setBackgroundColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setBackgroundColorFromAttr;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setPadding;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextSize;
-
-public class DayHeaderVisualizer extends WidgetEntryVisualizer<DayHeader> {
-
-    private final Alignment alignment;
-    private final boolean horizontalLineBelowDayHeader;
-
-    public DayHeaderVisualizer(Context context, int widgetId) {
-        super(new EventProvider(EventProviderType.DAY_HEADER, context, widgetId));
-        alignment = Alignment.valueOf(getSettings().getDayHeaderAlignment());
-        horizontalLineBelowDayHeader = getSettings().getHorizontalLineBelowDayHeader();
+    init {
+        alignment = Alignment.valueOf(settings.dayHeaderAlignment)
+        horizontalLineBelowDayHeader = settings.horizontalLineBelowDayHeader
     }
 
-    @Override
-    @NonNull
-    public RemoteViews getRemoteViews(WidgetEntry eventEntry, int position) {
-        DayHeader entry = (DayHeader) eventEntry;
-        RemoteViews rv = new RemoteViews(getContext().getPackageName(), horizontalLineBelowDayHeader
-                ? R.layout.day_header_separator_below : R.layout.day_header_separator_above);
-        rv.setInt(R.id.day_header_title_wrapper, "setGravity", alignment.gravity);
-
-        TextColorPref textColorPref = TextColorPref.forDayHeader(entry);
-        ContextThemeWrapper themeContext = getSettings().colors().getThemeContext(textColorPref);
-        setBackgroundColor(rv, R.id.event_entry, getSettings().colors().getEntryBackgroundColor(entry));
-        if (getSettings().isCompactLayout()) {
-            RemoteViewsUtil.setPadding(getSettings(), rv, R.id.event_entry, R.dimen.zero, R.dimen.zero, R.dimen.zero, R.dimen.zero);
+    override fun getRemoteViews(eventEntry: WidgetEntry<*>, position: Int): RemoteViews {
+        val entry = eventEntry as DayHeader
+        val rv = RemoteViews(
+            context.packageName,
+            if (horizontalLineBelowDayHeader) R.layout.day_header_separator_below else R.layout.day_header_separator_above
+        )
+        rv.setInt(R.id.day_header_title_wrapper, "setGravity", alignment.gravity)
+        val textColorPref: TextColorPref = TextColorPref.Companion.forDayHeader(entry)
+        val themeContext = settings.colors().getThemeContext(textColorPref)
+        RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
+        if (settings.isCompactLayout) {
+            RemoteViewsUtil.setPadding(
+                settings,
+                rv,
+                R.id.event_entry,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero
+            )
         } else {
-            RemoteViewsUtil.setPadding(getSettings(), rv, R.id.event_entry, R.dimen.calender_padding, R.dimen.zero, R.dimen.calender_padding, R.dimen.entry_bottom_padding);
+            RemoteViewsUtil.setPadding(
+                settings,
+                rv,
+                R.id.event_entry,
+                R.dimen.calender_padding,
+                R.dimen.zero,
+                R.dimen.calender_padding,
+                R.dimen.entry_bottom_padding
+            )
         }
-        setDayHeaderTitle(position, entry, rv, textColorPref);
-        setDayHeaderSeparator(position, rv, themeContext);
-        return rv;
+        setDayHeaderTitle(position, entry, rv, textColorPref)
+        setDayHeaderSeparator(position, rv, themeContext)
+        return rv
     }
 
-    @Override
-    public Intent newViewEntryIntent(WidgetEntry eventEntry) {
-        DayHeader entry = (DayHeader) eventEntry;
-        return newOpenCalendarAtDayIntent(entry.entryDate);
+    override fun newViewEntryIntent(eventEntry: WidgetEntry<*>): Intent? {
+        val entry = eventEntry as DayHeader
+        return CalendarIntentUtil.newOpenCalendarAtDayIntent(entry.entryDate)
     }
 
-    private void setDayHeaderTitle(int position, DayHeader entry, RemoteViews rv, TextColorPref textColorPref) {
-        String dateString = getTitleString(entry).toString().toUpperCase(Locale.getDefault());
-        rv.setTextViewText(R.id.day_header_title, dateString);
-        setTextSize(getSettings(), rv, R.id.day_header_title, R.dimen.day_header_title);
-        setTextColor(getSettings(), textColorPref, rv, R.id.day_header_title, R.attr.dayHeaderTitle);
-
-        if (getSettings().isCompactLayout()) {
-            setPadding(getSettings(), rv, R.id.day_header_title,
-                    R.dimen.zero, R.dimen.zero, R.dimen.zero, R.dimen.zero);
+    private fun setDayHeaderTitle(position: Int, entry: DayHeader, rv: RemoteViews, textColorPref: TextColorPref?) {
+        val dateString = getTitleString(entry).toString().uppercase(Locale.getDefault())
+        rv.setTextViewText(R.id.day_header_title, dateString)
+        RemoteViewsUtil.setTextSize(settings, rv, R.id.day_header_title, R.dimen.day_header_title)
+        RemoteViewsUtil.setTextColor(settings, textColorPref, rv, R.id.day_header_title, R.attr.dayHeaderTitle)
+        if (settings.isCompactLayout) {
+            RemoteViewsUtil.setPadding(
+                settings, rv, R.id.day_header_title,
+                R.dimen.zero, R.dimen.zero, R.dimen.zero, R.dimen.zero
+            )
         } else {
-            int paddingTopId = horizontalLineBelowDayHeader
-                    ? R.dimen.day_header_padding_bottom
-                    : (position == 0 ? R.dimen.day_header_padding_top_first : R.dimen.day_header_padding_top);
-            int paddingBottomId = horizontalLineBelowDayHeader
-                    ? R.dimen.day_header_padding_top
-                    : R.dimen.day_header_padding_bottom;
-            setPadding(getSettings(), rv, R.id.day_header_title,
-                    R.dimen.day_header_padding_left, paddingTopId, R.dimen.day_header_padding_right, paddingBottomId);
+            val paddingTopId =
+                if (horizontalLineBelowDayHeader) R.dimen.day_header_padding_bottom else if (position == 0) R.dimen.day_header_padding_top_first else R.dimen.day_header_padding_top
+            val paddingBottomId =
+                if (horizontalLineBelowDayHeader) R.dimen.day_header_padding_top else R.dimen.day_header_padding_bottom
+            RemoteViewsUtil.setPadding(
+                settings, rv, R.id.day_header_title,
+                R.dimen.day_header_padding_left, paddingTopId, R.dimen.day_header_padding_right, paddingBottomId
+            )
         }
     }
 
-    protected CharSequence getTitleString(DayHeader entry) {
-        switch (entry.entryPosition) {
-            case PAST_AND_DUE_HEADER:
-                return getContext().getString(R.string.past_header);
-            case END_OF_LIST_HEADER:
-                return getContext().getString(R.string.end_of_list_header);
-            default:
-                return MyClock.isDateDefined(entry.entryDate)
-                        ? getSettings().dayHeaderDateFormatter().formatDate(entry.entryDate)
-                        : "??? " + entry.entryPosition;
+    protected fun getTitleString(entry: DayHeader): CharSequence? {
+        return when (entry.entryPosition) {
+            WidgetEntryPosition.PAST_AND_DUE_HEADER -> context.getString(R.string.past_header)
+            WidgetEntryPosition.END_OF_LIST_HEADER -> context.getString(R.string.end_of_list_header)
+            else -> if (MyClock.Companion.isDateDefined(entry.entryDate)) settings.dayHeaderDateFormatter()
+                .formatDate(entry.entryDate) else "??? " + entry.entryPosition
         }
     }
 
-    private void setDayHeaderSeparator(int position, RemoteViews rv, ContextThemeWrapper shadingContext) {
-        int viewId = R.id.day_header_separator;
+    private fun setDayHeaderSeparator(position: Int, rv: RemoteViews, shadingContext: ContextThemeWrapper?) {
+        val viewId = R.id.day_header_separator
         if (horizontalLineBelowDayHeader) {
-            setBackgroundColorFromAttr(shadingContext, rv, viewId, R.attr.dayHeaderSeparator);
+            RemoteViewsUtil.setBackgroundColorFromAttr(shadingContext, rv, viewId, R.attr.dayHeaderSeparator)
         } else {
             if (position == 0) {
-                rv.setViewVisibility(viewId, View.GONE);
+                rv.setViewVisibility(viewId, View.GONE)
             } else {
-                rv.setViewVisibility(viewId, View.VISIBLE);
-                setBackgroundColorFromAttr(shadingContext, rv, viewId, R.attr.dayHeaderSeparator);
+                rv.setViewVisibility(viewId, View.VISIBLE)
+                RemoteViewsUtil.setBackgroundColorFromAttr(shadingContext, rv, viewId, R.attr.dayHeaderSeparator)
             }
         }
     }
 
-    @Override
-    public List<DayHeader> queryEventEntries() {
-        return Collections.emptyList();
+    override fun queryEventEntries(): List<DayHeader> {
+        return emptyList()
     }
 }

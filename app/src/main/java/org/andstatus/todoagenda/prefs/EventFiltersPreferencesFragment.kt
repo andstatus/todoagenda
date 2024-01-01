@@ -1,107 +1,94 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.os.Bundle
+import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import org.andstatus.todoagenda.R
 
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceFragmentCompat;
-
-import org.andstatus.todoagenda.R;
-
-public class EventFiltersPreferencesFragment extends PreferenceFragmentCompat
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.preferences_event_filters);
+class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.preferences_event_filters)
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        showStatus();
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    override fun onResume() {
+        super.onResume()
+        showStatus()
+        preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
     }
 
-    private void showStatus() {
-        showEventsEnded();
-        showEvenRange();
-        showHideBasedOnKeywords();
-        showShowBasedOnKeywords();
-        showAllDayEventsPlacement();
-        showTaskScheduling();
-        showTasksWithoutDates();
-        showFilterMode();
+    private fun showStatus() {
+        showEventsEnded()
+        showEvenRange()
+        showHideBasedOnKeywords()
+        showShowBasedOnKeywords()
+        showAllDayEventsPlacement()
+        showTaskScheduling()
+        showTasksWithoutDates()
+        showFilterMode()
     }
 
-    private void showEventsEnded() {
-        ListPreference preference = (ListPreference) findPreference(InstanceSettings.PREF_EVENTS_ENDED);
-        preference.setSummary(preference.getEntry());
+    private fun showEventsEnded() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_EVENTS_ENDED) as ListPreference?
+        preference!!.summary = preference.entry
     }
 
-    private void showEvenRange() {
-        ListPreference preference = (ListPreference) findPreference(InstanceSettings.PREF_EVENT_RANGE);
-        preference.setSummary(preference.getEntry());
+    private fun showEvenRange() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_EVENT_RANGE) as ListPreference?
+        preference!!.summary = preference.entry
     }
 
-    private void showHideBasedOnKeywords() {
-        EditTextPreference preference = (EditTextPreference) findPreference(InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS);
-        KeywordsFilter filter = new KeywordsFilter(false, preference.getText());
-        if (filter.isEmpty()) {
-            preference.setSummary(R.string.this_option_is_turned_off);
+    private fun showHideBasedOnKeywords() {
+        val preference =
+            findPreference<Preference>(InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS) as EditTextPreference?
+        val filter = KeywordsFilter(false, preference!!.text)
+        if (filter.isEmpty) {
+            preference.setSummary(R.string.this_option_is_turned_off)
         } else {
-            preference.setSummary(filter.toString());
+            preference.summary = filter.toString()
         }
     }
 
-    private void showShowBasedOnKeywords() {
-        EditTextPreference preference = (EditTextPreference) findPreference(InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS);
-        KeywordsFilter filter = new KeywordsFilter(true, preference.getText());
-        if (filter.isEmpty()) {
-            preference.setSummary(R.string.this_option_is_turned_off);
+    private fun showShowBasedOnKeywords() {
+        val preference =
+            findPreference<Preference>(InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS) as EditTextPreference?
+        val filter = KeywordsFilter(true, preference!!.text)
+        if (filter.isEmpty) {
+            preference.setSummary(R.string.this_option_is_turned_off)
         } else {
-            preference.setSummary(filter.toString());
+            preference.summary = filter.toString()
         }
     }
 
-    private void showAllDayEventsPlacement() {
-        Preference preference = findPreference(InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT);
-        if (preference != null) {
-            preference.setSummary(ApplicationPreferences.getAllDayEventsPlacement(getActivity()).valueResId);
-        }
+    private fun showAllDayEventsPlacement() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT)
+        preference?.setSummary(ApplicationPreferences.getAllDayEventsPlacement(requireActivity()).valueResId)
     }
 
-    private void showTaskScheduling() {
-        Preference preference = findPreference(InstanceSettings.PREF_TASK_SCHEDULING);
-        if (preference != null) {
-            preference.setSummary(ApplicationPreferences.getTaskScheduling(getActivity()).valueResId);
-        }
+    private fun showTaskScheduling() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_TASK_SCHEDULING)
+        preference?.setSummary(ApplicationPreferences.getTaskScheduling(requireActivity()).valueResId)
     }
 
-    private void showTasksWithoutDates() {
-        Preference preference = findPreference(InstanceSettings.PREF_TASK_WITHOUT_DATES);
-        if (preference != null) {
-            preference.setSummary(ApplicationPreferences.getTasksWithoutDates(getActivity()).valueResId);
-        }
+    private fun showTasksWithoutDates() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_TASK_WITHOUT_DATES)
+        preference?.setSummary(ApplicationPreferences.getTasksWithoutDates(requireActivity()).valueResId)
     }
 
-    private void showFilterMode() {
-        Preference preference = findPreference(InstanceSettings.PREF_FILTER_MODE);
-        if (preference != null) {
-            preference.setSummary(ApplicationPreferences.getFilterMode(getActivity()).valueResId);
-        }
+    private fun showFilterMode() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_FILTER_MODE)
+        preference?.setSummary(ApplicationPreferences.getFilterMode(requireActivity()).valueResId)
     }
 
-    @Override
-    public void onPause() {
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-        super.onPause();
+    override fun onPause() {
+        preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
+        super.onPause()
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        showStatus();
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        showStatus()
     }
 }

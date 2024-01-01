@@ -1,15 +1,11 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import android.os.Bundle;
+import android.os.Bundle
+import androidx.preference.PreferenceFragmentCompat
+import org.andstatus.todoagenda.R
 
-import androidx.preference.PreferenceFragmentCompat;
-
-import org.andstatus.todoagenda.R;
-
-public class EventDetailsPreferencesFragment extends PreferenceFragmentCompat {
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.preferences_event_details);
+class EventDetailsPreferencesFragment : PreferenceFragmentCompat() {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.preferences_event_details)
     }
 }

@@ -53,7 +53,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
                 .setTitle("This will be the only event that will be shown")
         )
         playResults(TAG)
-        Assert.assertEquals(3, getFactory().widgetEntries.size.toLong())
+        Assert.assertEquals(3, factory.widgetEntries.size.toLong())
     }
 
     private fun oneTimeDst(iso8601time: String) {
@@ -113,7 +113,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
     fun testPeriodicAlarmTimeDuringTimeGap() {
         try {
             val zone = DateTimeZone.forID("America/Winnipeg")
-            MyClock.setDefaultTimeZone(zone)
+            MyClock.myDefaultTimeZone = zone
             val periodMinutes = 10
             val nowUtc = DateTime(
                 2020, 3, 8, 2, 15,
@@ -144,7 +144,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
             )
             Assert.assertEquals(expWinnipeg, DateUtil.exactMinutesPlusMinutes(nowWinnipeg, periodMinutes))
         } finally {
-            MyClock.setDefaultTimeZone(null)
+            MyClock.myDefaultTimeZone = null
         }
     }
 

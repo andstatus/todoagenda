@@ -1,72 +1,70 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import android.content.Context;
-import android.content.Intent;
-import android.util.Log;
-import android.widget.RemoteViews;
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import android.widget.RemoteViews
+import org.andstatus.todoagenda.MainActivity
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.RemoteViewsFactory
+import org.andstatus.todoagenda.prefs.colors.TextColorPref
+import org.andstatus.todoagenda.provider.EventProvider
+import org.andstatus.todoagenda.provider.EventProviderType
+import org.andstatus.todoagenda.util.CalendarIntentUtil
+import org.andstatus.todoagenda.util.RemoteViewsUtil
+import org.andstatus.todoagenda.widget.LastEntry.LastEntryType
+import org.joda.time.DateTime
 
-import androidx.annotation.NonNull;
-
-import org.andstatus.todoagenda.MainActivity;
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.prefs.colors.TextColorPref;
-import org.andstatus.todoagenda.provider.EventProvider;
-import org.andstatus.todoagenda.provider.EventProviderType;
-import org.joda.time.DateTime;
-
-import java.util.Collections;
-import java.util.List;
-
-import static org.andstatus.todoagenda.RemoteViewsFactory.ACTION_CONFIGURE;
-import static org.andstatus.todoagenda.RemoteViewsFactory.getActionPendingIntent;
-import static org.andstatus.todoagenda.util.CalendarIntentUtil.newOpenCalendarAtDayIntent;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setBackgroundColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextColor;
-import static org.andstatus.todoagenda.util.RemoteViewsUtil.setTextSize;
-
-/** @author yvolk@yurivolkov.com */
-public class LastEntryVisualizer extends WidgetEntryVisualizer<LastEntry> {
-    private static final String TAG = LastEntryVisualizer.class.getSimpleName();
-
-    public LastEntryVisualizer(Context context, int widgetId) {
-        super(new EventProvider(EventProviderType.LAST_ENTRY, context, widgetId));
-    }
-
-    @Override
-    @NonNull
-    public RemoteViews getRemoteViews(WidgetEntry eventEntry, int position) {
-        LastEntry entry = (LastEntry) eventEntry;
-        Log.d(TAG, "lastEntry: " + entry.type);
-        RemoteViews rv = new RemoteViews(getContext().getPackageName(), entry.type.layoutId);
-
-        int viewId = R.id.event_entry;
+/** @author yvolk@yurivolkov.com
+ */
+class LastEntryVisualizer(context: Context, widgetId: Int) :
+    WidgetEntryVisualizer<LastEntry>(EventProvider(EventProviderType.LAST_ENTRY, context, widgetId)) {
+    override fun getRemoteViews(eventEntry: WidgetEntry<*>, position: Int): RemoteViews {
+        val entry = eventEntry as LastEntry
+        Log.d(TAG, "lastEntry: " + entry.type)
+        val rv = RemoteViews(context.packageName, entry.type.layoutId)
+        val viewId = R.id.event_entry
         if (position < 0) {
-            rv.setOnClickPendingIntent(R.id.event_entry, getActionPendingIntent(getSettings(), ACTION_CONFIGURE));
+            rv.setOnClickPendingIntent(
+                R.id.event_entry, RemoteViewsFactory.getActionPendingIntent(
+                    settings, RemoteViewsFactory.ACTION_CONFIGURE
+                )
+            )
         }
-        if (entry.type == LastEntry.LastEntryType.EMPTY && getSettings().noPastEvents()) {
-            rv.setTextViewText(viewId, getContext().getText(R.string.no_upcoming_events));
+        if (entry.type == LastEntryType.EMPTY && settings.noPastEvents()) {
+            rv.setTextViewText(viewId, context.getText(R.string.no_upcoming_events))
         }
-        setTextSize(getSettings(), rv, viewId, R.dimen.event_entry_title);
-        setTextColor(getSettings(), TextColorPref.forTitle(entry), rv, viewId, R.attr.eventEntryTitle);
-        setBackgroundColor(rv, viewId, getSettings().colors().getEntryBackgroundColor(entry));
-        return rv;
+        RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
+        RemoteViewsUtil.setTextColor(
+            settings,
+            TextColorPref.forTitle(entry),
+            rv,
+            viewId,
+            R.attr.eventEntryTitle
+        )
+        RemoteViewsUtil.setBackgroundColor(rv, viewId, settings.colors().getEntryBackgroundColor(entry))
+        return rv
     }
 
-    @Override
-    public Intent newViewEntryIntent(WidgetEntry widgetEntry) {
-        LastEntry entry = (LastEntry) widgetEntry;
-        switch (entry.type) {
-            case EMPTY:
-            case NOT_LOADED:
-                return newOpenCalendarAtDayIntent(new DateTime(getSettings().clock().getZone()));
-            default:
-                break;
+    override fun newViewEntryIntent(widgetEntry: WidgetEntry<*>): Intent? {
+        val entry = widgetEntry as LastEntry
+        when (entry.type) {
+            LastEntryType.EMPTY, LastEntryType.NOT_LOADED -> return CalendarIntentUtil.newOpenCalendarAtDayIntent(
+                DateTime(
+                    settings.clock().zone
+                )
+            )
+
+            else -> {}
         }
-        return  MainActivity.intentToConfigure(getSettings().getContext(), getSettings().getWidgetId());
+        return MainActivity.intentToConfigure(settings.context, settings.widgetId)
     }
 
-    @Override
-    public List<LastEntry> queryEventEntries() {
-        return Collections.emptyList();
+    override fun queryEventEntries(): List<LastEntry> {
+        return emptyList()
+    }
+
+    companion object {
+        private val TAG = LastEntryVisualizer::class.java.simpleName
     }
 }

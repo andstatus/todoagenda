@@ -13,161 +13,147 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.andstatus.todoagenda.prefs.dateformat
 
-package org.andstatus.todoagenda.prefs.dateformat;
+import android.content.Context
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.KeyEvent
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
+import androidx.preference.PreferenceDialogFragmentCompat
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.joda.time.DateTime
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-import android.content.Context;
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
+class DateFormatDialog(private val preference: DateFormatPreference) : PreferenceDialogFragmentCompat(),
+    OnItemSelectedListener, View.OnKeyListener, TextWatcher {
+    private var typeSpinner: Spinner? = null
+    private var customPatternText: EditText? = null
+    private var sampleDateText: EditText? = null
+    private var resultText: TextView? = null
+    private val sampleDateFormatValue: DateFormatValue =
+        DateFormatValue.of(DateFormatType.CUSTOM, "yyyy-MM-dd")
 
-import androidx.preference.PreferenceDialogFragmentCompat;
-
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.prefs.AllSettings;
-import org.andstatus.todoagenda.prefs.ApplicationPreferences;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.joda.time.DateTime;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
-public class DateFormatDialog extends PreferenceDialogFragmentCompat implements AdapterView.OnItemSelectedListener, View.OnKeyListener, TextWatcher {
-    private final DateFormatPreference preference;
-    private Spinner typeSpinner;
-    private EditText customPatternText;
-    private EditText sampleDateText;
-    private TextView resultText;
-    private DateFormatValue sampleDateFormatValue = DateFormatValue.of(DateFormatType.CUSTOM, "yyyy-MM-dd");
-
-    public DateFormatDialog(DateFormatPreference preference) {
-        this.preference = preference;
-
-        final Bundle b = new Bundle();
-        b.putString(ARG_KEY, preference.getKey());
-        setArguments(b);
+    init {
+        val b = Bundle()
+        b.putString(ARG_KEY, preference.key)
+        arguments = b
     }
 
-    @Override
-    protected View onCreateDialogView(Context context) {
-        LinearLayout dialogView = (LinearLayout) LayoutInflater.from(context).inflate(R.layout.dateformat_preference, null);
-
-        typeSpinner = dialogView.findViewById(R.id.date_format_type);
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(
-                context, android.R.layout.simple_spinner_item, DateFormatType.getSpinnerEntryList(context));
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        typeSpinner.setAdapter(adapter);
-        typeSpinner.setSelection(preference.getValue().type.getSpinnerPosition());
-        typeSpinner.setOnItemSelectedListener(this);
-
-        customPatternText = dialogView.findViewById(R.id.custom_pattern);
-        customPatternText.setText(preference.getValue().getPattern());
-        customPatternText.addTextChangedListener(this);
-
-        sampleDateText = dialogView.findViewById(R.id.sample_date);
-        sampleDateText.setText(getSampleDateText());
-        sampleDateText.addTextChangedListener(this);
-
-        resultText = dialogView.findViewById(R.id.result);
-
-        return dialogView;
+    override fun onCreateDialogView(context: Context): View {
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dateformat_preference, null) as LinearLayout
+        typeSpinner = dialogView.findViewById<Spinner?>(R.id.date_format_type).also {
+            val adapter: ArrayAdapter<CharSequence> = ArrayAdapter<CharSequence>(
+                context, android.R.layout.simple_spinner_item, DateFormatType.getSpinnerEntryList(context)
+            )
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            it.setAdapter(adapter)
+            it.setSelection(preference.value.type.spinnerPosition)
+            it.setOnItemSelectedListener(this)
+        }
+        customPatternText = dialogView.findViewById<EditText?>(R.id.custom_pattern).apply {
+            setText(preference.value.pattern)
+            addTextChangedListener(this@DateFormatDialog)
+        }
+        sampleDateText = dialogView.findViewById<EditText?>(R.id.sample_date).apply {
+            setText(getSampleDateText())
+            addTextChangedListener(this@DateFormatDialog)
+        }
+        resultText = dialogView.findViewById(R.id.result)
+        return dialogView
     }
 
-    private CharSequence getSampleDateText() {
-        return new DateFormatter(getContext(), sampleDateFormatValue, getSettings().clock().now())
-                .formatDate(getSettings().clock().now());
+    private fun getSampleDateText(): CharSequence {
+        return DateFormatter(context, sampleDateFormatValue, settings.clock().now())
+            .formatDate(settings.clock().now())
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        calcResult();
+    override fun onResume() {
+        super.onResume()
+        calcResult()
     }
 
     // Two methods to listen for the Spinner changes
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (getValue().type.hasPattern()) {
-            customPatternText.setText(getValue().type.pattern);
-        } else if (!getValue().hasPattern() && getValue().type.isCustomPattern()) {
-            customPatternText.setText(DateFormatType.DEFAULT_EXAMPLE.pattern);
+    override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+        if (value.type.hasPattern()) {
+            customPatternText!!.setText(value.type.pattern)
+        } else if (!value.hasPattern() && value.type.isCustomPattern) {
+            customPatternText!!.setText(DateFormatType.DEFAULT_EXAMPLE.pattern)
         }
-        calcResult();
+        calcResult()
     }
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        calcResult();
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        calcResult()
     }
 
     // Four methods to listen to the Custom pattern text changes
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) { }
-    @Override
-    public void afterTextChanged(Editable s) {
-        calcResult();
-    }
-    @Override
-    public boolean onKey(View v, int keyCode, KeyEvent event) {
-        return false;
+    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+    override fun afterTextChanged(s: Editable) {
+        calcResult()
     }
 
-    @Override
-    public void onDialogClosed(boolean positiveResult) {
+    override fun onKey(v: View, keyCode: Int, event: KeyEvent): Boolean {
+        return false
+    }
+
+    override fun onDialogClosed(positiveResult: Boolean) {
         if (positiveResult) {
-            DateFormatValue value = getValue().toSave();
+            val value = value.toSave()
             if (preference.callChangeListener(value)) {
-                preference.setValue(value);
+                preference.value = value
             }
         }
     }
 
-    private DateFormatValue getValue() {
-        int position = typeSpinner.getSelectedItemPosition();
-        if (position >= 0) {
-            DateFormatType selectedType = DateFormatType.values()[position];
-            return DateFormatValue.of(selectedType, customPatternText.getText().toString());
+    private val value: DateFormatValue
+        get() {
+            val position = typeSpinner!!.selectedItemPosition
+            if (position >= 0) {
+                val selectedType = DateFormatType.entries[position]
+                return DateFormatValue.of(selectedType, customPatternText!!.text.toString())
+            }
+            return DateFormatType.UNKNOWN.defaultValue
         }
-        return DateFormatType.UNKNOWN.defaultValue();
-    }
 
-    private void calcResult() {
-        DateFormatValue dateFormatValue = getValue();
-        SimpleDateFormat sampleFormat = getSampleDateFormat();
-        CharSequence result;
+    private fun calcResult() {
+        val dateFormatValue = value
+        val sampleFormat = sampleDateFormat
+        var result: CharSequence?
         try {
-            if (customPatternText.isEnabled() != dateFormatValue.type.isCustomPattern()) {
-                customPatternText.setEnabled(dateFormatValue.type.isCustomPattern());
+            if (customPatternText!!.isEnabled != dateFormatValue.type.isCustomPattern) {
+                customPatternText!!.isEnabled = dateFormatValue.type.isCustomPattern
             }
-            Date sampleDate = sampleFormat.parse(sampleDateText.getText().toString());
-            result = sampleDate == null
-                    ? "null"
-                    : new DateFormatter(this.getContext(), dateFormatValue, getSettings().clock().now())
-                        .formatDate(new DateTime(sampleDate.getTime(), getSettings().clock().getZone()));
-        } catch (ParseException e) {
-            result = e.getLocalizedMessage();
+            val sampleDate = sampleFormat.parse(sampleDateText!!.text.toString())
+            result =
+                if (sampleDate == null) "null" else DateFormatter(this.context, dateFormatValue, settings.clock().now())
+                    .formatDate(DateTime(sampleDate.time, settings.clock().zone))
+        } catch (e: ParseException) {
+            result = e.localizedMessage
         }
-        resultText.setText(result);
+        resultText!!.text = result
     }
 
-    private SimpleDateFormat getSampleDateFormat() {
-        return new SimpleDateFormat(sampleDateFormatValue.getPattern(), Locale.ENGLISH);
-    }
-
-    private InstanceSettings getSettings() {
-        int widgetId = ApplicationPreferences.getWidgetId(getActivity());
-        return AllSettings.instanceFromId(getActivity(), widgetId);
-    }
+    private val sampleDateFormat: SimpleDateFormat
+        get() = SimpleDateFormat(sampleDateFormatValue.pattern, Locale.ENGLISH)
+    private val settings: InstanceSettings
+        get() {
+            val widgetId = ApplicationPreferences.getWidgetId(activity)
+            return AllSettings.instanceFromId(requireActivity(), widgetId)
+        }
 }

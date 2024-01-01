@@ -18,6 +18,6 @@ class TodaysColorsEventsTest : BaseWidgetTest() {
         )
         provider!!.addResults(inputs)
         playResults(method)
-        Assert.assertEquals("Number of entries", 43, getFactory().widgetEntries.size.toLong())
+        Assert.assertEquals("Number of entries", 43, factory.widgetEntries.size.toLong())
     }
 }

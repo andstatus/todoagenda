@@ -1,100 +1,73 @@
-package org.andstatus.todoagenda.provider;
+package org.andstatus.todoagenda.provider
 
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
+import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.graphics.Color
+import io.vavr.control.Try
+import org.andstatus.todoagenda.MainActivity
+import org.andstatus.todoagenda.prefs.EventSource
+import org.andstatus.todoagenda.prefs.FilterMode
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.KeywordsFilter
+import org.joda.time.DateTime
+import java.util.Optional
 
-import androidx.annotation.NonNull;
-
-import org.andstatus.todoagenda.MainActivity;
-import org.andstatus.todoagenda.prefs.EventSource;
-import org.andstatus.todoagenda.prefs.FilterMode;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.KeywordsFilter;
-import org.joda.time.DateTime;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import io.vavr.control.Try;
-
-import static android.database.Cursor.FIELD_TYPE_NULL;
-import static android.graphics.Color.argb;
-import static android.graphics.Color.blue;
-import static android.graphics.Color.green;
-import static android.graphics.Color.red;
-
-/** Implementation of Empty event provider */
-public class EventProvider {
-
-    protected static final String AND_BRACKET = " AND (";
-    protected static final String OPEN_BRACKET = "( ";
-    protected static final String CLOSING_BRACKET = " )";
-    protected static final String AND = " AND ";
-    protected static final String OR = " OR ";
-    protected static final String IN = " IN ";
-    protected static final String EQUALS = " = ";
-    protected static final String NOT_EQUALS = " != ";
-    protected static final String LTE = " <= ";
-    protected static final String IS_NULL = " IS NULL";
-
-    public final EventProviderType type;
-    public final Context context;
-    public final int widgetId;
-    protected final MyContentResolver myContentResolver;
+/** Implementation of Empty event provider  */
+open class EventProvider(val type: EventProviderType, val context: Context, val widgetId: Int) {
+    protected val myContentResolver: MyContentResolver = MyContentResolver(type, context, widgetId)
 
     // Below are parameters, which may change in settings
-    protected KeywordsFilter hideBasedOnKeywordsFilter;
-    protected KeywordsFilter showBasedOnKeywordsFilter;
-    protected DateTime mStartOfTimeRange;
-    protected DateTime mEndOfTimeRange;
+    protected var hideBasedOnKeywordsFilter: KeywordsFilter? = null
+    protected var showBasedOnKeywordsFilter: KeywordsFilter? = null
+    protected var mStartOfTimeRange: DateTime? = null
+    protected lateinit var mEndOfTimeRange: DateTime
 
-    public EventProvider(EventProviderType type, Context context, int widgetId) {
-        this.type = type;
-        this.context = context;
-        this.widgetId = widgetId;
-        myContentResolver =  new MyContentResolver(type, context, widgetId);
+    protected open fun initialiseParameters() {
+        hideBasedOnKeywordsFilter = KeywordsFilter(false, settings.hideBasedOnKeywords)
+        showBasedOnKeywordsFilter = KeywordsFilter(true, settings.showBasedOnKeywords)
+        mStartOfTimeRange = settings.startOfTimeRange
+        mEndOfTimeRange = settings.endOfTimeRange
     }
 
-    protected void initialiseParameters() {
-        hideBasedOnKeywordsFilter = new KeywordsFilter(false, getSettings().getHideBasedOnKeywords());
-        showBasedOnKeywordsFilter = new KeywordsFilter(true, getSettings().getShowBasedOnKeywords());
-        mStartOfTimeRange = getSettings().getStartOfTimeRange();
-        mEndOfTimeRange = getSettings().getEndOfTimeRange();
+    val settings: InstanceSettings
+        get() = myContentResolver.settings
+
+    protected fun getAsOpaque(color: Int): Int {
+        return Color.argb(255, Color.red(color), Color.green(color), Color.blue(color))
     }
 
-    @NonNull
-    public InstanceSettings getSettings() {
-        return myContentResolver.getSettings();
+    open fun fetchAvailableSources(): Try<MutableList<EventSource>> {
+        return Try.success(mutableListOf())
     }
 
-    protected int getAsOpaque(int color) {
-        return argb(255, red(color), green(color), blue(color));
-    }
+    protected val filterMode: FilterMode
+        get() = settings.filterMode
+    open val addEventIntent: Intent?
+        get() = MainActivity.intentToConfigure(context, widgetId)
 
-    public static Long getPositiveLongOrNull(Cursor cursor, String columnName) {
-        return getColumnIndex(cursor, columnName)
-                .map(cursor::getLong)
-                .filter(value -> value > 0)
-                .orElse(null);
-    }
+    companion object {
+        const val AND_BRACKET = " AND ("
+        const val OPEN_BRACKET = "( "
+        const val CLOSING_BRACKET = " )"
+        const val AND = " AND "
+        const val OR = " OR "
+        const val IN = " IN "
+        const val EQUALS = " = "
+        const val NOT_EQUALS = " != "
+        const val LTE = " <= "
+        const val IS_NULL = " IS NULL"
+        fun getPositiveLongOrNull(cursor: Cursor, columnName: String?): Long? {
+            return getColumnIndex(cursor, columnName)
+                .map { columnIndex: Int? -> cursor.getLong(columnIndex!!) }
+                .filter { value: Long? -> value!! > 0 }
+                .orElse(null)
+        }
 
-    public static Optional<Integer> getColumnIndex(Cursor cursor, String columnName) {
-        return Optional.of(cursor.getColumnIndex(columnName))
-                .filter(ind -> ind >=0)
-                .filter(ind -> cursor.getType(ind) != FIELD_TYPE_NULL);
-    }
-
-    public Try<List<EventSource>> fetchAvailableSources() {
-        return Try.success(Collections.emptyList());
-    }
-
-    protected FilterMode getFilterMode() {
-        return getSettings().getFilterMode();
-    }
-
-    public Intent getAddEventIntent() {
-        return MainActivity.intentToConfigure(context, widgetId);
+        fun getColumnIndex(cursor: Cursor, columnName: String?): Optional<Int> {
+            return Optional.of(cursor.getColumnIndex(columnName))
+                .filter { ind: Int -> ind >= 0 }
+                .filter { ind: Int? -> cursor.getType(ind!!) != Cursor.FIELD_TYPE_NULL }
+        }
     }
 }

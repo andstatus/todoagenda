@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.andstatus.todoagenda.util
 
-package org.andstatus.todoagenda.util;
+import java.util.concurrent.atomic.AtomicLong
 
-import java.util.concurrent.atomic.AtomicLong;
-
-public class InstanceId {
+object InstanceId {
     /**
      * IDs used for testing purposes to identify instances of reference types.
      */
-    private static final AtomicLong PREV_INSTANCE_ID = new AtomicLong(0);
-
-    private InstanceId() {
-    }
+    private val PREV_INSTANCE_ID = AtomicLong(0)
 
     /**
      * @return Unique for this process long value, numbers are given in the order starting from 1
      */
-    public static long next() {
-        return PREV_INSTANCE_ID.incrementAndGet();
+    operator fun next(): Long {
+        return PREV_INSTANCE_ID.incrementAndGet()
     }
 }

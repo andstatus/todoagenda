@@ -16,11 +16,11 @@ class DayHeadersShiftTest : BaseWidgetTest() {
         )
         provider!!.addResults(inputs)
         playResults(method)
-        val dayHeader0 = getFactory().widgetEntries[0] as DayHeader
+        val dayHeader0 = factory.widgetEntries[0] as DayHeader
         Assert.assertEquals(
             """
     First day header should be Jan 8
-    ${getFactory().widgetEntries}
+    ${factory.widgetEntries}
     """.trimIndent(), 8,
             dayHeader0.entryDate.dayOfMonth().get().toLong()
         )
@@ -28,7 +28,7 @@ class DayHeadersShiftTest : BaseWidgetTest() {
         Assert.assertEquals(
             """
     First day header should show Jan 8
-    ${getFactory().widgetEntries}
+    ${factory.widgetEntries}
     
     """.trimIndent(),
             "Wednesday, January 8, 2020", dayHeaderTitle

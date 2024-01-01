@@ -1,64 +1,50 @@
-package org.andstatus.todoagenda.task;
+package org.andstatus.todoagenda.task
 
-import android.content.Context;
-import android.content.Intent;
+import android.content.Context
+import android.content.Intent
+import org.andstatus.todoagenda.prefs.FilterMode
+import org.andstatus.todoagenda.prefs.TaskScheduling
+import org.andstatus.todoagenda.provider.EventProvider
+import org.andstatus.todoagenda.provider.EventProviderType
+import org.joda.time.DateTime
 
-import org.andstatus.todoagenda.prefs.FilterMode;
-import org.andstatus.todoagenda.prefs.TaskScheduling;
-import org.andstatus.todoagenda.provider.EventProvider;
-import org.andstatus.todoagenda.provider.EventProviderType;
-import org.joda.time.DateTime;
-
-import java.util.Collections;
-import java.util.List;
-
-public abstract class AbstractTaskProvider extends EventProvider {
-
-    protected DateTime now;
-
-    public AbstractTaskProvider(EventProviderType type, Context context, int widgetId) {
-        super(type, context, widgetId);
+abstract class AbstractTaskProvider(type: EventProviderType, context: Context, widgetId: Int) :
+    EventProvider(type, context, widgetId) {
+    protected var now: DateTime? = null
+    override fun initialiseParameters() {
+        super.initialiseParameters()
+        now = settings.clock().now()
     }
 
-    @Override
-    protected void initialiseParameters() {
-        super.initialiseParameters();
-
-        now = getSettings().clock().now();
+    fun queryEvents(): List<TaskEvent> {
+        initialiseParameters()
+        return if (myContentResolver.isPermissionNeeded(context, type.permission) ||
+            settings.getActiveEventSources(type).isEmpty()
+        ) {
+            emptyList()
+        } else queryTasks()
     }
 
-    List<TaskEvent> queryEvents() {
-        initialiseParameters();
-        if (myContentResolver.isPermissionNeeded(context, type.permission) ||
-            getSettings().getActiveEventSources(type).isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return queryTasks();
-    }
-
-    public abstract List<TaskEvent> queryTasks();
+    abstract fun queryTasks(): List<TaskEvent>
 
     /**
      * @return true - include the event in the result
      */
-    protected boolean matchedFilter(TaskEvent task) {
-        if (getFilterMode() == FilterMode.NO_FILTERING) return true;
-
-        if (getFilterMode() == FilterMode.DEBUG_FILTER) {
-            if (task.getStatus() == TaskStatus.COMPLETED) return false;
-            if (task.hasStartDate() && task.getStartDate().isAfter(getSettings().getEndOfTimeRange())) return false;
+    protected fun matchedFilter(task: TaskEvent): Boolean {
+        if (filterMode == FilterMode.NO_FILTERING) return true
+        if (filterMode == FilterMode.DEBUG_FILTER) {
+            if (task.status == TaskStatus.COMPLETED) return false
+            if (task.startDate?.isAfter(settings.endOfTimeRange) == true) return false
         }
-        if (getSettings().getTaskScheduling() == TaskScheduling.DATE_DUE) {
+        if (settings.taskScheduling == TaskScheduling.DATE_DUE) {
             if (!task.hasStartDate()) {
-                if (task.hasDueDate() && task.getDueDate().isAfter(getSettings().getEndOfTimeRange())) return false;
+                if (task.dueDate?.isAfter(settings.endOfTimeRange) == true) return false
             }
         }
-        if (hideBasedOnKeywordsFilter.matched(task.getTitle())) {
-            return false;
-        }
-        return showBasedOnKeywordsFilter.matched(task.getTitle());
+        return if (hideBasedOnKeywordsFilter!!.matched(task.title)) {
+            false
+        } else showBasedOnKeywordsFilter!!.matched(task.title)
     }
 
-    public abstract Intent newViewEventIntent(TaskEvent event);
+    abstract fun newViewEventIntent(event: TaskEvent): Intent
 }

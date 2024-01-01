@@ -1,108 +1,56 @@
-package org.andstatus.todoagenda.task;
+package org.andstatus.todoagenda.task
 
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.andstatus.todoagenda.prefs.OrderedEventSource;
-import org.andstatus.todoagenda.widget.WidgetEvent;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.OrderedEventSource
+import org.andstatus.todoagenda.util.StringUtil
+import org.andstatus.todoagenda.widget.WidgetEvent
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
-import static org.andstatus.todoagenda.util.StringUtil.notNull;
+class TaskEvent(private val settings: InstanceSettings, private val zone: DateTimeZone?) : WidgetEvent {
+    override lateinit var eventSource: OrderedEventSource
+        private set
+    override var eventId: Long = 0
+        private set
+    var title: String = ""
+        set(title) {
+            field = StringUtil.notNull(title)
+        }
+    var startDate: DateTime? = null
+        private set
+    var isAllDay = false
+    var dueDate: DateTime? = null
+        private set
+    var color = 0
+    var status = TaskStatus.UNKNOWN
 
-public class TaskEvent implements WidgetEvent {
-
-    private OrderedEventSource eventSource;
-    private long id;
-    private String title = "";
-    private final InstanceSettings settings;
-    private final DateTimeZone zone;
-    private DateTime startDate;
-    private boolean allDay = false;
-    private DateTime dueDate;
-    private int color;
-    private TaskStatus status = TaskStatus.UNKNOWN;
-
-    public TaskEvent(InstanceSettings settings, DateTimeZone zone) {
-        this.settings = settings;
-        this.zone = zone;
+    fun setEventSource(eventSource: OrderedEventSource): TaskEvent {
+        this.eventSource = eventSource
+        return this
     }
 
-    @Override
-    public OrderedEventSource getEventSource() {
-        return eventSource;
+    fun setId(id: Long) {
+        eventId = id
     }
 
-    public TaskEvent setEventSource(OrderedEventSource eventSource) {
-        this.eventSource = eventSource;
-        return this;
+    fun setDates(startMillis: Long?, dueMillis: Long?) {
+        startDate = toStartDate(startMillis, dueMillis)
+        dueDate = toDueDate(startMillis, dueMillis)
     }
 
-    @Override
-    public long getEventId() {
-        return id;
+    private fun toStartDate(startMillis: Long?, dueMillis: Long?): DateTime? {
+        return if (startMillis == null) null else DateTime(startMillis, zone)
     }
 
-    public void setId(long id) {
-        this.id = id;
+    private fun toDueDate(startMillis: Long?, dueMillis: Long?): DateTime? {
+        return if (dueMillis == null) null else DateTime(dueMillis, zone)
     }
 
-    public String getTitle() {
-        return title;
+    fun hasStartDate(): Boolean {
+        return startDate != null
     }
 
-    public void setTitle(String title) {
-        this.title = notNull(title);
-    }
-
-    public DateTime getStartDate() {
-        return startDate;
-    }
-
-    public void setAllDay(boolean allDay) {
-        this.allDay = allDay;
-    }
-
-    public boolean isAllDay() {
-        return allDay;
-    }
-
-    public DateTime getDueDate() {
-        return dueDate;
-    }
-
-    public int getColor() {
-        return color;
-    }
-
-    public void setColor(int color) {
-        this.color = color;
-    }
-
-    public void setDates(Long startMillis, Long dueMillis) {
-        startDate = toStartDate(startMillis, dueMillis);
-        dueDate = toDueDate(startMillis, dueMillis);
-    }
-
-    private DateTime toStartDate(Long startMillis, Long dueMillis) {
-        return startMillis == null ? null : new DateTime(startMillis, zone);
-    }
-
-    private DateTime toDueDate(Long startMillis, Long dueMillis) {
-        return dueMillis == null ? null : new DateTime(dueMillis, zone);
-    }
-
-    public boolean hasStartDate() {
-        return startDate != null;
-    }
-
-    public boolean hasDueDate() {
-        return dueDate != null;
-    }
-
-    public TaskStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
+    fun hasDueDate(): Boolean {
+        return dueDate != null
     }
 }

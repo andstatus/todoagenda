@@ -1,59 +1,60 @@
-package org.andstatus.todoagenda;
+package org.andstatus.todoagenda
 
-import androidx.annotation.NonNull;
-
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class InstanceState {
-    private final static ConcurrentHashMap<Integer, InstanceState> instances = new ConcurrentHashMap<>();
-    public final static InstanceState EMPTY = new InstanceState(0, 0, 0);
+class InstanceState private constructor(val updated: Long, val listReloaded: Long, val listRedrawn: Long) {
+    companion object {
+        private val instances = ConcurrentHashMap<Int, InstanceState>()
+        val EMPTY = InstanceState(0, 0, 0)
+        fun clearAll() {
+            instances.clear()
+        }
 
-    public final long updated;
-    public final long listReloaded;
-    public final long listRedrawn;
+        fun clear(widgetId: Int) {
+            instances.remove(widgetId)
+        }
 
-    private InstanceState(long updated, long listReloaded, long listRedrawn) {
-        this.updated = updated;
-        this.listReloaded = listReloaded;
-        this.listRedrawn = listRedrawn;
-    }
+        fun updated(widgetId: Int) {
+            instances.compute(
+                widgetId
+            ) { id: Int?, state: InstanceState? ->
+                InstanceState(
+                    if (state == null) 1 else state.updated + 1,
+                    state?.listReloaded ?: 0,
+                    state?.listRedrawn ?: 0
+                )
+            }
+        }
 
-    public static void clearAll() {
-        instances.clear();
-    }
+        fun listReloaded(widgetId: Int) {
+            instances.compute(
+                widgetId
+            ) { id: Int?, state: InstanceState? ->
+                InstanceState(
+                    state?.updated ?: 0,
+                    if (state == null) 1 else state.listReloaded + 1,
+                    state?.listRedrawn ?: 0
+                )
+            }
+        }
 
-    public static void clear(@NonNull Integer widgetId) {
-        instances.remove(widgetId);
-    }
+        fun listRedrawn(widgetId: Int) {
+            instances.compute(
+                widgetId
+            ) { id: Int?, state: InstanceState? ->
+                InstanceState(
+                    state?.updated ?: 0,
+                    state?.listReloaded ?: 0,
+                    if (state == null) 1 else state.listRedrawn + 1
+                )
+            }
+        }
 
-    public static void updated(@NonNull Integer widgetId) {
-        instances.compute(widgetId, (id, state) -> new InstanceState(
-                state == null ? 1 : state.updated + 1,
-                state == null ? 0 : state.listReloaded,
-                state == null ? 0 : state.listRedrawn)
-        );
-    }
-
-    public static void listReloaded(@NonNull Integer widgetId) {
-        instances.compute(widgetId, (id, state) -> new InstanceState(
-                state == null ? 0 : state.updated,
-                state == null ? 1 : state.listReloaded + 1,
-                state == null ? 0 : state.listRedrawn)
-        );
-    }
-
-    public static void listRedrawn(@NonNull Integer widgetId) {
-        instances.compute(widgetId, (id, state) -> new InstanceState(
-                state == null ? 0 : state.updated,
-                state == null ? 0 : state.listReloaded,
-                state == null ? 1 : state.listRedrawn + 1)
-        );
-    }
-
-    public static InstanceState get(Integer widgetId) {
-        return instances.getOrDefault(widgetId, EMPTY);
+        operator fun get(widgetId: Int): InstanceState {
+            return instances.getOrDefault(widgetId, EMPTY)
+        }
     }
 }

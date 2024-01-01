@@ -17,7 +17,7 @@ import java.util.function.Function
  * @author yvolk@yurivolkov.com
  */
 class FakeCalendarContentProviderTest : BaseWidgetTest() {
-    private val projection = CalendarEventProvider.getProjection()
+    private val projection = CalendarEventProvider.projection
     private val sortOrder = CalendarEventProvider.EVENT_SORT_ORDER
     private var eventId: Long = 0
     @Throws(Exception::class)
@@ -33,7 +33,7 @@ class FakeCalendarContentProviderTest : BaseWidgetTest() {
 
     @Test
     fun testTestMode() {
-        Assert.assertTrue("isTestMode should be true", PermissionsUtil.isTestMode())
+        Assert.assertTrue("isTestMode should be true", PermissionsUtil.isTestMode)
     }
 
     @Test
@@ -43,18 +43,18 @@ class FakeCalendarContentProviderTest : BaseWidgetTest() {
         results.addResult(input1)
         val input2 = newResult("SOMETHING=1")
         results.addResult(input2)
-        provider!!.addResults(results)
-        provider!!.updateAppSettings(TAG)
+        provider.addResults(results)
+        provider.updateAppSettings(TAG)
         QueryResultsStorage.setNeedToStoreResults(true, provider.widgetId)
         val resolver = MyContentResolver(EventProviderType.CALENDAR, provider.context, provider.widgetId)
         val result1 = queryList(resolver, input1.uri, input1.selection)
-        val stored1 = QueryResultsStorage.getStorage().getResults(EventProviderType.CALENDAR, provider.widgetId)
+        val stored1 = QueryResultsStorage.storage!!.getResults(EventProviderType.CALENDAR, provider.widgetId)
         Assert.assertEquals(input1, result1)
         Assert.assertEquals(result1, input1)
         Assert.assertEquals("Results 1 size\n$stored1", 1, stored1.size.toLong())
         Assert.assertEquals(input1, stored1[0])
         val result2 = queryList(resolver, input2.uri, input2.selection)
-        val stored2 = QueryResultsStorage.getStorage().getResults(EventProviderType.CALENDAR, provider.widgetId)
+        val stored2 = QueryResultsStorage.storage!!.getResults(EventProviderType.CALENDAR, provider.widgetId)
         Assert.assertEquals(input2, result2)
         Assert.assertEquals(result2, input2)
         Assert.assertEquals("Results 2 size\n$stored2", 2, stored2.size.toLong())
@@ -110,10 +110,10 @@ class FakeCalendarContentProviderTest : BaseWidgetTest() {
     @Test
     @Throws(JSONException::class)
     fun testJsonToAndFrom() {
-        val inputs1 = provider!!.loadResultsAndSettings(
+        val inputs1 = provider.loadResultsAndSettings(
             org.andstatus.todoagenda.test.R.raw.birthday
         )
-        val jsonOutput = inputs1!!.toJson(provider.context, provider.widgetId, true)
+        val jsonOutput = inputs1.toJson(provider.context, provider.widgetId, true)
         val inputs2 = QueryResultsStorage.fromJson(provider.widgetId, jsonOutput)
         Assert.assertEquals(inputs1, inputs2)
     }

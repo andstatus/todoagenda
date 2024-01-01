@@ -14,23 +14,23 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
     @Test
     fun testInsidePeriod() {
         val method = "testInsidePeriod"
-        val inputs = provider!!.loadResultsAndSettings(
+        val inputs = provider.loadResultsAndSettings(
             org.andstatus.todoagenda.test.R.raw.multi_day
         )
         val now = DateTime(2015, 8, 30, 0, 0, 1, 0, settings.clock().zone)
-        inputs!!.executedAt = now
-        provider!!.addResults(inputs)
+        inputs.executedAt.set(now)
+        provider.addResults(inputs)
         val dateRange = 30
-        provider!!.startEditingPreferences()
+        provider.startEditingPreferences()
         ApplicationPreferences.setEventRange(provider.context, dateRange)
-        provider!!.savePreferences()
+        provider.savePreferences()
         playResults(method)
         val today = now.withTimeAtStartOfDay()
         val endOfRangeTime = today.plusDays(dateRange)
         var dayOfEventEntryPrev = 0
         var dayOfHeaderPrev = 0
-        for (ind in getFactory().widgetEntries.indices) {
-            val entry = getFactory().widgetEntries[ind]
+        for (ind in factory.widgetEntries.indices) {
+            val entry = factory.widgetEntries[ind]
             val logMsg = method + "; " + String.format("%02d ", ind) + entry.toString()
             if (entry.entryDay.isBefore(today)) {
                 Assert.fail("Is present before today $logMsg")

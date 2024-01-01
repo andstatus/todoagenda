@@ -10,7 +10,6 @@ import org.hamcrest.MatcherAssert
 import org.hamcrest.core.StringStartsWith
 import org.junit.Assert
 import org.junit.Test
-import java.util.Arrays
 import java.util.function.UnaryOperator
 
 /**
@@ -21,7 +20,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateDueNoFilters() {
         val method = "dateDueNoFilters"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task11 ", "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -36,10 +35,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             WidgetEntryPosition.END_OF_LIST_HEADER.value,
             "task14 ", "task8 ", "task4 ", "task2 ", "task15 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_DUE)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
                 .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .setFilterMode(FilterMode.NO_FILTERING)
+                .filterMode = FilterMode.NO_FILTERING
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -48,7 +48,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateDueEndOfList() {
         val method = "dateDueNoFilters"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task11 ", "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -64,10 +64,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task14 ", "task8 ", "task4 ", "task2 ", "task15 ",
             "task10 ", "task9 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_DUE)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
                 .setTaskWithoutDates(TasksWithoutDates.END_OF_LIST)
-                .setFilterMode(FilterMode.NO_FILTERING)
+                .filterMode = FilterMode.NO_FILTERING
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -75,7 +76,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateDueFiltered() {
         val method = "testDateDueFiltered"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -90,10 +91,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             WidgetEntryPosition.END_OF_LIST_HEADER.value,
             "task8 ", "task2 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_DUE)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
                 .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .setFilterMode(FilterMode.DEBUG_FILTER)
+                .filterMode = FilterMode.DEBUG_FILTER
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -101,7 +103,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateDueFilteredHideNoDates() {
         val method = "dateDueFilteredHideNoDates"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -116,10 +118,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             WidgetEntryPosition.END_OF_LIST_HEADER.value,
             "task8 ", "task2 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_DUE)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
                 .setTaskWithoutDates(TasksWithoutDates.HIDE)
-                .setFilterMode(FilterMode.DEBUG_FILTER)
+                .filterMode = FilterMode.DEBUG_FILTER
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -127,7 +130,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateStartedNoFilters() {
         val method = "dateStartedNoFilters"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task11 ", "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -143,10 +146,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             WidgetEntryPosition.END_OF_LIST_HEADER.value,
             "task14 ", "task15 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_STARTED)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
                 .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .setFilterMode(FilterMode.NO_FILTERING)
+                .filterMode = FilterMode.NO_FILTERING
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -155,7 +159,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateStartedEndOfList() {
         val method = "dateStartedEndOfList"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task11 ", "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -171,10 +175,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task14 ", "task15 ",
             "task10 ", "task9 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_STARTED)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
                 .setTaskWithoutDates(TasksWithoutDates.END_OF_LIST)
-                .setFilterMode(FilterMode.NO_FILTERING)
+                .filterMode = FilterMode.NO_FILTERING
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -182,7 +187,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateStartedHideNoDates() {
         val method = "dateStartedHideNoDates"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task11 ", "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -197,10 +202,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             WidgetEntryPosition.END_OF_LIST_HEADER.value,
             "task14 ", "task15 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_STARTED)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
                 .setTaskWithoutDates(TasksWithoutDates.HIDE)
-                .setFilterMode(FilterMode.NO_FILTERING)
+                .filterMode = FilterMode.NO_FILTERING
+            settings
         }
         oneCase(method, setter, names)
     }
@@ -208,7 +214,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
     @Test
     fun dateStartedFiltered() {
         val method = "dateStartedFiltered"
-        val names = Arrays.asList(
+        val names = listOf(
             WidgetEntryPosition.DAY_HEADER.value,
             "task5 ",
             WidgetEntryPosition.DAY_HEADER.value,
@@ -222,34 +228,34 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "", "task8 ",
             "", "task17 "
         )
-        val setter = UnaryOperator { settings: InstanceSettings? ->
-            settings!!.setTaskScheduling(TaskScheduling.DATE_STARTED)
+        val setter = UnaryOperator { settings: InstanceSettings ->
+            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
                 .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .setFilterMode(FilterMode.DEBUG_FILTER)
+                .filterMode = FilterMode.DEBUG_FILTER
+            settings
         }
         oneCase(method, setter, names)
     }
 
-    private fun oneCase(method: String, setter: UnaryOperator<InstanceSettings?>, names: List<String>) {
-        val inputs = provider!!.loadResultsAndSettings(
+    private fun oneCase(method: String, setter: UnaryOperator<InstanceSettings>, names: List<String>) {
+        val inputs = provider.loadResultsAndSettings(
             org.andstatus.todoagenda.test.R.raw.filter_tasks_308_no_filters
         )
-        provider!!.addResults(inputs)
+        provider.addResults(inputs)
         oneCaseSettings(method, setter, names)
         oneCaseSettings(
             method,
-            { settings: InstanceSettings? -> setter.apply(settings)!!.setEventEntryLayout(EventEntryLayout.ONE_LINE) },
+            { settings: InstanceSettings -> setter.apply(settings).setEventEntryLayout(EventEntryLayout.ONE_LINE) },
             names
         )
     }
 
-    private fun oneCaseSettings(method: String, setter: UnaryOperator<InstanceSettings?>, names: List<String>) {
+    private fun oneCaseSettings(method: String, setter: UnaryOperator<InstanceSettings>, names: List<String>) {
         setter.apply(settings)
         playResults(method)
-        val widgetEntries = getFactory().widgetEntries
+        val widgetEntries = factory.widgetEntries
         for (ind in names.indices) {
-            val entryPosition = WidgetEntryPosition.fromValue(names[ind])
-            when (entryPosition) {
+            when (val entryPosition = WidgetEntryPosition.fromValue(names[ind])) {
                 WidgetEntryPosition.UNKNOWN -> MatcherAssert.assertThat(
                     "ind=$ind", widgetEntries[ind].title, StringStartsWith.startsWith(
                         names[ind]

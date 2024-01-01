@@ -21,7 +21,7 @@ class SingleEventTest : BaseWidgetTest() {
         event.setEventId(++eventId)
         event.setTitle("Single Event today with all known attributes")
         event.setStartDate(today.plusHours(12))
-        event.endDate = today.plusHours(13)
+        event.setEndDate(today.plusHours(13))
         event.color = -0x6d1e40
         event.location = "somewhere"
         event.isAlarmActive = true
@@ -42,13 +42,13 @@ class SingleEventTest : BaseWidgetTest() {
         event.setEventId(++eventId)
         event.setTitle("Single AllDay event today with all known attributes")
         event.setStartDate(today.minusDays(1))
-        event.endDate = today.plusDays(1)
+        event.setEndDate(today.plusDays(1))
         event.color = -0x6d1e40
         event.location = "somewhere"
         val executedAt = today.plusHours(10)
         assertOneEvent(executedAt, event, false)
         event.setStartDate(today)
-        event.endDate = today.plusDays(1)
+        event.setEndDate(today.plusDays(1))
         assertOneEvent(executedAt, event, true)
     }
 
@@ -65,16 +65,16 @@ class SingleEventTest : BaseWidgetTest() {
     }
 
     private fun assertOneEvent(executedAt: DateTime, event: CalendarEvent, equal: Boolean) {
-        provider!!.clear()
-        provider!!.setExecutedAt(executedAt)
-        provider!!.addRow(event)
-        playResults(BaseWidgetTest.Companion.TAG)
+        provider.clear()
+        provider.setExecutedAt(executedAt)
+        provider.addRow(event)
+        playResults(TAG)
         Assert.assertFalse(
             settings.toString(),
             settings.getActiveEventSources(EventProviderType.CALENDAR).isEmpty()
         )
         val source = provider.firstActiveEventSource
-        Assert.assertTrue(source.toString(), source!!.source.isAvailable)
+        Assert.assertTrue(source.toString(), source.source.isAvailable)
         Assert.assertTrue(
             settings.toString(),
             settings.getActiveEventSource(
@@ -82,8 +82,8 @@ class SingleEventTest : BaseWidgetTest() {
                 source.source.id
             ).source.isAvailable
         )
-        Assert.assertEquals(getFactory().widgetEntries.toString(), 3, getFactory().widgetEntries.size.toLong())
-        val entry = getFactory().widgetEntries[1]
+        Assert.assertEquals(factory.widgetEntries.toString(), 3, factory.widgetEntries.size.toLong())
+        val entry = factory.widgetEntries[1]
         Assert.assertTrue(entry is CalendarEntry)
         val eventOut = (entry as CalendarEntry).event
         val msgLog = """

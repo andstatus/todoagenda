@@ -1,38 +1,33 @@
-package org.andstatus.todoagenda.util;
+package org.andstatus.todoagenda.util
 
-import android.content.ContentUris;
-import android.content.Intent;
-import android.net.Uri;
-import android.provider.CalendarContract;
-import android.provider.CalendarContract.Events;
+import android.content.ContentUris
+import android.content.Intent
+import android.provider.CalendarContract
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-public class CalendarIntentUtil {
-
-    private static final String KEY_DETAIL_VIEW = "DETAIL_VIEW";
-    private static final String TIME = "time";
-
-    public static Intent newOpenCalendarAtDayIntent(DateTime goToTime) {
-        Intent intent = IntentUtil.newViewIntent();
-        Uri.Builder builder = CalendarContract.CONTENT_URI.buildUpon();
-        builder.appendPath(TIME);
-        if (goToTime.getMillis() != 0) {
-            intent.putExtra(KEY_DETAIL_VIEW, true);
-            ContentUris.appendId(builder, goToTime.getMillis());
+object CalendarIntentUtil {
+    private const val KEY_DETAIL_VIEW = "DETAIL_VIEW"
+    private const val TIME = "time"
+    fun newOpenCalendarAtDayIntent(goToTime: DateTime?): Intent? {
+        val intent = IntentUtil.newViewIntent()
+        val builder = CalendarContract.CONTENT_URI.buildUpon()
+        builder.appendPath(TIME)
+        if (goToTime!!.millis != 0L) {
+            intent!!.putExtra(KEY_DETAIL_VIEW, true)
+            ContentUris.appendId(builder, goToTime.millis)
         }
-        intent.setData(builder.build());
-        return intent;
+        intent!!.setData(builder.build())
+        return intent
     }
 
-    public static Intent newAddCalendarEventIntent(DateTimeZone timeZone) {
-        DateTime beginTime = new DateTime(timeZone).plusHours(1).withMinuteOfHour(0).withSecondOfMinute(0)
-                .withMillisOfSecond(0);
-        DateTime endTime = beginTime.plusHours(1);
+    fun newAddCalendarEventIntent(timeZone: DateTimeZone?): Intent {
+        val beginTime = DateTime(timeZone).plusHours(1).withMinuteOfHour(0).withSecondOfMinute(0)
+            .withMillisOfSecond(0)
+        val endTime = beginTime.plusHours(1)
         return IntentUtil.newIntent(Intent.ACTION_INSERT)
-                .setData(Events.CONTENT_URI)
-                .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.getMillis())
-                .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.getMillis());
+            .setData(CalendarContract.Events.CONTENT_URI)
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, beginTime.millis)
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, endTime.millis)
     }
 }

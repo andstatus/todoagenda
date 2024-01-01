@@ -13,66 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.andstatus.todoagenda.prefs.dateformat
 
-package org.andstatus.todoagenda.prefs.dateformat;
+import android.content.Context
+import org.andstatus.todoagenda.util.StringUtil
 
-import android.content.Context;
-
-import androidx.annotation.NonNull;
-
-import org.andstatus.todoagenda.util.StringUtil;
-
-public class DateFormatValue {
-    public final DateFormatType type;
-    public final String value;
-
-    public DateFormatValue(DateFormatType type, String value) {
-        this.type = type;
-        this.value = value;
-    }
-
-    @NonNull
-    public static DateFormatValue loadOrUnknown(Object defaultValue) {
-        return defaultValue == null
-                ? DateFormatType.unknownValue()
-                : DateFormatValue.load(defaultValue.toString(), DateFormatType.unknownValue());
-    }
-
-    @NonNull
-    public static DateFormatValue load(String storedValue, @NonNull DateFormatValue defaultValue) {
-        return DateFormatType.load(storedValue, defaultValue);
-    }
-
-    public static DateFormatValue of(DateFormatType type, String value) {
-         return type.isCustomPattern() && StringUtil.nonEmpty(value)
-            ? new DateFormatValue(type, value)
-            : type.defaultValue();
-    }
-
-    @NonNull
-    public String save() {
-        if (type == type.toSave()) {
-            return type == DateFormatType.UNKNOWN
-                    ? ""
-                    : type.code + ":" + getPattern();
+class DateFormatValue(val type: DateFormatType, val value: String) {
+    fun save(): String {
+        return if (type == type.toSave()) {
+            if (type == DateFormatType.UNKNOWN) "" else type.code + ":" + pattern
         } else {
-            return toSave().save();
+            toSave().save()
         }
     }
 
-    public boolean hasPattern() {
-        return StringUtil.nonEmpty(getPattern());
+    fun hasPattern(): Boolean {
+        return StringUtil.nonEmpty(pattern)
     }
 
-    public String getPattern() {
-        return StringUtil.isEmpty(value) ? type.pattern : value;
+    val pattern: String
+        get() = if (StringUtil.isEmpty(value)) type.pattern else value
+
+    fun getSummary(context: Context?): CharSequence {
+        return context!!.getText(type.titleResourceId).toString() + if (type.isCustomPattern) ": $value" else ""
     }
 
-    public CharSequence getSummary(Context context) {
-        return context.getText(type.titleResourceId) + (type.isCustomPattern() ? ": " + value : "");
+    fun toSave(): DateFormatValue {
+        return of(type.toSave(), value)
     }
 
-    public DateFormatValue toSave() {
-        return DateFormatValue.of(type.toSave(), value);
+    companion object {
+        fun loadOrUnknown(defaultValue: Any?): DateFormatValue {
+            return if (defaultValue == null) DateFormatType.unknownValue() else load(
+                defaultValue.toString(),
+                DateFormatType.unknownValue()
+            )
+        }
+
+        fun load(storedValue: String?, defaultValue: DateFormatValue): DateFormatValue {
+            return DateFormatType.load(storedValue, defaultValue)
+        }
+
+        fun of(type: DateFormatType?, value: String): DateFormatValue {
+            return if (type!!.isCustomPattern && StringUtil.nonEmpty(value)) DateFormatValue(
+                type,
+                value
+            ) else type.defaultValue
+        }
     }
 }

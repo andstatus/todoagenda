@@ -22,7 +22,7 @@ class ShowOnlyClosestInstanceTest : BaseWidgetTest() {
             "SnaphotDate", dateTime(2020, 2, 15),
             settings.clock().now().withTimeAtStartOfDay()
         )
-        val entries = getFactory().widgetEntries.stream()
+        val entries = factory.widgetEntries.stream()
             .filter { e: WidgetEntry<*> -> e.title.startsWith("Test event 2 that") }.collect(Collectors.toList())
         Assert.assertEquals("Number of entries of the test event $entries", 2, entries.size.toLong())
         Assert.assertNotEquals(

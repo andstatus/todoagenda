@@ -1,166 +1,157 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import android.content.SharedPreferences;
-import android.os.Bundle;
+import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.os.Bundle
+import androidx.preference.CheckBoxPreference
+import androidx.preference.EditTextPreference
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import org.andstatus.todoagenda.MainActivity
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
+import org.andstatus.todoagenda.prefs.dateformat.DateFormatter
+import org.andstatus.todoagenda.provider.QueryResultsStorage
+import org.andstatus.todoagenda.util.DateUtil
+import org.joda.time.DateTime
+import java.util.TimeZone
 
-import androidx.preference.CheckBoxPreference;
-import androidx.preference.EditTextPreference;
-import androidx.preference.ListPreference;
-import androidx.preference.Preference;
-
-import org.andstatus.todoagenda.MainActivity;
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.prefs.dateformat.DateFormatType;
-import org.andstatus.todoagenda.prefs.dateformat.DateFormatter;
-import org.andstatus.todoagenda.provider.QueryResultsStorage;
-import org.andstatus.todoagenda.util.DateUtil;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-
-import java.util.TimeZone;
-
-public class OtherPreferencesFragment extends MyPreferenceFragment
-        implements SharedPreferences.OnSharedPreferenceChangeListener {
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.preferences_other);
-   }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        showWidgetInstanceName();
-
-        showSnapshotMode();
-        setLockTimeZone();
-        showLockTimeZone();
-
-        showRefreshPeriod();
-        getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.preferences_other)
     }
 
-    private void setLockTimeZone() {
-        CheckBoxPreference preference = (CheckBoxPreference) findPreference(InstanceSettings.PREF_LOCK_TIME_ZONE);
+    override fun onResume() {
+        super.onResume()
+        showWidgetInstanceName()
+        showSnapshotMode()
+        setLockTimeZone()
+        showLockTimeZone()
+        showRefreshPeriod()
+        preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
+    }
+
+    private fun setLockTimeZone() {
+        val preference =
+            findPreference<Preference>(InstanceSettings.PREF_LOCK_TIME_ZONE) as CheckBoxPreference?
         if (preference != null) {
-            SnapshotMode snapshotMode = ApplicationPreferences.getSnapshotMode(getActivity());
-             boolean isChecked = snapshotMode == SnapshotMode.SNAPSHOT_TIME ||
-                     ApplicationPreferences.isTimeZoneLocked(getActivity());
-            if (preference.isChecked() != isChecked) {
-                preference.setChecked(isChecked);
+            val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
+            val isChecked = snapshotMode == SnapshotMode.SNAPSHOT_TIME ||
+                ApplicationPreferences.isTimeZoneLocked(requireActivity())
+            if (preference.isChecked != isChecked) {
+                preference.isChecked = isChecked
             }
         }
     }
 
-    private void showLockTimeZone() {
-        CheckBoxPreference preference = findPreference(InstanceSettings.PREF_LOCK_TIME_ZONE);
-        if (preference == null) return;
-
-        SnapshotMode snapshotMode = ApplicationPreferences.getSnapshotMode(getActivity());
-        preference.setEnabled(snapshotMode != SnapshotMode.SNAPSHOT_TIME);
-
-        DateTimeZone timeZone = getSettings().clock().getZone();
-        preference.setSummary(String.format(
-                getText(preference.isChecked() ? R.string.lock_time_zone_on_desc : R.string.lock_time_zone_off_desc).toString(),
-                timeZone.getName(DateTime.now(timeZone).getMillis()))
-        );
+    private fun showLockTimeZone() {
+        val preference = findPreference<CheckBoxPreference>(InstanceSettings.PREF_LOCK_TIME_ZONE)
+            ?: return
+        val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
+        preference.isEnabled = snapshotMode != SnapshotMode.SNAPSHOT_TIME
+        val timeZone = settings.clock().zone
+        preference.summary = String.format(
+            getText(if (preference.isChecked) R.string.lock_time_zone_on_desc else R.string.lock_time_zone_off_desc).toString(),
+            timeZone.getName(DateTime.now(timeZone).millis)
+        )
     }
 
-    private void showSnapshotMode() {
-        ListPreference preference = findPreference(InstanceSettings.PREF_SNAPSHOT_MODE);
-        if (preference == null) return;
-
-        InstanceSettings settings = getSettings();
-
-        CharSequence[] entries = {
+    private fun showSnapshotMode() {
+        val preference = findPreference<ListPreference>(InstanceSettings.PREF_SNAPSHOT_MODE)
+            ?: return
+        val settings = settings
+        val entries = arrayOf(
             getText(R.string.snapshot_mode_live_data),
             formatSnapshotModeSummary(settings, R.string.snapshot_mode_time),
             formatSnapshotModeSummary(settings, R.string.snapshot_mode_now)
-        };
-        preference.setEntries(entries);
-
-        SnapshotMode snapshotMode = ApplicationPreferences.getSnapshotMode(getActivity());
-        if (snapshotMode.isSnapshotMode()) {
-            preference.setSummary(formatSnapshotModeSummary(settings, snapshotMode.valueResId));
+        )
+        preference.entries = entries
+        val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
+        if (snapshotMode.isSnapshotMode) {
+            preference.summary = formatSnapshotModeSummary(settings, snapshotMode.valueResId)
         } else {
-            preference.setSummary(snapshotMode.valueResId);
+            preference.setSummary(snapshotMode.valueResId)
         }
     }
 
-    private String formatSnapshotModeSummary(InstanceSettings settings, int valueResId) {
-        CharSequence snapshotDateString = settings.hasResults()
-                ? new DateFormatter(settings.getContext(), DateFormatType.DEFAULT_WEEKDAY.defaultValue(),
-                    settings.clock().now()).formatDate(settings.getResultsStorage().getExecutedAt()) +
-                    " " + DateUtil.formatTime(this::getSettings, settings.getResultsStorage().getExecutedAt())
-                : "...";
-        return String.format(getText(valueResId).toString(), snapshotDateString);
+    private fun formatSnapshotModeSummary(settings: InstanceSettings, valueResId: Int): String {
+        val snapshotDateString: CharSequence = if (settings.hasResults()) {
+            DateFormatter(
+                settings.context, DateFormatType.DEFAULT_WEEKDAY.defaultValue,
+                settings.clock().now()
+            ).formatDate(settings.resultsStorage!!.executedAt.get()).toString() +
+                " " + DateUtil.formatTime({ settings }, settings.resultsStorage!!.executedAt.get())
+        } else {
+            "..."
+        }
+        return String.format(getText(valueResId).toString(), snapshotDateString)
     }
 
-    private void showRefreshPeriod() {
-        EditTextPreference preference = (EditTextPreference) findPreference(InstanceSettings.PREF_REFRESH_PERIOD_MINUTES);
-
+    private fun showRefreshPeriod() {
+        val preference =
+            findPreference<Preference>(InstanceSettings.PREF_REFRESH_PERIOD_MINUTES) as EditTextPreference?
         if (preference != null) {
-            int value = ApplicationPreferences.getRefreshPeriodMinutes(getActivity());
-            preference.setSummary(String.format(getText(R.string.refresh_period_minutes_desc).toString(), value));
+            val value = ApplicationPreferences.getRefreshPeriodMinutes(requireActivity())
+            preference.summary = String.format(getText(R.string.refresh_period_minutes_desc).toString(), value)
         }
     }
 
-    @Override
-    public boolean onPreferenceTreeClick(Preference preference) {
-        switch (preference.getKey()) {
-            case InstanceSettings.PREF_LOCK_TIME_ZONE:
-                if (preference instanceof CheckBoxPreference) {
-                    CheckBoxPreference checkPref = (CheckBoxPreference) preference;
-                    ApplicationPreferences.setLockedTimeZoneId(getActivity(),
-                            checkPref.isChecked() ? TimeZone.getDefault().getID() : "");
-                    showLockTimeZone();
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        when (preference.key) {
+            InstanceSettings.PREF_LOCK_TIME_ZONE -> if (preference is CheckBoxPreference) {
+                ApplicationPreferences.setLockedTimeZoneId(
+                    activity,
+                    if (preference.isChecked) TimeZone.getDefault().id else ""
+                )
+                showLockTimeZone()
+            }
+
+            else -> {}
+        }
+        return super.onPreferenceTreeClick(preference)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+        when (key) {
+            InstanceSettings.PREF_WIDGET_INSTANCE_NAME -> {
+                requireActivity().finish()
+                startActivity(
+                    MainActivity.intentToConfigure(
+                        activity, ApplicationPreferences.getWidgetId(
+                            activity
+                        )
+                    )
+                )
+            }
+
+            InstanceSettings.PREF_REFRESH_PERIOD_MINUTES -> showRefreshPeriod()
+            InstanceSettings.PREF_SNAPSHOT_MODE -> {
+                val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
+                val settings = settings
+                if (snapshotMode.isSnapshotMode && !settings.hasResults()) {
+                    settings.resultsStorage = QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
                 }
-                break;
-            default:
-                break;
-        }
-        return super.onPreferenceTreeClick(preference);
-    }
+                settings.clock().setSnapshotMode(snapshotMode, settings)
+                settings.save(key, "newResultsForSnapshotMode")
+                showSnapshotMode()
+                setLockTimeZone()
+                showLockTimeZone()
+            }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        switch (key) {
-            case InstanceSettings.PREF_WIDGET_INSTANCE_NAME:
-                getActivity().finish();
-                startActivity(MainActivity.intentToConfigure(getActivity(), ApplicationPreferences
-                        .getWidgetId(getActivity())));
-                break;
-            case InstanceSettings.PREF_REFRESH_PERIOD_MINUTES:
-                showRefreshPeriod();
-                break;
-            case InstanceSettings.PREF_SNAPSHOT_MODE:
-                SnapshotMode snapshotMode = ApplicationPreferences.getSnapshotMode(getActivity());
-                InstanceSettings settings = getSettings();
-                if (snapshotMode.isSnapshotMode() && !settings.hasResults()) {
-                    settings.setResultsStorage(QueryResultsStorage.getNewResults(getActivity(), settings.widgetId));
-                }
-                settings.clock().setSnapshotMode(snapshotMode, settings);
-                settings.save(key, "newResultsForSnapshotMode");
-                showSnapshotMode();
-                setLockTimeZone();
-                showLockTimeZone();
-                break;
-            default:
-                break;
+            else -> {}
         }
     }
 
-    private void showWidgetInstanceName() {
-        Preference preference = findPreference(InstanceSettings.PREF_WIDGET_INSTANCE_NAME);
+    private fun showWidgetInstanceName() {
+        val preference = findPreference<Preference>(InstanceSettings.PREF_WIDGET_INSTANCE_NAME)
         if (preference != null) {
-            preference.setSummary(ApplicationPreferences.getWidgetInstanceName(getActivity()) +
-                    " (id:" + ApplicationPreferences.getWidgetId(getActivity()) +")");
+            preference.summary = ApplicationPreferences.getWidgetInstanceName(requireActivity()) +
+                " (id:" + ApplicationPreferences.getWidgetId(activity) + ")"
         }
     }
 }

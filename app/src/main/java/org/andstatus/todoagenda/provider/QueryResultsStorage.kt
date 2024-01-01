@@ -1,234 +1,222 @@
-package org.andstatus.todoagenda.provider;
+package org.andstatus.todoagenda.provider
 
-import android.content.Context;
-import android.content.Intent;
-import android.text.TextUtils;
-import android.util.Log;
-
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.RemoteViewsFactory;
-import org.andstatus.todoagenda.prefs.AllSettings;
-import org.andstatus.todoagenda.prefs.InstanceSettings;
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-
-import static org.andstatus.todoagenda.util.DateUtil.formatLogDateTime;
+import android.content.Context
+import android.content.Intent
+import android.text.TextUtils
+import android.util.Log
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.RemoteViewsFactory
+import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.util.DateUtil
+import org.joda.time.DateTime
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.util.Optional
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicReference
+import java.util.stream.Collectors
+import kotlin.concurrent.Volatile
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public class QueryResultsStorage {
+class QueryResultsStorage {
+    val results: MutableList<QueryResult> = CopyOnWriteArrayList()
+    val executedAt = AtomicReference<DateTime>(null)
 
-    private static final String TAG = QueryResultsStorage.class.getSimpleName();
-    private static final String KEY_RESULTS_VERSION = "resultsVersion";
-    private static final int RESULTS_VERSION = 3;
-    private static final String KEY_RESULTS = "results";
-    public static final String KEY_SETTINGS = "settings";
-
-    private static volatile QueryResultsStorage theStorage = null;
-    private static volatile int widgetIdResultsToStore = 0;
-
-    private final List<QueryResult> results = new CopyOnWriteArrayList<>();
-    private AtomicReference<DateTime> executedAt = new AtomicReference<>(null);
-
-    public static boolean store(QueryResult result) {
-        QueryResultsStorage storage = theStorage;
-        if (storage != null) {
-            storage.addResult(result);
-            return (storage == theStorage);
+    fun addResults(newResults: QueryResultsStorage) {
+        for (result in newResults.results) {
+            addResult(result)
         }
-        return false;
+        setExecutedAt(newResults.getExecutedAt())
     }
 
-    public static void shareEventsForDebugging(Context context, int widgetId) {
-        final String method = "shareEventsForDebugging";
-        Log.i(TAG, method + " started");
-        InstanceSettings settings = AllSettings.instanceFromId(context, widgetId);
-        QueryResultsStorage storage = settings.isSnapshotMode()
-                ? settings.getResultsStorage()
-                : getNewResults(context, widgetId);
-        String results = storage.toJsonString(context, widgetId);
-        if (TextUtils.isEmpty(results)) {
-            Log.i(TAG, method + "; Nothing to share");
-        } else {
-            String fileName = (settings.getWidgetInstanceName() + "-" + context.getText(R.string.app_name))
-                    .replaceAll("\\W+", "-") +
-                    "-shareEvents-" + formatLogDateTime(System.currentTimeMillis()) +
-                    ".json";
-            Intent intent = new Intent(Intent.ACTION_SEND);
-            intent.setType("application/json");
-            intent.putExtra(Intent.EXTRA_SUBJECT, fileName);
-            intent.putExtra(Intent.EXTRA_TEXT, results);
-            context.startActivity(
-                    Intent.createChooser(intent, context.getText(R.string.share_events_for_debugging_title)));
-            Log.i(TAG, method + "; Shared " + results);
+    fun addResult(result: QueryResult) {
+        executedAt.compareAndSet(null, result.executedAt)
+        results.add(result)
+    }
+
+    fun getResults(type: EventProviderType, widgetId: Int): List<QueryResult> {
+        return results.stream()
+            .filter { result: QueryResult -> type === EventProviderType.EMPTY || result.providerType === type }
+            .filter { result: QueryResult -> widgetId == 0 || result.widgetId == widgetId }
+            .collect(Collectors.toList())
+    }
+
+    fun findLast(type: EventProviderType): Optional<QueryResult> {
+        for (index in results.indices.reversed()) {
+            val result = results[index]
+            if (type !== EventProviderType.EMPTY && result.providerType !== type) continue
+            return Optional.of(result)
         }
+        return Optional.empty()
     }
 
-    public static QueryResultsStorage getNewResults(Context context, int widgetId) {
-        QueryResultsStorage resultsStorage;
-        try {
-            setNeedToStoreResults(true, widgetId);
-            RemoteViewsFactory factory = RemoteViewsFactory.factories.computeIfAbsent(widgetId,
-                    id -> new RemoteViewsFactory(context, id, false));
-            factory.onDataSetChanged();
-            resultsStorage = QueryResultsStorage.theStorage;
-        } finally {
-            setNeedToStoreResults(false, widgetId);
+    fun getResult(type: EventProviderType, index: Int): Optional<QueryResult> {
+        var foundIndex = -1
+        for (result in results) {
+            if (type !== EventProviderType.EMPTY && result.providerType !== type) continue
+            foundIndex++
+            if (foundIndex == index) return Optional.of(result)
         }
-        return resultsStorage;
+        return Optional.empty()
     }
 
-    public static boolean getNeedToStoreResults(int widgetId) {
-        return theStorage != null && (widgetId == 0 || widgetId == widgetIdResultsToStore);
-    }
-
-    public static void setNeedToStoreResults(boolean needToStoreResults, int widgetId) {
-        widgetIdResultsToStore = widgetId;
-        if (needToStoreResults) {
-            theStorage = new QueryResultsStorage();
-        } else {
-            theStorage = null;
+    private fun toJsonString(context: Context?, widgetId: Int): String {
+        return try {
+            toJson(context, widgetId, true).toString(2)
+        } catch (e: JSONException) {
+            "Error while formatting data $e"
         }
     }
 
-    public static QueryResultsStorage getStorage() {
-        return theStorage;
-    }
-
-    public List<QueryResult> getResults() {
-        return results;
-    }
-
-    public void addResults(QueryResultsStorage newResults) {
-        for (QueryResult result : newResults.getResults()) {
-            addResult(result);
-        }
-        setExecutedAt(newResults.getExecutedAt());
-    }
-
-    public void addResult(QueryResult result) {
-        executedAt.compareAndSet(null, result.getExecutedAt());
-        results.add(result);
-    }
-
-    public List<QueryResult> getResults(EventProviderType type, int widgetId) {
-        return results.stream().filter(result -> type == EventProviderType.EMPTY || result.providerType == type)
-                .filter(result -> widgetId == 0 || result.getWidgetId() == widgetId)
-                .collect(Collectors.toList());
-    }
-
-    public Optional<QueryResult> findLast(EventProviderType type) {
-        for (int index = results.size() - 1; index >=0; index--) {
-            QueryResult result = results.get(index);
-            if (type != EventProviderType.EMPTY && result.providerType != type) continue;
-
-            return Optional.of(result);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<QueryResult> getResult(EventProviderType type, int index) {
-        int foundIndex = -1;
-        for (QueryResult result: results) {
-            if (type != EventProviderType.EMPTY && result.providerType != type) continue;
-
-            foundIndex++;
-            if (foundIndex == index) return Optional.of(result);
-        }
-        return Optional.empty();
-    }
-
-    private String toJsonString(Context context, int widgetId) {
-        try {
-            return toJson(context, widgetId, true).toString(2);
-        } catch (JSONException e) {
-            return "Error while formatting data " + e;
-        }
-    }
-
-    public JSONObject toJson(Context context, int widgetId, boolean withSettings) throws JSONException {
-        JSONArray resultsArray = new JSONArray();
-        for (QueryResult result : results) {
-            if (result.getWidgetId() == widgetId) {
-                resultsArray.put(result.toJson());
+    @Throws(JSONException::class)
+    fun toJson(context: Context?, widgetId: Int, withSettings: Boolean): JSONObject {
+        val resultsArray = JSONArray()
+        for (result in results) {
+            if (result.widgetId == widgetId) {
+                resultsArray.put(result.toJson())
             }
         }
-        WidgetData widgetData = context == null || widgetId == 0
-            ? WidgetData.EMPTY
-            : WidgetData.fromSettings(context, withSettings ? AllSettings.instanceFromId(context, widgetId) : null);
-
-        JSONObject json = widgetData.toJson();
-        json.put(KEY_RESULTS_VERSION, RESULTS_VERSION);
-        json.put(KEY_RESULTS, resultsArray);
-        return json;
+        val widgetData: WidgetData =
+            if (context == null || widgetId == 0) WidgetData.EMPTY else WidgetData.fromSettings(
+                context,
+                if (withSettings) AllSettings.instanceFromId(context, widgetId) else null
+            )
+        val json = widgetData.toJson()
+        json.put(KEY_RESULTS_VERSION, RESULTS_VERSION)
+        json.put(KEY_RESULTS, resultsArray)
+        return json
     }
 
-    public static QueryResultsStorage fromJson(int widgetId, JSONObject jsonStorage) {
-        QueryResultsStorage resultsStorage = new QueryResultsStorage();
-        if (jsonStorage.has(KEY_RESULTS)) {
-            try {
-                JSONArray jsonResults = jsonStorage.getJSONArray(KEY_RESULTS);
-                for (int ind = 0; ind < jsonResults.length(); ind++) {
-                    resultsStorage.addResult(QueryResult.fromJson(jsonResults.getJSONObject(ind), widgetId));
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || javaClass != other.javaClass) return false
+        val results = other as QueryResultsStorage
+        if (this.results.size != results.results.size) {
+            return false
+        }
+        for (ind in this.results.indices) {
+            if (this.results[ind] != results.results[ind]) {
+                return false
+            }
+        }
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = 0
+        for (ind in results.indices) {
+            result = 31 * result + results[ind].hashCode()
+        }
+        return result
+    }
+
+    override fun toString(): String {
+        return TAG + ":" + results
+    }
+
+    fun clear() {
+        results.clear()
+        executedAt.set(null)
+    }
+
+    fun setExecutedAt(date: DateTime?) {
+        executedAt.set(date)
+    }
+
+    fun getExecutedAt(): DateTime? {
+        return executedAt.get()
+    }
+
+    companion object {
+        private val TAG = QueryResultsStorage::class.java.simpleName
+        private const val KEY_RESULTS_VERSION = "resultsVersion"
+        private const val RESULTS_VERSION = 3
+        private const val KEY_RESULTS = "results"
+        const val KEY_SETTINGS = "settings"
+
+        @Volatile
+        var storage: QueryResultsStorage? = null
+            private set
+
+        @Volatile
+        private var widgetIdResultsToStore = 0
+        fun store(result: QueryResult): Boolean {
+            val storage = storage
+            if (storage != null) {
+                storage.addResult(result)
+                return storage === Companion.storage
+            }
+            return false
+        }
+
+        fun shareEventsForDebugging(context: Context, widgetId: Int) {
+            val method = "shareEventsForDebugging"
+            Log.i(TAG, "$method started")
+            val settings = AllSettings.instanceFromId(context, widgetId)
+            val storage = if (settings.isSnapshotMode) settings.resultsStorage else getNewResults(context, widgetId)
+            val results = storage!!.toJsonString(context, widgetId)
+            if (TextUtils.isEmpty(results)) {
+                Log.i(TAG, "$method; Nothing to share")
+            } else {
+                val fileName = (settings.widgetInstanceName + "-" + context.getText(R.string.app_name))
+                    .replace("\\W+".toRegex(), "-") +
+                    "-shareEvents-" + DateUtil.formatLogDateTime(System.currentTimeMillis()) +
+                    ".json"
+                val intent = Intent(Intent.ACTION_SEND)
+                intent.setType("application/json")
+                intent.putExtra(Intent.EXTRA_SUBJECT, fileName)
+                intent.putExtra(Intent.EXTRA_TEXT, results)
+                context.startActivity(
+                    Intent.createChooser(intent, context.getText(R.string.share_events_for_debugging_title))
+                )
+                Log.i(TAG, "$method; Shared $results")
+            }
+        }
+
+        fun getNewResults(context: Context, widgetId: Int): QueryResultsStorage? {
+            val resultsStorage: QueryResultsStorage?
+            resultsStorage = try {
+                setNeedToStoreResults(true, widgetId)
+                val factory: RemoteViewsFactory = RemoteViewsFactory.factories.computeIfAbsent(widgetId,
+                    { id: Int -> RemoteViewsFactory(context, id, false) })
+                factory.onDataSetChanged()
+                storage
+            } finally {
+                setNeedToStoreResults(false, widgetId)
+            }
+            return resultsStorage
+        }
+
+        fun getNeedToStoreResults(widgetId: Int): Boolean {
+            return storage != null && (widgetId == 0 || widgetId == widgetIdResultsToStore)
+        }
+
+        fun setNeedToStoreResults(needToStoreResults: Boolean, widgetId: Int) {
+            widgetIdResultsToStore = widgetId
+            storage = if (needToStoreResults) QueryResultsStorage() else null
+        }
+
+        fun fromJson(widgetId: Int, jsonStorage: JSONObject): QueryResultsStorage {
+            val resultsStorage = QueryResultsStorage()
+            if (jsonStorage.has(KEY_RESULTS)) {
+                try {
+                    val jsonResults = jsonStorage.getJSONArray(KEY_RESULTS)
+                    for (ind in 0 until jsonResults.length()) {
+                        resultsStorage.addResult(
+                            QueryResult.fromJson(
+                                jsonResults.getJSONObject(ind),
+                                widgetId
+                            )
+                        )
+                    }
+                } catch (e: Exception) {
+                    Log.w(TAG, "Error reading results", e)
                 }
-            } catch (Exception e) {
-                Log.w(TAG, "Error reading results", e);
             }
+            return resultsStorage
         }
-        return resultsStorage;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        QueryResultsStorage results = (QueryResultsStorage) o;
-
-        if (this.results.size() != results.results.size()) {
-            return false;
-        }
-        for (int ind = 0; ind < this.results.size(); ind++) {
-            if (!this.results.get(ind).equals(results.results.get(ind))) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = 0;
-        for (int ind = 0; ind < results.size(); ind++) {
-            result = 31 * result + results.get(ind).hashCode();
-        }
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return TAG + ":" + results;
-    }
-
-    public void clear() {
-        results.clear();
-        executedAt.set(null);
-    }
-
-    public void setExecutedAt(DateTime date) {
-        executedAt.set(date);
-    }
-
-    public DateTime getExecutedAt() {
-        return executedAt.get();
     }
 }

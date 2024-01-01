@@ -16,64 +16,66 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.vavr.control;
+package io.vavr.control
 
-import java.util.Objects;
+import org.andstatus.todoagenda.R
+import java.util.Objects
 
 /**
- * A {@linkplain java.util.function.Function} which may throw.
+ * A [java.util.function.Function] which may throw.
  *
  * @param <T> the type of this function's domain
  * @param <R> the type of this function's codomain, i.e. the return type
- */
-@FunctionalInterface
-public interface CheckedFunction<T, R> {
-
-    /**
-     * Returns the identity {@code CheckedFunction}, i.e. the function that returns its input.
-     *
-     * @param <T> argument type (and return type) of the identity function
-     * @return the identity {@code CheckedFunction}
-     */
-    static <T> CheckedFunction<T, T> identity() {
-        return t -> t;
-    }
-
+</R></T> */
+fun interface CheckedFunction<T, R> {
     /**
      * Applies this function to one argument and returns the result.
      *
-     * @param t argument of type {@code T}
+     * @param t argument of type `T`
      * @return the result of the function application
      * @throws Exception if something goes wrong applying this function to the given argument
      */
-    R apply(T t) throws Exception;
+    @Throws(Exception::class)
+    fun apply(t: T): R
 
     /**
      * Returns a composed function that first applies this to the given argument and then applies
-     * {@code after} to the result.
+     * `after` to the result.
      *
      * @param <U> return type of after
      * @param after the function applied after this
-     * @return a function composed of this and {@code after}
-     * @throws NullPointerException if {@code after} is null
-     */
-    default <U> CheckedFunction<T, U> andThen(CheckedFunction<? super R, ? extends U> after) {
-        Objects.requireNonNull(after, "after is null");
-        return t -> after.apply(apply(t));
+     * @return a function composed of this and `after`
+     * @throws NullPointerException if `after` is null
+    </U> */
+    fun <U> andThen(after: CheckedFunction<in R, out U>): CheckedFunction<T, U>? {
+        Objects.requireNonNull(after, "after is null")
+        return CheckedFunction { t: T -> after.apply(apply(t)) }
     }
 
     /**
-     * Returns a composed function that first applies {@code before} to the given argument and then applies this
+     * Returns a composed function that first applies `before` to the given argument and then applies this
      * to the result.
      *
      * @param <U> argument type of before
      * @param before the function applied before this
-     * @return a function composed of {@code before} and this
-     * @throws NullPointerException if {@code before} is null
-     */
-    default <U> CheckedFunction<U, R> compose(CheckedFunction<? super U, ? extends T> before) {
-        Objects.requireNonNull(before, "before is null");
-        return u -> apply(before.apply(u));
+     * @return a function composed of `before` and this
+     * @throws NullPointerException if `before` is null
+    </U> */
+    fun <U> compose(before: CheckedFunction<in U, out T>): CheckedFunction<U, R>? {
+        Objects.requireNonNull(before, "before is null")
+        return CheckedFunction { u: U -> apply(before.apply(u)) }
     }
 
+    companion object {
+        /**
+         * Returns the identity `CheckedFunction`, i.e. the function that returns its input.
+         *
+         * @param <T> argument type (and return type) of the identity function
+         * @return the identity `CheckedFunction`
+        </T> */
+        @JvmStatic
+        fun <T> identity(): CheckedFunction<T, T>? {
+            return CheckedFunction { t: T -> t }
+        }
+    }
 }

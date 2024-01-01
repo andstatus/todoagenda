@@ -1,163 +1,171 @@
-package org.andstatus.todoagenda.prefs;
+package org.andstatus.todoagenda.prefs
 
-import android.graphics.LightingColorFilter;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
+import android.graphics.LightingColorFilter
+import android.graphics.drawable.Drawable
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.preference.CheckBoxPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceScreen
+import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.provider.EventProviderType
 
-import androidx.fragment.app.Fragment;
-import androidx.preference.CheckBoxPreference;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceScreen;
-
-import org.andstatus.todoagenda.R;
-import org.andstatus.todoagenda.provider.EventProviderType;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-public class EventSourcesPreferencesFragment extends MyPreferenceFragment {
-    private static final String TAG = EventSourcesPreferencesFragment.class.getSimpleName();
-    private static final String SOURCE_ID = "sourceId";
-
-    List<OrderedEventSource> savedActiveSources = Collections.emptyList();
-    List<EventSource> clickedSources = new ArrayList<>();
-
-    @Override
-    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        addPreferencesFromResource(R.xml.preferences_event_sources);
+class EventSourcesPreferencesFragment : MyPreferenceFragment() {
+    var savedActiveSources: List<OrderedEventSource>? = emptyList<OrderedEventSource>()
+    var clickedSources: MutableList<EventSource> = ArrayList()
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        addPreferencesFromResource(R.xml.preferences_event_sources)
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadActiveSources();
+    override fun onResume() {
+        super.onResume()
+        loadActiveSources()
     }
 
-    private void loadActiveSources() {
-        List<OrderedEventSource> activeSourcesNew = ApplicationPreferences.getActiveEventSources(getActivity());
-        if(!(savedActiveSources.equals(activeSourcesNew))) {
-            savedActiveSources = activeSourcesNew;
-            Log.i(TAG, this.toString() + "\nLoaded " + savedActiveSources.size());
-            showAllSources(activeSourcesNew);
+    private fun loadActiveSources() {
+        val activeSourcesNew = ApplicationPreferences.getActiveEventSources(requireActivity())
+        if (savedActiveSources != activeSourcesNew) {
+            savedActiveSources = activeSourcesNew
+            Log.i(
+                TAG, """
+     $this
+     Loaded ${savedActiveSources!!.size}
+     """.trimIndent()
+            )
+            showAllSources(activeSourcesNew)
         }
     }
 
-    private void showAllSources(List<OrderedEventSource> activeSources) {
-        getPreferenceScreen().removeAll();
-        List<EventSource> added = new ArrayList<>();
-        for (OrderedEventSource saved: activeSources) {
-            added.add(saved.source);
-            addAsPreference(saved.source, true);
+    private fun showAllSources(activeSources: List<OrderedEventSource>?) {
+        preferenceScreen.removeAll()
+        val added: MutableList<EventSource> = ArrayList()
+        for (saved in activeSources!!) {
+            added.add(saved.source)
+            addAsPreference(saved.source, true)
         }
-        for (EventSource clicked : clickedSources) {
+        for (clicked in clickedSources) {
             if (!added.contains(clicked)) {
-                added.add(clicked);
-                addAsPreference(clicked, false);
+                added.add(clicked)
+                addAsPreference(clicked, false)
             }
         }
-        if (getSettings().isLiveMode()) {
-            for (OrderedEventSource available : EventProviderType.getAvailableSources()) {
+        if (settings.isLiveMode) {
+            for (available in EventProviderType.availableSources) {
                 if (!added.contains(available.source)) {
-                    added.add(available.source);
-                    addAsPreference(available.source, false);
+                    added.add(available.source)
+                    addAsPreference(available.source, false)
                 }
             }
         }
     }
 
-    private void addAsPreference(EventSource source, boolean isChecked ) {
-        CheckBoxPreference checkboxPref = new CheckBoxPreference(getActivity());
-        checkboxPref.setTitle((source.isAvailable ? "" : getText(R.string.not_found) + ": ") + source.getTitle());
-        checkboxPref.setSummary(source.getSummary());
-        checkboxPref.setIcon(getDrawable(source.providerType.isCalendar, source.getColor()));
-        checkboxPref.getExtras().putString(SOURCE_ID, source.toStoredString());
-        getPreferenceScreen().addPreference(checkboxPref);
-        checkboxPref.setChecked(isChecked);
+    private fun addAsPreference(source: EventSource?, isChecked: Boolean) {
+        val checkboxPref = CheckBoxPreference(requireActivity())
+        checkboxPref.title =
+            (if (source!!.isAvailable) "" else getText(R.string.not_found).toString() + ": ") + source.title
+        checkboxPref.summary = source.summary
+        checkboxPref.icon = getDrawable(source.providerType.isCalendar, source.color)
+        checkboxPref.extras.putString(SOURCE_ID, source.toStoredString())
+        preferenceScreen.addPreference(checkboxPref)
+        checkboxPref.isChecked = isChecked
     }
 
-    private Drawable getDrawable(boolean isCalendar, int color) {
-        Drawable drawable = getResources().getDrawable(
-                isCalendar ? R.drawable.prefs_calendar_entry : R.drawable.task_icon
-        );
-        drawable.setColorFilter(new LightingColorFilter(0x0, color));
-        return drawable;
+    private fun getDrawable(isCalendar: Boolean, color: Int): Drawable {
+        val drawable = resources.getDrawable(
+            if (isCalendar) R.drawable.prefs_calendar_entry else R.drawable.task_icon
+        )
+        drawable.colorFilter = LightingColorFilter(0x0, color)
+        return drawable
     }
 
-    @Override
-    public void onPause() {
-        if (!getSelectedSources().equals(savedActiveSources)) {
-            saveSelectedSources();
+    override fun onPause() {
+        if (selectedSources != savedActiveSources) {
+            saveSelectedSources()
         }
-        super.onPause();
+        super.onPause()
     }
 
-    private static final Object setLock = new Object();
-    public void saveSelectedSources() {
-        synchronized (setLock) {
-            List<OrderedEventSource> selectedSources = getSelectedSources();
-            Log.i(TAG, this.toString() + "\nSaving " + selectedSources.size());
-            ApplicationPreferences.setActiveEventSources(getActivity(), selectedSources);
-            savedActiveSources = selectedSources;
+    fun saveSelectedSources() {
+        synchronized(setLock) {
+            val selectedSources = selectedSources
+            Log.i(
+                TAG, """
+     $this
+     Saving ${selectedSources.size}
+     """.trimIndent()
+            )
+            ApplicationPreferences.setActiveEventSources(activity, selectedSources)
+            savedActiveSources = selectedSources
         }
-        loadSelectedInOtherInstances();
+        loadSelectedInOtherInstances()
     }
 
-    private List<OrderedEventSource> getSelectedSources() {
-        PreferenceScreen preferenceScreen = getPreferenceScreen();
-        int prefCount = preferenceScreen.getPreferenceCount();
-        List<EventSource> checkedSources = getCheckedSources(preferenceScreen, prefCount);
-        List<EventSource> clickedSelectedSources = new ArrayList<>();
-        for (EventSource clicked : clickedSources) {
-            if (checkedSources.contains(clicked)) {
-                checkedSources.remove(clicked);
-                clickedSelectedSources.add(clicked);
+    private val selectedSources: List<OrderedEventSource>
+        get() {
+            val preferenceScreen = preferenceScreen
+            val prefCount = preferenceScreen.preferenceCount
+            val checkedSources = getCheckedSources(preferenceScreen, prefCount)
+            val clickedSelectedSources: MutableList<EventSource> = ArrayList()
+            for (clicked in clickedSources) {
+                if (checkedSources.contains(clicked)) {
+                    checkedSources.remove(clicked)
+                    clickedSelectedSources.add(clicked)
+                }
             }
+            // Previously selected sources are first
+            val selectedSources: MutableList<OrderedEventSource> =
+                OrderedEventSource.fromSources(checkedSources)
+            // Then recently selected sources go
+            return OrderedEventSource.addAll(selectedSources, clickedSelectedSources)
         }
-        // Previously selected sources are first
-        List<OrderedEventSource> selectedSources = OrderedEventSource.fromSources(checkedSources);
-        // Then recently selected sources go
-        return OrderedEventSource.addAll(selectedSources, clickedSelectedSources);
-    }
 
-    private List<EventSource> getCheckedSources(PreferenceScreen preferenceScreen, int prefCount) {
-        List<EventSource> checkedSources = new ArrayList<>();
-        for (int i = 0; i < prefCount; i++) {
-            Preference preference = preferenceScreen.getPreference(i);
-            if (preference instanceof CheckBoxPreference) {
-                CheckBoxPreference checkBox = (CheckBoxPreference) preference;
-                if (checkBox.isChecked()) {
-                    EventSource eventSource = EventSource.fromStoredString(checkBox.getExtras().getString(SOURCE_ID));
-                    if (eventSource != EventSource.EMPTY) {
-                        checkedSources.add(eventSource);
+    private fun getCheckedSources(preferenceScreen: PreferenceScreen, prefCount: Int): MutableList<EventSource> {
+        val checkedSources: MutableList<EventSource> = ArrayList()
+        for (i in 0 until prefCount) {
+            val preference = preferenceScreen.getPreference(i)
+            if (preference is CheckBoxPreference) {
+                val checkBox = preference
+                if (checkBox.isChecked) {
+                    val eventSource: EventSource = EventSource.fromStoredString(
+                        checkBox.extras.getString(
+                            SOURCE_ID
+                        )
+                    )
+                    if (eventSource !== EventSource.EMPTY) {
+                        checkedSources.add(eventSource)
                     }
                 }
             }
         }
-        return checkedSources;
+        return checkedSources
     }
 
-    private void loadSelectedInOtherInstances() {
+    private fun loadSelectedInOtherInstances() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            for (Fragment fragment: getActivity().getSupportFragmentManager().getFragments()) {
-                if (fragment instanceof EventSourcesPreferencesFragment && fragment != this) {
-                    Log.i(TAG, this.toString() + "\nFound loaded " + fragment);
-                    ((EventSourcesPreferencesFragment) fragment).loadActiveSources();
+            for (fragment in requireActivity().supportFragmentManager.fragments) {
+                if (fragment is EventSourcesPreferencesFragment && fragment !== this) {
+                    Log.i(TAG, "$this\nFound loaded $fragment")
+                    fragment.loadActiveSources()
                 }
             }
         }
     }
 
-    @Override
-    public boolean onPreferenceTreeClick(Preference preference) {
-        if (preference instanceof CheckBoxPreference) {
-            EventSource source = EventSource.fromStoredString(preference.getExtras().getString(SOURCE_ID));
-            clickedSources.remove(source);
-            clickedSources.add(source); // last clicked is the last in the list
-            showAllSources(getSelectedSources());
+    override fun onPreferenceTreeClick(preference: Preference): Boolean {
+        if (preference is CheckBoxPreference) {
+            val source: EventSource =
+                EventSource.fromStoredString(preference.getExtras().getString(SOURCE_ID))
+            clickedSources.remove(source)
+            clickedSources.add(source) // last clicked is the last in the list
+            showAllSources(selectedSources)
         }
-        return super.onPreferenceTreeClick(preference);
+        return super.onPreferenceTreeClick(preference)
+    }
+
+    companion object {
+        private val TAG = EventSourcesPreferencesFragment::class.java.simpleName
+        private const val SOURCE_ID = "sourceId"
+        private val setLock = Any()
     }
 }

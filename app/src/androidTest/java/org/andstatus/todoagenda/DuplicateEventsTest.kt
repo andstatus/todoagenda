@@ -18,6 +18,6 @@ class DuplicateEventsTest : BaseWidgetTest() {
         )
         provider!!.addResults(inputs)
         playResults(method)
-        Assert.assertEquals("Number of entries", 40, getFactory().widgetEntries.size.toLong())
+        Assert.assertEquals("Number of entries", 40, factory.widgetEntries.size.toLong())
     }
 }

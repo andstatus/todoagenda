@@ -1,38 +1,31 @@
-package org.andstatus.todoagenda.widget;
+package org.andstatus.todoagenda.widget
 
-import androidx.annotation.LayoutRes;
-import androidx.annotation.StringRes;
-
-import org.andstatus.todoagenda.R;
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
+import org.andstatus.todoagenda.R
 
 /**
  * @author yvolk@yurivolkov.com
  */
-public enum EventEntryLayout {
+enum class EventEntryLayout(
+    @field:LayoutRes @param:LayoutRes val layoutId: Int,
+    val value: String,
+    @field:StringRes val summaryResId: Int
+) {
     DEFAULT(R.layout.event_entry, "DEFAULT", R.string.default_multiline_layout),
     ONE_LINE(R.layout.event_entry_one_line, "ONE_LINE", R.string.single_line_layout);
-    public static final String SPACE_PIPE_SPACE = "  |  ";
 
-    @LayoutRes
-    public final int layoutId;
-    public final String value;
-    @StringRes
-    public final int summaryResId;
-
-    EventEntryLayout(@LayoutRes int layoutId, String value, int summaryResId) {
-        this.layoutId = layoutId;
-        this.value = value;
-        this.summaryResId = summaryResId;
-    }
-
-    public static EventEntryLayout fromValue(String value) {
-        EventEntryLayout layout = DEFAULT;
-        for (EventEntryLayout item : EventEntryLayout.values()) {
-            if (item.value.equals(value)) {
-                layout = item;
-                break;
+    companion object {
+        const val SPACE_PIPE_SPACE = "  |  "
+        fun fromValue(value: String?): EventEntryLayout {
+            var layout = DEFAULT
+            for (item in entries) {
+                if (item.value == value) {
+                    layout = item
+                    break
+                }
             }
+            return layout
         }
-        return layout;
     }
 }
