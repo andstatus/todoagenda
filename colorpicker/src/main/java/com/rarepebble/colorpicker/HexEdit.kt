@@ -13,100 +13,96 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.graphics.Color
+import android.text.Editable
+import android.text.InputFilter
+import android.text.InputFilter.LengthFilter
+import android.text.Spanned
+import android.text.TextWatcher
+import android.widget.EditText
 
-import android.graphics.Color;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.Spanned;
-import android.text.TextWatcher;
-import android.widget.EditText;
+internal object HexEdit {
+    private val withoutAlphaDigits = arrayOf<InputFilter>(ColorPasteLengthFilter())
+    private val withAlphaDigits = arrayOf<InputFilter>(LengthFilter(8))
+    fun setUpListeners(hexEdit: EditText, observableColor: ObservableColor) {
+        class MultiObserver : ColorObserver, TextWatcher {
+            override fun updateColor(observableColor: ObservableColor) {
+                val colorString = formatColor(observableColor.color)
+                // Prevent onTextChanged getting called when we update text programmatically
+                hexEdit.removeTextChangedListener(this)
+                hexEdit.setText(colorString)
+                hexEdit.addTextChangedListener(this)
+            }
 
-class HexEdit {
+            private fun formatColor(color: Int): String {
+                return if (shouldTrimAlphaDigits()) String.format(
+                    "%06x",
+                    color and 0x00ffffff
+                ) else String.format("%08x", color)
+            }
 
-	private static InputFilter[] withoutAlphaDigits = {new ColorPasteLengthFilter()};
-	private static InputFilter[] withAlphaDigits = {new InputFilter.LengthFilter(8)};
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                var color = parseHexColor(s)
+                if (shouldTrimAlphaDigits()) color = color or -0x1000000
+                observableColor.updateColor(color, this)
+            }
 
-	public static void setUpListeners(final EditText hexEdit, final ObservableColor observableColor) {
+            override fun afterTextChanged(s: Editable) {}
+            private fun shouldTrimAlphaDigits(): Boolean {
+                return hexEdit.filters == withoutAlphaDigits
+            }
+        }
 
-		class MultiObserver implements ColorObserver, TextWatcher {
+        val multiObserver = MultiObserver()
+        hexEdit.addTextChangedListener(multiObserver)
+        observableColor.addObserver(multiObserver)
+        setShowAlphaDigits(hexEdit, true)
+    }
 
-			@Override
-			public void updateColor(ObservableColor observableColor) {
-				final String colorString = formatColor(observableColor.getColor());
-				// Prevent onTextChanged getting called when we update text programmatically
-				hexEdit.removeTextChangedListener(this);
-				hexEdit.setText(colorString);
-				hexEdit.addTextChangedListener(this);
-			}
+    private fun parseHexColor(s: CharSequence): Int {
+        return try {
+            (s.toString().toLong(16) and 0xffffffffL).toInt()
+        } catch (e: NumberFormatException) {
+            Color.GRAY
+        }
+    }
 
-			private String formatColor(int color) {
-				return shouldTrimAlphaDigits()
-						? String.format("%06x", color & 0x00ffffff)
-						: String.format("%08x", color);
-			}
+    fun setShowAlphaDigits(hexEdit: EditText, showAlphaDigits: Boolean) {
+        hexEdit.filters = if (showAlphaDigits) withAlphaDigits else withoutAlphaDigits
+        hexEdit.text = hexEdit.text // trigger a reformat of text
+    }
 
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-			}
+    private class ColorPasteLengthFilter : InputFilter {
+        private val sixDigitFilter: InputFilter = LengthFilter(MAX_LENGTH)
+        override fun filter(
+            source: CharSequence,
+            start: Int,
+            end: Int,
+            dest: Spanned,
+            dstart: Int,
+            dend: Int
+        ): CharSequence {
+            // If 8 digits have been pasted, replacing all source, trim alpha digits.
+            // Otherwise standard LengthFilter behavior.
+            val srcLength = end - start
+            val dstSelLength = dend - dstart
+            return if (srcLength == PASTED_LEN && dstSelLength == dest.length) {
+                // Discard alpha digits:
+                source.subSequence(
+                    PASTED_LEN - MAX_LENGTH,
+                    PASTED_LEN
+                )
+            } else {
+                sixDigitFilter.filter(source, start, end, dest, dstart, dend)
+            }
+        }
 
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				int color = parseHexColor(s);
-				if (shouldTrimAlphaDigits()) color = color | 0xff000000;
-				observableColor.updateColor(color, this);
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-
-			private boolean shouldTrimAlphaDigits() {
-				return hexEdit.getFilters() == withoutAlphaDigits;
-			}
-		}
-
-		final MultiObserver multiObserver = new MultiObserver();
-		hexEdit.addTextChangedListener(multiObserver);
-		observableColor.addObserver(multiObserver);
-		setShowAlphaDigits(hexEdit, true);
-	}
-
-	private static int parseHexColor(CharSequence s) {
-		try {
-			return (int)(Long.parseLong(s.toString(), 16) & 0xffffffffL);
-		}
-		catch (NumberFormatException e) {
-			return Color.GRAY;
-		}
-	}
-
-	public static void setShowAlphaDigits(final EditText hexEdit, boolean showAlphaDigits) {
-		hexEdit.setFilters(showAlphaDigits ? withAlphaDigits : withoutAlphaDigits);
-		hexEdit.setText(hexEdit.getText()); // trigger a reformat of text
-	}
-
-
-	private static class ColorPasteLengthFilter implements InputFilter {
-
-		private static final int MAX_LENGTH = 6;
-		private static final int PASTED_LEN = 8;
-		private final InputFilter sixDigitFilter = new InputFilter.LengthFilter(MAX_LENGTH);
-
-		public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
-			// If 8 digits have been pasted, replacing all source, trim alpha digits.
-			// Otherwise standard LengthFilter behavior.
-			final int srcLength = end - start;
-			final int dstSelLength = dend - dstart;
-			if (srcLength == PASTED_LEN && dstSelLength == dest.length()) {
-				// Discard alpha digits:
-				return source.subSequence(PASTED_LEN - MAX_LENGTH, PASTED_LEN);
-			}
-			else {
-				return sixDigitFilter.filter(source, start, end, dest, dstart, dend);
-			}
-		}
-	}
-
+        companion object {
+            private const val MAX_LENGTH = 6
+            private const val PASTED_LEN = 8
+        }
+    }
 }

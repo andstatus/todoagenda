@@ -13,62 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.content.Context
+import android.graphics.Bitmap
+import android.util.AttributeSet
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.AttributeSet;
+class AlphaView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    SliderViewBase(context, attrs), ColorObserver {
+    private var observableColor = ObservableColor(0)
+    fun observeColor(observableColor: ObservableColor) {
+        this.observableColor = observableColor
+        observableColor.addObserver(this)
+    }
 
-public class AlphaView extends SliderViewBase implements ColorObserver {
+    override fun updateColor(observableColor: ObservableColor) {
+        setPos(observableColor.alpha.toFloat() / 0xff)
+        updateBitmap()
+        invalidate()
+    }
 
-	private ObservableColor observableColor = new ObservableColor(0);
+    override fun notifyListener(currentPos: Float) {
+        observableColor.updateAlpha((currentPos * 0xff).toInt(), this)
+    }
 
-	public AlphaView(Context context) {
-		this(context, null);
-	}
+    override fun getPointerColor(currentPos: Float): Int {
+        val solidColorLightness = observableColor.lightness
+        val posLightness = 1 + currentPos * (solidColorLightness - 1)
+        return if (posLightness > 0.5f) -0x1000000 else -0x1
+    }
 
-	public AlphaView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-	}
-
-	public void observeColor(ObservableColor observableColor) {
-		this.observableColor = observableColor;
-		observableColor.addObserver(this);
-	}
-
-	@Override
-	public void updateColor(ObservableColor observableColor) {
-		setPos((float)observableColor.getAlpha()/0xff);
-		updateBitmap();
-		invalidate();
-	}
-
-	@Override
-	protected void notifyListener(float currentPos) {
-		observableColor.updateAlpha((int)(currentPos * 0xff), this);
-	}
-
-	@Override
-	protected int getPointerColor(float currentPos) {
-		float solidColorLightness = observableColor.getLightness();
-		float posLightness = 1 + currentPos * (solidColorLightness - 1);
-		return posLightness > 0.5f ? 0xff000000 : 0xffffffff;
-	}
-
-	@Override
-	protected Bitmap makeBitmap(int w, int h) {
-		final boolean isWide = w > h;
-		final int n = Math.max(w, h);
-		int color = observableColor.getColor();
-		int[] colors = new int[n];
-		for (int i = 0; i < n; ++i) {
-			float alpha = isWide ? (float)i / n : 1 - (float)i / n;
-			colors[i] = color & 0xffffff | (int)(alpha * 0xff) << 24;
-		}
-		final int bmpWidth = isWide ? w : 1;
-		final int bmpHeight = isWide ? 1 : h;
-		return Bitmap.createBitmap(colors, bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888);
-	}
-
+    override fun makeBitmap(w: Int, h: Int): Bitmap? {
+        val isWide = w > h
+        val n = Math.max(w, h)
+        val color = observableColor.color
+        val colors = IntArray(n)
+        for (i in 0 until n) {
+            val alpha = if (isWide) i.toFloat() / n else 1 - i.toFloat() / n
+            colors[i] = color and 0xffffff or ((alpha * 0xff).toInt() shl 24)
+        }
+        val bmpWidth = if (isWide) w else 1
+        val bmpHeight = if (isWide) 1 else h
+        return Bitmap.createBitmap(colors, bmpWidth, bmpHeight, Bitmap.Config.ARGB_8888)
+    }
 }

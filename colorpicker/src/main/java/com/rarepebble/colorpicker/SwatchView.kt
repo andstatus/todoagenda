@@ -13,139 +13,132 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.util.AttributeSet
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.RectF;
-import android.util.AttributeSet;
+class SwatchView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : SquareView(context, attrs),
+    ColorObserver {
+    private val borderPaint: Paint?
+    private val borderPath: Path
+    private val checkerPaint: Paint?
+    private val oldFillPath: Path
+    private val newFillPath: Path
+    private val oldFillPaint: Paint
+    private val newFillPaint: Paint
+    private var radialMarginPx = 0f
 
-public class SwatchView extends SquareView implements ColorObserver {
+    init {
+        radialMarginPx = if (attrs != null) {
+            val a = context.theme.obtainStyledAttributes(attrs, R.styleable.SwatchView, 0, 0)
+            a.getDimension(R.styleable.SwatchView_radialMargin, 0f)
+        } else {
+            0f
+        }
+        borderPaint = Resources.makeLinePaint(context)
+        checkerPaint = Resources.makeCheckerPaint(context)
+        oldFillPaint = Paint()
+        newFillPaint = Paint()
+        borderPath = Path()
+        oldFillPath = Path()
+        newFillPath = Path()
+    }
 
-	private final Paint borderPaint;
-	private final Path borderPath;
-	private final Paint checkerPaint;
-	private final Path oldFillPath;
-	private final Path newFillPath;
-	private final Paint oldFillPaint;
-	private final Paint newFillPaint;
-	private final float radialMarginPx;
+    fun setOriginalColor(color: Int) {
+        oldFillPaint.color = color
+        invalidate()
+    }
 
-	public SwatchView(Context context) {
-		this(context, null);
-	}
+    fun observeColor(observableColor: ObservableColor) {
+        observableColor.addObserver(this)
+    }
 
-	public SwatchView(Context context, AttributeSet attrs) {
-		super(context, attrs);
+    override fun updateColor(observableColor: ObservableColor) {
+        newFillPaint.color = observableColor.color
+        invalidate()
+    }
 
-		if (attrs != null) {
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.SwatchView, 0, 0);
-			radialMarginPx = a.getDimension(R.styleable.SwatchView_radialMargin, 0f);
-		}
-		else {
-			radialMarginPx = 0;
-		}
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        // We expect to be stacked behind a square HueSatView and fill the top left corner.
+        val inset = borderPaint!!.strokeWidth / 2
+        val r = Math.min(w, h).toFloat()
 
-		borderPaint = Resources.makeLinePaint(context);
-		checkerPaint = Resources.makeCheckerPaint(context);
-		oldFillPaint = new Paint();
-		newFillPaint = new Paint();
+        // Trim the corners of the swatch is where it is radialMarginPx thick.
+        // find how long the outeredges are:
+        val margin = radialMarginPx
+        val diagonal = r + 2 * margin
+        val opp = Math.sqrt((diagonal * diagonal - r * r).toDouble()).toFloat()
+        val edgeLen = r - opp
 
-		borderPath = new Path();
-		oldFillPath = new Path();
-		newFillPath = new Path();
-	}
+        // Arc angles for drawing CCW
+        val outerAngle = Math.toDegrees(Math.atan2(opp.toDouble(), r.toDouble())).toFloat()
+        val startAngle = 270 - outerAngle
+        // Sweep angle for each half of the swatch:
+        val sweepAngle = outerAngle - 45
+        // Sweep angle for the smooth corners:
+        val cornerSweepAngle = 90 - outerAngle
 
-	void setOriginalColor(int color) {
-		oldFillPaint.setColor(color);
-		invalidate();
-	}
+        // Outer border:
+        beginBorder(borderPath, inset, edgeLen, margin, cornerSweepAngle)
+        mainArc(borderPath, r, margin, startAngle, 2 * sweepAngle)
+        endBorder(borderPath, inset, edgeLen, margin, cornerSweepAngle)
 
-	void observeColor(ObservableColor observableColor) {
-		observableColor.addObserver(this);
-	}
+        // Old fill shape:
+        oldFillPath.reset()
+        oldFillPath.moveTo(inset, inset)
+        mainArc(oldFillPath, r, margin, 225f, sweepAngle)
+        endBorder(oldFillPath, inset, edgeLen, margin, cornerSweepAngle)
 
-	@Override
-	public void updateColor(ObservableColor observableColor) {
-		newFillPaint.setColor(observableColor.getColor());
-		invalidate();
-	}
+        // New fill shape:
+        beginBorder(newFillPath, inset, edgeLen, margin, cornerSweepAngle)
+        mainArc(newFillPath, r, margin, startAngle, sweepAngle)
+        newFillPath.lineTo(inset, inset)
+        newFillPath.close()
+    }
 
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		// We expect to be stacked behind a square HueSatView and fill the top left corner.
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        canvas.drawPath(borderPath, checkerPaint!!)
+        canvas.drawPath(oldFillPath, oldFillPaint)
+        canvas.drawPath(newFillPath, newFillPaint)
+        canvas.drawPath(borderPath, borderPaint!!)
+    }
 
-		final float inset = borderPaint.getStrokeWidth() / 2;
-		final float r = Math.min(w, h);
+    companion object {
+        private fun beginBorder(
+            path: Path,
+            inset: Float,
+            edgeLen: Float,
+            cornerRadius: Float,
+            cornerSweepAngle: Float
+        ) {
+            path.reset()
+            path.moveTo(inset, inset)
+            cornerArc(path, edgeLen, inset, cornerRadius - inset, 0f, cornerSweepAngle)
+        }
 
-		// Trim the corners of the swatch is where it is radialMarginPx thick.
-		// find how long the outeredges are:
-		final float margin = radialMarginPx;
-		final float diagonal = r + 2 * margin;
-		final float opp = (float)Math.sqrt(diagonal * diagonal - r * r);
-		final float edgeLen = r - opp;
+        private fun endBorder(path: Path, inset: Float, edgeLen: Float, cornerRadius: Float, cornerSweepAngle: Float) {
+            cornerArc(path, inset, edgeLen, cornerRadius - inset, 90 - cornerSweepAngle, cornerSweepAngle)
+            path.lineTo(inset, inset)
+            path.close()
+        }
 
-		// Arc angles for drawing CCW
-		final float outerAngle = (float)Math.toDegrees(Math.atan2(opp, r));
-		final float startAngle = 270 - outerAngle;
-		// Sweep angle for each half of the swatch:
-		final float sweepAngle = outerAngle - 45;
-		// Sweep angle for the smooth corners:
-		final float cornerSweepAngle = 90 - outerAngle;
+        private fun cornerArc(path: Path, cx: Float, cy: Float, r: Float, startAngle: Float, sweepAngle: Float) {
+            val ovalRect = RectF(-r, -r, r, r)
+            ovalRect.offset(cx, cy)
+            path.arcTo(ovalRect, startAngle, sweepAngle)
+        }
 
-		// Outer border:
-		beginBorder(borderPath, inset, edgeLen, margin, cornerSweepAngle);
-		mainArc(borderPath, r, margin, startAngle, 2 * sweepAngle);
-		endBorder(borderPath, inset, edgeLen, margin, cornerSweepAngle);
-
-		// Old fill shape:
-		oldFillPath.reset();
-		oldFillPath.moveTo(inset, inset);
-		mainArc(oldFillPath, r, margin, 225, sweepAngle);
-		endBorder(oldFillPath, inset, edgeLen, margin, cornerSweepAngle);
-
-		// New fill shape:
-		beginBorder(newFillPath, inset, edgeLen, margin, cornerSweepAngle);
-		mainArc(newFillPath, r, margin, startAngle, sweepAngle);
-		newFillPath.lineTo(inset, inset);
-		newFillPath.close();
-	}
-
-	private static void beginBorder(Path path, float inset, float edgeLen, float cornerRadius, float cornerSweepAngle) {
-		path.reset();
-		path.moveTo(inset, inset);
-		cornerArc(path, edgeLen, inset, cornerRadius-inset, 0, cornerSweepAngle);
-	}
-
-	private static void endBorder(Path path, float inset, float edgeLen, float cornerRadius, float cornerSweepAngle) {
-		cornerArc(path, inset, edgeLen, cornerRadius - inset, 90 - cornerSweepAngle, cornerSweepAngle);
-		path.lineTo(inset, inset);
-		path.close();
-	}
-
-	private static void cornerArc(Path path, float cx, float cy, float r, float startAngle, float sweepAngle) {
-		final RectF ovalRect = new RectF(-r, -r, r, r);
-		ovalRect.offset(cx, cy);
-		path.arcTo(ovalRect, startAngle, sweepAngle);
-	}
-
-	private static void mainArc(Path path, float viewSize, float margin, float startAngle, float sweepAngle) {
-		float r = viewSize + margin;
-		final RectF ovalRect = new RectF(-r, -r, r, r);
-		ovalRect.offset(viewSize, viewSize);
-		path.arcTo(ovalRect, startAngle, sweepAngle);
-	}
-
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		canvas.drawPath(borderPath, checkerPaint);
-		canvas.drawPath(oldFillPath, oldFillPaint);
-		canvas.drawPath(newFillPath, newFillPaint);
-		canvas.drawPath(borderPath, borderPaint);
-	}
-
+        private fun mainArc(path: Path, viewSize: Float, margin: Float, startAngle: Float, sweepAngle: Float) {
+            val r = viewSize + margin
+            val ovalRect = RectF(-r, -r, r, r)
+            ovalRect.offset(viewSize, viewSize)
+            path.arcTo(ovalRect, startAngle, sweepAngle)
+        }
+    }
 }

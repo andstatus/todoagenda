@@ -13,93 +13,76 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.graphics.Color
 
-import android.graphics.Color;
+class ObservableColor(color: Int) {
+    // Store as HSV & A, otherwise round-trip to int causes color drift.
+    private val hsv = floatArrayOf(0f, 0f, 0f)
+    var alpha: Int
+        private set
+    private val observers: MutableList<ColorObserver> = ArrayList()
 
-import java.util.ArrayList;
-import java.util.List;
+    init {
+        Color.colorToHSV(color, hsv)
+        alpha = Color.alpha(color)
+    }
 
-public class ObservableColor {
+    fun getHsv(hsvOut: FloatArray) {
+        hsvOut[0] = hsv[0]
+        hsvOut[1] = hsv[1]
+        hsvOut[2] = hsv[2]
+    }
 
-	// Store as HSV & A, otherwise round-trip to int causes color drift.
-	private final float[] hsv = {0, 0, 0};
-	private int alpha;
-	private final List<ColorObserver> observers = new ArrayList<ColorObserver>();
+    val color: Int
+        get() = Color.HSVToColor(alpha, hsv)
+    val hue: Float
+        get() = hsv[0]
+    val sat: Float
+        get() = hsv[1]
+    val value: Float
+        get() = hsv[2]
+    val lightness: Float
+        get() = getLightnessWithValue(hsv[2])
 
-	public ObservableColor(int color) {
-		Color.colorToHSV(color, hsv);
-		alpha = Color.alpha(color);
-	}
+    fun getLightnessWithValue(value: Float): Float {
+        val hsV = floatArrayOf(hsv[0], hsv[1], value)
+        val color = Color.HSVToColor(hsV)
+        return (Color.red(color) * 0.2126f + Color.green(color) * 0.7152f + Color.blue(color) * 0.0722f) / 0xff
+    }
 
-	public void getHsv(float hsvOut[]) {
-		hsvOut[0] = hsv[0];
-		hsvOut[1] = hsv[1];
-		hsvOut[2] = hsv[2];
-	}
+    fun addObserver(observer: ColorObserver) {
+        observers.add(observer)
+    }
 
-	public int getColor() {
-		return Color.HSVToColor(alpha, hsv);
-	}
+    fun updateHueSat(hue: Float, sat: Float, sender: ColorObserver?) {
+        hsv[0] = hue
+        hsv[1] = sat
+        notifyOtherObservers(sender)
+    }
 
-	public float getHue() {
-		return hsv[0];
-	}
+    fun updateValue(value: Float, sender: ColorObserver?) {
+        hsv[2] = value
+        notifyOtherObservers(sender)
+    }
 
-	public float getSat() {
-		return hsv[1];
-	}
+    fun updateAlpha(alpha: Int, sender: ColorObserver?) {
+        this.alpha = alpha
+        notifyOtherObservers(sender)
+    }
 
-	public float getValue() {
-		return hsv[2];
-	}
+    fun updateColor(color: Int, sender: ColorObserver?) {
+        Color.colorToHSV(color, hsv)
+        alpha = Color.alpha(color)
+        notifyOtherObservers(sender)
+    }
 
-	public int getAlpha() {
-		return alpha;
-	}
-
-	public float getLightness() {
-		return getLightnessWithValue(hsv[2]);
-	}
-
-	public float getLightnessWithValue(float value) {
-		float[] hsV = {hsv[0], hsv[1], value};
-		final int color = Color.HSVToColor(hsV);
-		return (Color.red(color) * 0.2126f + Color.green(color) * 0.7152f + Color.blue(color) * 0.0722f)/0xff;
-	}
-
-	public void addObserver(ColorObserver observer) {
-		observers.add(observer);
-	}
-
-	public void updateHueSat(float hue, float sat, ColorObserver sender) {
-		hsv[0] = hue;
-		hsv[1] = sat;
-		notifyOtherObservers(sender);
-	}
-
-	public void updateValue(float value, ColorObserver sender) {
-		hsv[2] = value;
-		notifyOtherObservers(sender);
-	}
-
-	public void updateAlpha(int alpha, ColorObserver sender) {
-		this.alpha = alpha;
-		notifyOtherObservers(sender);
-	}
-
-	public void updateColor(int color, ColorObserver sender) {
-		Color.colorToHSV(color, hsv);
-		alpha = Color.alpha(color);
-		notifyOtherObservers(sender);
-	}
-
-	private void notifyOtherObservers(ColorObserver sender) {
-		for (ColorObserver observer : observers) {
-			if (observer != sender) {
-				observer.updateColor(this);
-			}
-		}
-	}
+    private fun notifyOtherObservers(sender: ColorObserver?) {
+        for (observer in observers) {
+            if (observer !== sender) {
+                observer.updateColor(this)
+            }
+        }
+    }
 }

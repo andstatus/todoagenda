@@ -13,97 +13,83 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.EditText
+import android.widget.FrameLayout
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.FrameLayout;
+class ColorPickerView @JvmOverloads constructor(context: Context?, attrs: AttributeSet? = null) : FrameLayout(
+    context!!, attrs
+) {
+    private val alphaView: AlphaView
+    private val hexEdit: EditText
+    private val observableColor = ObservableColor(0)
+    private val swatchView: SwatchView
 
-public class ColorPickerView extends FrameLayout {
+    init {
+        LayoutInflater.from(context).inflate(R.layout.picker, this)
+        swatchView = findViewById<View>(R.id.swatchView) as SwatchView
+        swatchView.observeColor(observableColor)
+        val hueSatView = findViewById<View>(R.id.hueSatView) as HueSatView
+        hueSatView.observeColor(observableColor)
+        val valueView = findViewById<View>(R.id.valueView) as ValueView
+        valueView.observeColor(observableColor)
+        alphaView = findViewById<View>(R.id.alphaView) as AlphaView
+        alphaView.observeColor(observableColor)
+        hexEdit = findViewById<View>(R.id.hexEdit) as EditText
+        HexEdit.setUpListeners(hexEdit, observableColor)
+        applyAttributes(attrs)
 
-	private final AlphaView alphaView;
-	private final EditText hexEdit;
-	private final ObservableColor observableColor = new ObservableColor(0);
-	private final SwatchView swatchView;
+        // We get all our state saved and restored for free,
+        // thanks to the EditText and its listeners!
+    }
 
-	public ColorPickerView(Context context) {
-		this(context, null);
-	}
+    private fun applyAttributes(attrs: AttributeSet?) {
+        if (attrs != null) {
+            val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ColorPicker, 0, 0)
+            showAlpha(a.getBoolean(R.styleable.ColorPicker_colorpicker_showAlpha, true))
+            showHex(a.getBoolean(R.styleable.ColorPicker_colorpicker_showHex, true))
+            showPreview(a.getBoolean(R.styleable.ColorPicker_colorpicker_showPreview, true))
+        }
+    }
 
-	public ColorPickerView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		LayoutInflater.from(context).inflate(R.layout.picker, this);
+    var color: Int
+        /** Returns the color selected by the user  */
+        get() = observableColor.color
+        /** Sets the original color swatch and the current color to the specified value.  */
+        set(color) {
+            setOriginalColor(color)
+            setCurrentColor(color)
+        }
 
-		swatchView = (SwatchView)findViewById(R.id.swatchView);
-		swatchView.observeColor(observableColor);
+    /** Sets the original color swatch without changing the current color.  */
+    fun setOriginalColor(color: Int) {
+        swatchView.setOriginalColor(color)
+    }
 
-		HueSatView hueSatView = (HueSatView)findViewById(R.id.hueSatView);
-		hueSatView.observeColor(observableColor);
+    /** Updates the current color without changing the original color swatch.  */
+    fun setCurrentColor(color: Int) {
+        observableColor.updateColor(color, null)
+    }
 
-		ValueView valueView = (ValueView)findViewById(R.id.valueView);
-		valueView.observeColor(observableColor);
+    fun showAlpha(showAlpha: Boolean) {
+        alphaView.visibility = if (showAlpha) VISIBLE else GONE
+        HexEdit.setShowAlphaDigits(hexEdit, showAlpha)
+    }
 
-		alphaView = (AlphaView)findViewById(R.id.alphaView);
-		alphaView.observeColor(observableColor);
+    fun addColorObserver(observer: ColorObserver) {
+        observableColor.addObserver(observer)
+    }
 
-		hexEdit = (EditText)findViewById(R.id.hexEdit);
-		HexEdit.setUpListeners(hexEdit, observableColor);
+    fun showHex(showHex: Boolean) {
+        hexEdit.visibility = if (showHex) VISIBLE else GONE
+    }
 
-		applyAttributes(attrs);
-
-		// We get all our state saved and restored for free,
-		// thanks to the EditText and its listeners!
-	}
-
-	private void applyAttributes(AttributeSet attrs) {
-		if (attrs != null) {
-			TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.ColorPicker, 0, 0);
-			showAlpha(a.getBoolean(R.styleable.ColorPicker_colorpicker_showAlpha, true));
-			showHex(a.getBoolean(R.styleable.ColorPicker_colorpicker_showHex, true));
-			showPreview(a.getBoolean(R.styleable.ColorPicker_colorpicker_showPreview, true));
-		}
-	}
-
-	/** Returns the color selected by the user */
-	public int getColor() {
-		return observableColor.getColor();
-	}
-
-	/** Sets the original color swatch and the current color to the specified value. */
-	public void setColor(int color) {
-		setOriginalColor(color);
-		setCurrentColor(color);
-	}
-
-	/** Sets the original color swatch without changing the current color. */
-	public void setOriginalColor(int color) {
-		swatchView.setOriginalColor(color);
-	}
-
-	/** Updates the current color without changing the original color swatch. */
-	public void setCurrentColor(int color) {
-		observableColor.updateColor(color, null);
-	}
-
-	public void showAlpha(boolean showAlpha) {
-		alphaView.setVisibility(showAlpha ? View.VISIBLE : View.GONE);
-		HexEdit.setShowAlphaDigits(hexEdit, showAlpha);
-	}
-
-	public void addColorObserver(ColorObserver observer) {
-		observableColor.addObserver(observer);
-	}
-
-	public void showHex(boolean showHex) {
-		hexEdit.setVisibility(showHex ? View.VISIBLE : View.GONE);
-	}
-
-	public void showPreview(boolean showPreview) {
-		swatchView.setVisibility(showPreview ? View.VISIBLE : View.GONE);
-	}
+    fun showPreview(showPreview: Boolean) {
+        swatchView.visibility = if (showPreview) VISIBLE else GONE
+    }
 }

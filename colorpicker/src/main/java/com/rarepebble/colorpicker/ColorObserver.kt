@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
-
-public interface ColorObserver {
-	void updateColor(ObservableColor observableColor);
+interface ColorObserver {
+    fun updateColor(observableColor: ObservableColor)
 }

@@ -1,37 +1,35 @@
-package com.rarepebble.colorpicker;
+package com.rarepebble.colorpicker
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.View;
+import android.content.Context
+import android.util.AttributeSet
+import android.view.View
 
-class SquareView extends View {
-	private static final int MIN_SIZE_DIP = 200;
+open class SquareView(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+    private val minSizePx: Int
 
-	private final int minSizePx;
+    init {
+        minSizePx = Resources.dipToPixels(context, MIN_SIZE_DIP.toFloat()).toInt()
+    }
 
-	public SquareView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		minSizePx = (int)Resources.dipToPixels(context, MIN_SIZE_DIP);
-	}
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        // Constrain to square
+        val w = MeasureSpec.getSize(widthMeasureSpec)
+        val h = MeasureSpec.getSize(heightMeasureSpec)
+        val modeW = MeasureSpec.getMode(widthMeasureSpec)
+        val modeH = MeasureSpec.getMode(heightMeasureSpec)
+        var size = minSizePx
+        size = if (modeW == MeasureSpec.UNSPECIFIED) {
+            h
+        } else if (modeH == MeasureSpec.UNSPECIFIED) {
+            w
+        } else {
+            Math.min(w, h)
+        }
+        size = Math.max(size, minSizePx)
+        setMeasuredDimension(size, size)
+    }
 
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		// Constrain to square
-		final int w = MeasureSpec.getSize(widthMeasureSpec);
-		final int h = MeasureSpec.getSize(heightMeasureSpec);
-		final int modeW = MeasureSpec.getMode(widthMeasureSpec);
-		final int modeH = MeasureSpec.getMode(heightMeasureSpec);
-		int size = minSizePx;
-		if (modeW == MeasureSpec.UNSPECIFIED) {
-			size = h;
-		}
-		else if (modeH == MeasureSpec.UNSPECIFIED) {
-			size = w;
-		}
-		else {
-			size = Math.min(w, h);
-		}
-		size = Math.max(size, minSizePx);
-		setMeasuredDimension(size, size);
-	}
+    companion object {
+        private const val MIN_SIZE_DIP = 200
+    }
 }

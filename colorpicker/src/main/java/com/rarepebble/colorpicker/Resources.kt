@@ -13,54 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.content.Context
+import android.graphics.BitmapFactory
+import android.graphics.BitmapShader
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Shader
+import android.util.TypedValue
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Shader;
-import android.util.DisplayMetrics;
-import android.util.TypedValue;
+internal object Resources {
+    private const val LINE_WIDTH_DIP = 1.5f
+    private const val POINTER_RADIUS_DIP = 7f
+    private const val VIEW_OUTLINE_COLOR = -0x7f7f80
+    fun makeLinePaint(context: Context): Paint {
+        val paint = Paint()
+        paint.color = VIEW_OUTLINE_COLOR
+        paint.strokeWidth =
+            dipToPixels(context, LINE_WIDTH_DIP)
+        paint.style = Paint.Style.STROKE
+        paint.isAntiAlias = true
+        return paint
+    }
 
-class Resources {
+    fun makeCheckerPaint(context: Context): Paint {
+        val paint = Paint()
+        val checkerBmp = BitmapFactory.decodeResource(context.resources, R.drawable.checker_background)
+        paint.setShader(BitmapShader(checkerBmp, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT))
+        paint.strokeWidth =
+            dipToPixels(context, LINE_WIDTH_DIP)
+        paint.style = Paint.Style.FILL
+        paint.isAntiAlias = true
+        return paint
+    }
 
-	private static final float LINE_WIDTH_DIP = 1.5f;
-	private static final float POINTER_RADIUS_DIP = 7;
-	private static final int VIEW_OUTLINE_COLOR = 0xff808080;
+    fun makePointerPath(context: Context): Path {
+        val pointerPath = Path()
+        val radiusPx = dipToPixels(context, POINTER_RADIUS_DIP)
+        pointerPath.addCircle(0f, 0f, radiusPx, Path.Direction.CW)
+        return pointerPath
+    }
 
-	public static Paint makeLinePaint(Context context) {
-		Paint paint = new Paint();
-		paint.setColor(VIEW_OUTLINE_COLOR);
-		paint.setStrokeWidth(dipToPixels(context, LINE_WIDTH_DIP));
-		paint.setStyle(Paint.Style.STROKE);
-		paint.setAntiAlias(true);
-		return paint;
-	}
-
-	public static Paint makeCheckerPaint(Context context) {
-		Paint paint = new Paint();
-		final Bitmap checkerBmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.checker_background);
-		paint.setShader(new BitmapShader(checkerBmp, Shader.TileMode.REPEAT, Shader.TileMode.REPEAT));
-		paint.setStrokeWidth(dipToPixels(context, LINE_WIDTH_DIP));
-		paint.setStyle(Paint.Style.FILL);
-		paint.setAntiAlias(true);
-		return paint;
-	}
-
-	public static Path makePointerPath(Context context) {
-		Path pointerPath = new Path();
-		final float radiusPx = dipToPixels(context, POINTER_RADIUS_DIP);
-		pointerPath.addCircle(0, 0, radiusPx, Path.Direction.CW);
-		return pointerPath;
-	}
-
-	public static float dipToPixels(Context context, float dipValue) {
-		DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-		return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
-	}
-
+    fun dipToPixels(context: Context, dipValue: Float): Float {
+        val metrics = context.resources.displayMetrics
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics)
+    }
 }

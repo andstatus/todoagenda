@@ -13,117 +13,104 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Rect
+import android.graphics.RectF
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.RectF;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
+abstract class SliderViewBase(context: Context, attrs: AttributeSet?) : View(context, attrs) {
+    private val borderPaint: Paint?
+    private val checkerPaint: Paint?
+    private val viewRect = Rect()
+    private var w = 0
+    private var h = 0
+    private val borderPath: Path
+    private var bitmap: Bitmap? = null
+    private val pointerPath: Path?
+    private val pointerPaint: Paint?
+    private var currentPos = 0f
 
-public abstract class SliderViewBase extends View {
+    init {
+        checkerPaint = Resources.makeCheckerPaint(context)
+        borderPaint = Resources.makeLinePaint(context)
+        pointerPaint = Resources.makeLinePaint(context)
+        pointerPath = Resources.makePointerPath(context)
+        borderPath = Path()
+    }
 
-	private final Paint borderPaint;
-	private final Paint checkerPaint;
-	private final Rect viewRect = new Rect();
-	private int w;
-	private int h;
-	private final Path borderPath;
-	private Bitmap bitmap;
-	private final Path pointerPath;
-	private final Paint pointerPaint;
+    protected abstract fun notifyListener(currentPos: Float)
+    protected abstract fun makeBitmap(w: Int, h: Int): Bitmap?
+    protected abstract fun getPointerColor(currentPos: Float): Int
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        this.w = w
+        this.h = h
+        viewRect[0, 0, w] = h
+        val inset = borderPaint!!.strokeWidth / 2
+        borderPath.reset()
+        borderPath.addRect(RectF(inset, inset, w - inset, h - inset), Path.Direction.CW)
+        updateBitmap()
+    }
 
-	private float currentPos;
+    protected fun setPos(pos: Float) {
+        currentPos = pos
+        optimisePointerColor()
+    }
 
-	public SliderViewBase(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		checkerPaint = Resources.makeCheckerPaint(context);
-		borderPaint = Resources.makeLinePaint(context);
-		pointerPaint = Resources.makeLinePaint(context);
-		pointerPath = Resources.makePointerPath(context);
-		borderPath = new Path();
-	}
+    protected fun updateBitmap() {
+        if (w > 0 && h > 0) {
+            bitmap = makeBitmap(w, h)
+            optimisePointerColor()
+        }
+        // else not ready yet
+    }
 
-	protected abstract void notifyListener(float currentPos);
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val action = event.actionMasked
+        when (action) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                currentPos = valueForTouchPos(event.x, event.y)
+                optimisePointerColor()
+                notifyListener(currentPos)
+                invalidate()
+                parent.requestDisallowInterceptTouchEvent(true)
+                return true
+            }
+        }
+        return super.onTouchEvent(event)
+    }
 
-	protected abstract Bitmap makeBitmap(int w, int h);
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        canvas.drawPath(borderPath, checkerPaint!!)
+        canvas.drawBitmap(bitmap!!, null, viewRect, null)
+        canvas.drawPath(borderPath, borderPaint!!)
+        canvas.save()
+        if (isWide) {
+            canvas.translate(w * currentPos, (h / 2).toFloat())
+        } else {
+            canvas.translate((w / 2).toFloat(), h * (1 - currentPos))
+        }
+        canvas.drawPath(pointerPath!!, pointerPaint!!)
+        canvas.restore()
+    }
 
-	protected abstract int getPointerColor(float currentPos);
+    private val isWide: Boolean
+        private get() = w > h
 
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-		this.w = w;
-		this.h = h;
-		viewRect.set(0, 0, w, h);
-		float inset = borderPaint.getStrokeWidth() / 2;
-		borderPath.reset();
-		borderPath.addRect(new RectF(inset, inset, w - inset, h - inset), Path.Direction.CW);
-		updateBitmap();
-	}
+    private fun valueForTouchPos(x: Float, y: Float): Float {
+        val `val` = if (isWide) x / w else 1 - y / h
+        return Math.max(0f, Math.min(1f, `val`))
+    }
 
-	protected void setPos(float pos) {
-		currentPos = pos;
-		optimisePointerColor();
-	}
-
-	protected void updateBitmap() {
-		if (w > 0 && h > 0) {
-			bitmap = makeBitmap(w, h);
-			optimisePointerColor();
-		}
-		// else not ready yet
-	}
-
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		int action = event.getActionMasked();
-		switch (action) {
-			case MotionEvent.ACTION_DOWN:
-			case MotionEvent.ACTION_MOVE:
-				currentPos = valueForTouchPos(event.getX(), event.getY());
-				optimisePointerColor();
-				notifyListener(currentPos);
-				invalidate();
-				getParent().requestDisallowInterceptTouchEvent(true);
-				return true;
-		}
-		return super.onTouchEvent(event);
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas) {
-		super.onDraw(canvas);
-		canvas.drawPath(borderPath, checkerPaint);
-		canvas.drawBitmap(bitmap, null, viewRect, null);
-		canvas.drawPath(borderPath, borderPaint);
-
-		canvas.save();
-		if (isWide()) {
-			canvas.translate(w * currentPos, h / 2);
-		}
-		else {
-			canvas.translate(w / 2, h * (1 - currentPos));
-		}
-		canvas.drawPath(pointerPath, pointerPaint);
-		canvas.restore();
-	}
-
-	private boolean isWide() {
-		return w > h;
-	}
-
-	private float valueForTouchPos(float x, float y) {
-		final float val = isWide() ? x / w : 1 - y / h;
-		return Math.max(0, Math.min(1, val));
-	}
-
-	private void optimisePointerColor() {
-		pointerPaint.setColor(getPointerColor(currentPos));
-	}
+    private fun optimisePointerColor() {
+        pointerPaint!!.color = getPointerColor(currentPos)
+    }
 }

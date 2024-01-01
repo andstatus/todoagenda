@@ -13,203 +13,175 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.rarepebble.colorpicker
 
-package com.rarepebble.colorpicker;
+import android.content.Context
+import android.content.res.TypedArray
+import android.graphics.Color
+import android.util.AttributeSet
+import android.util.TypedValue
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.preference.DialogPreference
+import androidx.preference.PreferenceViewHolder
 
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Color;
-import android.util.AttributeSet;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+class ColorPreference @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) :
+    DialogPreference(context, attrs) {
+    var selectNoneButtonText: String? = null
+    var defaultColor: Int? = null
+    private var noneSelectedSummaryText: String? = null
+    var sampleText1: String? = "5_ABC"
+    var sampleText2: String? = "Abcde"
+    private var sampleTextColor1: Int? = null
+    private var sampleTextColor2: Int? = null
+    private val summaryText: CharSequence?
+    var showAlpha = false
+    var showHex = false
+    var showPreview = false
+    private var thumbnail: View? = null
+    private val mPicker: ColorPickerView? = null
 
-import androidx.preference.DialogPreference;
-import androidx.preference.PreferenceViewHolder;
+    init {
+        summaryText = super.getSummary()
+        if (attrs != null) {
+            val a = context.theme.obtainStyledAttributes(attrs, R.styleable.ColorPicker, 0, 0)
+            selectNoneButtonText = a.getString(R.styleable.ColorPicker_colorpicker_selectNoneButtonText)
+            noneSelectedSummaryText = a.getString(R.styleable.ColorPicker_colorpicker_noneSelectedSummaryText)
+            showAlpha = a.getBoolean(R.styleable.ColorPicker_colorpicker_showAlpha, true)
+            showHex = a.getBoolean(R.styleable.ColorPicker_colorpicker_showHex, true)
+            showPreview = a.getBoolean(R.styleable.ColorPicker_colorpicker_showPreview, true)
+        } else {
+            selectNoneButtonText = null
+            noneSelectedSummaryText = null
+            showAlpha = true
+            showHex = true
+            showPreview = true
+        }
+    }
 
-public class ColorPreference extends DialogPreference {
-	final String selectNoneButtonText;
-	Integer defaultColor;
-	private final String noneSelectedSummaryText;
-	public String sampleText1 = "5_ABC";
-	public String sampleText2 = "Abcde";
-	private Integer sampleTextColor1;
-	private Integer sampleTextColor2;
-	private final CharSequence summaryText;
-	final boolean showAlpha;
-	final boolean showHex;
-	final boolean showPreview;
-	private View thumbnail;
-	private ColorPickerView mPicker = null;
+    override fun onBindViewHolder(viewHolder: PreferenceViewHolder) {
+        thumbnail = addThumbnail(viewHolder.itemView)
+        showColor()
+        // Only call after showColor sets any summary text:
+        super.onBindViewHolder(viewHolder)
+    }
 
-	public ColorPreference(Context context) {
-		this(context, null);
-	}
+    override fun onGetDefaultValue(a: TypedArray, index: Int): Any? {
+        defaultColor = readDefaultValue(a, index)
+        return defaultColor
+    }
 
-	public ColorPreference(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		summaryText = super.getSummary();
+    override fun setDefaultValue(defaultValue: Any) {
+        super.setDefaultValue(defaultValue)
+        defaultColor = parseDefaultValue(defaultValue)
+    }
 
-		if (attrs != null) {
-			TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ColorPicker, 0, 0);
-			selectNoneButtonText = a.getString(R.styleable.ColorPicker_colorpicker_selectNoneButtonText);
-			noneSelectedSummaryText = a.getString(R.styleable.ColorPicker_colorpicker_noneSelectedSummaryText);
-			showAlpha = a.getBoolean(R.styleable.ColorPicker_colorpicker_showAlpha, true);
-			showHex = a.getBoolean(R.styleable.ColorPicker_colorpicker_showHex, true);
-			showPreview = a.getBoolean(R.styleable.ColorPicker_colorpicker_showPreview, true);
-		}
-		else {
-			selectNoneButtonText = null;
-			noneSelectedSummaryText = null;
-			showAlpha = true;
-			showHex = true;
-			showPreview = true;
-		}
-	}
+    @Deprecated("Deprecated in Java")
+    override fun onSetInitialValue(restorePersistedValue: Boolean, defaultValue: Any?) {
+        color = if (restorePersistedValue) color else parseDefaultValue(defaultValue)
+    }
 
-	public void onBindViewHolder(PreferenceViewHolder viewHolder) {
-		thumbnail = addThumbnail(viewHolder.itemView);
-		showColor();
-		// Only call after showColor sets any summary text:
-		super.onBindViewHolder(viewHolder);
-	}
+    private fun addThumbnail(view: View): View {
+        val widgetFrameView = view.findViewById<View>(android.R.id.widget_frame) as LinearLayout
+        widgetFrameView.visibility = View.VISIBLE
+        widgetFrameView.removeAllViews()
+        LayoutInflater.from(context).inflate(
+            if (isEnabled) R.layout.color_preference_thumbnail else R.layout.color_preference_thumbnail_disabled,
+            widgetFrameView
+        )
+        return widgetFrameView.findViewById(R.id.thumbnail)
+    }
 
-	@Override
-	protected Object onGetDefaultValue(TypedArray a, int index) {
-		defaultColor = readDefaultValue(a, index);
-		return defaultColor;
-	}
+    private val persistedColorOrDefaultOrNull: Int
+        private get() = if (shouldPersist() && sharedPreferences!!.contains(key)) Integer.valueOf(getPersistedInt(Color.GRAY)) else defaultColor!!
 
-	private static Integer readDefaultValue(TypedArray a, int index) {
-		if (a.peekValue(index) != null) {
-			int type = a.peekValue(index).type;
-			if (type == TypedValue.TYPE_STRING) {
-				return Color.parseColor(standardiseColorDigits(a.getString(index)));
-			}
-			else if (TypedValue.TYPE_FIRST_COLOR_INT <= type && type <= TypedValue.TYPE_LAST_COLOR_INT) {
-				return a.getColor(index, Color.GRAY);
-			}
-			else if (TypedValue.TYPE_FIRST_INT <= type && type <= TypedValue.TYPE_LAST_INT) {
-				return a.getInt(index, Color.GRAY);
-			}
-		}
-		return null;
-	}
+    private fun showColor(color: Int? = persistedColorOrDefaultOrNull) {
+        val thumbColor = color ?: defaultColor
+        if (thumbnail != null) {
+            thumbnail!!.visibility = if (thumbColor == null) View.GONE else View.VISIBLE
+            thumbnail!!.findViewById<View>(R.id.colorPreview).setBackgroundColor(thumbColor ?: 0)
+            if (sampleTextColor1 != null && sampleText1 != null) {
+                val textPreview =
+                    thumbnail!!.findViewById<TextView>(if (sampleTextColor2 == null) R.id.textPreview else R.id.textPreviewUpper)
+                if (textPreview != null) {
+                    textPreview.text = sampleText1
+                    textPreview.setTextColor(sampleTextColor1!!)
+                }
+                if (sampleTextColor2 != null && sampleText2 != null) {
+                    val textPreview2 = thumbnail!!.findViewById<TextView>(R.id.textPreviewLower)
+                    if (textPreview2 != null) {
+                        textPreview2.text = sampleText2
+                        textPreview2.setTextColor(sampleTextColor2!!)
+                    }
+                }
+            }
+        }
+        if (noneSelectedSummaryText != null) {
+            summary = if (thumbColor == null) noneSelectedSummaryText else summaryText
+        }
+    }
 
-	@Override
-	public void setDefaultValue(Object defaultValue) {
-		super.setDefaultValue(defaultValue);
-		defaultColor = parseDefaultValue(defaultValue);
-	}
+    private fun removeSetting() {
+        if (shouldPersist()) {
+            sharedPreferences
+                ?.edit()
+                ?.remove(key)
+                ?.apply()
+        }
+    }
 
-	@Override
-	protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-		setColor(restorePersistedValue ? getColor() : parseDefaultValue(defaultValue));
-	}
+    var color: Int?
+        get() = persistedColorOrDefaultOrNull
+        set(color) {
+            color?.let { persistInt(it) } ?: removeSetting()
+            showColor(color)
+        }
 
-	private static int parseDefaultValue(Object defaultValue) {
-		return (defaultValue == null)
-				? Color.GRAY
-				: (defaultValue instanceof Integer)
-					? (Integer)defaultValue
-					: Color.parseColor(standardiseColorDigits(defaultValue.toString()));
-	}
+    fun setSampleTextColor1(textColor: Int?) {
+        sampleTextColor1 = textColor
+        showColor()
+    }
 
-	private static String standardiseColorDigits(String s) {
-		if (s.charAt(0) == '#' && s.length() <= "#argb".length()) {
-			// Convert #[a]rgb to #[aa]rrggbb
-			String ss = "#";
-			for (int i = 1; i < s.length(); ++i) {
-				ss += s.charAt(i);
-				ss += s.charAt(i);
-			}
-			return ss;
-		}
-		else {
-			return s;
-		}
-	}
+    fun setSampleTextColor2(textColor: Int?) {
+        sampleTextColor2 = textColor
+        showColor()
+    }
 
-	private View addThumbnail(View view) {
-		LinearLayout widgetFrameView = ((LinearLayout)view.findViewById(android.R.id.widget_frame));
-		widgetFrameView.setVisibility(View.VISIBLE);
-		widgetFrameView.removeAllViews();
-		LayoutInflater.from(getContext()).inflate(
-				isEnabled()
-					? R.layout.color_preference_thumbnail
-					: R.layout.color_preference_thumbnail_disabled,
-				widgetFrameView);
-		return widgetFrameView.findViewById(R.id.thumbnail);
-	}
+    companion object {
+        private fun readDefaultValue(a: TypedArray, index: Int): Int? {
+            if (a.peekValue(index) != null) {
+                val type = a.peekValue(index).type
+                if (type == TypedValue.TYPE_STRING) {
+                    return Color.parseColor(standardiseColorDigits(a.getString(index)))
+                } else if (TypedValue.TYPE_FIRST_COLOR_INT <= type && type <= TypedValue.TYPE_LAST_COLOR_INT) {
+                    return a.getColor(index, Color.GRAY)
+                } else if (TypedValue.TYPE_FIRST_INT <= type && type <= TypedValue.TYPE_LAST_INT) {
+                    return a.getInt(index, Color.GRAY)
+                }
+            }
+            return null
+        }
 
-	private Integer getPersistedColorOrDefaultOrNull() {
-		return shouldPersist() && getSharedPreferences().contains(getKey())
-				? Integer.valueOf(getPersistedInt(Color.GRAY))
-				: defaultColor;
-	}
+        private fun parseDefaultValue(defaultValue: Any?): Int {
+            return if (defaultValue == null) Color.GRAY else (if (defaultValue is Int) defaultValue else Color.parseColor(
+                standardiseColorDigits(defaultValue.toString())
+            ))!!
+        }
 
-
-	private void showColor() {
-		showColor(getPersistedColorOrDefaultOrNull());
-	}
-
-	private void showColor(Integer color) {
-		Integer thumbColor = color == null ? defaultColor : color;
-		if (thumbnail != null) {
-			thumbnail.setVisibility(thumbColor == null ? View.GONE : View.VISIBLE);
-			thumbnail.findViewById(R.id.colorPreview).setBackgroundColor(thumbColor == null ? 0 : thumbColor);
-			if (sampleTextColor1 != null && sampleText1 != null) {
-				TextView textPreview = thumbnail.findViewById(sampleTextColor2 == null
-						? R.id.textPreview : R.id.textPreviewUpper);
-				if (textPreview != null) {
-					textPreview.setText(sampleText1);
-					textPreview.setTextColor(sampleTextColor1);
-				}
-				if (sampleTextColor2 != null && sampleText2 != null) {
-					TextView textPreview2 = thumbnail.findViewById(R.id.textPreviewLower);
-					if (textPreview2 != null) {
-						textPreview2.setText(sampleText2);
-						textPreview2.setTextColor(sampleTextColor2);
-					}
-				}
-			}
-		}
-		if (noneSelectedSummaryText != null) {
-			setSummary(thumbColor == null ? noneSelectedSummaryText : summaryText);
-		}
-	}
-
-	private void removeSetting() {
-		if (shouldPersist()) {
-			getSharedPreferences()
-					.edit()
-					.remove(getKey())
-					.apply();
-		}
-	}
-
-	public void setColor(Integer color) {
-		if (color == null) {
-			removeSetting();
-		} else {
-			persistInt(color);
-		}
-		showColor(color);
-	}
-
-	public Integer getColor() {
-		return getPersistedColorOrDefaultOrNull();
-	}
-
-	public void setSampleTextColor1(Integer textColor) {
-		this.sampleTextColor1 = textColor;
-		showColor();
-	}
-
-	public void setSampleTextColor2(Integer textColor) {
-		this.sampleTextColor2 = textColor;
-		showColor();
-	}
+        private fun standardiseColorDigits(s: String?): String? {
+            return if (s!![0] == '#' && s.length <= "#argb".length) {
+                // Convert #[a]rgb to #[aa]rrggbb
+                var ss = "#"
+                for (i in 1 until s.length) {
+                    ss += s[i]
+                    ss += s[i]
+                }
+                ss
+            } else {
+                s
+            }
+        }
+    }
 }
