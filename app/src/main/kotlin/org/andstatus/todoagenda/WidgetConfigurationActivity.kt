@@ -34,7 +34,7 @@ class WidgetConfigurationActivity : AppCompatActivity(), PreferenceFragmentCompa
         super.onPause()
         if (saveOnPause) {
             ApplicationPreferences.save(this, widgetId)
-            EnvironmentChangedReceiver.Companion.updateWidget(this, widgetId)
+            EnvironmentChangedReceiver.updateWidget(this, widgetId)
         }
     }
 
@@ -79,10 +79,10 @@ class WidgetConfigurationActivity : AppCompatActivity(), PreferenceFragmentCompa
             newWidgetId = ApplicationPreferences.getWidgetId(this)
         }
         var restartIntent: Intent? = null
-        if (newWidgetId == 0 || !PermissionsUtil.arePermissionsGranted(this)) {
-            restartIntent = MainActivity.Companion.intentToStartMe(this)
+        if (newWidgetId == 0 || PermissionsUtil.mustRequestPermissions(this)) {
+            restartIntent = MainActivity.intentToStartMe(this)
         } else if (widgetId != 0 && widgetId != newWidgetId) {
-            restartIntent = MainActivity.Companion.intentToConfigure(this, newWidgetId)
+            restartIntent = MainActivity.intentToConfigure(this, newWidgetId)
         } else if (widgetId == 0) {
             widgetId = newWidgetId
             ApplicationPreferences.fromInstanceSettings(this, widgetId)
@@ -97,14 +97,15 @@ class WidgetConfigurationActivity : AppCompatActivity(), PreferenceFragmentCompa
 
     private fun restartIfNeeded() {
         if (widgetId != ApplicationPreferences.getWidgetId(this) ||
-            !PermissionsUtil.arePermissionsGranted(this)
+            PermissionsUtil.mustRequestPermissions(this)
         ) {
             widgetId = 0
-            startActivity(MainActivity.Companion.intentToStartMe(this))
+            startActivity(MainActivity.intentToStartMe(this))
             finish()
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             REQUEST_ID_BACKUP_SETTINGS -> if (resultCode == RESULT_OK && data != null) {
@@ -122,7 +123,7 @@ class WidgetConfigurationActivity : AppCompatActivity(), PreferenceFragmentCompa
     private fun backupSettings(uri: Uri?) {
         if (uri == null) return
         val settings = AllSettings.instanceFromId(this, widgetId)
-        val jsonSettings: String = WidgetData.Companion.fromSettings(this, settings).toJsonString()
+        val jsonSettings: String = WidgetData.fromSettings(this, settings).toJsonString()
         var pfd: ParcelFileDescriptor? = null
         var out: FileOutputStream? = null
         try {
@@ -214,7 +215,7 @@ ${e.message}"""
 
     companion object {
         val EXTRA_GOTO_PREFERENCES_SECTION: String =
-            RemoteViewsFactory.Companion.PACKAGE + ".extra.GOTO_COLORS_PREFERENCES"
+            RemoteViewsFactory.PACKAGE + ".extra.GOTO_COLORS_PREFERENCES"
         const val EXTRA_GOTO_SECTION_COLORS = "colors"
         private val TAG = WidgetConfigurationActivity::class.java.simpleName
         const val FRAGMENT_TAG = "settings_fragment"

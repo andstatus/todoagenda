@@ -8,7 +8,7 @@ import org.andstatus.todoagenda.prefs.AllSettings
 class RemoteViewsService : android.widget.RemoteViewsService() {
     override fun onCreate() {
         Log.d(TAG, "onCreate")
-        AllSettings.ensureLoadedFromFiles(this, false)
+        AllSettings.ensureLoadedFromFiles(this)
     }
 
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory {

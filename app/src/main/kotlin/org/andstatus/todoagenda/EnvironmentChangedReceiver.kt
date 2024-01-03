@@ -16,7 +16,6 @@ import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.util.CalendarIntentUtil
 import org.andstatus.todoagenda.util.DateUtil
 import org.andstatus.todoagenda.util.PermissionsUtil
-import org.andstatus.todoagenda.util.StringUtil
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.joda.time.DateTime
 import java.util.concurrent.TimeUnit
@@ -29,14 +28,15 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.i(TAG, "Received intent: $intent")
-        AllSettings.ensureLoadedFromFiles(context, false)
-        val widgetId = intent?.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0) ?: 0
+        AllSettings.ensureLoadedFromFiles(context)
+        val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0) ?: 0
         val settings = if (widgetId == 0) null else AllSettings.loadedInstances[widgetId]
-        val action0 = if (intent == null) "" else intent.action!!
-        var action =
-            if (intent == null || settings == null || StringUtil.isEmpty(action0)) RemoteViewsFactory.ACTION_REFRESH else action0
-        if (action != RemoteViewsFactory.ACTION_REFRESH && !PermissionsUtil.arePermissionsGranted(context)) {
-            action = RemoteViewsFactory.ACTION_CONFIGURE
+        val action = if (settings == null || intent.action.isNullOrBlank()) {
+            RemoteViewsFactory.ACTION_REFRESH
+        } else if (PermissionsUtil.mustRequestPermissions(context)) {
+            RemoteViewsFactory.ACTION_CONFIGURE
+        } else {
+            intent.action
         }
         when (action) {
             RemoteViewsFactory.ACTION_OPEN_CALENDAR -> {
@@ -55,7 +55,10 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
                 updateWidget(context, widgetId)
             }
 
-            RemoteViewsFactory.ACTION_GOTO_TODAY -> gotoToday(context, widgetId)
+            RemoteViewsFactory.ACTION_GOTO_TODAY -> {
+                gotoToday(context, widgetId)
+            }
+
             RemoteViewsFactory.ACTION_ADD_CALENDAR_EVENT -> {
                 val addCalendarEvent = settings!!.getFirstSource(true)!!.source.providerType
                     .getEventProvider(context, widgetId)
@@ -71,8 +74,8 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             }
 
             RemoteViewsFactory.ACTION_CONFIGURE -> {
-                val configure: Intent = MainActivity.intentToConfigure(context, widgetId)
-                startActivity(context, configure, action, widgetId, "Open widget Settings")
+                val activityIntent: Intent = MainActivity.intentToConfigure(context, widgetId)
+                startActivity(context, activityIntent, action, widgetId, "Open widget Settings")
             }
 
             else -> updateAllWidgets(context)

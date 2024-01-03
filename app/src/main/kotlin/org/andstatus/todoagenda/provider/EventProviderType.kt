@@ -14,6 +14,7 @@ import org.andstatus.todoagenda.task.astrid.AstridCloneTasksProvider
 import org.andstatus.todoagenda.task.dmfs.DmfsOpenTasksContract
 import org.andstatus.todoagenda.task.dmfs.DmfsOpenTasksProvider
 import org.andstatus.todoagenda.task.samsung.SamsungTasksProvider
+import org.andstatus.todoagenda.util.PermissionsUtil
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
 import java.util.concurrent.CopyOnWriteArrayList
@@ -66,6 +67,8 @@ enum class EventProviderType(
     DAY_HEADER(6, true, "", ""),
     LAST_ENTRY(7, true, "", "");
 
+    val isPermissionNeeded: Boolean get() = neededPermissions.contains(permission)
+
     open fun getEventProvider(context: Context, widgetId: Int): EventProvider {
         return EventProvider(this, context, widgetId)
     }
@@ -85,13 +88,13 @@ enum class EventProviderType(
     companion object {
         private val TAG = EventProviderType::class.java.simpleName
         val availableSources: MutableList<OrderedEventSource> = CopyOnWriteArrayList()
-        private val permissionsNeeded: MutableSet<String> = CopyOnWriteArraySet()
+        val neededPermissions: MutableSet<String> = CopyOnWriteArraySet()
 
         @Volatile
         private var initialized = false
         fun initialize(context: Context, reInitialize: Boolean) {
             if (initialized && !reInitialize) return
-            availableSources.clear()
+            forget()
             for (type in entries) {
                 val provider = type.getEventProvider(context, 0)
                 provider.fetchAvailableSources()
@@ -99,11 +102,18 @@ enum class EventProviderType(
                         Log.i(TAG, "provider " + type + ", " + (if (ss.isEmpty()) "no" else ss.size) + " sources")
                         availableSources.addAll(OrderedEventSource.fromSources(ss))
                     }
-                    .onFailure { e: Throwable? ->
-                        Log.i(TAG, "provider " + type + " initialization error: " + e!!.message)
-                        if (e is SecurityException) {
-                            Log.i(TAG, "provider " + type + ", needs " + type.permission)
-                            permissionsNeeded.add(type.permission)
+                    .onFailure { e: Throwable ->
+                        if (PermissionsUtil.isPermissionGranted(context, type.permission)) {
+                            Log.i(
+                                TAG, "provider '$type' has granted permission ${type.permission}" +
+                                    ", initialization error: ${e.message}"
+                            )
+                        } else {
+                            Log.i(
+                                TAG, "provider '$type' needs permission ${type.permission}" +
+                                    ", initialization error: ${e.message}"
+                            )
+                            neededPermissions.add(type.permission)
                         }
                     }
             }
@@ -117,12 +127,9 @@ enum class EventProviderType(
             return EMPTY
         }
 
-        val neededPermissions: Set<String>
-            get() = permissionsNeeded
-
         fun forget() {
             availableSources.clear()
-            permissionsNeeded.clear()
+            neededPermissions.clear()
             initialized = false
         }
 

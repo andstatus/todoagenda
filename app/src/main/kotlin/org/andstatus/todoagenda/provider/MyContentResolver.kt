@@ -7,7 +7,6 @@ import android.util.Log
 import io.vavr.control.Try
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
-import org.andstatus.todoagenda.util.PermissionsUtil
 import java.util.Arrays
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Function
@@ -25,9 +24,8 @@ class MyContentResolver(val type: EventProviderType, val context: Context, val w
         )
     }
 
-    fun isPermissionNeeded(context: Context?, permission: String?): Boolean {
-        return settings.isLiveMode && PermissionsUtil.isPermissionNeeded(context, permission)
-    }
+    fun isPermissionNeeded(providerType: EventProviderType): Boolean =
+        settings.isLiveMode && providerType.isPermissionNeeded
 
     fun <R> foldAvailableSources(
         uri: Uri, projection: Array<String>?,

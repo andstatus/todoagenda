@@ -19,7 +19,7 @@
         tools:text="@string/permissions_justification" />
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/instancesList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="@dimen/activity_vertical_margin"
@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="end"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/grant_permissions"
@@ -42,8 +42,20 @@
             android:layout_marginEnd="@dimen/activity_vertical_margin"
             android:layout_marginStart="@dimen/activity_vertical_margin"
             android:layout_marginTop="24dp"
-            android:onClick="grantPermissions"
+            android:onClick="onGrantPermissionsButtonClick"
             android:text="@string/grant_permissions" />
+
+        <Button
+            android:id="@+id/dont_ask_for_permissions_button"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/activity_vertical_margin"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_marginTop="24dp"
+            android:onClick="onDontAskForPermissionsButtonClick"
+            android:text="@string/dont_ask_for_permissions" />
 
         <Button
             android:id="@+id/go_to_home_screen_button"

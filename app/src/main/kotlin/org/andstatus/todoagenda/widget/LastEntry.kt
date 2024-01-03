@@ -23,7 +23,7 @@ class LastEntry(settings: InstanceSettings, val type: LastEntryType, date: DateT
     companion object {
         fun forEmptyList(settings: InstanceSettings): LastEntry {
             val entryType =
-                if (PermissionsUtil.arePermissionsGranted(settings.context)) LastEntryType.EMPTY else LastEntryType.NO_PERMISSIONS
+                if (PermissionsUtil.mustRequestPermissions(settings.context)) LastEntryType.NO_PERMISSIONS else LastEntryType.EMPTY
             return LastEntry(settings, entryType, settings.clock().now())
         }
 

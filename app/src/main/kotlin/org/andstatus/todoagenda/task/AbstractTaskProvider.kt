@@ -18,7 +18,7 @@ abstract class AbstractTaskProvider(type: EventProviderType, context: Context, w
 
     fun queryEvents(): List<TaskEvent> {
         initialiseParameters()
-        return if (myContentResolver.isPermissionNeeded(context, type.permission) ||
+        return if (myContentResolver.isPermissionNeeded(type) ||
             settings.getActiveEventSources(type).isEmpty()
         ) {
             emptyList()

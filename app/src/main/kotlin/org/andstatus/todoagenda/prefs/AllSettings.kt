@@ -23,7 +23,7 @@ object AllSettings {
     private var instancesLoaded = false
     private val instances: MutableMap<Int, InstanceSettings> = ConcurrentHashMap()
     fun instanceFromId(context: Context, widgetId: Int): InstanceSettings {
-        ensureLoadedFromFiles(context, false)
+        ensureLoadedFromFiles(context)
         synchronized(instances) {
             val settings = instances[widgetId]
             return settings ?: newInstance(context, widgetId)
@@ -49,7 +49,9 @@ object AllSettings {
         }
     }
 
-    fun ensureLoadedFromFiles(context: Context, reInitialize: Boolean) {
+    fun reInitialize(context: Context) = ensureLoadedFromFiles(context, true)
+
+    fun ensureLoadedFromFiles(context: Context, reInitialize: Boolean = false) {
         if (instancesLoaded && !reInitialize) return
         synchronized(instances) {
             if (instancesLoaded && !reInitialize) return
@@ -108,7 +110,7 @@ object AllSettings {
     }
 
     fun delete(context: Context, widgetId: Int) {
-        ensureLoadedFromFiles(context, false)
+        ensureLoadedFromFiles(context)
         synchronized(instances) {
             instances.remove(widgetId)
             SettingsStorage.delete(context, getStorageKey(widgetId))
@@ -151,7 +153,7 @@ object AllSettings {
     }
 
     fun getInstances(context: Context): Map<Int, InstanceSettings> {
-        ensureLoadedFromFiles(context, false)
+        ensureLoadedFromFiles(context)
         return instances
     }
 

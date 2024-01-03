@@ -16,6 +16,8 @@ import org.andstatus.todoagenda.widget.WidgetHeaderLayout
 object ApplicationPreferences {
     const val PREF_DIFFERENT_COLORS_FOR_DARK = "differentColorsForDark"
     private const val PREF_COLOR_THEME_TYPE = "colorThemeType"
+    private const val PREF_ASK_FOR_PERMISSIONS = "askForPermissions"
+
     fun fromInstanceSettings(context: Context, widgetId: Int) {
         synchronized(ApplicationPreferences::class.java) {
             val settings = AllSettings.instanceFromId(context, widgetId)
@@ -80,6 +82,14 @@ object ApplicationPreferences {
         if (context != null && wigdetId != 0 && wigdetId == getWidgetId(context)) {
             AllSettings.saveFromApplicationPreferences(context, wigdetId)
         }
+    }
+
+    fun isAskForPermissions(context: Context): Boolean {
+        return getBoolean(context, PREF_ASK_FOR_PERMISSIONS, true)
+    }
+
+    fun setAskForPermissions(context: Context, value: Boolean) {
+        setBoolean(context, PREF_ASK_FOR_PERMISSIONS, value)
     }
 
     fun getWidgetId(context: Context?): Int {
@@ -426,7 +436,6 @@ object ApplicationPreferences {
         }
     }
 
-    // TODO: is return type nullable?
     fun getString(context: Context, key: String?, defaultValue: String = ""): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         return (if (prefs == null) defaultValue

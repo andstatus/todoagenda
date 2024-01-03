@@ -31,7 +31,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
     fun queryEvents(): List<CalendarEvent> {
         initialiseParameters()
         myContentResolver.onQueryEvents()
-        if (myContentResolver.isPermissionNeeded(context, type.permission) ||
+        if (myContentResolver.isPermissionNeeded(type) ||
             settings.getActiveEventSources(type).isEmpty()
         ) {
             return emptyList()

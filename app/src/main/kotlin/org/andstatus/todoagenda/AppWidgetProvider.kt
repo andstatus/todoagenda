@@ -26,7 +26,7 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(TAG, "onReceive, intent:$intent")
-        AllSettings.ensureLoadedFromFiles(context, false)
+        AllSettings.ensureLoadedFromFiles(context)
         val action = intent.action
         if (AppWidgetManager.ACTION_APPWIDGET_UPDATE == action) {
             val extras = intent.extras

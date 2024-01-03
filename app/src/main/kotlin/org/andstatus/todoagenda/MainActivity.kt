@@ -16,7 +16,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.prefs.ApplicationPreferences.isAskForPermissions
 import org.andstatus.todoagenda.provider.EventProviderType
+import org.andstatus.todoagenda.provider.EventProviderType.Companion.neededPermissions
 import org.andstatus.todoagenda.util.IntentUtil
 import org.andstatus.todoagenda.util.PermissionsUtil
 
@@ -24,41 +27,18 @@ import org.andstatus.todoagenda.util.PermissionsUtil
  * @author yvolk@yurivolkov.com
  */
 class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
-    var permissionsGranted = false
-    var listView: ListView? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try {
-            setContentView(R.layout.activity_main)
-        } catch (e: Exception) {
-            Log.w("onCreate", "Failed to find layout", e)
-            finish()
-            return
-        }
-        listView = findViewById(android.R.id.list)
-        checkPermissions()
-        if (openThisActivity()) {
+        setContentView(R.layout.activity_main)
+        AllSettings.reInitialize(this)
+        if (isOpenThisActivity()) {
             updateScreen()
         }
     }
 
-    private fun checkPermissionsAndRequestThem() {
-        checkPermissions()
-        if (!permissionsGranted) {
-            val neededPermissions: List<String> = EventProviderType.neededPermissions.toList()
-            Log.d(this.localClassName, "Requesting permissions: $neededPermissions")
-            val arr: Array<String> = Array(neededPermissions.size) {i -> neededPermissions[i] }
-            ActivityCompat.requestPermissions(this, arr, 1)
-        }
-    }
-
-    private fun checkPermissions() {
-        permissionsGranted = PermissionsUtil.arePermissionsGranted(this)
-    }
-
-    private fun openThisActivity(): Boolean {
+    private fun isOpenThisActivity(): Boolean {
         var widgetIdToConfigure = 0
-        if (permissionsGranted) {
+        if (!PermissionsUtil.mustRequestPermissions(this)) {
             widgetIdToConfigure = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
             if (widgetIdToConfigure == 0 && AllSettings.getInstances(this).size == 1) {
                 widgetIdToConfigure = AllSettings.getInstances(this).keys.iterator().next()
@@ -78,32 +58,37 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     }
 
     private fun updateScreen() {
-        var messageResourceId = R.string.permissions_justification
-        if (permissionsGranted) {
-            messageResourceId = if (AllSettings.getInstances(this).isEmpty()) {
+        val needToRequestPermission = PermissionsUtil.mustRequestPermissions(this)
+        val messageResourceId = if (needToRequestPermission) {
+            R.string.permissions_justification
+        } else {
+            if (AllSettings.getInstances(this).isEmpty()) {
                 R.string.no_widgets_found
             } else {
                 R.string.select_a_widget_to_configure
             }
         }
-        val message = findViewById<TextView>(R.id.message)
-        message?.setText(messageResourceId)
-        if (!AllSettings.getInstances(this).isEmpty() && permissionsGranted) {
-            fillWidgetList()
-            listView!!.visibility = View.VISIBLE
-        } else {
-            listView!!.visibility = View.GONE
+        var text = this.getText(messageResourceId)
+        if (needToRequestPermission) {
+            text = text.toString() + EventProviderType.neededPermissions
+                .fold("\n") { acc, it -> "$acc\n$it" }
         }
-        val goToHomeScreenButton = findViewById<Button>(R.id.go_to_home_screen_button)
-        if (goToHomeScreenButton != null) {
-            goToHomeScreenButton.visibility = if (permissionsGranted &&
-                AllSettings.getInstances(this).isEmpty()
-            ) View.VISIBLE else View.GONE
-        }
-        val grantPermissionsButton = findViewById<Button>(R.id.grant_permissions)
-        if (grantPermissionsButton != null) {
-            grantPermissionsButton.visibility = if (permissionsGranted) View.GONE else View.VISIBLE
-        }
+        findViewById<TextView>(R.id.message)?.setText(text)
+
+        findViewById<ListView>(R.id.instancesList)?.visibility =
+            if (!needToRequestPermission && AllSettings.getInstances(this).isNotEmpty()) {
+                fillWidgetList()
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        findViewById<Button>(R.id.grant_permissions)?.visibility =
+            if (needToRequestPermission) View.VISIBLE else View.GONE
+        findViewById<Button>(R.id.dont_ask_for_permissions_button)?.visibility =
+            if (needToRequestPermission && isAskForPermissions(this)) View.VISIBLE else View.GONE
+        findViewById<Button>(R.id.go_to_home_screen_button)?.visibility =
+            if (!needToRequestPermission && AllSettings.getInstances(this).isEmpty()) View.VISIBLE else View.GONE
+
         EnvironmentChangedReceiver.updateAllWidgets(this)
     }
 
@@ -115,37 +100,47 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
             map[KEY_ID] = Integer.toString(settings.widgetId)
             data.add(map)
         }
-        listView!!.adapter = SimpleAdapter(
-            this,
-            data,
-            R.layout.widget_list_item,
-            arrayOf(KEY_VISIBLE_NAME),
-            intArrayOf(R.id.widget_name)
-        )
-        listView!!.onItemClickListener = OnItemClickListener { parent, view, position, id ->
-            val stringStringMap = data[position]
-            val widgetId: String? = stringStringMap[KEY_ID]
-            if (widgetId.isNullOrBlank()) {
-                Log.w("fillWidgetList", "No $KEY_ID in $stringStringMap")
-            } else {
-                val intent: Intent = WidgetConfigurationActivity.intentToStartMe(
-                    this@MainActivity, Integer.valueOf(widgetId)
-                )
-                startActivity(intent)
+        findViewById<ListView>(R.id.instancesList)?.let { listView ->
+            listView.adapter = SimpleAdapter(
+                this,
+                data,
+                R.layout.widget_list_item,
+                arrayOf(KEY_VISIBLE_NAME),
+                intArrayOf(R.id.widget_name)
+            )
+            listView.onItemClickListener = OnItemClickListener { parent, view, position, id ->
+                val stringStringMap = data[position]
+                val widgetId: String? = stringStringMap[KEY_ID]
+                if (widgetId.isNullOrBlank()) {
+                    Log.w("fillWidgetList", "No $KEY_ID in $stringStringMap")
+                } else {
+                    val intent: Intent = WidgetConfigurationActivity.intentToStartMe(
+                        this@MainActivity, Integer.valueOf(widgetId)
+                    )
+                    startActivity(intent)
+                }
+                finish()
             }
-            finish()
         }
     }
 
-    fun grantPermissions(view: View?) {
-        checkPermissionsAndRequestThem()
+    fun onGrantPermissionsButtonClick(view: View?) {
+        neededPermissions.toList().takeIf { it.isNotEmpty() }?.let { neededPermissions ->
+            Log.d(localClassName, "Requesting permissions: $neededPermissions")
+            val arr: Array<String> = Array(neededPermissions.size) { i -> neededPermissions[i] }
+            ActivityCompat.requestPermissions(this, arr, 1)
+        }
         updateScreen()
     }
 
+    fun onDontAskForPermissionsButtonClick(view: View?) {
+        ApplicationPreferences.setAskForPermissions(this, false)
+        onHomeButtonClick(view)
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        AllSettings.ensureLoadedFromFiles(this, true)
+        AllSettings.reInitialize(this)
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        checkPermissions()
         updateScreen()
     }
 

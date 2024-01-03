@@ -20,6 +20,7 @@
     <string name="grant_permissions">Grant permissions</string>
     <string name="grant_permissions_verbose">Widget requires permission to read calendars and tasks.\n
         Tap here to grant permissions.</string>
+    <string name="dont_ask_for_permissions">Don\'t ask for permissions anymore</string>
     <string name="past_header">Past and due</string>
     <string name="end_of_list_header">Other events</string>
     <string name="permissions_justification">Welcome to the Todo Agenda, the easy access to your calendars and tasks.\n\n
