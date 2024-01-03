@@ -7,6 +7,7 @@ import android.util.Log
 import org.andstatus.todoagenda.EnvironmentChangedReceiver
 import org.andstatus.todoagenda.calendar.CalendarEventProvider
 import org.andstatus.todoagenda.calendar.CalendarEventVisualizer
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.EventSource
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.task.TaskVisualizer
@@ -116,6 +117,9 @@ enum class EventProviderType(
                             neededPermissions.add(type.permission)
                         }
                     }
+            }
+            if (availableSources.isEmpty()) {
+                ApplicationPreferences.setAskForPermissions(context, true)
             }
             initialized = true
         }

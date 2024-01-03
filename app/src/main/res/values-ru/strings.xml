@@ -18,6 +18,7 @@
     <string name="no_title">(Без заголовка)</string>
     <string name="grant_permissions">Предоставить разрешения</string>
     <string name="grant_permissions_verbose">Для Виджета требуется разрешение на чтение календарей и задач. \nНажмите здесь, чтобы предоставить это разрешение.</string>
+    <string name="dont_ask_for_permissions">Больше не спрашивать разрешения</string>
     <string name="past_header">Просроченные</string>
     <string name="end_of_list_header">Другие события</string>
     <string name="permissions_justification">Добро пожаловать в приложение Todo Agenda - легкий доступ к вашим календарям и задачам.\n\nДля того, чтобы получить максимум от этого виджета, Вам необходимо предоставить этому приложению доступ к календарям и задачам.</string>

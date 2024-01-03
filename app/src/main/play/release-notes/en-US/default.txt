@@ -1,2 +1,7 @@
-v4.7.3 Filter for Today and Tomorrow. Show based on keywords in a title. Allow changing language of User Interface for Android 13+
+v4.8.0. Fixed "Default Time zone in app doesn't change, when Android System Time Zone changes".
+Fixed "Do not make all permissions mandatory".
+App converted from Java to Kotlin.
+v4.7.3. Filter for Today and Tomorrow.
+Show based on keywords in a title.
+Allow changing language of User Interface for Android 13+
 

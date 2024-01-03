@@ -34,7 +34,9 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         val action = if (settings == null || intent.action.isNullOrBlank()) {
             RemoteViewsFactory.ACTION_REFRESH
         } else if (PermissionsUtil.mustRequestPermissions(context)) {
-            RemoteViewsFactory.ACTION_CONFIGURE
+            // Recheck
+            AllSettings.reInitialize(context)
+            if (PermissionsUtil.mustRequestPermissions(context)) RemoteViewsFactory.ACTION_CONFIGURE else intent.action
         } else {
             intent.action
         }

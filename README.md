@@ -85,13 +85,20 @@ In particular, see these solutions:
 
 ## Changelog
 
+<a id="v4.8"/>
+
+### 2024-01-03 v4.8.0 Time zone changes fixed
+* Fixed "[Default Time zone in app doesn't change, when Android System Time Zone changes](https://github.com/andstatus/todoagenda/issues/106)".
+* Fixed "[Do not make all permissions mandatory](https://github.com/andstatus/todoagenda/issues/80)".
+* App converted from Java to Kotlin.
+
 <a id="v4.7"/>
 
 ### 2023-12-31 v4.7.3 Show based on keywords in a title
-* Date range filtering extended with "[Today and Tomorrow](https://github.com/plusonelabs/calendar-widget/issues/123)"
+* Date range filtering extended with "[Today and Tomorrow](https://github.com/andstatus/todoagenda/issues/123)"
   option. This is different from the "One day" option as that hides events after current time on the next day,
   which is a bit confusing.
-* [Show based on keywords in a title](https://github.com/plusonelabs/calendar-widget/issues/122) option added,
+* [Show based on keywords in a title](https://github.com/andstatus/todoagenda/issues/122) option added,
   allowing to see events that have certain text included. 
   In addition to existing option "Hide based on keywords in a title".
 * Allow changing language of User Interface for Android 13+ in Android System Settings - Apps, see

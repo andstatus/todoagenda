@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView.OnItemClickListener
@@ -13,13 +14,11 @@ import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.ApplicationPreferences.isAskForPermissions
 import org.andstatus.todoagenda.provider.EventProviderType
-import org.andstatus.todoagenda.provider.EventProviderType.Companion.neededPermissions
 import org.andstatus.todoagenda.util.IntentUtil
 import org.andstatus.todoagenda.util.PermissionsUtil
 
@@ -85,7 +84,9 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
         findViewById<Button>(R.id.grant_permissions)?.visibility =
             if (needToRequestPermission) View.VISIBLE else View.GONE
         findViewById<Button>(R.id.dont_ask_for_permissions_button)?.visibility =
-            if (needToRequestPermission && isAskForPermissions(this)) View.VISIBLE else View.GONE
+            if (needToRequestPermission && isAskForPermissions(this) &&
+                EventProviderType.availableSources.isNotEmpty()
+            ) View.VISIBLE else View.GONE
         findViewById<Button>(R.id.go_to_home_screen_button)?.visibility =
             if (!needToRequestPermission && AllSettings.getInstances(this).isEmpty()) View.VISIBLE else View.GONE
 
@@ -125,23 +126,18 @@ class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
     }
 
     fun onGrantPermissionsButtonClick(view: View?) {
-        neededPermissions.toList().takeIf { it.isNotEmpty() }?.let { neededPermissions ->
-            Log.d(localClassName, "Requesting permissions: $neededPermissions")
-            val arr: Array<String> = Array(neededPermissions.size) { i -> neededPermissions[i] }
-            ActivityCompat.requestPermissions(this, arr, 1)
-        }
-        updateScreen()
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            Uri.fromParts("package", packageName, null)
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
     }
 
     fun onDontAskForPermissionsButtonClick(view: View?) {
         ApplicationPreferences.setAskForPermissions(this, false)
         onHomeButtonClick(view)
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        AllSettings.reInitialize(this)
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        updateScreen()
     }
 
     fun onHomeButtonClick(view: View?) {
