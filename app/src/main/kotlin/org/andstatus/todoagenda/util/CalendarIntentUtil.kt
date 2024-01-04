@@ -7,17 +7,17 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
 object CalendarIntentUtil {
-    private const val KEY_DETAIL_VIEW = "DETAIL_VIEW"
     private const val TIME = "time"
-    fun newOpenCalendarAtDayIntent(goToTime: DateTime?): Intent? {
+
+    /**
+     * https://developer.android.com/guide/topics/providers/calendar-provider.html#intents
+     */
+    fun newOpenCalendarAtDayIntent(goToTime: DateTime): Intent {
         val intent = IntentUtil.newViewIntent()
         val builder = CalendarContract.CONTENT_URI.buildUpon()
         builder.appendPath(TIME)
-        if (goToTime!!.millis != 0L) {
-            intent!!.putExtra(KEY_DETAIL_VIEW, true)
-            ContentUris.appendId(builder, goToTime.millis)
-        }
-        intent!!.setData(builder.build())
+        ContentUris.appendId(builder, goToTime.millis)
+        intent.setData(builder.build())
         return intent
     }
 

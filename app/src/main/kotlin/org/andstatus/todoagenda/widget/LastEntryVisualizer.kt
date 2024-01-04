@@ -46,7 +46,7 @@ class LastEntryVisualizer(context: Context, widgetId: Int) :
         return rv
     }
 
-    override fun newViewEntryIntent(widgetEntry: WidgetEntry<*>): Intent? {
+    override fun newViewEntryIntent(widgetEntry: WidgetEntry<*>): Intent {
         val entry = widgetEntry as LastEntry
         when (entry.type) {
             LastEntryType.EMPTY, LastEntryType.NOT_LOADED -> return CalendarIntentUtil.newOpenCalendarAtDayIntent(

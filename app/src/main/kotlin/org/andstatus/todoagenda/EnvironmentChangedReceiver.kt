@@ -29,7 +29,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         Log.i(TAG, "Received intent: $intent")
         AllSettings.ensureLoadedFromFiles(context)
-        val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0) ?: 0
+        val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
         val settings = if (widgetId == 0) null else AllSettings.loadedInstances[widgetId]
         val action = if (settings == null || intent.action.isNullOrBlank()) {
             RemoteViewsFactory.ACTION_REFRESH
@@ -62,14 +62,14 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             }
 
             RemoteViewsFactory.ACTION_ADD_CALENDAR_EVENT -> {
-                val addCalendarEvent = settings!!.getFirstSource(true)!!.source.providerType
+                val addCalendarEvent = settings!!.getFirstSource(true).source.providerType
                     .getEventProvider(context, widgetId)
                     .addEventIntent
                 startActivity(context, addCalendarEvent, action, widgetId, "Add calendar event")
             }
 
             RemoteViewsFactory.ACTION_ADD_TASK -> {
-                val addTask = settings!!.getFirstSource(false)!!.source.providerType
+                val addTask = settings!!.getFirstSource(false).source.providerType
                     .getEventProvider(context, widgetId)
                     .addEventIntent
                 startActivity(context, addTask, action, widgetId, "Add task")
@@ -85,7 +85,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
     }
 
     private fun gotoToday(context: Context, widgetId: Int) {
-        val factory: RemoteViewsFactory? = RemoteViewsFactory.factories.get(widgetId)
+        val factory: RemoteViewsFactory? = RemoteViewsFactory.factories[widgetId]
         val position1 = factory?.tomorrowsPosition ?: 0
         val position2 = factory?.todaysPosition ?: 0
         gotoPosition(context, widgetId, position1)
@@ -151,10 +151,9 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         private fun scheduleMidnightAlarms(context: Context, instances: Map<Int, InstanceSettings>) {
             val alarmTimes: MutableSet<DateTime> = HashSet()
             for (settings in instances.values) {
-                alarmTimes.add(settings!!.clock().now().withTimeAtStartOfDay().plusDays(1))
+                alarmTimes.add(settings.clock().now().withTimeAtStartOfDay().plusDays(1))
             }
-            var counter = 0
-            for (alarmTime in alarmTimes) {
+            for ((counter, alarmTime) in alarmTimes.withIndex()) {
                 val intent = Intent(context, EnvironmentChangedReceiver::class.java)
                     .setAction(RemoteViewsFactory.ACTION_MIDNIGHT_ALARM)
                     .setData(Uri.parse("intent:midnightAlarm$counter"))
@@ -166,14 +165,13 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
                 )
                 val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
                 am?.set(AlarmManager.RTC, alarmTime.millis, pendingIntent)
-                counter++
             }
         }
 
         private fun schedulePeriodicAlarms(context: Context, instances: Map<Int, InstanceSettings>) {
             var periodMinutes = TimeUnit.DAYS.toMinutes(1).toInt()
             for (settings in instances.values) {
-                val period = settings!!.refreshPeriodMinutes
+                val period = settings.refreshPeriodMinutes
                 if (period > 0 && period < periodMinutes) {
                     periodMinutes = period
                 }

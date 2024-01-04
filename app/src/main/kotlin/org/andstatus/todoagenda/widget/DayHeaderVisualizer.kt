@@ -31,7 +31,7 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
             if (horizontalLineBelowDayHeader) R.layout.day_header_separator_below else R.layout.day_header_separator_above
         )
         rv.setInt(R.id.day_header_title_wrapper, "setGravity", alignment.gravity)
-        val textColorPref: TextColorPref = TextColorPref.Companion.forDayHeader(entry)
+        val textColorPref: TextColorPref = TextColorPref.forDayHeader(entry)
         val themeContext = settings.colors().getThemeContext(textColorPref)
         RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
         if (settings.isCompactLayout) {
@@ -60,7 +60,7 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
         return rv
     }
 
-    override fun newViewEntryIntent(eventEntry: WidgetEntry<*>): Intent? {
+    override fun newViewEntryIntent(eventEntry: WidgetEntry<*>): Intent {
         val entry = eventEntry as DayHeader
         return CalendarIntentUtil.newOpenCalendarAtDayIntent(entry.entryDate)
     }
@@ -87,11 +87,11 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
         }
     }
 
-    protected fun getTitleString(entry: DayHeader): CharSequence? {
+    protected fun getTitleString(entry: DayHeader): CharSequence {
         return when (entry.entryPosition) {
             WidgetEntryPosition.PAST_AND_DUE_HEADER -> context.getString(R.string.past_header)
             WidgetEntryPosition.END_OF_LIST_HEADER -> context.getString(R.string.end_of_list_header)
-            else -> if (MyClock.Companion.isDateDefined(entry.entryDate)) settings.dayHeaderDateFormatter()
+            else -> if (MyClock.isDateDefined(entry.entryDate)) settings.dayHeaderDateFormatter()
                 .formatDate(entry.entryDate) else "??? " + entry.entryPosition
         }
     }
