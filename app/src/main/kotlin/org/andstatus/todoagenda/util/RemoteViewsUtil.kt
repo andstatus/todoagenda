@@ -117,6 +117,13 @@ object RemoteViewsUtil {
         }
     }
 
+    /**
+     * Note: Looks like "setEllipsize" is not supported for RemoteViews
+     * */
+    fun setMaxLines(rv: RemoteViews, viewId: Int, maxLines: Int) {
+        rv.setInt(viewId, "setMaxLines", maxLines)
+    }
+
     fun setMultiline(rv: RemoteViews, viewId: Int, multiLine: Boolean) {
         rv.setBoolean(viewId, METHOD_SET_SINGLE_LINE, !multiLine)
     }

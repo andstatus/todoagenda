@@ -20,18 +20,30 @@ class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreference
         super.onResume()
         showEventEntryLayout()
         showWidgetHeaderLayout()
+        showMaxLinesTitle()
+        showMaxLinesDetails()
         preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
     }
 
-    private fun showEventEntryLayout() {
-        val preference = findPreference<Preference>(InstanceSettings.PREF_EVENT_ENTRY_LAYOUT)
-        preference?.setSummary(ApplicationPreferences.getEventEntryLayout(requireActivity()).summaryResId)
-    }
+    private fun showEventEntryLayout() =
+        findPreference<Preference>(InstanceSettings.PREF_EVENT_ENTRY_LAYOUT)?.apply {
+            setSummary(ApplicationPreferences.getEventEntryLayout(requireActivity()).summaryResId)
+        }
 
-    private fun showWidgetHeaderLayout() {
-        val preference = findPreference<Preference>(InstanceSettings.PREF_WIDGET_HEADER_LAYOUT)
-        preference?.setSummary(ApplicationPreferences.getWidgetHeaderLayout(requireActivity()).summaryResId)
-    }
+    private fun showWidgetHeaderLayout() =
+        findPreference<Preference>(InstanceSettings.PREF_WIDGET_HEADER_LAYOUT)?.apply {
+            setSummary(ApplicationPreferences.getWidgetHeaderLayout(requireActivity()).summaryResId)
+        }
+
+    private fun showMaxLinesTitle() =
+        findPreference<Preference>(InstanceSettings.PREF_MAXLINES_TITLE)?.apply {
+            summary = ApplicationPreferences.getMaxLinesTitle(requireActivity()).toString()
+        }
+
+    private fun showMaxLinesDetails() =
+        findPreference<Preference>(InstanceSettings.PREF_MAXLINES_DETAILS)?.apply {
+            summary = ApplicationPreferences.getMaxLinesDetails(requireActivity()).toString()
+        }
 
     override fun onDisplayPreferenceDialog(preference: Preference) {
         var dialogFragment: DialogFragment? = null
@@ -55,6 +67,8 @@ class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreference
         when (key) {
             InstanceSettings.PREF_EVENT_ENTRY_LAYOUT -> showEventEntryLayout()
             InstanceSettings.PREF_WIDGET_HEADER_LAYOUT -> showWidgetHeaderLayout()
+            InstanceSettings.PREF_MAXLINES_TITLE -> showMaxLinesTitle()
+            InstanceSettings.PREF_MAXLINES_DETAILS -> showMaxLinesDetails()
             else -> {}
         }
     }

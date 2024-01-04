@@ -60,7 +60,9 @@ object ApplicationPreferences {
             setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
             setString(context, InstanceSettings.PREF_EVENT_ENTRY_LAYOUT, settings.eventEntryLayout.value)
             setBoolean(context, InstanceSettings.PREF_MULTILINE_TITLE, settings.isMultilineTitle)
+            setString(context, InstanceSettings.PREF_MAXLINES_TITLE, settings.maxLinesTitle.toString())
             setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
+            setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
             setBoolean(
                 context, InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, settings
                     .showOnlyClosestInstanceOfRecurringEvent
@@ -353,7 +355,7 @@ object ApplicationPreferences {
         )
     }
 
-    fun isMultilineTitle(context: Context?): Boolean {
+    fun isMultilineTitle(context: Context): Boolean {
         return getBoolean(
             context,
             InstanceSettings.PREF_MULTILINE_TITLE,
@@ -361,11 +363,27 @@ object ApplicationPreferences {
         )
     }
 
-    fun isMultilineDetails(context: Context?): Boolean {
+    fun getMaxLinesTitle(context: Context): Int {
+        return getIntStoredAsString(
+            context,
+            InstanceSettings.PREF_MAXLINES_TITLE,
+            InstanceSettings.PREF_MAXLINES_TITLE_DEFAULT
+        )
+    }
+
+    fun isMultilineDetails(context: Context): Boolean {
         return getBoolean(
             context,
             InstanceSettings.PREF_MULTILINE_DETAILS,
             InstanceSettings.PREF_MULTILINE_DETAILS_DEFAULT
+        )
+    }
+
+    fun getMaxLinesDetails(context: Context): Int {
+        return getIntStoredAsString(
+            context,
+            InstanceSettings.PREF_MAXLINES_DETAILS,
+            InstanceSettings.PREF_MAXLINES_DETAILS_DEFAULT
         )
     }
 

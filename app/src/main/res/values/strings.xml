@@ -100,6 +100,8 @@
     <string name="show_event_icon_title">Show event icon</string>
     <string name="show_event_icon_desc">Show Calendar color bar / Task icon for event</string>
     <string name="entry_date_format">Entry date format</string>
+    <string name="maxlines_title_title">Maximum number of lines in a title</string>
+    <string name="maxlines_details_title">Maximum number of lines in details</string>
     <string name="multiline_details_title">Multiline details</string>
     <string name="multiline_details_desc">Spread event time and location over multiple lines</string>
 

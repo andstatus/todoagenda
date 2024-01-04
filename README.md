@@ -85,6 +85,12 @@ In particular, see these solutions:
 
 ## Changelog
 
+<a id="next"/>
+
+### 2024- ...
+* Added settings to limit maximum number of lines for an event's title and for details (i.e. for time and location) 
+  [#109](https://github.com/andstatus/todoagenda/issues/109)".
+
 <a id="v4.8"/>
 
 ### 2024-01-03 v4.8.0 Time zone changes fixed

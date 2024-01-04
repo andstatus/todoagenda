@@ -84,6 +84,8 @@
     <string name="show_event_icon_title">Показывать значок события</string>
     <string name="show_event_icon_desc">Показать цветовую полоску календаря / значок задачи для события</string>
     <string name="entry_date_format">Формат даты элемента списка</string>
+    <string name="maxlines_title_title">Максимальное количество строк в заголовке события</string>
+    <string name="maxlines_details_title">Максимальное количество строк в подробностях</string>
     <string name="multiline_details_title">Многострочные подробности</string>
     <string name="multiline_details_desc">Длинный текст с информацией о времени и местоположении продолжается на несколько строк</string>
     <!-- Date format preference -->

@@ -100,11 +100,25 @@
             android:summary="@string/appearance_multiline_title_desc"
             android:title="@string/appearance_multiline_title_title" />
 
+        <org.andstatus.todoagenda.prefs.MultilineEditTextPreference
+            android:key="maxLinesTitle"
+            android:defaultValue="5"
+            android:summary="5"
+            android:title="@string/maxlines_title_title"
+            android:dependency="multiline_title" />
+
         <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
             android:key="multiline_details"
             android:defaultValue="false"
             android:summary="@string/multiline_details_desc"
             android:title="@string/multiline_details_title" />
+
+        <org.andstatus.todoagenda.prefs.MultilineEditTextPreference
+            android:key="maxLinesDetails"
+            android:defaultValue="5"
+            android:summary="5"
+            android:title="@string/maxlines_details_title"
+            android:dependency="multiline_details" />
     </PreferenceCategory>
 
 </PreferenceScreen>

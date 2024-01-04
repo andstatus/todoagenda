@@ -58,8 +58,10 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
         private set
     var isMultilineTitle = PREF_MULTILINE_TITLE_DEFAULT
         private set
+    var maxLinesTitle = PREF_MAXLINES_TITLE_DEFAULT
     var isMultilineDetails = PREF_MULTILINE_DETAILS_DEFAULT
         private set
+    var maxLinesDetails = PREF_MAXLINES_DETAILS_DEFAULT
 
     // ----------------------------------------------------------------------------------
     // Colors
@@ -215,8 +217,14 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             if (json.has(PREF_MULTILINE_TITLE)) {
                 isMultilineTitle = json.getBoolean(PREF_MULTILINE_TITLE)
             }
+            if (json.has(PREF_MAXLINES_TITLE)) {
+                maxLinesTitle = json.getInt(PREF_MAXLINES_TITLE)
+            }
             if (json.has(PREF_MULTILINE_DETAILS)) {
                 isMultilineDetails = json.getBoolean(PREF_MULTILINE_DETAILS)
+            }
+            if (json.has(PREF_MAXLINES_DETAILS)) {
+                maxLinesDetails = json.getInt(PREF_MAXLINES_DETAILS)
             }
             if (json.has(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT)) {
                 showOnlyClosestInstanceOfRecurringEvent = json.getBoolean(
@@ -327,7 +335,9 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
         refreshPeriodMinutes = ApplicationPreferences.getRefreshPeriodMinutes(context)
         setEventEntryLayout(ApplicationPreferences.getEventEntryLayout(context))
         isMultilineTitle = ApplicationPreferences.isMultilineTitle(context)
+        maxLinesTitle = ApplicationPreferences.getMaxLinesTitle(context)
         isMultilineDetails = ApplicationPreferences.isMultilineDetails(context)
+        maxLinesDetails = ApplicationPreferences.getMaxLinesDetails(context)
         showOnlyClosestInstanceOfRecurringEvent = ApplicationPreferences.getShowOnlyClosestInstanceOfRecurringEvent(
             context
         )
@@ -419,7 +429,9 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             json.put(PREF_REFRESH_PERIOD_MINUTES, refreshPeriodMinutes)
             json.put(PREF_EVENT_ENTRY_LAYOUT, eventEntryLayout.value)
             json.put(PREF_MULTILINE_TITLE, isMultilineTitle)
+            json.put(PREF_MAXLINES_TITLE, maxLinesTitle)
             json.put(PREF_MULTILINE_DETAILS, isMultilineDetails)
+            json.put(PREF_MAXLINES_DETAILS, maxLinesDetails)
             json.put(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, showOnlyClosestInstanceOfRecurringEvent)
             json.put(PREF_HIDE_DUPLICATES, hideDuplicates)
             json.put(PREF_ALL_DAY_EVENTS_PLACEMENT, allDayEventsPlacement.value)
@@ -607,8 +619,12 @@ ${toJson()}"""
         private val PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT = "showNumberOfDaysToEvent" // till v 4.0
         const val PREF_MULTILINE_TITLE = "multiline_title"
         const val PREF_MULTILINE_TITLE_DEFAULT = false
+        const val PREF_MAXLINES_TITLE = "maxLinesTitle"
+        const val PREF_MAXLINES_TITLE_DEFAULT = 5
         const val PREF_MULTILINE_DETAILS = "multiline_details"
         const val PREF_MULTILINE_DETAILS_DEFAULT = false
+        const val PREF_MAXLINES_DETAILS = "maxLinesDetails"
+        const val PREF_MAXLINES_DETAILS_DEFAULT = 5
         const val PREF_DARK_THEME = "darkTheme"
 
         // ----------------------------------------------------------------------------------
