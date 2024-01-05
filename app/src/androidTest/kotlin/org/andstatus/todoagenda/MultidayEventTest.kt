@@ -18,7 +18,7 @@ class MultidayEventTest : BaseWidgetTest() {
     @Test
     fun testEventWhichCarryOverToTheNextDay() {
         val today = settings.clock().now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
+        val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
         event.title = "Event that carry over to the next day, show as ending midnight"
@@ -65,7 +65,7 @@ class MultidayEventTest : BaseWidgetTest() {
     fun testThreeDaysEvent() {
         val friday = dateTime(2015, 9, 18)
         val sunday = friday.plusDays(2)
-        val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
+        val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
         event.title = "Leader's weekend"

@@ -160,8 +160,12 @@ class QueryRow {
         return setColumn(CalendarContract.Instances.ALL_DAY, obj)
     }
 
-    fun setEventLocation(obj: Any): QueryRow {
+    fun setEventLocation(obj: Any?): QueryRow {
         return setColumn(CalendarContract.Instances.EVENT_LOCATION, obj)
+    }
+
+    fun setDescription(obj: Any?): QueryRow {
+        return setColumn(CalendarContract.Instances.DESCRIPTION, obj)
     }
 
     fun setHasAlarm(obj: Any): QueryRow {

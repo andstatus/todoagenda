@@ -89,7 +89,8 @@ In particular, see these solutions:
 
 ### 2024- ...
 * Added settings to limit maximum number of lines for an event's title and for details (i.e. for time and location) 
-  [#109](https://github.com/andstatus/todoagenda/issues/109)".
+  [#109](https://github.com/andstatus/todoagenda/issues/109).
+* Event details -> "Description" option added to show Calendar event Description. [#78](https://github.com/andstatus/todoagenda/issues/78)
 
 <a id="v4.8"/>
 

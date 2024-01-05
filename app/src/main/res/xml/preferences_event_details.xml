@@ -13,6 +13,12 @@
         android:title="@string/event_details_show_location_title" />
 
     <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="showDescription"
+        android:summary="@string/show_description_desc"
+        android:title="@string/show_description_title" />
+
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="fillAllDay"
         android:summary="@string/event_details_fill_all_day_events_desc"

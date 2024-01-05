@@ -71,6 +71,8 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
         private set
     var showLocation = PREF_SHOW_LOCATION_DEFAULT
         private set
+    var showDescription = PREF_SHOW_DESCRIPTION_DEFAULT
+        private set
     var fillAllDayEvents = PREF_FILL_ALL_DAY_DEFAULT
         private set
     var indicateAlerts = true
@@ -205,6 +207,9 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             if (json.has(PREF_SHOW_LOCATION)) {
                 showLocation = json.getBoolean(PREF_SHOW_LOCATION)
             }
+            if (json.has(PREF_SHOW_DESCRIPTION)) {
+                showDescription = json.getBoolean(PREF_SHOW_DESCRIPTION)
+            }
             if (json.has(PREF_TIME_FORMAT)) {
                 timeFormat = json.getString(PREF_TIME_FORMAT)
             }
@@ -331,6 +336,7 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
         entryDateFormat = ApplicationPreferences.getEntryDateFormat(context)
         showEndTime = ApplicationPreferences.getShowEndTime(context)
         showLocation = ApplicationPreferences.getShowLocation(context)
+        showDescription = ApplicationPreferences.getShowDescription(context)
         timeFormat = ApplicationPreferences.getTimeFormat(context)
         refreshPeriodMinutes = ApplicationPreferences.getRefreshPeriodMinutes(context)
         setEventEntryLayout(ApplicationPreferences.getEventEntryLayout(context))
@@ -423,6 +429,7 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             json.put(PREF_ENTRY_DATE_FORMAT, entryDateFormat.save())
             json.put(PREF_SHOW_END_TIME, showEndTime)
             json.put(PREF_SHOW_LOCATION, showLocation)
+            json.put(PREF_SHOW_DESCRIPTION, showDescription)
             json.put(PREF_TIME_FORMAT, timeFormat)
             json.put(PREF_LOCKED_TIME_ZONE_ID, clock().lockedTimeZoneId)
             json.put(PREF_SNAPSHOT_MODE, clock().snapshotMode.value)
@@ -633,6 +640,8 @@ ${toJson()}"""
         const val PREF_SHOW_END_TIME_DEFAULT = true
         const val PREF_SHOW_LOCATION = "showLocation"
         const val PREF_SHOW_LOCATION_DEFAULT = true
+        const val PREF_SHOW_DESCRIPTION = "showDescription"
+        const val PREF_SHOW_DESCRIPTION_DEFAULT = false
         const val PREF_FILL_ALL_DAY = "fillAllDay"
         const val PREF_FILL_ALL_DAY_DEFAULT = true
         const val PREF_INDICATE_ALERTS = "indicateAlerts"

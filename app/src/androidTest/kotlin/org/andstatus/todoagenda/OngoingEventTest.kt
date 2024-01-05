@@ -17,7 +17,7 @@ class OngoingEventTest : BaseWidgetTest() {
     @Test
     fun testTodaysOngoingEvent() {
         val today = settings.clock().now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
+        val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
         event.title = "Ongoing event shows original start time"
@@ -45,7 +45,7 @@ class OngoingEventTest : BaseWidgetTest() {
     @Test
     fun testYesterdaysOngoingEvent() {
         val today = settings.clock().now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
+        val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
         event.title = "Ongoing event, which started yesterday, shows no start time"
@@ -72,7 +72,7 @@ class OngoingEventTest : BaseWidgetTest() {
     @Test
     fun testEventWhichCarryOverToTheNextDay() {
         val today = settings.clock().now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, provider.widgetId, false)
+        val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
         event.title = "Event that carry over to the next day, show as ending midnight"

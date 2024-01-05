@@ -79,17 +79,21 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
     }
 
     protected fun getTitleString(event: WidgetEntry<*>): CharSequence {
-        return if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) event.title else MyStringBuilder.of(
+        return if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) {
             event.title
-        )
-            .withSeparator(event.locationString, EventEntryLayout.SPACE_PIPE_SPACE)
+        } else {
+            MyStringBuilder.of(event.title)
+                .withSeparator(event.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
+                .withSeparator(event.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
+        }
     }
 
     protected fun setDetails(entry: WidgetEntry<*>, rv: RemoteViews) {
         if (settings.eventEntryLayout == EventEntryLayout.ONE_LINE) return
         val eventDetails: MyStringBuilder = MyStringBuilder.of(entry.formatEntryDate())
             .withSpace(entry.eventTimeString)
-            .withSeparator(entry.locationString, EventEntryLayout.SPACE_PIPE_SPACE)
+            .withSeparator(entry.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
+            .withSeparator(entry.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
         val viewId = R.id.event_entry_details
         if (eventDetails.isEmpty) {
             rv.setViewVisibility(viewId, View.GONE)

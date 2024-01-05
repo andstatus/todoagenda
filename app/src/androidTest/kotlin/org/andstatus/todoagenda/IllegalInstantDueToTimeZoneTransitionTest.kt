@@ -47,7 +47,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
             Assert.fail("No active event sources")
         }
         provider.addRow(
-            CalendarEvent(settings, provider.context, provider.widgetId, false)
+            CalendarEvent(settings, provider.context, false)
                 .setStartDate(settings.clock().startOfTomorrow())
                 .setEventSource(provider.firstActiveEventSource)
                 .apply {

@@ -8,6 +8,21 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
 import android.provider.CalendarContract.Attendees
+import android.provider.CalendarContract.Instances.ALL_DAY
+import android.provider.CalendarContract.Instances.BEGIN
+import android.provider.CalendarContract.Instances.CALENDAR_COLOR
+import android.provider.CalendarContract.Instances.CALENDAR_ID
+import android.provider.CalendarContract.Instances.CONTENT_URI
+import android.provider.CalendarContract.Instances.DESCRIPTION
+import android.provider.CalendarContract.Instances.DISPLAY_COLOR
+import android.provider.CalendarContract.Instances.END
+import android.provider.CalendarContract.Instances.EVENT_ID
+import android.provider.CalendarContract.Instances.EVENT_LOCATION
+import android.provider.CalendarContract.Instances.HAS_ALARM
+import android.provider.CalendarContract.Instances.RRULE
+import android.provider.CalendarContract.Instances.START_DAY
+import android.provider.CalendarContract.Instances.STATUS
+import android.provider.CalendarContract.Instances.TITLE
 import android.util.Log
 import androidx.core.database.getStringOrNull
 import io.vavr.control.Try
@@ -83,7 +98,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
     private val timeFilteredEventList: MutableList<CalendarEvent>
         get() {
             val filterMode = settings.filterMode
-            val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            val builder = CONTENT_URI.buildUpon()
             val startDateForQuery = if (filterMode == FilterMode.NORMAL_FILTER) correctStartOfTimeRangeForQuery(
                 mStartOfTimeRange!!
             ) else MyClock.DATETIME_MIN
@@ -134,7 +149,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
                 val iterator: Iterator<OrderedEventSource> = activeSources.iterator()
                 while (iterator.hasNext()) {
                     val source = iterator.next().source
-                    stringBuilder.append(CalendarContract.Instances.CALENDAR_ID)
+                    stringBuilder.append(CALENDAR_ID)
                     stringBuilder.append(EQUALS)
                     stringBuilder.append(source.id)
                     if (iterator.hasNext()) {
@@ -169,7 +184,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
 
     private val pastEventsWithColorList: List<CalendarEvent>
         get() {
-            val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            val builder = CONTENT_URI.buildUpon()
             ContentUris.appendId(builder, 0)
             ContentUris.appendId(builder, settings.clock().now().millis)
             return queryList(builder.build(), pastEventsWithColorSelection).stream()
@@ -179,27 +194,28 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
     private val pastEventsWithColorSelection: String
         get() = calendarSelection +
             AND_BRACKET +
-            CalendarContract.Instances.DISPLAY_COLOR + EQUALS + CalendarContract.Instances.CALENDAR_COLOR +
+            DISPLAY_COLOR + EQUALS + CALENDAR_COLOR +
             CLOSING_BRACKET
 
     @SuppressLint("Range")
     private fun newCalendarEvent(cursor: Cursor): CalendarEvent {
         val source = settings
-            .getActiveEventSource(type, cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.CALENDAR_ID)))
-        val allDay = cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.ALL_DAY)) > 0
-        val event = CalendarEvent(settings, context, widgetId, allDay)
+            .getActiveEventSource(type, cursor.getInt(cursor.getColumnIndex(CALENDAR_ID)))
+        val allDay = cursor.getInt(cursor.getColumnIndex(ALL_DAY)) > 0
+        val event = CalendarEvent(settings, context, allDay)
         event.setEventSource(source)
-        event.setEventId(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.EVENT_ID)))
+        event.setEventId(cursor.getInt(cursor.getColumnIndex(EVENT_ID)))
         event.status =
-            EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.STATUS)))
-        event.title = cursor.getStringOrNull(cursor.getColumnIndex(CalendarContract.Instances.TITLE)) ?: ""
-        event.startMillis = cursor.getLong(cursor.getColumnIndex(CalendarContract.Instances.BEGIN))
-        event.endMillis = cursor.getLong(cursor.getColumnIndex(CalendarContract.Instances.END))
-        event.location = cursor.getStringOrNull(cursor.getColumnIndex(CalendarContract.Instances.EVENT_LOCATION)) ?: ""
-        event.isAlarmActive = cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.HAS_ALARM)) > 0
-        event.isRecurring = cursor.getStringOrNull(cursor.getColumnIndex(CalendarContract.Instances.RRULE)) != null
-        event.color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(CalendarContract.Instances.DISPLAY_COLOR)))
-        getColumnIndex(cursor, CalendarContract.Instances.CALENDAR_COLOR)
+            EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(STATUS)))
+        event.title = cursor.getStringOrNull(cursor.getColumnIndex(TITLE)) ?: ""
+        event.startMillis = cursor.getLong(cursor.getColumnIndex(BEGIN))
+        event.endMillis = cursor.getLong(cursor.getColumnIndex(END))
+        event.location = cursor.getStringOrNull(cursor.getColumnIndex(EVENT_LOCATION))
+        event.description = cursor.getStringOrNull(cursor.getColumnIndex(DESCRIPTION))
+        event.isAlarmActive = cursor.getInt(cursor.getColumnIndex(HAS_ALARM)) > 0
+        event.isRecurring = cursor.getStringOrNull(cursor.getColumnIndex(RRULE)) != null
+        event.color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(DISPLAY_COLOR)))
+        getColumnIndex(cursor, CALENDAR_COLOR)
             .map<Int>({ ind: Int? -> getAsOpaque(cursor.getInt(ind!!)) })
             .ifPresent({ color: Int -> event.calendarColor = Optional.of(color) })
         return event
@@ -244,7 +260,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
             CalendarContract.Calendars.CALENDAR_DISPLAY_NAME, CalendarContract.Calendars.CALENDAR_COLOR,
             CalendarContract.Calendars.ACCOUNT_NAME
         )
-        const val EVENT_SORT_ORDER = "startDay ASC, allDay DESC, begin ASC "
+        const val EVENT_SORT_ORDER = "${START_DAY} ASC, ${ALL_DAY} DESC, ${BEGIN} ASC "
         private const val EVENT_SELECTION = (CalendarContract.Instances.SELF_ATTENDEE_STATUS + "!="
             + Attendees.ATTENDEE_STATUS_DECLINED)
 
@@ -256,22 +272,23 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
             }
         }
 
-        val projection: Array<String>
-            get() {
+        val projection: Array<String> =
+            run {
                 val columnNames: MutableList<String> = ArrayList()
-                columnNames.add(CalendarContract.Instances.CALENDAR_ID)
-                columnNames.add(CalendarContract.Instances.EVENT_ID)
-                columnNames.add(CalendarContract.Instances.STATUS)
-                columnNames.add(CalendarContract.Instances.TITLE)
-                columnNames.add(CalendarContract.Instances.BEGIN)
-                columnNames.add(CalendarContract.Instances.END)
-                columnNames.add(CalendarContract.Instances.ALL_DAY)
-                columnNames.add(CalendarContract.Instances.EVENT_LOCATION)
-                columnNames.add(CalendarContract.Instances.HAS_ALARM)
-                columnNames.add(CalendarContract.Instances.RRULE)
-                columnNames.add(CalendarContract.Instances.DISPLAY_COLOR)
-                columnNames.add(CalendarContract.Instances.CALENDAR_COLOR)
-                return columnNames.toTypedArray<String>()
+                columnNames.add(CALENDAR_ID)
+                columnNames.add(EVENT_ID)
+                columnNames.add(STATUS)
+                columnNames.add(TITLE)
+                columnNames.add(BEGIN)
+                columnNames.add(END)
+                columnNames.add(ALL_DAY)
+                columnNames.add(EVENT_LOCATION)
+                columnNames.add(DESCRIPTION)
+                columnNames.add(HAS_ALARM)
+                columnNames.add(RRULE)
+                columnNames.add(DISPLAY_COLOR)
+                columnNames.add(CALENDAR_COLOR)
+                columnNames.toTypedArray<String>()
             }
     }
 }

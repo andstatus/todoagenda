@@ -131,8 +131,10 @@
     <string name="event_details_prefs_desc">Укажите, какую информацию о событиях показывать</string>
     <string name="event_details_show_end_time_title">Время окончания</string>
     <string name="event_details_show_end_time_desc">Показать время окончания события</string>
-    <string name="event_details_show_location_title">Показать местоположение</string>
+    <string name="event_details_show_location_title">Местоположение</string>
     <string name="event_details_show_location_desc">Показать или скрыть местоположение события</string>
+    <string name="show_description_title">Описание</string>
+    <string name="show_description_desc">Показать или скрыть описание события</string>
     <string name="event_details_fill_all_day_events_title">Показать каждый день событий, которые занимают более одного дня (событий на весь день)</string>
     <string name="event_details_fill_all_day_events_desc">Для событий, которые длятся весь день: показать эти события в каждом дне</string>
     <string name="event_details_indicators">Индикаторы</string>

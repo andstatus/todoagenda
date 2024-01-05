@@ -34,6 +34,8 @@ class CalendarEntry private constructor(
         get() = event.color
     override val location: String?
         get() = event.location
+    override val description: String?
+        get() = event.description
     val isAlarmActive: Boolean
         get() = event.isAlarmActive
     val isRecurring: Boolean
@@ -97,13 +99,13 @@ class CalendarEntry private constructor(
 
     override fun toString(): String {
         val timeString = eventTimeString
-        val locationString = locationString
-        return (super.toString() + " CalendarEntry ["
-            + (if (allDay) "allDay" else "")
-            + (if (StringUtil.nonEmpty(timeString)) ", time=$timeString" else "")
-            + (if (StringUtil.nonEmpty(locationString)) ", location=$locationString" else "")
-            + ", event=" + event
-            + "]")
+        return (super.toString() + " CalendarEntry [" +
+            (if (allDay) "allDay" else "") +
+            (if (StringUtil.nonEmpty(timeString)) ", time=$timeString" else "") +
+            (if (locationShown.isNullOrBlank()) "" else ", location='$locationShown'") +
+            (if (descriptionShown.isNullOrBlank()) "" else ", description='$descriptionShown'") +
+            ", event=" + event +
+            "]")
     }
 
     override fun equals(other: Any?): Boolean {

@@ -55,6 +55,7 @@ object ApplicationPreferences {
             setDateFormat(context, InstanceSettings.PREF_ENTRY_DATE_FORMAT, settings.entryDateFormat)
             setBoolean(context, InstanceSettings.PREF_SHOW_END_TIME, settings.showEndTime)
             setBoolean(context, InstanceSettings.PREF_SHOW_LOCATION, settings.showLocation)
+            setBoolean(context, InstanceSettings.PREF_SHOW_DESCRIPTION, settings.showDescription)
             setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
             setLockedTimeZoneId(context, settings.clock().lockedTimeZoneId)
             setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
@@ -269,6 +270,14 @@ object ApplicationPreferences {
             context,
             InstanceSettings.PREF_SHOW_LOCATION,
             InstanceSettings.PREF_SHOW_LOCATION_DEFAULT
+        )
+    }
+
+    fun getShowDescription(context: Context?): Boolean {
+        return getBoolean(
+            context,
+            InstanceSettings.PREF_SHOW_DESCRIPTION,
+            InstanceSettings.PREF_SHOW_DESCRIPTION_DEFAULT
         )
     }
 

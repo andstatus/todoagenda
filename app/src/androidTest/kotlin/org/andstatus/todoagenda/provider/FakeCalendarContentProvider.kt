@@ -78,6 +78,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
                 .setDisplayColor(event.color)
                 .setAllDay(if (event.isAllDay) 1 else 0)
                 .setEventLocation(event.location)
+                .setDescription(event.description)
                 .setHasAlarm(if (event.isAlarmActive) 1 else 0)
                 .setRRule(if (event.isRecurring) "FREQ=WEEKLY;WKST=MO;BYDAY=MO,WE,FR" else null)
         )

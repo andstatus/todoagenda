@@ -17,7 +17,6 @@ import kotlin.concurrent.Volatile
 class CalendarEvent(
     val settings: InstanceSettings,
     val context: Context,
-    private val widgetId: Int,
     val isAllDay: Boolean
 ) : WidgetEvent {
     override lateinit var eventSource: OrderedEventSource
@@ -31,8 +30,8 @@ class CalendarEvent(
 
     var color = 0
     var calendarColor = Optional.empty<Int>()
-    var location: String = ""
-
+    var location: String? = null
+    var description: String? = null
     var isAlarmActive = false
     var isRecurring = false
     var status = EventStatus.CONFIRMED
@@ -148,8 +147,9 @@ class CalendarEvent(
             .orElse("???"))
             + ", allDay=" + isAllDay
             + ", alarmActive=" + isAlarmActive
-            + ", recurring=" + isRecurring
-            + (if (StringUtil.nonEmpty(location)) ", location=$location" else "") +
+            + ", recurring=" + isRecurring +
+            (if (location.isNullOrBlank()) "" else ", location='$location'") +
+            (if (description.isNullOrBlank()) "" else ", description='$description'") +
             "; Source [" + eventSource + "]]")
     }
 

@@ -39,15 +39,19 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
         get() = ""
     open val status: EventStatus?
         get() = EventStatus.CONFIRMED
-    val locationString: String
-        get() = if (hideLocation()) "" else location!!
+    val locationShown: String?
+        get() = location?.let {
+            if (it.isBlank() || !settings.showLocation) null else it
+        }
 
-    private fun hideLocation(): Boolean {
-        return location!!.isEmpty() || !settings.showLocation
-    }
+    val descriptionShown: String?
+        get() = description?.let {
+            if (it.isBlank() || !settings.showDescription) null else it
+        }
 
-    open val location: String?
-        get() = ""
+    open val location: String? = null
+
+    open val description: String? = null
 
     override operator fun compareTo(other: WidgetEntry<*>): Int {
         val globalSignum = Integer.signum(entryPosition.globalOrder - other.entryPosition.globalOrder)
@@ -73,7 +77,9 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
 
     fun duplicates(other: WidgetEntry<*>): Boolean {
         return entryPosition == other.entryPosition && entryDate == other.entryDate &&
-            DateUtil.isSameDate(endDate, other.endDate) && title == other.title && location == other.location
+            DateUtil.isSameDate(endDate, other.endDate) && title == other.title &&
+            (!settings.showLocation || location == other.location) &&
+            (!settings.showDescription || description == other.description)
     }
 
     fun formatEntryDate(): CharSequence {
