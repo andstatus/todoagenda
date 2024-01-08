@@ -10,7 +10,7 @@ so that you can easily have a glimpse at your due, current and upcoming appointm
 [<img src="doc/images/5x5.png" width="10">](#)
 [<img src="doc/images/get-it-on-google-play.png" alt="Get ToDo Agenda on Google Play" height="60" />](https://play.google.com/store/apps/details?id=org.andstatus.todoagenda)
 [<img src="doc/images/5x5.png" width="10">](#)
-[<img src="doc/images/get-it-on-fdroid.png" alt="Get ToDo Agenda on F-Droid" height="60">](https://f-droid.org/repository/browse/?fdid=org.andstatus.game2048)
+[<img src="doc/images/get-it-on-fdroid.png" alt="Get ToDo Agenda on F-Droid" height="60">](https://f-droid.org/packages/org.andstatus.todoagenda)
 
 ![Calendar Widget Screenshots](app/src/main/play/listings/en-US/graphics/large-tablet-screenshots/widget-collage.png)
 
