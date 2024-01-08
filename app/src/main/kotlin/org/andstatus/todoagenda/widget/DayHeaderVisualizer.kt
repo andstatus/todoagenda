@@ -28,7 +28,8 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
         val entry = eventEntry as DayHeader
         val rv = RemoteViews(
             context.packageName,
-            if (horizontalLineBelowDayHeader) R.layout.day_header_separator_below else R.layout.day_header_separator_above
+            if (horizontalLineBelowDayHeader) WidgetLayout.DAY_HEADER_SEPARATOR_BELOW.shadowed(settings.textShadow)
+            else WidgetLayout.DAY_HEADER_SEPARATOR_ABOVE.shadowed(settings.textShadow)
         )
         rv.setInt(R.id.day_header_title_wrapper, "setGravity", alignment.gravity)
         val textColorPref: TextColorPref = TextColorPref.forDayHeader(entry)

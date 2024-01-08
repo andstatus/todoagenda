@@ -14,7 +14,7 @@ import org.andstatus.todoagenda.util.RemoteViewsUtil
 
 abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProvider: EventProvider) {
     open fun getRemoteViews(entry: WidgetEntry<*>, position: Int): RemoteViews {
-        val rv = RemoteViews(context.packageName, settings.eventEntryLayout.layoutId)
+        val rv = RemoteViews(context.packageName, settings.eventEntryLayout.widgetLayout.shadowed(settings.textShadow))
         setTitle(entry, rv)
         setDetails(entry, rv)
         setDate(entry, rv)

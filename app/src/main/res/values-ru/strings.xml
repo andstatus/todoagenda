@@ -126,6 +126,10 @@
     <string name="appearance_theme_dark">Светлый</string>
     <string name="appearance_theme_light">Тёмный</string>
     <string name="appearance_theme_white">Чёрный</string>
+    <string name="text_shadow_title">Тень текста</string>
+    <string name="text_shadow_no_shadow">Без тени</string>
+    <string name="text_shadow_dark">Тёмная тень</string>
+    <string name="text_shadow_light">Светлая тень</string>
     <!-- Preference frame: Event details -->
     <string name="event_details_prefs">Подробности о событии</string>
     <string name="event_details_prefs_desc">Укажите, какую информацию о событиях показывать</string>

@@ -1,6 +1,5 @@
 package org.andstatus.todoagenda.widget
 
-import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import org.andstatus.todoagenda.R
 
@@ -8,13 +7,13 @@ import org.andstatus.todoagenda.R
  * @author yvolk@yurivolkov.com
  */
 enum class WidgetHeaderLayout(
-    @field:LayoutRes @param:LayoutRes val layoutId: Int,
+    val widgetLayout: WidgetLayout?,
     val value: String,
     @field:StringRes @param:StringRes val summaryResId: Int
 ) {
-    ONE_ROW(R.layout.widget_header_one_row, "ONE_ROW", R.string.single_line_layout),
-    TWO_ROWS(R.layout.widget_header_two_rows, "TWO_ROWS", R.string.two_rows_layout),
-    HIDDEN(0, "HIDDEN", R.string.hidden);
+    ONE_ROW(WidgetLayout.WIDGET_HEADER_ONE_ROW, "ONE_ROW", R.string.single_line_layout),
+    TWO_ROWS(WidgetLayout.WIDGET_HEADER_TWO_ROWS, "TWO_ROWS", R.string.two_rows_layout),
+    HIDDEN(null, "HIDDEN", R.string.hidden);
 
     companion object {
         var defaultValue = ONE_ROW

@@ -18,6 +18,13 @@
             android:summary="@string/text_color_source_auto_desc"
             android:title="@string/text_color_source" />
 
+        <ListPreference
+            android:key="textShadow"
+            android:defaultValue="no"
+            android:entries="@array/pref_text_shadow_entries"
+            android:entryValues="@array/pref_text_shadow_values"
+            android:title="@string/text_shadow_title" />
+
         <PreferenceCategory app:title="@string/widget_header">
                 <ListPreference
                     android:key="headerTheme"

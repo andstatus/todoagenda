@@ -29,6 +29,7 @@ import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
 import org.andstatus.todoagenda.widget.WidgetHeaderLayout
+import org.andstatus.todoagenda.widget.WidgetLayout
 import org.joda.time.DateTime
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
@@ -295,7 +296,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
                     return
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
-                val rv = RemoteViews(context.packageName, R.layout.widget_initial)
+                val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_INITIAL.shadowed(settings.textShadow))
                 settings.clock().updateZone()
                 configureWidgetHeader(settings, rv)
                 configureWidgetEntriesList(settings, rv)
@@ -311,7 +312,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             if (settings.widgetHeaderLayout != WidgetHeaderLayout.HIDDEN) {
                 val headerView = RemoteViews(
                     settings.context.packageName,
-                    settings.widgetHeaderLayout.layoutId
+                    settings.widgetHeaderLayout.widgetLayout?.shadowed(settings.textShadow) ?: 0
                 )
                 rv.addView(R.id.header_parent, headerView)
                 RemoteViewsUtil.setBackgroundColor(

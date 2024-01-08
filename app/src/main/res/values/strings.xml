@@ -139,6 +139,10 @@
     <string name="text_color_source_shading_desc">Text shading should be set for each part of the widget</string>
     <string name="text_color_source_color">Custom text colors</string>
     <string name="text_color_source_color_desc">Text color should be set for each part of the widget</string>
+    <string name="text_shadow_title">Text shadow</string>
+    <string name="text_shadow_no_shadow">No shadow</string>
+    <string name="text_shadow_dark">Dark shadow</string>
+    <string name="text_shadow_light">Light shadow</string>
     <string name="appearance_background_color_title">Background color</string>
     <string name="appearance_background_color_desc">Adjust the color of the background</string>
     <string name="appearance_past_events_background_color_title">Past events background color</string>

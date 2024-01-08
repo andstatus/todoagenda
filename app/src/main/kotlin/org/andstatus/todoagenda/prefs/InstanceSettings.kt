@@ -15,6 +15,7 @@ import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.StringUtil
 import org.andstatus.todoagenda.widget.Alignment
 import org.andstatus.todoagenda.widget.EventEntryLayout
+import org.andstatus.todoagenda.widget.TextShadow
 import org.andstatus.todoagenda.widget.WidgetHeaderLayout
 import org.joda.time.DateTime
 import org.json.JSONException
@@ -67,6 +68,11 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
     // Colors
     private var defaultColors: ThemeColors
     private var darkColors: ThemeColors = ThemeColors.EMPTY
+    var textShadow: TextShadow = TextShadow.NO_SHADOW
+        private set
+
+    // ----------------------------------------------------------------------------------
+    // ,,,
     var showEndTime = PREF_SHOW_END_TIME_DEFAULT
         private set
     var showLocation = PREF_SHOW_LOCATION_DEFAULT
@@ -165,6 +171,10 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
                     PREF_DARK_THEME
                 )
             ) else ThemeColors.EMPTY
+            if (json.has(PREF_TEXT_SHADOW)) {
+                textShadow = TextShadow.fromValue(json.getString(PREF_TEXT_SHADOW))
+            }
+
             if (json.has(PREF_SHOW_DAYS_WITHOUT_EVENTS)) {
                 showDaysWithoutEvents = json.getBoolean(PREF_SHOW_DAYS_WITHOUT_EVENTS)
             }
@@ -326,6 +336,8 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
                 )
             }
         }
+        textShadow = ApplicationPreferences.getTextShadow(context)
+
         showDaysWithoutEvents = ApplicationPreferences.getShowDaysWithoutEvents(context)
         showDayHeaders = ApplicationPreferences.getShowDayHeaders(context)
         dayHeaderDateFormat = ApplicationPreferences.getDayHeaderDateFormat(context)
@@ -372,7 +384,11 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
     }
 
     init {
-        widgetInstanceName = if (contextIn == null) "(empty)" else AllSettings.uniqueInstanceName(context, widgetId, proposedInstanceName)
+        widgetInstanceName = if (contextIn == null) "(empty)" else AllSettings.uniqueInstanceName(
+            context,
+            widgetId,
+            proposedInstanceName
+        )
         defaultColors = if (contextIn == null) ThemeColors.EMPTY else ThemeColors(context, ColorThemeType.SINGLE)
     }
 
@@ -419,6 +435,7 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             if (!darkColors.isEmpty) {
                 json.put(PREF_DARK_THEME, darkColors.toJson(JSONObject()))
             }
+            json.put(PREF_TEXT_SHADOW, textShadow.value)
             json.put(PREF_SHOW_DAYS_WITHOUT_EVENTS, showDaysWithoutEvents)
             json.put(PREF_SHOW_DAY_HEADERS, showDayHeaders)
             json.put(PREF_DAY_HEADER_DATE_FORMAT, dayHeaderDateFormat.save())
@@ -633,6 +650,11 @@ ${toJson()}"""
         const val PREF_MAXLINES_DETAILS = "maxLinesDetails"
         const val PREF_MAXLINES_DETAILS_DEFAULT = 5
         const val PREF_DARK_THEME = "darkTheme"
+
+        // ----------------------------------------------------------------------------------
+        // Color
+        const val PREF_TEXT_SHADOW = "textShadow"
+        val PREF_TEXT_SHADOW_DEFAULT = TextShadow.NO_SHADOW.name
 
         // ----------------------------------------------------------------------------------
         // Event details

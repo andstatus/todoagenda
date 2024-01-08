@@ -15,7 +15,9 @@ import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.WidgetConfigurationActivity
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
 import org.andstatus.todoagenda.prefs.MyPreferenceFragment
+import org.andstatus.todoagenda.widget.TextShadow
 import org.andstatus.todoagenda.widget.TimeSection
 import java.util.Arrays
 import java.util.stream.Collectors
@@ -41,6 +43,7 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
         removeUnavailablePreferences()
         preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
         showTextSources()
+        showTextShadow()
     }
 
     private fun showTextSources() {
@@ -133,10 +136,17 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
         }
     }
 
+    private fun showTextShadow() {
+        findPreference<ListPreference>(PREF_TEXT_SHADOW)?.let { preference ->
+            TextShadow.fromValue(preference.value).let { textShadow ->
+                preference.summary = requireActivity().getString(textShadow.titleResId)
+            }
+        }
+    }
+
     private fun showShadings() {
         for (shadingPref in TextColorPref.entries) {
-            val preference = findPreference<ListPreference>(shadingPref.shadingPreferenceName)
-            if (preference != null) {
+            findPreference<ListPreference>(shadingPref.shadingPreferenceName)?.let { preference ->
                 val shading: Shading = Shading.fromThemeName(preference.value, shadingPref.defaultShading)
                 preference.summary = requireActivity().getString(shading.titleResId)
             }
@@ -180,6 +190,7 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
             else -> {
                 saveSettings()
                 showTextSources()
+                showTextShadow()
             }
         }
     }

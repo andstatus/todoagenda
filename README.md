@@ -85,12 +85,16 @@ In particular, see these solutions:
 
 ## Changelog
 
-<a id="next"/>
+<a id="v4.9"/>
 
-### 2024- ...
-* Added settings to limit maximum number of lines for an event's title and for details (i.e. for time and location) 
-  [#109](https://github.com/andstatus/todoagenda/issues/109).
-* Event details -> "Description" option added to show Calendar event Description. [#78](https://github.com/andstatus/todoagenda/issues/78)
+### 2024-01-08 v4.9.0 Text shadow and Event description
+* "Text shadow" option added to Colors section with these values: "No shadow" (default, nothing changes for existing widgets), 
+  "Dark shadow" and "Light shadow". For simplicity the same shadow applies to all parts of the widget.
+  [#88](https://github.com/andstatus/todoagenda/issues/88)
+* Event details -> "Description" option added to show Calendar event Description. 
+  [#78](https://github.com/andstatus/todoagenda/issues/78)
+* Added settings to limit maximum number of lines for an event's title and for details (i.e. for time, 
+  location and description). [#109](https://github.com/andstatus/todoagenda/issues/109).
 
 <a id="v4.8"/>
 

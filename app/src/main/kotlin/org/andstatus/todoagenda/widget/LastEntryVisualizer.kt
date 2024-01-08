@@ -22,7 +22,7 @@ class LastEntryVisualizer(context: Context, widgetId: Int) :
     override fun getRemoteViews(eventEntry: WidgetEntry<*>, position: Int): RemoteViews {
         val entry = eventEntry as LastEntry
         Log.d(TAG, "lastEntry: " + entry.type)
-        val rv = RemoteViews(context.packageName, entry.type.layoutId)
+        val rv = RemoteViews(context.packageName, entry.type.widgetLayout.shadowed(settings.textShadow))
         val viewId = R.id.event_entry
         if (position < 0) {
             rv.setOnClickPendingIntent(

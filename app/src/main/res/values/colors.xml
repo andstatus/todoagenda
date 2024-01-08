@@ -46,4 +46,8 @@
     <color name="tasks_priority_low">#2196f3</color>
     <color name="tasks_priority_none">#9e9e9e</color>
 
+    <!-- Text shadow -->
+    <color name="text_shadow_dark">#FF000000</color>
+    <color name="text_shadow_light">#FFFFFFFF</color>
+
 </resources>

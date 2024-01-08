@@ -17,6 +17,7 @@ import org.andstatus.todoagenda.util.CalendarIntentUtil
 import org.andstatus.todoagenda.util.DateUtil
 import org.andstatus.todoagenda.util.PermissionsUtil
 import org.andstatus.todoagenda.widget.WidgetEntry
+import org.andstatus.todoagenda.widget.WidgetLayout
 import org.joda.time.DateTime
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -118,7 +119,8 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
     private fun gotoPosition(context: Context, widgetId: Int, position: Int) {
         if (widgetId == 0 || position < 0) return
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        val rv = RemoteViews(context.packageName, R.layout.widget_initial)
+        val settings = AllSettings.instanceFromId(context, widgetId)
+        val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_INITIAL.shadowed(settings.textShadow))
         Log.d(TAG, "gotoPosition, Scrolling widget $widgetId to position $position")
         rv.setScrollPosition(R.id.event_list, position)
         appWidgetManager.updateAppWidget(widgetId, rv)
