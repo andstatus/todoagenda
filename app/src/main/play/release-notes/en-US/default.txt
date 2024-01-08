@@ -1,3 +1,6 @@
+v4.9.0. "Text shadow" option added to Colors section: "No shadow", "Dark shadow" and "Light shadow"
+Event details -> "Description" option added to show Calendar event Description.
+Added settings to limit maximum number of lines for an event's title and for details.
 v4.8.0. Fixed "Default Time zone in app doesn't change, when Android System Time Zone changes".
 Fixed "Do not make all permissions mandatory".
 App converted from Java to Kotlin.
