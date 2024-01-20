@@ -1,11 +1,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditTextPreference
+    <org.andstatus.todoagenda.prefs.MultilineEditTextPreference
         android:key="widgetInstanceName"
         android:title="@string/widget_instance_name"
         android:singleLine="true" />
 
-    <ListPreference
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
         android:key="textSizeScale"
         android:defaultValue="1.0"
         android:entries="@array/pref_text_size_entries"
@@ -13,7 +13,7 @@
         android:summary="@string/appearance_text_size_desc"
         android:title="@string/appearance_text_size_title" />
 
-    <ListPreference
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
         android:key="dateFormat"
         android:defaultValue="auto"
         android:entries="@array/pref_date_format_entries"
@@ -21,22 +21,21 @@
         android:summary="@string/appearance_date_format_desc"
         android:title="@string/appearance_time_format_title" />
 
-    <CheckBoxPreference
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:key="lockTimeZone"
         android:defaultValue="false"
         android:persistent="false"
         android:summary="@string/lock_time_zone_off_desc"
-        android:title="@string/lock_time_zone_title">
-    </CheckBoxPreference>
+        android:title="@string/lock_time_zone_title" />
 
-    <ListPreference
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
         android:key="snapshotMode"
         android:defaultValue="live_data"
         android:entries="@array/pref_snapshot_mode_entries"
         android:entryValues="@array/pref_snapshot_mode_values"
         android:title="@string/snapshot_mode" />
 
-    <EditTextPreference
+    <org.andstatus.todoagenda.prefs.MultilineEditTextPreference
         android:key="refreshPeriodMinutes"
         android:title="@string/refresh_period_minutes"
         android:singleLine="true" />

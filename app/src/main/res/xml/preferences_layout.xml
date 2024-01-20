@@ -11,7 +11,7 @@
         android:title="@string/compact_layout_title" />
 
     <PreferenceCategory app:title="@string/widget_header">
-        <ListPreference
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:key="widgetHeaderLayout"
             android:defaultValue="ONE_ROW"
             android:entries="@array/pref_widget_header_layout_entries"
@@ -49,7 +49,7 @@
             android:summary="@string/show_past_events_under_one_header_desc"
             android:dependency="showDayHeaders" />
 
-        <ListPreference
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:key="dayHeaderAlignment"
             android:defaultValue="RIGHT"
             android:dependency="showDayHeaders"
@@ -75,7 +75,7 @@
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/event_entry">
-        <ListPreference
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:key="eventEntryLayout"
             android:defaultValue="DEFAULT"
             android:entries="@array/pref_event_entry_layout_entries"

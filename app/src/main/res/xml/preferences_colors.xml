@@ -10,7 +10,7 @@
             android:summaryOn="@string/different_colors_for_dark_on_desc"
             android:summaryOff="@string/different_colors_for_dark_off_desc" />
 
-        <ListPreference
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:key="textColorSource"
             android:defaultValue="auto"
             android:entries="@array/pref_text_color_source_entries"
@@ -18,7 +18,7 @@
             android:summary="@string/text_color_source_auto_desc"
             android:title="@string/text_color_source" />
 
-        <ListPreference
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:key="textShadow"
             android:defaultValue="no"
             android:entries="@array/pref_text_shadow_entries"
@@ -26,7 +26,7 @@
             android:title="@string/text_shadow_title" />
 
         <PreferenceCategory app:title="@string/widget_header">
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="headerTheme"
                     android:defaultValue="DARK"
                     android:entries="@array/pref_theme_entries"
@@ -48,7 +48,7 @@
         </PreferenceCategory>
 
         <PreferenceCategory app:title="@string/past_events" app:key="PastTime">
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="dayHeaderThemePast"
                     android:defaultValue="DARK"
                     android:entries="@array/pref_theme_entries"
@@ -61,7 +61,7 @@
                     android:title="@string/day_header_text_color"
                     app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="entryThemePast"
                     android:defaultValue="BLACK"
                     android:entries="@array/pref_theme_entries"
@@ -82,7 +82,7 @@
         </PreferenceCategory>
 
         <PreferenceCategory app:title="@string/todays_events"  app:key="TodayTime">
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="dayHeaderTheme"
                     android:defaultValue="LIGHT"
                     android:entries="@array/pref_theme_entries"
@@ -95,7 +95,7 @@
                     android:title="@string/day_header_text_color"
                     app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="entryTheme"
                     android:defaultValue="WHITE"
                     android:entries="@array/pref_theme_entries"
@@ -116,7 +116,7 @@
         </PreferenceCategory>
 
         <PreferenceCategory app:title="@string/future_events" app:key="FutureTime">
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="dayHeaderThemeFuture"
                     android:defaultValue="DARK"
                     android:entries="@array/pref_theme_entries"
@@ -129,7 +129,7 @@
                     android:title="@string/day_header_text_color"
                     app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <ListPreference
+                <org.andstatus.todoagenda.prefs.MultilineListPreference
                     android:key="entryThemeFuture"
                     android:defaultValue="BLACK"
                     android:entries="@array/pref_theme_entries"

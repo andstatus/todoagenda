@@ -32,8 +32,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
     }
 
     private fun setLockTimeZone() {
-        val preference =
-            findPreference<Preference>(InstanceSettings.PREF_LOCK_TIME_ZONE) as CheckBoxPreference?
+        val preference = findPreference<CheckBoxPreference>(InstanceSettings.PREF_LOCK_TIME_ZONE)
         if (preference != null) {
             val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
             val isChecked = snapshotMode == SnapshotMode.SNAPSHOT_TIME ||
@@ -45,8 +44,9 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
     }
 
     private fun showLockTimeZone() {
-        val preference = findPreference<CheckBoxPreference>(InstanceSettings.PREF_LOCK_TIME_ZONE)
-            ?: return
+        val preference =
+            findPreference<CheckBoxPreference>(InstanceSettings.PREF_LOCK_TIME_ZONE)
+                ?: return
         val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
         preference.isEnabled = snapshotMode != SnapshotMode.SNAPSHOT_TIME
         val timeZone = settings.clock().zone

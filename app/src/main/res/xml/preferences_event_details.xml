@@ -1,36 +1,36 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <CheckBoxPreference
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:key="showEndTime"
         android:title="@string/event_details_show_end_time_title"
         android:summary="@string/event_details_show_end_time_desc"
         android:defaultValue="true" />
 
-    <CheckBoxPreference
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:defaultValue="true"
         android:key="showLocation"
         android:summary="@string/event_details_show_location_desc"
         android:title="@string/event_details_show_location_title" />
 
-    <CheckBoxPreference
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:defaultValue="false"
         android:key="showDescription"
         android:summary="@string/show_description_desc"
         android:title="@string/show_description_title" />
 
-    <CheckBoxPreference
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:defaultValue="true"
         android:key="fillAllDay"
         android:summary="@string/event_details_fill_all_day_events_desc"
         android:title="@string/event_details_fill_all_day_events_title" />
 
     <PreferenceCategory android:title="@string/event_details_indicators">
-        <CheckBoxPreference
+        <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
             android:defaultValue="true"
             android:key="indicateAlerts"
             android:summary="@string/event_details_indicate_alert_desc"
             android:title="@string/event_details_indicate_alert_title" />
-        <CheckBoxPreference
+        <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
             android:defaultValue="false"
             android:key="indicateRecurring"
             android:summary="@string/event_details_indicate_recurring_desc"
