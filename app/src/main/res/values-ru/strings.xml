@@ -156,7 +156,7 @@
     <string name="event_details_event_range_desc">Настроить количество отображаемых событий</string>
     <string name="event_range_today">Сегодня</string>
     <string name="event_range_today_and_tomorrow">Сегодня и завтра</string>
-    <string name="event_range_one_day">Один день</string>
+    <string name="event_range_one_day">24 часа</string>
     <string name="event_range_one_week">Одна неделя</string>
     <string name="event_range_two_weeks">Две недели</string>
     <string name="event_range_one_month">Один месяц</string>
