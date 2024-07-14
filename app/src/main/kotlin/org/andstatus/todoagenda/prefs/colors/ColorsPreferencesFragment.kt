@@ -158,7 +158,7 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         val activity = activity
         when (key) {
             ApplicationPreferences.PREF_DIFFERENT_COLORS_FOR_DARK -> if (activity != null) {

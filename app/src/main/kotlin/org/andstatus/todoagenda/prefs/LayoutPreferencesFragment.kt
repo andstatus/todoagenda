@@ -63,7 +63,7 @@ class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreference
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             InstanceSettings.PREF_EVENT_ENTRY_LAYOUT -> showEventEntryLayout()
             InstanceSettings.PREF_WIDGET_HEADER_LAYOUT -> showWidgetHeaderLayout()

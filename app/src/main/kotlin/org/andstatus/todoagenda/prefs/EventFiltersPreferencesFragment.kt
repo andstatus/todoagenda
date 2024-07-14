@@ -88,7 +88,7 @@ class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPref
         super.onPause()
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         showStatus()
     }
 }

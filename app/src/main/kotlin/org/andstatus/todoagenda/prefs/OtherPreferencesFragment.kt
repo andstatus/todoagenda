@@ -116,7 +116,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences, key: String) {
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         when (key) {
             InstanceSettings.PREF_WIDGET_INSTANCE_NAME -> {
                 requireActivity().finish()
