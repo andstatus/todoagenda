@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          android:installLocation="internalOnly">
+    android:installLocation="internalOnly">
 
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
-    <uses-permission android:name="org.dmfs.permission.READ_TASKS"/>
-    <uses-permission android:name="org.tasks.permission.READ_TASKS"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="org.dmfs.permission.READ_TASKS" />
+    <uses-permission android:name="org.tasks.permission.READ_TASKS" />
 
     <queries>
-        <provider android:authorities="org.tasks" android:exported="false" />
-        <provider android:authorities="org.dmfs.tasks" android:exported="false" />
+        <provider
+            android:authorities="org.tasks"
+            android:exported="false" />
+        <provider
+            android:authorities="org.dmfs.tasks"
+            android:exported="false" />
     </queries>
 
     <application
@@ -17,45 +21,47 @@
         android:label="@string/app_name"
         android:theme="@style/Theme.CalendarConfiguration.Dark">
 
-        <activity android:name="org.andstatus.todoagenda.MainActivity"
-                  android:exported="true"
-                  android:launchMode="singleTask"
-                  android:finishOnTaskLaunch="true"
-                  android:noHistory="true"
-                  android:excludeFromRecents="true"
-                  android:theme="@style/AppTheme">
+        <activity
+            android:name="org.andstatus.todoagenda.MainActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleTask"
+            android:noHistory="true"
+            android:theme="@style/AppTheme">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
 
-        <activity android:name="org.andstatus.todoagenda.ErrorReportActivity"
+        <activity
+            android:name="org.andstatus.todoagenda.ErrorReportActivity"
+            android:excludeFromRecents="true"
             android:exported="false"
             android:finishOnTaskLaunch="true"
             android:noHistory="true"
-            android:excludeFromRecents="true"
-            android:theme="@style/AppTheme">
-        </activity>
+            android:theme="@style/AppTheme" />
 
-        <activity android:name="org.andstatus.todoagenda.WidgetConfigurationActivity"
+        <activity
+            android:name="org.andstatus.todoagenda.WidgetConfigurationActivity"
             android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true">
-        </activity>
+            android:finishOnTaskLaunch="true"
+            android:theme="@style/AppTheme" />
 
         <receiver
             android:name="org.andstatus.todoagenda.AppWidgetProvider"
-            android:label="@string/widget_name"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/widget_name">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/appwidget_info"/>
+                android:resource="@xml/appwidget_info" />
         </receiver>
         <receiver
             android:name="org.andstatus.todoagenda.EnvironmentChangedReceiver"
@@ -72,16 +78,17 @@
                 <action android:name="org.andstatus.todoagenda.action.REFRESH" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.PROVIDER_CHANGED"/>
-                <data android:scheme="content"/>
-                <data android:host="com.android.calendar"/>
+                <action android:name="android.intent.action.PROVIDER_CHANGED" />
+
+                <data android:scheme="content" />
+                <data android:host="com.android.calendar" />
             </intent-filter>
         </receiver>
+
         <service
             android:name="org.andstatus.todoagenda.RemoteViewsService"
             android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS">
-        </service>
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
     </application>
 
 </manifest>

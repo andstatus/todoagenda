@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar" />
 
-    <style name="Theme.CalendarConfiguration.Dark" parent="Theme.AppCompat.DayNight" />
+    <style name="Theme.CalendarConfiguration.Dark" parent="Theme.AppCompat.DayNight.NoActionBar" />
 
     <style name="Theme.ToDoAgenda.Black" parent="Theme.AppCompat">
         <item name="header">@color/header_current_date_black</item>

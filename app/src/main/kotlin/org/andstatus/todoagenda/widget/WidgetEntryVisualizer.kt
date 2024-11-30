@@ -95,7 +95,7 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
             .withSeparator(entry.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
             .withSeparator(entry.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
         val viewId = R.id.event_entry_details
-        if (eventDetails.isEmpty) {
+        if (eventDetails.isEmpty()) {
             rv.setViewVisibility(viewId, View.GONE)
         } else {
             rv.setViewVisibility(viewId, View.VISIBLE)

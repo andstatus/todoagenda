@@ -5,16 +5,16 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity
 import org.andstatus.todoagenda.util.IntentUtil
 
 /**
  * @author yvolk@yurivolkov.com
  */
-class ErrorReportActivity : AppCompatActivity() {
+class ErrorReportActivity : MyActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_error_report)
+        setTitle(R.string.app_name)
         val appMessage = findViewById<EditText>(R.id.appMessage)
         appMessage?.setText(intent.getStringExtra(EXTRA_APP_MESSAGE))
     }

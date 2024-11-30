@@ -13,7 +13,6 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.SimpleAdapter
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat.OnRequestPermissionsResultCallback
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
@@ -25,10 +24,12 @@ import org.andstatus.todoagenda.util.PermissionsUtil
 /**
  * @author yvolk@yurivolkov.com
  */
-class MainActivity : AppCompatActivity(), OnRequestPermissionsResultCallback {
+class MainActivity : MyActivity(), OnRequestPermissionsResultCallback {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setTitle(R.string.app_name)
         AllSettings.reInitialize(this)
         if (isOpenThisActivity()) {
             updateScreen()

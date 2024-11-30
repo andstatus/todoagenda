@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.andstatus.todoagenda.prefs.AllSettings
@@ -27,7 +26,7 @@ import java.io.InputStreamReader
 import java.io.Reader
 import java.nio.charset.StandardCharsets
 
-class WidgetConfigurationActivity : AppCompatActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+class WidgetConfigurationActivity : MyActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     private var widgetId = 0
     private var saveOnPause = true
     override fun onPause() {

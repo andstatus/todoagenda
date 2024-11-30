@@ -12,8 +12,8 @@ android {
     }
 
     defaultConfig {
-        versionCode 705
-        versionName '4.9.0'
+        versionCode 706
+        versionName '4.10.0'
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
@@ -70,9 +70,9 @@ dependencies {
     implementation "androidx.core:core-ktx:$ktxVersion"
 
     androidTestImplementation "junit:junit:$junitVersion"
-    androidTestImplementation "androidx.test:core:$testRunnerVersion"
-    androidTestImplementation "androidx.test:runner:$testRunnerVersion"
+    androidTestImplementation "androidx.test:core:$testCoreVersion"
     androidTestImplementation "androidx.test:rules:$testRulesVersion"
+    androidTestImplementation "androidx.test:runner:$testRunnerVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoCoreVersion"
 
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"

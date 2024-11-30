@@ -16,8 +16,9 @@
 package org.andstatus.todoagenda.util
 
 interface IsEmpty {
-    val isEmpty: Boolean
+    fun isEmpty(): Boolean
+
     fun nonEmpty(): Boolean {
-        return !isEmpty
+        return !isEmpty()
     }
 }

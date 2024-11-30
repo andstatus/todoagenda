@@ -5,27 +5,28 @@ buildscript {
     }
 
     ext {
-        compileSdkVersion = 34 as int
-        buildToolsVersion = '34.0.0'
+        compileSdkVersion = 35 as int
+        buildToolsVersion = '35.0.0'
         minSdkVersion = 24 as int
-        targetSdkVersion = 33 as int
+        targetSdkVersion = 35 as int
 
         // Lookup the latest here: https://mvnrepository.com/
         annotationVersion = '1.0.1'
         appCompatVersion = '1.7.0'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
-        espressoCoreVersion = '3.6.1'
-        jodaTimeVersion = '2.12.7'     // https://github.com/JodaOrg/joda-time/releases
+        espressoCoreVersion = '3.6.1'  // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
+        jodaTimeVersion = '2.13.0'     // https://github.com/JodaOrg/joda-time/releases
         junitVersion = '4.13.2'
-        junitJupiterVersion = '5.10.3'
+        junitJupiterVersion = '5.11.3'
         preferenceVersion = '1.2.1'
+        testCoreVersion = '1.6.1'
         testRulesVersion = '1.6.1'
-        testRunnerVersion = '1.6.1'
-        kotlinVersion = '1.9.24'  // https://kotlinlang.org/docs/releases.html#release-details
-        ktxVersion = '1.13.1'  // https://androidx.tech/artifacts/core/core-ktx/
+        testRunnerVersion = '1.6.2'
+        kotlinVersion = '2.0.21'  // https://kotlinlang.org/docs/releases.html#release-details
+        ktxVersion = '1.15.0'  // https://androidx.tech/artifacts/core/core-ktx/
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.5.1'
+        classpath 'com.android.tools.build:gradle:8.7.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 

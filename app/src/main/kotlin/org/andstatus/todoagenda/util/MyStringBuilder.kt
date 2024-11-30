@@ -20,7 +20,7 @@ import java.util.function.Predicate
 import java.util.function.Supplier
 
 /** Adds convenience methods to [StringBuilder]  */
-class MyStringBuilder @JvmOverloads constructor(val builder: StringBuilder = StringBuilder()) : CharSequence, IsEmpty {
+class MyStringBuilder(val builder: StringBuilder = StringBuilder()) : CharSequence, IsEmpty {
     fun <T> withCommaNonEmpty(label: CharSequence?, obj: T): MyStringBuilder {
         return withComma<T>(label, obj) { obj: T -> nonEmptyObj(obj) }
     }
@@ -87,10 +87,6 @@ class MyStringBuilder @JvmOverloads constructor(val builder: StringBuilder = Str
     override val length get() = builder.length
     override fun get(index: Int): Char = builder[index]
 
-    // TODO: Delete?
-//    override fun charAt(index: Int): Char = builder[index]
-
-
     override fun subSequence(start: Int, end: Int): CharSequence {
         return builder.subSequence(start, end)
     }
@@ -107,8 +103,7 @@ class MyStringBuilder @JvmOverloads constructor(val builder: StringBuilder = Str
         return this
     }
 
-    override val isEmpty: Boolean
-        get() = length == 0
+    override fun isEmpty(): Boolean = length == 0
 
     companion object {
         const val COMMA = ","
@@ -170,7 +165,7 @@ class MyStringBuilder @JvmOverloads constructor(val builder: StringBuilder = Str
         }
 
         fun <T> isEmptyObj(obj: T?): Boolean {
-            if (obj is IsEmpty) return (obj as IsEmpty).isEmpty
+            if (obj is IsEmpty) return (obj as IsEmpty).isEmpty()
             if (obj is Number) return (obj as Number).toLong() == 0L
             return if (obj is String) StringUtil.isEmpty(obj as String?) else obj == null
         }

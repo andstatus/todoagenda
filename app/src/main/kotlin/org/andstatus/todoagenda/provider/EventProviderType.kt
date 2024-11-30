@@ -1,8 +1,10 @@
 package org.andstatus.todoagenda.provider
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.IntentFilter
+import android.os.Build
 import android.util.Log
 import org.andstatus.todoagenda.EnvironmentChangedReceiver
 import org.andstatus.todoagenda.calendar.CalendarEventProvider
@@ -148,6 +150,7 @@ enum class EventProviderType(
             }
         }
 
+        @SuppressLint("UnspecifiedRegisterReceiverFlag")
         private fun registerProviderChangedReceiver(
             context: Context, receiver: EnvironmentChangedReceiver,
             authority: String
@@ -156,7 +159,11 @@ enum class EventProviderType(
             intentFilter.addAction("android.intent.action.PROVIDER_CHANGED")
             intentFilter.addDataScheme("content")
             intentFilter.addDataAuthority(authority, null)
-            context.registerReceiver(receiver, intentFilter)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED)
+            } else {
+                context.registerReceiver(receiver, intentFilter)
+            }
         }
     }
 }
