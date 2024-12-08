@@ -89,23 +89,28 @@ object RemoteViewsUtil {
         return resValue * settings.textSizeScale.scaleValue / density
     }
 
-    fun getColorValue(context: Context?, @AttrRes attrId: Int): Int {
+    fun getColorValue(context: Context?, @AttrRes attrId: Int): Int = try {
+        val theme = context!!.theme
         val outValue = TypedValue()
-        if (context!!.theme.resolveAttribute(attrId, outValue, true)) {
+        if (theme.resolveAttribute(attrId, outValue, true)) {
             val colorResourceId = outValue.resourceId
-            return try {
-                context.resources.getColor(colorResourceId)
+            try {
+                context.resources.getColor(colorResourceId, theme)
             } catch (e: Exception) {
                 Log.w(
-                    TAG, "context.getResources() failed to resolve color for" +
-                        " resource Id:" + colorResourceId +
-                        " derived from attribute Id:" + attrId, e
+                    TAG,
+                    "context.getResources() failed to resolve color for resource Id:$colorResourceId" +
+                        " derived from attribute Id:$attrId", e
                 )
                 Color.GRAY
             }
+        } else {
+            Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId")
+            Color.GRAY
         }
-        Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId")
-        return Color.GRAY
+    } catch (e: Exception) {
+        Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId", e)
+        Color.GRAY
     }
 
     private fun getDimension(context: Context?, dimensionResourceId: Int): Float {
