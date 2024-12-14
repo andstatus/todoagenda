@@ -1,5 +1,14 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+<a id="v4.10"/>
+
+### 2024-12-14 v4.10.2 Text shadow and Event description
+* "All in one row" layout of Event entry improved. By default each entry is really in one row now.
+  In order to make time column multiline (as it was in previous version of the widget),
+  please set "Multiline details" option.
+  [#144](https://github.com/andstatus/todoagenda/issues/144)
+* Updated for Android 15.
+
 <a id="v4.9"/>
 
 ### 2024-01-08 v4.9.0 Text shadow and Event description

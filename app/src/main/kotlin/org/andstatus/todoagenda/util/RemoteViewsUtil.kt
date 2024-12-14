@@ -21,6 +21,7 @@ object RemoteViewsUtil {
     private const val METHOD_SET_ALPHA = "setAlpha"
     private const val METHOD_SET_COLOR_FILTER = "setColorFilter"
     private const val METHOD_SET_WIDTH = "setWidth"
+    private const val METHOD_SET_MIN_WIDTH = "setMinWidth"
     private const val METHOD_SET_HEIGHT = "setHeight"
     private const val METHOD_SET_PAINT_FLAGS = "setPaintFlags"
     fun setPadding(
@@ -44,6 +45,10 @@ object RemoteViewsUtil {
 
     fun setViewWidth(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
         rv.setInt(viewId, METHOD_SET_WIDTH, getScaledValueInPixels(settings, dimenId))
+    }
+
+    fun setViewMinWidth(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
+        rv.setInt(viewId, METHOD_SET_MIN_WIDTH, getScaledValueInPixels(settings, dimenId))
     }
 
     fun setViewHeight(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {

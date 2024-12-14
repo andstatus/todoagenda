@@ -637,7 +637,7 @@ ${toJson()}"""
         const val PREF_EVENT_ENTRY_LAYOUT = "eventEntryLayout"
         const val PREF_SHOW_EVENT_ICON = "showEventIcon"
         const val PREF_ENTRY_DATE_FORMAT = "entryDateFormat"
-        val PREF_ENTRY_DATE_FORMAT_DEFAULT: DateFormatValue = DateFormatType.NUMBER_OF_DAYS.defaultValue
+        val PREF_ENTRY_DATE_FORMAT_DEFAULT: DateFormatValue = DateFormatType.HIDDEN.defaultValue
 
         @Deprecated("")
         private val PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT = "showNumberOfDaysToEvent" // till v 4.0

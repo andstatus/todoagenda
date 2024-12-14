@@ -153,9 +153,14 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
     protected fun setTime(entry: WidgetEntry<*>, rv: RemoteViews) {
         if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) return
         val viewId = R.id.event_entry_time
-        RemoteViewsUtil.setMultiline(rv, viewId, settings.showEndTime)
+        RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineDetails)
         rv.setTextViewText(viewId, entry.eventTimeString.replace(CalendarEntry.SPACE_DASH_SPACE, "\n"))
-        RemoteViewsUtil.setViewWidth(settings, rv, viewId, R.dimen.event_time_width)
+        if (settings.isMultilineDetails) {
+            RemoteViewsUtil.setViewWidth(settings, rv, viewId, R.dimen.event_time_width)
+            RemoteViewsUtil.setMaxLines(rv, viewId, settings.maxLinesDetails)
+        } else {
+            RemoteViewsUtil.setViewMinWidth(settings, rv, viewId, R.dimen.event_time_width)
+        }
         RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_details)
         RemoteViewsUtil.setTextColor(
             settings,
