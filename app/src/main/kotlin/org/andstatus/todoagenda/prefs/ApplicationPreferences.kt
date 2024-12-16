@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.TextUtils
 import androidx.preference.PreferenceManager
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW_DEFAULT
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
@@ -219,7 +220,7 @@ object ApplicationPreferences {
             getString(
                 context,
                 PREF_TEXT_SHADOW,
-                TextShadow.NO_SHADOW.value
+                PREF_TEXT_SHADOW_DEFAULT
             )
         )
     }
@@ -473,7 +474,7 @@ object ApplicationPreferences {
         return try {
             val stringValue = getString(context, key)
             if (TextUtils.isEmpty(stringValue)) defaultValue else stringValue.toInt()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             defaultValue
         }
     }
@@ -531,7 +532,7 @@ object ApplicationPreferences {
     fun parseIntSafe(value: String?): Int {
         return if (StringUtil.isEmpty(value)) 0 else try {
             value!!.toInt()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             0
         }
     }

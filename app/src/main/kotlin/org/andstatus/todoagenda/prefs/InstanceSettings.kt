@@ -30,7 +30,12 @@ import kotlin.concurrent.Volatile
  *
  * @author yvolk@yurivolkov.com
  */
-class InstanceSettings(private val contextIn: Context?, val widgetId: Int, proposedInstanceName: String?) {
+class InstanceSettings private constructor(
+    private val contextIn: Context?,
+    val widgetId: Int,
+    proposedInstanceName: String?,
+    lockedTimeZoneId: String? = null
+) {
     val context: Context get() = contextIn ?: throw IllegalStateException("Context is null")
     val instanceId = InstanceId.next()
     var isCompactLayout = false
@@ -108,16 +113,20 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             return if (field == FilterMode.NORMAL_FILTER && clock().snapshotMode.isSnapshotMode) FilterMode.DEBUG_FILTER else field
         }
 
-    var activeEventSources: MutableList<OrderedEventSource> = CopyOnWriteArrayList()
-        get() {
-            return if (field.isEmpty() && isLiveMode) EventProviderType.availableSources else field
+    private val clock = MyClock().apply {
+        lockedTimeZoneId?.let {
+            this.lockedTimeZoneId = lockedTimeZoneId
+        }
+    }
+    val activeEventSources: MutableList<OrderedEventSource> = CopyOnWriteArrayList()
+        get() = field.also {
+            if (it.isEmpty()) it.addAll(EventProviderType.availableSources)
         }
     val widgetInstanceName: String
     var textSizeScale = TextSizeScale.MEDIUM
         private set
     var timeFormat: String = PREF_TIME_FORMAT_DEFAULT
         private set
-    private val clock = MyClock()
     var refreshPeriodMinutes = PREF_REFRESH_PERIOD_MINUTES_DEFAULT
         set(value) {
             if (value > 0) {
@@ -142,7 +151,7 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
             }
             if (json.has(PREF_ACTIVE_SOURCES)) {
                 val jsonArray = json.getJSONArray(PREF_ACTIVE_SOURCES)
-                activeEventSources = OrderedEventSource.fromJsonArray(jsonArray)
+                activeEventSources.addAll(OrderedEventSource.fromJsonArray(jsonArray))
             }
             if (json.has(PREF_EVENT_RANGE)) {
                 eventRange = json.getInt(PREF_EVENT_RANGE)
@@ -300,7 +309,7 @@ class InstanceSettings(private val contextIn: Context?, val widgetId: Int, propo
 
     private fun setFromApplicationPreferences(settingsStored: InstanceSettings?): InstanceSettings {
         widgetHeaderDateFormat = ApplicationPreferences.getWidgetHeaderDateFormat(context)
-        activeEventSources = ApplicationPreferences.getActiveEventSources(context)
+        activeEventSources.addAll(ApplicationPreferences.getActiveEventSources(context))
         eventRange = ApplicationPreferences.getEventRange(context)
         eventsEnded = ApplicationPreferences.getEventsEnded(context)
         fillAllDayEvents = ApplicationPreferences.getFillAllDayEvents(context)
@@ -703,6 +712,7 @@ ${toJson()}"""
         const val PREF_REFRESH_PERIOD_MINUTES = "refreshPeriodMinutes"
         const val PREF_REFRESH_PERIOD_MINUTES_DEFAULT = 10
         private const val PREF_RESULTS_STORAGE = "resultsStorage"
+
         fun fromJson(context: Context?, storedSettings: InstanceSettings?, json: JSONObject): InstanceSettings {
             val widgetId = json.optInt(PREF_WIDGET_ID)
             var instanceName = json.optString(PREF_WIDGET_INSTANCE_NAME)
@@ -715,6 +725,17 @@ ${toJson()}"""
             return settings.setFromJson(json)
         }
 
+        fun newEmpty(context: Context, widgetId: Int, proposedInstanceName: String?): InstanceSettings =
+            InstanceSettings(context, widgetId, proposedInstanceName)
+
+        fun newFake(
+            context: Context,
+            widgetId: Int,
+            proposedInstanceName: String?,
+            lockedTimeZoneId: String
+        ): InstanceSettings =
+            InstanceSettings(context, widgetId, proposedInstanceName, lockedTimeZoneId)
+
         fun fromApplicationPreferences(
             context: Context,
             widgetId: Int,
@@ -726,7 +747,7 @@ ${toJson()}"""
                     ApplicationPreferences.getString(
                         context, PREF_WIDGET_INSTANCE_NAME,
                         ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, "")
-                    )
+                    ),
                 )
                 return settings.setFromApplicationPreferences(settingsStored)
             }

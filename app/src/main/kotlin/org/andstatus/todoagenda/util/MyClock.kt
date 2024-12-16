@@ -7,10 +7,11 @@ import org.joda.time.DateTimeZone
 import org.joda.time.Days
 import org.joda.time.Minutes
 import java.util.TimeZone
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.Volatile
 
 /**
- * A clock, the can be changed independently from a Device clock
+ * A clock that can be changed independently from a Device clock
  *
  * @author yvolk@yurivolkov.com
  */
@@ -26,7 +27,7 @@ class MyClock {
     private var snapshotDateSetAt: DateTime? = null
 
     @Volatile
-    var lockedTimeZoneId = ""
+    var lockedTimeZoneId: String = ""
         set(value) {
             field = DateUtil.validatedTimeZoneId(value)
             updateZone()
@@ -35,6 +36,13 @@ class MyClock {
     @Volatile
     var zone = defaultTimeZone
         private set
+
+    private val startHourOfDayRef: AtomicInteger = AtomicInteger(0)
+    var startHourOfDay: Int
+        get() = startHourOfDayRef.get()
+        set(value) {
+            startHourOfDayRef.set(value)
+        }
 
     fun setSnapshotMode(snapshotModeIn: SnapshotMode?, settings: InstanceSettings) {
         snapshotMode =
@@ -135,8 +143,8 @@ class MyClock {
         var myDefaultTimeZone: DateTimeZone? = null
         val defaultTimeZone: DateTimeZone get() = myDefaultTimeZone ?: DateTimeZone.forTimeZone(TimeZone.getDefault())
 
-        fun startOfNextDay(date: DateTime?): DateTime {
-            return date!!.plusDays(1).withTimeAtStartOfDay()
+        fun startOfNextDay(date: DateTime): DateTime {
+            return date.plusDays(1).withTimeAtStartOfDay()
         }
 
         fun isDateDefined(dateTime: DateTime?): Boolean {

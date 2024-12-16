@@ -144,13 +144,13 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
                 context.registerReceiver(receiver, filter)
                 val oldReceiver = registeredReceiver.getAndSet(receiver)
                 oldReceiver?.unRegister(context)
-                scheduleMidnightAlarms(context, instances)
+                scheduleStartOfDayAlarms(context, instances)
                 schedulePeriodicAlarms(context, instances)
                 Log.i(TAG, "Receivers are registered")
             }
         }
 
-        private fun scheduleMidnightAlarms(context: Context, instances: Map<Int, InstanceSettings>) {
+        private fun scheduleStartOfDayAlarms(context: Context, instances: Map<Int, InstanceSettings>) {
             val alarmTimes: MutableSet<DateTime> = HashSet()
             for (settings in instances.values) {
                 alarmTimes.add(settings.clock().now().withTimeAtStartOfDay().plusDays(1))

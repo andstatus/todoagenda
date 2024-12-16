@@ -21,9 +21,9 @@ class RecurringEventsTest : BaseWidgetTest() {
     fun testShowRecurringEvents() {
         generateEventInstances()
         Assert.assertEquals("Entries: " + factory.widgetEntries.size, 15, countCalendarEntries().toLong())
-        provider!!.startEditingPreferences()
+        provider.startEditingPreferences()
         ApplicationPreferences.setShowOnlyClosestInstanceOfRecurringEvent(provider.context, true)
-        provider!!.savePreferences()
+        provider.savePreferences()
         generateEventInstances()
         Assert.assertEquals("Entries: " + factory.widgetEntries.size, 1, countCalendarEntries().toLong())
     }
