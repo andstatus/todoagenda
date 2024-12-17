@@ -37,83 +37,89 @@ class InstanceSettings private constructor(
     lockedTimeZoneId: String? = null
 ) {
     val context: Context get() = contextIn ?: throw IllegalStateException("Context is null")
-    val instanceId = InstanceId.next()
-    var isCompactLayout = false
+    val instanceId: Long = InstanceId.next()
+    var isCompactLayout: Boolean = false
         private set
     var widgetHeaderLayout: WidgetHeaderLayout = WidgetHeaderLayout.defaultValue
         private set
-    var widgetHeaderDateFormat = PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
+    var widgetHeaderDateFormat: DateFormatValue = PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
         private set
-    var showDayHeaders = true
+    var showDayHeaders: Boolean = true
         private set
-    var dayHeaderDateFormat = PREF_DAY_HEADER_DATE_FORMAT_DEFAULT
+    var dayHeaderDateFormat: DateFormatValue = PREF_DAY_HEADER_DATE_FORMAT_DEFAULT
         private set
-    var showPastEventsUnderOneHeader = false
+    var showPastEventsUnderOneHeader: Boolean = false
         private set
     var dayHeaderAlignment: String = PREF_DAY_HEADER_ALIGNMENT_DEFAULT
         private set
-    var horizontalLineBelowDayHeader = false
+    var horizontalLineBelowDayHeader: Boolean = false
         private set
-    var showDaysWithoutEvents = false
+    var showDaysWithoutEvents: Boolean = false
         private set
     var eventEntryLayout: EventEntryLayout = EventEntryLayout.DEFAULT
         private set
-    var showEventIcon = true
+    var showEventIcon: Boolean = true
         private set
-    var entryDateFormat = PREF_ENTRY_DATE_FORMAT_DEFAULT
+    var entryDateFormat: DateFormatValue = PREF_ENTRY_DATE_FORMAT_DEFAULT
         private set
-    var isMultilineTitle = PREF_MULTILINE_TITLE_DEFAULT
+    var isMultilineTitle: Boolean = PREF_MULTILINE_TITLE_DEFAULT
         private set
-    var maxLinesTitle = PREF_MAXLINES_TITLE_DEFAULT
-    var isMultilineDetails = PREF_MULTILINE_DETAILS_DEFAULT
+    var maxLinesTitle: Int = PREF_MAXLINES_TITLE_DEFAULT
+    var isMultilineDetails: Boolean = PREF_MULTILINE_DETAILS_DEFAULT
         private set
-    var maxLinesDetails = PREF_MAXLINES_DETAILS_DEFAULT
+    var maxLinesDetails: Int = PREF_MAXLINES_DETAILS_DEFAULT
+        private set
 
     // ----------------------------------------------------------------------------------
     // Colors
-    private var defaultColors: ThemeColors
+    private var defaultColors: ThemeColors = if (contextIn == null) {
+        ThemeColors.EMPTY
+    } else {
+        ThemeColors(context, ColorThemeType.SINGLE)
+    }
     private var darkColors: ThemeColors = ThemeColors.EMPTY
     var textShadow: TextShadow = TextShadow.NO_SHADOW
         private set
 
     // ----------------------------------------------------------------------------------
     // ,,,
-    var showEndTime = PREF_SHOW_END_TIME_DEFAULT
+    var showEndTime: Boolean = PREF_SHOW_END_TIME_DEFAULT
         private set
-    var showLocation = PREF_SHOW_LOCATION_DEFAULT
+    var showLocation: Boolean = PREF_SHOW_LOCATION_DEFAULT
         private set
-    var showDescription = PREF_SHOW_DESCRIPTION_DEFAULT
+    var showDescription: Boolean = PREF_SHOW_DESCRIPTION_DEFAULT
         private set
-    var fillAllDayEvents = PREF_FILL_ALL_DAY_DEFAULT
+    var fillAllDayEvents: Boolean = PREF_FILL_ALL_DAY_DEFAULT
         private set
-    var indicateAlerts = true
+    var indicateAlerts: Boolean = true
         private set
-    var indicateRecurring = false
+    var indicateRecurring: Boolean = false
         private set
     var eventsEnded: EndedSomeTimeAgo? = EndedSomeTimeAgo.NONE
         private set
-    var showPastEventsWithDefaultColor = false
+    var showPastEventsWithDefaultColor: Boolean = false
         private set
-    var eventRange = PREF_EVENT_RANGE_DEFAULT.toInt()
+    var eventRange: Int = PREF_EVENT_RANGE_DEFAULT.toInt()
+        // TODO: private set
     var hideBasedOnKeywords: String? = ""
         private set
     var showBasedOnKeywords: String? = ""
         private set
-    var showOnlyClosestInstanceOfRecurringEvent = false
+    var showOnlyClosestInstanceOfRecurringEvent: Boolean = false
         private set
-    var hideDuplicates = false
+    var hideDuplicates: Boolean = false
         private set
     var allDayEventsPlacement: AllDayEventsPlacement = AllDayEventsPlacement.defaultValue
         private set
     var taskScheduling: TaskScheduling = TaskScheduling.defaultValue
         private set
     var taskWithoutDates: TasksWithoutDates = TasksWithoutDates.defaultValue
+        // TODO: private set
     var filterMode: FilterMode = FilterMode.defaultValue
-        get() {
-            return if (field == FilterMode.NORMAL_FILTER && clock().snapshotMode.isSnapshotMode) FilterMode.DEBUG_FILTER else field
-        }
+        get() = if (field == FilterMode.NORMAL_FILTER && clock().snapshotMode.isSnapshotMode) FilterMode.DEBUG_FILTER else field
+        // TODO: private set
 
-    private val clock = MyClock().apply {
+    private val clock: MyClock = MyClock().apply {
         lockedTimeZoneId?.let {
             this.lockedTimeZoneId = lockedTimeZoneId
         }
@@ -122,12 +128,16 @@ class InstanceSettings private constructor(
         get() = field.also {
             if (it.isEmpty()) it.addAll(EventProviderType.availableSources)
         }
-    val widgetInstanceName: String
-    var textSizeScale = TextSizeScale.MEDIUM
+    val widgetInstanceName: String = if (contextIn == null) "(empty)" else AllSettings.uniqueInstanceName(
+        context,
+        widgetId,
+        proposedInstanceName
+    )
+    var textSizeScale: TextSizeScale = TextSizeScale.MEDIUM
         private set
     var timeFormat: String = PREF_TIME_FORMAT_DEFAULT
         private set
-    var refreshPeriodMinutes = PREF_REFRESH_PERIOD_MINUTES_DEFAULT
+    var refreshPeriodMinutes: Int = PREF_REFRESH_PERIOD_MINUTES_DEFAULT
         set(value) {
             if (value > 0) {
                 field = value
@@ -136,6 +146,7 @@ class InstanceSettings private constructor(
 
     @Volatile
     var resultsStorage: QueryResultsStorage? = null
+
     private fun setFromJson(json: JSONObject): InstanceSettings {
         if (widgetId == 0) {
             return EMPTY
@@ -392,15 +403,6 @@ class InstanceSettings private constructor(
         return this
     }
 
-    init {
-        widgetInstanceName = if (contextIn == null) "(empty)" else AllSettings.uniqueInstanceName(
-            context,
-            widgetId,
-            proposedInstanceName
-        )
-        defaultColors = if (contextIn == null) ThemeColors.EMPTY else ThemeColors(context, ColorThemeType.SINGLE)
-    }
-
     val isEmpty: Boolean
         get() = widgetId == 0
 
@@ -418,12 +420,7 @@ class InstanceSettings private constructor(
             SettingsStorage.saveJson(context, getStorageKey(widgetId), toJson())
             return true
         } catch (e: IOException) {
-            Log.e(
-                tag, """
-     $msgLog
-     ${toString()}
-     """.trimIndent(), e
-            )
+            Log.e(tag, "$msgLog ${toString()}", e)
         }
         return false
     }
