@@ -79,14 +79,14 @@ class AstridCloneTasksProvider private constructor(
         val source = settings.getActiveEventSource(
             type, cursor.getInt(cursor.getColumnIndex(taskSource.listColumnId))
         )
-        val task = TaskEvent(settings, settings.clock().zone)
+        val task = TaskEvent(settings, settings.clock.zone)
         task.setEventSource(source)
         task.setId(cursor.getLong(cursor.getColumnIndex(TASKS_COLUMN_ID)))
         task.title = cursor.getStringOrNull(cursor.getColumnIndex(TASKS_COLUMN_TITLE)) ?: ""
         val startMillis: Long? = getPositiveLongOrNull(cursor, TASKS_COLUMN_START_DATE)
         val dueMillisRaw: Long? = getPositiveLongOrNull(cursor, TASKS_COLUMN_DUE_DATE)
         task.isAllDay = taskSource.isAllDay(dueMillisRaw)
-        val dueMillis = taskSource.toDueMillis(dueMillisRaw, settings.clock().zone)
+        val dueMillis = taskSource.toDueMillis(dueMillisRaw, settings.clock.zone)
         task.setDates(startMillis, dueMillis)
         val priority = cursor.getInt(cursor.getColumnIndex(TASKS_COLUMN_IMPORTANCE))
         val color = context.getColor(priorityToColor(priority))

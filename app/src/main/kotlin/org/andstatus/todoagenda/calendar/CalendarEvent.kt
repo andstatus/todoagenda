@@ -54,7 +54,7 @@ class CalendarEvent(
         }
 
     private fun dateFromMillis(millis: Long): DateTime {
-        return if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.clock().zone)
+        return if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.clock.zone)
     }
 
     /**
@@ -71,11 +71,11 @@ class CalendarEvent(
                 .withDayOfMonth(utcDate.dayOfMonth)
                 .withMillisOfDay(0)
             var hour = 0
-            while (settings.clock().zone.isLocalDateTimeGap(ldt)) {
+            while (settings.clock.zone.isLocalDateTimeGap(ldt)) {
                 Log.v("fixTimeOfAllDayEvent", "Local Date Time Gap: $ldt; $msgLog")
                 ldt = ldt.withHourOfDay(++hour)
             }
-            fixed = ldt.toDateTime(settings.clock().zone)
+            fixed = ldt.toDateTime(settings.clock.zone)
             msgLog += " -> $fixed"
             if (Math.abs(System.currentTimeMillis() - fixTimeOfAllDayEventLoggedAt) > 1000) {
                 fixTimeOfAllDayEventLoggedAt = System.currentTimeMillis()
@@ -174,7 +174,7 @@ class CalendarEvent(
 
     val isActive: Boolean
         get() {
-            val now = settings.clock().now()
+            val now = settings.clock.now()
             return startDate.isBefore(now) && endDate.isAfter(now)
         }
     val isPartOfMultiDayEvent: Boolean

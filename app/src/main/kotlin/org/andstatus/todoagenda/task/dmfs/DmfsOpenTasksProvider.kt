@@ -87,7 +87,7 @@ class DmfsOpenTasksProvider(type: EventProviderType, context: Context, widgetId:
                 type,
                 cursor.getInt(cursor.getColumnIndex(DmfsOpenTasksContract.Tasks.COLUMN_LIST_ID))
             )
-        val task = TaskEvent(settings, settings.clock().zone)
+        val task = TaskEvent(settings, settings.clock.zone)
         task.setEventSource(source)
         task.setId(cursor.getLong(cursor.getColumnIndex(DmfsOpenTasksContract.Tasks.COLUMN_ID)))
         task.title =

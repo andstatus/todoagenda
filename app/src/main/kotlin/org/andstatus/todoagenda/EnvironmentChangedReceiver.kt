@@ -45,7 +45,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             RemoteViewsFactory.ACTION_OPEN_CALENDAR -> {
                 val openCalendar = CalendarIntentUtil.newOpenCalendarAtDayIntent(
                     DateTime(
-                        settings!!.clock().zone
+                        settings!!.clock.zone
                     )
                 )
                 startActivity(context, openCalendar, action, widgetId, "Open Calendar")
@@ -153,7 +153,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         private fun scheduleStartOfDayAlarms(context: Context, instances: Map<Int, InstanceSettings>) {
             val alarmTimes: MutableSet<DateTime> = HashSet()
             for (settings in instances.values) {
-                alarmTimes.add(settings.clock().now().withTimeAtStartOfDay().plusDays(1))
+                alarmTimes.add(settings.clock.now().withTimeAtStartOfDay().plusDays(1))
             }
             for ((counter, alarmTime) in alarmTimes.withIndex()) {
                 val intent = Intent(context, EnvironmentChangedReceiver::class.java)

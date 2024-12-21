@@ -36,7 +36,7 @@ class QueryResult internal constructor(
     constructor(
         providerType: EventProviderType, settings: InstanceSettings, uri: Uri?, projection: Array<String>?,
         selection: String, selectionArgs: Array<String>?, sortOrder: String?
-    ) : this(providerType, settings.widgetId, settings.clock().now()) {
+    ) : this(providerType, settings.widgetId, settings.clock.now()) {
         this.uri = uri
         projection?.let { this.projection = it }
         this.selection = selection

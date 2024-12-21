@@ -36,10 +36,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task14 ", "task8 ", "task4 ", "task2 ", "task15 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
-                .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .filterMode = FilterMode.NO_FILTERING
-            settings
+            settings.copy(
+                taskScheduling = TaskScheduling.DATE_DUE,
+                taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
+                filterModeInner = FilterMode.NO_FILTERING
+            )
         }
         oneCase(method, setter, names)
     }
@@ -65,10 +66,10 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task10 ", "task9 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
-                .setTaskWithoutDates(TasksWithoutDates.END_OF_LIST)
-                .filterMode = FilterMode.NO_FILTERING
-            settings
+            settings.copy(
+                taskWithoutDates = TasksWithoutDates.END_OF_LIST,
+                filterModeInner = FilterMode.NO_FILTERING
+            )
         }
         oneCase(method, setter, names)
     }
@@ -92,10 +93,10 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task8 ", "task2 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
-                .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .filterMode = FilterMode.DEBUG_FILTER
-            settings
+            settings.copy(
+                taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
+                filterModeInner = FilterMode.DEBUG_FILTER
+            )
         }
         oneCase(method, setter, names)
     }
@@ -119,10 +120,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task8 ", "task2 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_DUE)
-                .setTaskWithoutDates(TasksWithoutDates.HIDE)
-                .filterMode = FilterMode.DEBUG_FILTER
-            settings
+            settings.copy(
+                taskScheduling = TaskScheduling.DATE_DUE,
+                taskWithoutDates = TasksWithoutDates.HIDE,
+                filterModeInner = FilterMode.DEBUG_FILTER
+            )
         }
         oneCase(method, setter, names)
     }
@@ -147,10 +149,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task14 ", "task15 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
-                .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .filterMode = FilterMode.NO_FILTERING
-            settings
+            settings.copy(
+                taskScheduling = TaskScheduling.DATE_STARTED,
+                taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
+                filterModeInner = FilterMode.NO_FILTERING
+            )
         }
         oneCase(method, setter, names)
     }
@@ -176,10 +179,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task10 ", "task9 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
-                .setTaskWithoutDates(TasksWithoutDates.END_OF_LIST)
-                .filterMode = FilterMode.NO_FILTERING
-            settings
+            settings.copy(
+                taskScheduling = TaskScheduling.DATE_STARTED,
+                taskWithoutDates = TasksWithoutDates.END_OF_LIST,
+                filterModeInner = FilterMode.NO_FILTERING
+            )
         }
         oneCase(method, setter, names)
     }
@@ -203,10 +207,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "task14 ", "task15 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
-                .setTaskWithoutDates(TasksWithoutDates.HIDE)
-                .filterMode = FilterMode.NO_FILTERING
-            settings
+            settings.copy(
+                taskScheduling = TaskScheduling.DATE_STARTED,
+                taskWithoutDates = TasksWithoutDates.HIDE,
+                filterModeInner = FilterMode.NO_FILTERING
+            )
         }
         oneCase(method, setter, names)
     }
@@ -229,10 +234,11 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             "", "task17 "
         )
         val setter = UnaryOperator { settings: InstanceSettings ->
-            settings.setTaskScheduling(TaskScheduling.DATE_STARTED)
-                .setTaskWithoutDates(TasksWithoutDates.END_OF_TODAY)
-                .filterMode = FilterMode.DEBUG_FILTER
-            settings
+            settings.copy(
+                taskScheduling = TaskScheduling.DATE_STARTED,
+                taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
+                filterModeInner = FilterMode.DEBUG_FILTER
+            )
         }
         oneCase(method, setter, names)
     }
@@ -245,13 +251,17 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
         oneCaseSettings(method, setter, names)
         oneCaseSettings(
             method,
-            { settings: InstanceSettings -> setter.apply(settings).setEventEntryLayout(EventEntryLayout.ONE_LINE) },
+            { settings: InstanceSettings ->
+                setter.apply(settings).copy(
+                    eventEntryLayout = (EventEntryLayout.ONE_LINE)
+                )
+            },
             names
         )
     }
 
     private fun oneCaseSettings(method: String, setter: UnaryOperator<InstanceSettings>, names: List<String>) {
-        setter.apply(settings)
+        provider.settings = setter.apply(settings)
         playResults(method)
         val widgetEntries = factory.widgetEntries
         for (ind in names.indices) {

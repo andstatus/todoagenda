@@ -13,7 +13,7 @@ abstract class AbstractTaskProvider(type: EventProviderType, context: Context, w
     protected var now: DateTime? = null
     override fun initialiseParameters() {
         super.initialiseParameters()
-        now = settings.clock().now()
+        now = settings.clock.now()
     }
 
     fun queryEvents(): List<TaskEvent> {

@@ -48,7 +48,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
 
     init {
         visualizers.add(LastEntryVisualizer(context, widgetId))
-        widgetEntries.add(LastEntry(settings, LastEntryType.NOT_LOADED, settings.clock().now()))
+        widgetEntries.add(LastEntry(settings, LastEntryType.NOT_LOADED, settings.clock.now()))
         logEvent("Init" + if (createdByLauncher) " by Launcher" else "")
     }
 
@@ -228,7 +228,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
         toDayExclusive: DateTime?
     ) {
         var emptyDay = fromDayExclusive!!.plusDays(1)
-        val today = settings.clock().now().withTimeAtStartOfDay()
+        val today = settings.clock.now().withTimeAtStartOfDay()
         if (emptyDay.isBefore(today)) {
             emptyDay = today
         }
@@ -297,7 +297,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
                 val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_INITIAL.shadowed(settings.textShadow))
-                settings.clock().updateZone()
+                settings.clock.updateZone()
                 configureWidgetHeader(settings, rv)
                 configureWidgetEntriesList(settings, rv)
                 appWidgetManager.updateAppWidget(widgetId, rv)
@@ -333,7 +333,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             val viewId = R.id.calendar_current_date
             rv.setOnClickPendingIntent(viewId, getActionPendingIntent(settings, ACTION_OPEN_CALENDAR))
             val formattedDate = settings.widgetHeaderDateFormatter()
-                .formatDate(settings.clock().now()).toString()
+                .formatDate(settings.clock.now()).toString()
                 .uppercase(Locale.getDefault())
             rv.setTextViewText(viewId, if (StringUtil.isEmpty(formattedDate)) "                    " else formattedDate)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.widget_header_title)

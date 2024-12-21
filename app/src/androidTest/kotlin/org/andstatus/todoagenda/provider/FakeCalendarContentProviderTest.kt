@@ -70,7 +70,7 @@ class FakeCalendarContentProviderTest : BaseWidgetTest() {
             EventProviderType.CALENDAR, settings,
             CalendarContract.Instances.CONTENT_URI, projection, selection, null, sortOrder
         )
-        val today = settings.clock().now().withTimeAtStartOfDay()
+        val today = settings.clock.now().withTimeAtStartOfDay()
         input.addRow(
             QueryRow().setEventId(++eventId)
                 .setTitle("First Event today").setBegin(today.plusHours(8).millis)

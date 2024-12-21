@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -27,9 +28,7 @@ class WidgetData private constructor(private val jsonData: JSONObject) {
         return jsonData
     }
 
-    override fun toString(): String {
-        return TAG + ":" + jsonData
-    }
+    override fun toString(): String = "$TAG:$jsonData"
 
     fun getSettingsForWidget(
         context: Context,
@@ -40,12 +39,16 @@ class WidgetData private constructor(private val jsonData: JSONObject) {
             ?: return InstanceSettings.EMPTY
         val originalSettings: InstanceSettings =
             InstanceSettings.fromJson(context, storedSettings, jsonSettings)
-        val targetSettings = originalSettings.asForWidget(context, targetWidgetId)
         val results: QueryResultsStorage = QueryResultsStorage.fromJson(targetWidgetId, jsonData)
-        if (!results.results.isEmpty()) {
-            targetSettings.resultsStorage = results
-        }
-        return targetSettings
+        return originalSettings.copy(
+            widgetId = targetWidgetId,
+            proposedInstanceName = AllSettings.uniqueInstanceName(
+                originalSettings.context,
+                targetWidgetId,
+                originalSettings.widgetInstanceName
+            ),
+            resultsStorage = results.takeIf { results.results.isNotEmpty() }
+        )
     }
 
     companion object {

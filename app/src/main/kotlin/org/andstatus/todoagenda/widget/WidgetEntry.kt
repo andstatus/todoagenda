@@ -148,7 +148,7 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
             entryDate: DateTime?
         ): DateTime {
             return when (entryPosition) {
-                WidgetEntryPosition.START_OF_TODAY, WidgetEntryPosition.END_OF_TODAY -> settings.clock().now()
+                WidgetEntryPosition.START_OF_TODAY, WidgetEntryPosition.END_OF_TODAY -> settings.clock.now()
                     .withTimeAtStartOfDay()
 
                 else -> entryDate!!.withTimeAtStartOfDay()
@@ -165,13 +165,13 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 WidgetEntryPosition.END_OF_TODAY, WidgetEntryPosition.END_OF_LIST_HEADER, WidgetEntryPosition.END_OF_LIST, WidgetEntryPosition.LIST_FOOTER -> return TimeSection.FUTURE
                 else -> {}
             }
-            if (settings.clock().isToday(entryDay)) {
+            if (settings.clock.isToday(entryDay)) {
                 if (entryPosition == WidgetEntryPosition.DAY_HEADER) return TimeSection.TODAY
-                return if (settings.clock().isToday(endDate)) {
-                    if (settings.clock().isBeforeNow(endDate)) TimeSection.PAST else TimeSection.TODAY
+                return if (settings.clock.isToday(endDate)) {
+                    if (settings.clock.isBeforeNow(endDate)) TimeSection.PAST else TimeSection.TODAY
                 } else TimeSection.TODAY
             }
-            return if (settings.clock().isBeforeToday(entryDay)) TimeSection.PAST else if (settings.clock()
+            return if (settings.clock.isBeforeToday(entryDay)) TimeSection.PAST else if (settings.clock
                     .isToday(endDate)
             ) TimeSection.TODAY else TimeSection.FUTURE
         }
@@ -188,7 +188,7 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
         ): WidgetEntryPosition {
             if (mainDate == null && otherDate == null) return settings.taskWithoutDates.widgetEntryPosition
             val refDate = mainDate ?: otherDate
-            if (settings.showPastEventsUnderOneHeader && settings.clock().isBeforeToday(refDate)) {
+            if (settings.showPastEventsUnderOneHeader && settings.clock.isBeforeToday(refDate)) {
                 return WidgetEntryPosition.PAST_AND_DUE
             }
             if (refDate!!.isAfter(settings.endOfTimeRange)) return WidgetEntryPosition.END_OF_LIST

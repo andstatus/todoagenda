@@ -15,7 +15,7 @@ class SingleEventTest : BaseWidgetTest() {
     private var eventId = 0
     @Test
     fun testEventAttributes() {
-        val today = settings.clock().now().withTimeAtStartOfDay()
+        val today = settings.clock.now().withTimeAtStartOfDay()
         val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
@@ -36,7 +36,7 @@ class SingleEventTest : BaseWidgetTest() {
 
     @Test
     fun testAlldayEventAttributes() {
-        val today = settings.clock().now().withTimeAtStartOfDay()
+        val today = settings.clock.now().withTimeAtStartOfDay()
         val event = CalendarEvent(settings, provider.context, true)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)
@@ -54,7 +54,7 @@ class SingleEventTest : BaseWidgetTest() {
 
     @Test
     fun testAlldayEventMillis() {
-        val today = settings.clock().now(DateTimeZone.UTC).withTimeAtStartOfDay()
+        val today = settings.clock.now(DateTimeZone.UTC).withTimeAtStartOfDay()
         val event = CalendarEvent(settings, provider.context, true)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)

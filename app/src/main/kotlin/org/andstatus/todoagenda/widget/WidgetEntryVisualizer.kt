@@ -126,7 +126,7 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
             rv.setViewVisibility(R.id.event_entry_days, View.GONE)
             rv.setViewVisibility(R.id.event_entry_days_right, View.GONE)
         } else {
-            val days = settings.clock().getNumberOfDaysTo(entry.entryDate)
+            val days = settings.clock.getNumberOfDaysTo(entry.entryDate)
             val daysAsText = settings.entryDateFormat.type != DateFormatType.NUMBER_OF_DAYS || days > -2 && days < 2
             val viewToShow = if (daysAsText) R.id.event_entry_days else R.id.event_entry_days_right
             val viewToHide = if (daysAsText) R.id.event_entry_days_right else R.id.event_entry_days

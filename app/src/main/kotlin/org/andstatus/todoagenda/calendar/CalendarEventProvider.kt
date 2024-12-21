@@ -79,8 +79,8 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
             val otherEvent = eventIds[event.eventId]
             if (otherEvent == null) {
                 eventIds[event.eventId] = event
-            } else if (Math.abs(settings.clock().getNumberOfMinutesTo(event.startDate)) <
-                Math.abs(settings.clock().getNumberOfMinutesTo(otherEvent.startDate))
+            } else if (Math.abs(settings.clock.getNumberOfMinutesTo(event.startDate)) <
+                Math.abs(settings.clock.getNumberOfMinutesTo(otherEvent.startDate))
             ) {
                 toRemove.add(otherEvent)
                 eventIds[event.eventId] = event
@@ -186,7 +186,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
         get() {
             val builder = CONTENT_URI.buildUpon()
             ContentUris.appendId(builder, 0)
-            ContentUris.appendId(builder, settings.clock().now().millis)
+            ContentUris.appendId(builder, settings.clock.now().millis)
             return queryList(builder.build(), pastEventsWithColorSelection).stream()
                 .filter { ev: CalendarEvent -> settings.filterMode != FilterMode.DEBUG_FILTER || ev.hasDefaultCalendarColor() }
                 .collect(Collectors.toList())
@@ -251,7 +251,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
     }
 
     override val addEventIntent: Intent
-        get() = CalendarIntentUtil.newAddCalendarEventIntent(settings.clock().zone)
+        get() = CalendarIntentUtil.newAddCalendarEventIntent(settings.clock.zone)
 
     companion object {
         private val TAG = CalendarEventProvider::class.java.simpleName

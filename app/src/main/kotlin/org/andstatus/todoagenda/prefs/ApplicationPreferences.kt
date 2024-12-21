@@ -22,7 +22,7 @@ object ApplicationPreferences {
     private const val PREF_ASK_FOR_PERMISSIONS = "askForPermissions"
 
     fun fromInstanceSettings(context: Context, widgetId: Int) {
-        synchronized(ApplicationPreferences::class.java) {
+        synchronized(ApplicationPreferences::class) {
             val settings = AllSettings.instanceFromId(context, widgetId)
             setWidgetId(context, if (widgetId == 0) settings.widgetId else widgetId)
             setDateFormat(
@@ -63,7 +63,7 @@ object ApplicationPreferences {
             setBoolean(context, InstanceSettings.PREF_SHOW_LOCATION, settings.showLocation)
             setBoolean(context, InstanceSettings.PREF_SHOW_DESCRIPTION, settings.showDescription)
             setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
-            setLockedTimeZoneId(context, settings.clock().lockedTimeZoneId)
+            setLockedTimeZoneId(context, settings.clock.lockedTimeZoneId)
             setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
             setString(context, InstanceSettings.PREF_EVENT_ENTRY_LAYOUT, settings.eventEntryLayout.value)
             setBoolean(context, InstanceSettings.PREF_MULTILINE_TITLE, settings.isMultilineTitle)

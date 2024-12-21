@@ -40,7 +40,7 @@ class RecurringEventsTest : BaseWidgetTest() {
 
     fun generateEventInstances() {
         provider!!.clear()
-        val date = settings.clock().now().withTimeAtStartOfDay()
+        val date = settings.clock.now().withTimeAtStartOfDay()
         var millis = date.millis + TimeUnit.HOURS.toMillis(10)
         eventId++
         for (ind in 0..14) {

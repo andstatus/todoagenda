@@ -17,7 +17,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
         val inputs = provider.loadResultsAndSettings(
             org.andstatus.todoagenda.test.R.raw.multi_day
         )
-        val now = DateTime(2015, 8, 30, 0, 0, 1, 0, settings.clock().zone)
+        val now = DateTime(2015, 8, 30, 0, 0, 1, 0, settings.clock.zone)
         inputs.executedAt.set(now)
         provider.addResults(inputs)
         val dateRange = 30

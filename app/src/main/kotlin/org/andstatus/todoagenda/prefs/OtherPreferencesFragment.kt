@@ -49,7 +49,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 ?: return
         val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
         preference.isEnabled = snapshotMode != SnapshotMode.SNAPSHOT_TIME
-        val timeZone = settings.clock().zone
+        val timeZone = settings.clock.zone
         preference.summary = String.format(
             getText(if (preference.isChecked) R.string.lock_time_zone_on_desc else R.string.lock_time_zone_off_desc).toString(),
             timeZone.getName(DateTime.now(timeZone).millis)
@@ -78,7 +78,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
         val snapshotDateString: CharSequence = if (settings.hasResults()) {
             DateFormatter(
                 settings.context, DateFormatType.DEFAULT_WEEKDAY.defaultValue,
-                settings.clock().now()
+                settings.clock.now()
             ).formatDate(settings.resultsStorage!!.executedAt.get()).toString() +
                 " " + DateUtil.formatTime({ settings }, settings.resultsStorage!!.executedAt.get())
         } else {
@@ -136,7 +136,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 if (snapshotMode.isSnapshotMode && !settings.hasResults()) {
                     settings.resultsStorage = QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
                 }
-                settings.clock().setSnapshotMode(snapshotMode, settings)
+                settings.clock.setSnapshotMode(snapshotMode, settings)
                 settings.save(key, "newResultsForSnapshotMode")
                 showSnapshotMode()
                 setLockTimeZone()

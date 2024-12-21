@@ -23,7 +23,7 @@ class LastEntry(settings: InstanceSettings, val type: LastEntryType, date: DateT
         fun forEmptyList(settings: InstanceSettings): LastEntry {
             val entryType =
                 if (PermissionsUtil.mustRequestPermissions(settings.context)) LastEntryType.NO_PERMISSIONS else LastEntryType.EMPTY
-            return LastEntry(settings, entryType, settings.clock().now())
+            return LastEntry(settings, entryType, settings.clock.now())
         }
 
         fun addLast(settings: InstanceSettings, widgetEntries: MutableList<WidgetEntry<*>>) {

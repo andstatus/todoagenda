@@ -48,7 +48,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
         }
         provider.addRow(
             CalendarEvent(settings, provider.context, false)
-                .setStartDate(settings.clock().startOfTomorrow())
+                .setStartDate(settings.clock.startOfTomorrow())
                 .setEventSource(provider.firstActiveEventSource)
                 .apply {
                     title = "This will be the only event that will be shown"

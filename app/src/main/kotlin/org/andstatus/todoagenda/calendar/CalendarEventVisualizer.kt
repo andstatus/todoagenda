@@ -119,7 +119,7 @@ class CalendarEventVisualizer(eventProvider: EventProvider) : WidgetEntryVisuali
                 firstDate = dayOfStartOfTimeRange
             }
         }
-        val today = settings.clock().now(event.startDate.zone).withTimeAtStartOfDay()
+        val today = settings.clock.now(event.startDate.zone).withTimeAtStartOfDay()
         if (event.isActive && firstDate.isBefore(today)) {
             firstDate = today
         }

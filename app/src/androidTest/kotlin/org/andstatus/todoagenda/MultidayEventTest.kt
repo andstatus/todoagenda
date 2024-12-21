@@ -17,7 +17,7 @@ class MultidayEventTest : BaseWidgetTest() {
      */
     @Test
     fun testEventWhichCarryOverToTheNextDay() {
-        val today = settings.clock().now().withTimeAtStartOfDay()
+        val today = settings.clock.now().withTimeAtStartOfDay()
         val event = CalendarEvent(settings, provider.context, false)
         event.setEventSource(provider.firstActiveEventSource)
         event.setEventId(++eventId)

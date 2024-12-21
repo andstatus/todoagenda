@@ -16,7 +16,7 @@ import org.andstatus.todoagenda.util.RawResourceUtils
 import org.joda.time.DateTime
 import org.json.JSONObject
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.Volatile
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * @author yvolk@yurivolkov.com
@@ -26,35 +26,35 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
     val widgetId: Int
     val usesActualWidget: Boolean
 
-    @Volatile
-    lateinit var settings: InstanceSettings
+    val settingsRef = AtomicReference<InstanceSettings>()
+    var settings: InstanceSettings
+        get() = settingsRef.get()
+            ?: throw java.lang.IllegalStateException("No settings stored")
+        set(value) {
+            settingsRef.set(value)
+            AllSettings.addNew(TAG, context, value)
+        }
 
     init {
         val instanceToReuse = AllSettings.getInstances(context).values.stream()
             .filter { obj: InstanceSettings -> obj.isForTestsReplaying }.findFirst().orElse(null)
         usesActualWidget = instanceToReuse != null
         widgetId = if (usesActualWidget) instanceToReuse.widgetId else lastWidgetId.incrementAndGet()
-        val settings = InstanceSettings.newFake(
+        settings = InstanceSettings.newFake(
             context, widgetId,
             "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX,
             ZONE_IDS[(System.currentTimeMillis() % ZONE_IDS.size).toInt()]
         )
-        setSettings1(settings)
-    }
-
-    private fun setSettings1(settings: InstanceSettings) {
-        this.settings = settings
-        AllSettings.addNew(TAG, context, settings)
     }
 
     fun updateAppSettings(tag: String) {
         settings.resultsStorage = results
         if (!results.results.isEmpty()) {
-            settings.clock().setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
+            settings.clock.setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
         }
         AllSettings.addNew(tag, context, settings)
         if (results.results.size > 0) {
-            Log.d(tag, "Results executed at " + settings.clock().now())
+            Log.d(tag, "Results executed at " + settings.clock.now())
         }
     }
 
@@ -91,7 +91,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
 
     private fun addFirstQueryResult(providerType: EventProviderType): QueryResult {
         ensureOneActiveEventSource(providerType)
-        val r2 = QueryResult(providerType, settings.widgetId, settings.clock().now())
+        val r2 = QueryResult(providerType, settings.widgetId, settings.clock.now())
         results.addResult(r2)
         return r2
     }
@@ -130,8 +130,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
                 JSONObject(RawResourceUtils.getString(InstrumentationRegistry.getInstrumentation().context, jsonResId))
             json.getJSONObject(QueryResultsStorage.KEY_SETTINGS).put(InstanceSettings.PREF_WIDGET_ID, widgetId)
             val widgetData = WidgetData.fromJson(json)
-            val settings = widgetData.getSettingsForWidget(context, settings, widgetId)
-            setSettings1(settings)
+            settings = widgetData.getSettingsForWidget(context, settings, widgetId)
             return settings.resultsStorage ?: throw IllegalStateException("No results storage")
         } catch (e: Exception) {
             throw IllegalStateException("loadResultsAndSettings" + e.message)

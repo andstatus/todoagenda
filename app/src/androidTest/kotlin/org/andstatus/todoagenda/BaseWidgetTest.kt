@@ -48,7 +48,7 @@ open class BaseWidgetTest {
     ): DateTime {
         return DateTime(
             year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, 0, 0,
-            provider.settings.clock().zone
+            provider.settings.clock.zone
         )
     }
 
@@ -123,8 +123,9 @@ open class BaseWidgetTest {
 
     protected fun ensureNonEmptyResults() {
         val inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday)
-        val settings = settings
-        settings.filterMode = FilterMode.NO_FILTERING
+        provider.settings = settings.copy(
+            filterModeInner = FilterMode.NO_FILTERING
+        )
         provider.addResults(inputs)
     }
 

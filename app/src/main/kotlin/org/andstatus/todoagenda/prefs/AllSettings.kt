@@ -82,11 +82,10 @@ object AllSettings {
         save(tag, "addNew", settings)
     }
 
-    /** @return true if success
-     */
+    /** @return true if success */
     private fun save(tag: String, method: String, settings: InstanceSettings): Boolean {
         if (settings.isEmpty) {
-            settings.logMe(tag, "Skipped save empty from $method", settings.widgetId)
+            settings.logMe(tag, "Skipped saving empty from $method", settings.widgetId)
         } else if (settings.save(tag, method)) {
             instances[settings.widgetId] = settings
             return true
@@ -171,7 +170,7 @@ object AllSettings {
         val settings: InstanceSettings = WidgetData.fromJson(json)
             .getSettingsForWidget(activity, instances[targetWidgetId], targetWidgetId)
         if (settings.hasResults()) {
-            settings.clock().setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
+            settings.clock.setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
         }
         save(TAG, "restoreWidgetSettings", settings)
         return settings

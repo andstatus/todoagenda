@@ -78,8 +78,8 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
     }
 
     private fun getSampleDateText(): CharSequence {
-        return DateFormatter(context, sampleDateFormatValue, settings.clock().now())
-            .formatDate(settings.clock().now())
+        return DateFormatter(context, sampleDateFormatValue, settings.clock.now())
+            .formatDate(settings.clock.now())
     }
 
     override fun onResume() {
@@ -141,8 +141,8 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
             }
             val sampleDate = sampleFormat.parse(sampleDateText!!.text.toString())
             result =
-                if (sampleDate == null) "null" else DateFormatter(this.context, dateFormatValue, settings.clock().now())
-                    .formatDate(DateTime(sampleDate.time, settings.clock().zone))
+                if (sampleDate == null) "null" else DateFormatter(this.context, dateFormatValue, settings.clock.now())
+                    .formatDate(DateTime(sampleDate.time, settings.clock.zone))
         } catch (e: ParseException) {
             result = e.localizedMessage
         }

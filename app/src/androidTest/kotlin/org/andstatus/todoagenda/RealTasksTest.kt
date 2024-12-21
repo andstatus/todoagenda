@@ -22,8 +22,10 @@ class RealTasksTest : BaseWidgetTest() {
         Assert.assertTrue("No End of list entries although filters are off",
             factory.widgetEntries.stream()
                 .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST })
-        settings.filterMode = FilterMode.DEBUG_FILTER
-        settings.taskWithoutDates = TasksWithoutDates.HIDE
+        provider.settings = settings.copy(
+            filterModeInner = FilterMode.DEBUG_FILTER,
+            taskWithoutDates = TasksWithoutDates.HIDE
+        )
         playResults(method)
         Assert.assertFalse("End of list entries although filters are on",
             factory.widgetEntries.stream()

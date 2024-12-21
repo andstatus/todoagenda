@@ -44,7 +44,7 @@ object DateUtil {
             dateTime!!.millis,
             dateTime.millis,
             flags,
-            settings.clock().zone.id
+            settings.clock.zone.id
         )
             .toString()
     }

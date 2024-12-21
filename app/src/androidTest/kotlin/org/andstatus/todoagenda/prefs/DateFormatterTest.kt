@@ -71,7 +71,7 @@ class DateFormatterTest : BaseWidgetTest() {
     fun customPatterns() {
         ensureNonEmptyResults()
         val settings = settings
-        val now = settings!!.clock().now().withTimeAtStartOfDay().plusHours(1)
+        val now = settings!!.clock.now().withTimeAtStartOfDay().plusHours(1)
         provider!!.setExecutedAt(now)
         val todayText = provider.context.getText(R.string.today)
         val tomorrowText = provider.context.getText(R.string.tomorrow).toString()
@@ -148,7 +148,7 @@ class DateFormatterTest : BaseWidgetTest() {
 
     private fun assertPattern(date: DateTime, pattern: String, expected: String) {
         val format = DateFormatValue.of(DateFormatType.CUSTOM, pattern)
-        val now = settings.clock().now()
+        val now = settings.clock.now()
         val formatter = DateFormatter(settings.context, format, now)
         Assert.assertEquals("Date: $date, Now:$now, Pattern: [$pattern]", expected, formatter.formatDate(date))
     }

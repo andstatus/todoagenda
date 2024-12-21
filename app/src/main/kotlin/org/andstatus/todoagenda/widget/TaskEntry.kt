@@ -47,12 +47,12 @@ class TaskEntry private constructor(
             val otherDate = otherDate(settings, event)
             if (settings.taskScheduling == TaskScheduling.DATE_DUE) {
                 if (!event.hasDueDate()) {
-                    if (settings.clock().isBeforeToday(event.startDate)) return WidgetEntryPosition.START_OF_TODAY
+                    if (settings.clock.isBeforeToday(event.startDate)) return WidgetEntryPosition.START_OF_TODAY
                     if (event.startDate!!.isAfter(settings.endOfTimeRange)) return WidgetEntryPosition.END_OF_LIST
                 }
             } else {
-                if (!event.hasStartDate() || settings.clock().isBeforeToday(event.startDate)) {
-                    if (!settings.clock().isBeforeToday(event.dueDate)) return WidgetEntryPosition.START_OF_TODAY
+                if (!event.hasStartDate() || settings.clock.isBeforeToday(event.startDate)) {
+                    if (!settings.clock.isBeforeToday(event.dueDate)) return WidgetEntryPosition.START_OF_TODAY
                 }
             }
             return WidgetEntry.getEntryPosition(settings, event.isAllDay, mainDate, otherDate)
@@ -96,7 +96,7 @@ class TaskEntry private constructor(
                 if (event.hasDueDate()) event.dueDate else if (event.hasStartDate()) event.startDate else defaultDate
             } else {
                 if (event.hasStartDate()) {
-                    if (settings.clock().isBeforeToday(event.startDate)) {
+                    if (settings.clock.isBeforeToday(event.startDate)) {
                         if (event.hasDueDate()) event.dueDate else defaultDate
                     } else event.startDate
                 } else {
