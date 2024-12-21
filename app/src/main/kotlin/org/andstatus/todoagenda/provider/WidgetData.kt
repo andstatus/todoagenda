@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
-import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -42,11 +41,7 @@ class WidgetData private constructor(private val jsonData: JSONObject) {
         val results: QueryResultsStorage = QueryResultsStorage.fromJson(targetWidgetId, jsonData)
         return originalSettings.copy(
             widgetId = targetWidgetId,
-            proposedInstanceName = AllSettings.uniqueInstanceName(
-                originalSettings.context,
-                targetWidgetId,
-                originalSettings.widgetInstanceName
-            ),
+            proposedInstanceName = originalSettings.widgetInstanceName,
             resultsStorage = results.takeIf { results.results.isNotEmpty() }
         )
     }

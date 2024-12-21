@@ -44,19 +44,18 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
         settings = InstanceSettings(
             contextIn = context,
             widgetId = widgetId,
-            proposedInstanceName = "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX
-        ).apply {
-            clock.lockedTimeZoneId = timeZoneId
-        }
+            proposedInstanceName = "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX,
+            lockedTimeZoneIdIn = timeZoneId
+        )
     }
 
     fun updateAppSettings(tag: String) {
-        settings.resultsStorage = results
-        if (!results.results.isEmpty()) {
-            settings.clock.setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
-        }
+        settings = settings.copy(
+            resultsStorage = results,
+            snapshotModeIn = SnapshotMode.SNAPSHOT_TIME
+        )
         AllSettings.addNew(tag, context, settings)
-        if (results.results.size > 0) {
+        if (results.results.isNotEmpty()) {
             Log.d(tag, "Results executed at " + settings.clock.now())
         }
     }
@@ -110,7 +109,9 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
                 "", 0, true
             )
             val newSource = OrderedEventSource(source, 1)
-            settings.activeEventSources.add(newSource)
+            settings = settings.copy(
+                activeEventSourcesIn = settings.activeEventSources + newSource
+            )
         }
     }
 

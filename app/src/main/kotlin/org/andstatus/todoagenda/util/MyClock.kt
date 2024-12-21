@@ -15,27 +15,13 @@ import kotlin.concurrent.Volatile
  *
  * @author yvolk@yurivolkov.com
  */
-class MyClock {
-    @Volatile
-    var snapshotMode: SnapshotMode = SnapshotMode.Companion.defaultValue
-        private set
+class MyClock(val settings: InstanceSettings) {
 
-    @Volatile
-    private var snapshotDate: DateTime? = null
-
-    @Volatile
-    private var snapshotDateSetAt: DateTime? = null
-
-    @Volatile
-    var lockedTimeZoneId: String = ""
-        set(value) {
-            field = DateUtil.validatedTimeZoneId(value)
-            updateZone()
-        }
-
-    @Volatile
-    var zone = defaultTimeZone
-        private set
+    val snapshotMode: SnapshotMode get() = settings.snapshotMode
+    val snapshotDate: DateTime? get() = settings.snapshotDate
+    val lockedTimeZoneId: String get() = settings.lockedTimeZoneId
+    val zone: DateTimeZone get() = settings.zone
+    private var snapshotDateSetAt: DateTime? = if (snapshotDate != null) DateTime.now() else null
 
     private val startHourOfDayRef: AtomicInteger = AtomicInteger(0)
     var startHourOfDay: Int
@@ -43,30 +29,6 @@ class MyClock {
         set(value) {
             startHourOfDayRef.set(value)
         }
-
-    fun setSnapshotMode(snapshotModeIn: SnapshotMode?, settings: InstanceSettings) {
-        snapshotMode =
-            if (snapshotModeIn!!.isSnapshotMode && !settings.hasResults()) SnapshotMode.LIVE_DATA else snapshotModeIn
-        if (snapshotMode.isSnapshotMode) {
-            setSnapshotDate(settings.resultsStorage!!.executedAt.get())
-        }
-        updateZone()
-    }
-
-    private fun setSnapshotDate(snapshotDate: DateTime?) {
-        this.snapshotDate = snapshotDate
-        snapshotDateSetAt = DateTime.now()
-    }
-
-    fun updateZone() {
-        zone = if (snapshotMode == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
-            snapshotDate!!.zone
-        } else if (StringUtil.nonEmpty(lockedTimeZoneId)) {
-            DateTimeZone.forID(lockedTimeZoneId)
-        } else {
-            defaultTimeZone
-        }
-    }
 
     /**
      * Usually returns real "now", but may be #setNow to some other time for testing purposes

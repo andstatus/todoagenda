@@ -297,7 +297,6 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
                 val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_INITIAL.shadowed(settings.textShadow))
-                settings.clock.updateZone()
                 configureWidgetHeader(settings, rv)
                 configureWidgetEntriesList(settings, rv)
                 appWidgetManager.updateAppWidget(widgetId, rv)

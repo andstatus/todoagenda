@@ -220,3 +220,5 @@ class QueryResultsStorage {
         }
     }
 }
+
+fun QueryResultsStorage?.hasResults(): Boolean = this?.results?.isNotEmpty() == true

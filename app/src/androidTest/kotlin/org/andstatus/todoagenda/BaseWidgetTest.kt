@@ -124,7 +124,7 @@ open class BaseWidgetTest {
     protected fun ensureNonEmptyResults() {
         val inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday)
         provider.settings = settings.copy(
-            filterModeInner = FilterMode.NO_FILTERING
+            filterModeIn = FilterMode.NO_FILTERING
         )
         provider.addResults(inputs)
     }

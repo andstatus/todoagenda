@@ -132,11 +132,14 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
             InstanceSettings.PREF_REFRESH_PERIOD_MINUTES -> showRefreshPeriod()
             InstanceSettings.PREF_SNAPSHOT_MODE -> {
                 val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
-                val settings = settings
-                if (snapshotMode.isSnapshotMode && !settings.hasResults()) {
-                    settings.resultsStorage = QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
-                }
-                settings.clock.setSnapshotMode(snapshotMode, settings)
+                val settings = settings.copy(
+                    snapshotModeIn = snapshotMode,
+                    resultsStorage = if (snapshotMode.isSnapshotMode && !settings.hasResults()) {
+                        QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
+                    } else {
+                        settings.resultsStorage
+                    }
+                )
                 settings.save(key, "newResultsForSnapshotMode")
                 showSnapshotMode()
                 setLockTimeZone()

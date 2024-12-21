@@ -169,9 +169,7 @@ object AllSettings {
     fun restoreWidgetSettings(activity: Activity, json: JSONObject?, targetWidgetId: Int): InstanceSettings {
         val settings: InstanceSettings = WidgetData.fromJson(json)
             .getSettingsForWidget(activity, instances[targetWidgetId], targetWidgetId)
-        if (settings.hasResults()) {
-            settings.clock.setSnapshotMode(SnapshotMode.SNAPSHOT_TIME, settings)
-        }
+            .copy(snapshotModeIn = SnapshotMode.SNAPSHOT_TIME)
         save(TAG, "restoreWidgetSettings", settings)
         return settings
     }

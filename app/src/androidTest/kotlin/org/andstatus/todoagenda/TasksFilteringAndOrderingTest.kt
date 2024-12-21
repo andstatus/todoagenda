@@ -39,7 +39,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             settings.copy(
                 taskScheduling = TaskScheduling.DATE_DUE,
                 taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
-                filterModeInner = FilterMode.NO_FILTERING
+                filterModeIn = FilterMode.NO_FILTERING
             )
         }
         oneCase(method, setter, names)
@@ -68,7 +68,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
         val setter = UnaryOperator { settings: InstanceSettings ->
             settings.copy(
                 taskWithoutDates = TasksWithoutDates.END_OF_LIST,
-                filterModeInner = FilterMode.NO_FILTERING
+                filterModeIn = FilterMode.NO_FILTERING
             )
         }
         oneCase(method, setter, names)
@@ -95,7 +95,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
         val setter = UnaryOperator { settings: InstanceSettings ->
             settings.copy(
                 taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
-                filterModeInner = FilterMode.DEBUG_FILTER
+                filterModeIn = FilterMode.DEBUG_FILTER
             )
         }
         oneCase(method, setter, names)
@@ -123,7 +123,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             settings.copy(
                 taskScheduling = TaskScheduling.DATE_DUE,
                 taskWithoutDates = TasksWithoutDates.HIDE,
-                filterModeInner = FilterMode.DEBUG_FILTER
+                filterModeIn = FilterMode.DEBUG_FILTER
             )
         }
         oneCase(method, setter, names)
@@ -152,7 +152,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             settings.copy(
                 taskScheduling = TaskScheduling.DATE_STARTED,
                 taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
-                filterModeInner = FilterMode.NO_FILTERING
+                filterModeIn = FilterMode.NO_FILTERING
             )
         }
         oneCase(method, setter, names)
@@ -182,7 +182,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             settings.copy(
                 taskScheduling = TaskScheduling.DATE_STARTED,
                 taskWithoutDates = TasksWithoutDates.END_OF_LIST,
-                filterModeInner = FilterMode.NO_FILTERING
+                filterModeIn = FilterMode.NO_FILTERING
             )
         }
         oneCase(method, setter, names)
@@ -210,7 +210,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             settings.copy(
                 taskScheduling = TaskScheduling.DATE_STARTED,
                 taskWithoutDates = TasksWithoutDates.HIDE,
-                filterModeInner = FilterMode.NO_FILTERING
+                filterModeIn = FilterMode.NO_FILTERING
             )
         }
         oneCase(method, setter, names)
@@ -237,7 +237,7 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
             settings.copy(
                 taskScheduling = TaskScheduling.DATE_STARTED,
                 taskWithoutDates = TasksWithoutDates.END_OF_TODAY,
-                filterModeInner = FilterMode.DEBUG_FILTER
+                filterModeIn = FilterMode.DEBUG_FILTER
             )
         }
         oneCase(method, setter, names)

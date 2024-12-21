@@ -23,7 +23,7 @@ class RealTasksTest : BaseWidgetTest() {
             factory.widgetEntries.stream()
                 .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST })
         provider.settings = settings.copy(
-            filterModeInner = FilterMode.DEBUG_FILTER,
+            filterModeIn = FilterMode.DEBUG_FILTER,
             taskWithoutDates = TasksWithoutDates.HIDE
         )
         playResults(method)
