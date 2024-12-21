@@ -99,10 +99,13 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
             InstanceSettings.PREF_LOCK_TIME_ZONE -> if (preference is CheckBoxPreference) {
+                val timeZone = if (preference.isChecked) TimeZone.getDefault().id else ""
                 ApplicationPreferences.setLockedTimeZoneId(
                     activity,
-                    if (preference.isChecked) TimeZone.getDefault().id else ""
+                    timeZone
                 )
+                settings.copy(lockedTimeZoneIdIn = timeZone)
+                    .let { AllSettings.addNew(TAG, requireActivity(), it) }
                 showLockTimeZone()
             }
 
@@ -141,6 +144,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                     }
                 )
                 settings.save(key, "newResultsForSnapshotMode")
+                AllSettings.addNew(TAG, requireActivity(), settings)
                 showSnapshotMode()
                 setLockTimeZone()
                 showLockTimeZone()
