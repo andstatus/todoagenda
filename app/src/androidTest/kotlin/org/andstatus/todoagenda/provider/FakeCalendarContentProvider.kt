@@ -40,11 +40,14 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
             .filter { obj: InstanceSettings -> obj.isForTestsReplaying }.findFirst().orElse(null)
         usesActualWidget = instanceToReuse != null
         widgetId = if (usesActualWidget) instanceToReuse.widgetId else lastWidgetId.incrementAndGet()
-        settings = InstanceSettings.newFake(
-            context, widgetId,
-            "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX,
-            ZONE_IDS[(System.currentTimeMillis() % ZONE_IDS.size).toInt()]
-        )
+        val timeZoneId = ZONE_IDS[(System.currentTimeMillis() % ZONE_IDS.size).toInt()]
+        settings = InstanceSettings(
+            contextIn = context,
+            widgetId = widgetId,
+            proposedInstanceName = "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX
+        ).apply {
+            clock.lockedTimeZoneId = timeZoneId
+        }
     }
 
     fun updateAppSettings(tag: String) {

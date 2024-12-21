@@ -37,7 +37,7 @@ object AllSettings {
                 settings = if (widgetId != 0 && ApplicationPreferences.getWidgetId(context) == widgetId) {
                     InstanceSettings.fromApplicationPreferences(context, widgetId, null)
                 } else {
-                    InstanceSettings.newEmpty(context, widgetId, "")
+                    InstanceSettings(contextIn = context, widgetId = widgetId)
                 }
                 if (save(TAG, "newInstance", settings)) {
                     EventProviderType.initialize(context, true)

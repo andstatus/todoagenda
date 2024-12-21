@@ -12,7 +12,6 @@ import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.provider.QueryResultsStorage
 import org.andstatus.todoagenda.util.InstanceId
 import org.andstatus.todoagenda.util.MyClock
-import org.andstatus.todoagenda.util.StringUtil
 import org.andstatus.todoagenda.widget.Alignment
 import org.andstatus.todoagenda.widget.EventEntryLayout
 import org.andstatus.todoagenda.widget.TextShadow
@@ -32,8 +31,6 @@ import java.util.stream.Collectors
 data class InstanceSettings(
     private val contextIn: Context?,
     val widgetId: Int,
-    private val proposedInstanceName: String?, // TODO: delete
-    private val lockedTimeZoneId: String? = null, // TODO: delete
     val instanceId: Long = InstanceId.next(),
 
     var isCompactLayout: Boolean = false,
@@ -82,12 +79,9 @@ data class InstanceSettings(
     var taskScheduling: TaskScheduling = TaskScheduling.defaultValue,
     var taskWithoutDates: TasksWithoutDates = TasksWithoutDates.defaultValue,
     private var filterModeInner: FilterMode = FilterMode.defaultValue,
-    val clock: MyClock = MyClock().apply {
-        lockedTimeZoneId?.let {
-            this.lockedTimeZoneId = lockedTimeZoneId
-        }
-    },
+    val clock: MyClock = MyClock(),
     private val activeEventSourcesInner: MutableList<OrderedEventSource> = CopyOnWriteArrayList(),
+    private val proposedInstanceName: String? = null, // TODO: delete
     val widgetInstanceName: String = if (contextIn == null) "(empty)" else AllSettings.uniqueInstanceName(
         contextIn,
         widgetId,
@@ -95,7 +89,7 @@ data class InstanceSettings(
     ),
     var textSizeScale: TextSizeScale = TextSizeScale.MEDIUM,
     var timeFormat: String = PREF_TIME_FORMAT_DEFAULT,
-    private var refreshPeriodMinutesInner: Int = PREF_REFRESH_PERIOD_MINUTES_DEFAULT,
+    private var refreshPeriodMinutesIn: Int = PREF_REFRESH_PERIOD_MINUTES_DEFAULT,
     var resultsStorage: QueryResultsStorage? = null
 ) {
     val context: Context get() = contextIn ?: throw IllegalStateException("Context is null")
@@ -111,10 +105,10 @@ data class InstanceSettings(
         }
 
     var refreshPeriodMinutes: Int
-        get() = refreshPeriodMinutesInner
+        get() = refreshPeriodMinutesIn
         set(value) {
             if (value > 0) {
-                refreshPeriodMinutesInner = value
+                refreshPeriodMinutesIn = value
             }
         }
 
@@ -135,7 +129,7 @@ data class InstanceSettings(
             SettingsStorage.saveJson(context, getStorageKey(widgetId), toJson())
             return true
         } catch (e: IOException) {
-            Log.e(tag, "$msgLog ${toString()}", e)
+            Log.e(tag, "$msgLog $this", e)
         }
         return false
     }
@@ -300,7 +294,7 @@ data class InstanceSettings(
     companion object {
         private val TAG = InstanceSettings::class.java.simpleName
         val EMPTY: InstanceSettings by lazy {
-            InstanceSettings(contextIn = null, widgetId = 0, proposedInstanceName = "(empty)")
+            InstanceSettings(contextIn = null, widgetId = 0)
         }
         const val PREF_WIDGET_ID = "widgetId"
 
@@ -394,13 +388,20 @@ data class InstanceSettings(
             if (widgetId == 0) {
                 return EMPTY
             }
-            var instanceName = json.optString(PREF_WIDGET_INSTANCE_NAME)
-            if (storedSettings != null && storedSettings.isForTestsReplaying &&
-                !instanceName.endsWith(TEST_REPLAY_SUFFIX)
-            ) {
-                instanceName = (if (StringUtil.isEmpty(instanceName)) "" else "$instanceName - ") + TEST_REPLAY_SUFFIX
+            val proposedInstanceName = json.optString(PREF_WIDGET_INSTANCE_NAME).let { prevName ->
+                if (storedSettings != null && storedSettings.isForTestsReplaying &&
+                    !prevName.endsWith(TEST_REPLAY_SUFFIX)
+                ) {
+                    (if (prevName.isEmpty()) "" else "$prevName - ") + TEST_REPLAY_SUFFIX
+                } else {
+                    prevName
+                }
             }
-            return InstanceSettings(context, widgetId, instanceName).apply {
+            return InstanceSettings(
+                contextIn = context,
+                widgetId = widgetId,
+                proposedInstanceName = proposedInstanceName
+            ).apply {
                 try {
                     if (json.has(PREF_WIDGET_HEADER_DATE_FORMAT)) {
                         widgetHeaderDateFormat = DateFormatValue.load(
@@ -570,25 +571,14 @@ data class InstanceSettings(
             }
         }
 
-        fun newEmpty(context: Context, widgetId: Int, proposedInstanceName: String?): InstanceSettings =
-            InstanceSettings(context, widgetId, proposedInstanceName)
-
-        fun newFake(
-            context: Context,
-            widgetId: Int,
-            proposedInstanceName: String?,
-            lockedTimeZoneId: String
-        ): InstanceSettings =
-            InstanceSettings(context, widgetId, proposedInstanceName, lockedTimeZoneId)
-
         fun fromApplicationPreferences(
             context: Context,
             widgetId: Int,
             settingsStored: InstanceSettings?
         ): InstanceSettings = synchronized(ApplicationPreferences::class) {
             InstanceSettings(
-                context, widgetId,
-                ApplicationPreferences.getString(
+                contextIn = context, widgetId = widgetId,
+                proposedInstanceName = ApplicationPreferences.getString(
                     context, PREF_WIDGET_INSTANCE_NAME,
                     ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, "")
                 ),
