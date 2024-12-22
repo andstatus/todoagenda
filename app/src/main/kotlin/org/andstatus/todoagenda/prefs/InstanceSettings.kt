@@ -363,8 +363,6 @@ data class InstanceSettings(
         const val PREF_ENTRY_DATE_FORMAT = "entryDateFormat"
         val PREF_ENTRY_DATE_FORMAT_DEFAULT: DateFormatValue = DateFormatType.HIDDEN.defaultValue
 
-        @Deprecated("")
-        private val PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT = "showNumberOfDaysToEvent" // till v 4.0
         const val PREF_MULTILINE_TITLE = "multiline_title"
         const val PREF_MULTILINE_TITLE_DEFAULT = false
         const val PREF_MAXLINES_TITLE = "maxLinesTitle"
@@ -543,11 +541,6 @@ data class InstanceSettings(
                     DateFormatValue.load(
                         json.getString(PREF_ENTRY_DATE_FORMAT), PREF_ENTRY_DATE_FORMAT_DEFAULT
                     )
-                } else if (json.has(PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT)) {
-                    (if (json.getBoolean(PREF_SHOW_NUMBER_OF_DAYS_TO_EVENT) &&
-                        eventEntryLayout == EventEntryLayout.ONE_LINE
-                    ) DateFormatType.NUMBER_OF_DAYS else DateFormatType.HIDDEN)
-                        .defaultValue
                 } else EMPTY.entryDateFormat,
                 showEndTime = if (json.has(PREF_SHOW_END_TIME)) {
                     json.getBoolean(PREF_SHOW_END_TIME)
