@@ -1,6 +1,5 @@
 package org.andstatus.todoagenda.util
 
-import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.SnapshotMode
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
@@ -15,12 +14,12 @@ import kotlin.concurrent.Volatile
  *
  * @author yvolk@yurivolkov.com
  */
-class MyClock(val settings: InstanceSettings) {
-
-    val snapshotMode: SnapshotMode get() = settings.snapshotMode
-    val snapshotDate: DateTime? get() = settings.snapshotDate
-    val lockedTimeZoneId: String get() = settings.lockedTimeZoneId
-    val zone: DateTimeZone get() = settings.zone
+class MyClock(
+    val snapshotMode: SnapshotMode,
+    val snapshotDate: DateTime?,
+    val lockedTimeZoneId: String,
+    val zone: DateTimeZone,
+) {
     private var snapshotDateSetAt: DateTime? = if (snapshotDate != null) DateTime.now() else null
 
     private val startHourOfDayRef: AtomicInteger = AtomicInteger(0)

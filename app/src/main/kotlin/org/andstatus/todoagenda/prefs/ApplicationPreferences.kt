@@ -25,19 +25,32 @@ object ApplicationPreferences {
         synchronized(ApplicationPreferences::class) {
             val settings = AllSettings.instanceFromId(context, widgetId)
             setWidgetId(context, if (widgetId == 0) settings.widgetId else widgetId)
+
+            // ----------------------------------------------------------------------------------
+            // Layout
+            setBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, settings.isCompactLayout)
+            setString(context, InstanceSettings.PREF_WIDGET_HEADER_LAYOUT, settings.widgetHeaderLayout.value)
             setDateFormat(
                 context,
                 InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT,
                 settings.widgetHeaderDateFormat
             )
-            setString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, settings.widgetInstanceName)
-            setActiveEventSources(context, settings.activeEventSources)
-            setEventRange(context, settings.eventRange)
-            setEventsEnded(context, settings.eventsEnded)
-            setFillAllDayEvents(context, settings.fillAllDayEvents)
-            setHideBasedOnKeywords(context, settings.hideBasedOnKeywords)
-            setShowBasedOnKeywords(context, settings.showBasedOnKeywords)
+            setShowDayHeaders(context, settings.showDayHeaders)
+            setDateFormat(context, InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT, settings.dayHeaderDateFormat)
+            setShowPastEventsUnderOneHeader(context, settings.showPastEventsUnderOneHeader)
+            setString(context, InstanceSettings.PREF_DAY_HEADER_ALIGNMENT, settings.dayHeaderAlignment)
+            setHorizontalLineBelowDayHeader(context, settings.horizontalLineBelowDayHeader)
+            setShowDaysWithoutEvents(context, settings.showDaysWithoutEvents)
+            setString(context, InstanceSettings.PREF_EVENT_ENTRY_LAYOUT, settings.eventEntryLayout.value)
+            setShowEventIcon(context, settings.showEventIcon)
+            setDateFormat(context, InstanceSettings.PREF_ENTRY_DATE_FORMAT, settings.entryDateFormat)
+            setBoolean(context, InstanceSettings.PREF_MULTILINE_TITLE, settings.isMultilineTitle)
+            setString(context, InstanceSettings.PREF_MAXLINES_TITLE, settings.maxLinesTitle.toString())
+            setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
+            setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
 
+            // ----------------------------------------------------------------------------------
+            // Colors
             val colors = settings.colors()
             setString(context, PREF_COLOR_THEME_TYPE, colors.colorThemeType.value)
             setBoolean(context, PREF_DIFFERENT_COLORS_FOR_DARK, colors.colorThemeType != ColorThemeType.SINGLE)
@@ -51,39 +64,44 @@ object ApplicationPreferences {
             }
             setString(context, PREF_TEXT_SHADOW, settings.textShadow.value)
 
-            setShowDaysWithoutEvents(context, settings.showDaysWithoutEvents)
-            setShowDayHeaders(context, settings.showDayHeaders)
-            setDateFormat(context, InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT, settings.dayHeaderDateFormat)
-            setHorizontalLineBelowDayHeader(context, settings.horizontalLineBelowDayHeader)
-            setShowPastEventsUnderOneHeader(context, settings.showPastEventsUnderOneHeader)
-            setShowPastEventsWithDefaultColor(context, settings.showPastEventsWithDefaultColor)
-            setShowEventIcon(context, settings.showEventIcon)
-            setDateFormat(context, InstanceSettings.PREF_ENTRY_DATE_FORMAT, settings.entryDateFormat)
+            // ----------------------------------------------------------------------------------
+            // Event details
             setBoolean(context, InstanceSettings.PREF_SHOW_END_TIME, settings.showEndTime)
             setBoolean(context, InstanceSettings.PREF_SHOW_LOCATION, settings.showLocation)
             setBoolean(context, InstanceSettings.PREF_SHOW_DESCRIPTION, settings.showDescription)
-            setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
-            setLockedTimeZoneId(context, settings.clock.lockedTimeZoneId)
-            setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
-            setString(context, InstanceSettings.PREF_EVENT_ENTRY_LAYOUT, settings.eventEntryLayout.value)
-            setBoolean(context, InstanceSettings.PREF_MULTILINE_TITLE, settings.isMultilineTitle)
-            setString(context, InstanceSettings.PREF_MAXLINES_TITLE, settings.maxLinesTitle.toString())
-            setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
-            setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
+            setFillAllDayEvents(context, settings.fillAllDayEvents)
+            setBoolean(context, InstanceSettings.PREF_INDICATE_ALERTS, settings.indicateAlerts)
+            setBoolean(context, InstanceSettings.PREF_INDICATE_RECURRING, settings.indicateRecurring)
+
+            // ----------------------------------------------------------------------------------
+            // Event filters
+            setEventsEnded(context, settings.eventsEnded)
+            setShowPastEventsWithDefaultColor(context, settings.showPastEventsWithDefaultColor)
+            setEventRange(context, settings.eventRange)
+            setHideBasedOnKeywords(context, settings.hideBasedOnKeywords)
+            setShowBasedOnKeywords(context, settings.showBasedOnKeywords)
             setBoolean(
                 context, InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, settings
                     .showOnlyClosestInstanceOfRecurringEvent
             )
             setHideDuplicates(context, settings.hideDuplicates)
+            setAllDayEventsPlacement(context, settings.allDayEventsPlacement)
             setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
             setString(context, InstanceSettings.PREF_TASK_WITHOUT_DATES, settings.taskWithoutDates.value)
             setString(context, InstanceSettings.PREF_FILTER_MODE, settings.filterMode.value)
-            setBoolean(context, InstanceSettings.PREF_INDICATE_ALERTS, settings.indicateAlerts)
-            setBoolean(context, InstanceSettings.PREF_INDICATE_RECURRING, settings.indicateRecurring)
-            setBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, settings.isCompactLayout)
-            setString(context, InstanceSettings.PREF_WIDGET_HEADER_LAYOUT, settings.widgetHeaderLayout.value)
+
+            // ----------------------------------------------------------------------------------
+            // Calendars and task lists
+            setActiveEventSources(context, settings.activeEventSources)
+
+            // ----------------------------------------------------------------------------------
+            // Other
+            setString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, settings.widgetInstanceName)
             setString(context, InstanceSettings.PREF_TEXT_SIZE_SCALE, settings.textSizeScale.preferenceValue)
-            setString(context, InstanceSettings.PREF_DAY_HEADER_ALIGNMENT, settings.dayHeaderAlignment)
+            setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
+            setLockedTimeZoneId(context, settings.clock.lockedTimeZoneId)
+            // Don't set InstanceSettings.PREF_SNAPSHOT_MODE here!
+            setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
         }
     }
 

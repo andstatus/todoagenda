@@ -75,7 +75,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
     }
 
     private fun formatSnapshotModeSummary(settings: InstanceSettings, valueResId: Int): String {
-        val snapshotDateString: CharSequence = if (settings.hasResults()) {
+        val snapshotDateString: CharSequence = if (settings.hasResults) {
             DateFormatter(
                 settings.context, DateFormatType.DEFAULT_WEEKDAY.defaultValue,
                 settings.clock.now()
@@ -137,7 +137,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
                 val settings = settings.copy(
                     snapshotModeIn = snapshotMode,
-                    resultsStorage = if (snapshotMode.isSnapshotMode && !settings.hasResults()) {
+                    resultsStorage = if (snapshotMode.isSnapshotMode && !settings.hasResults) {
                         QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
                     } else {
                         settings.resultsStorage
