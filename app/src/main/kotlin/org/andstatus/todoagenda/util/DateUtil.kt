@@ -23,7 +23,7 @@ object DateUtil {
     }
 
     fun formatTime(settingsSupplier: Supplier<InstanceSettings>, time: DateTime?): String {
-        if (!MyClock.isDateDefined(time)) return EMPTY_STRING
+        if (time == null || !MyClock.isDateDefined(time)) return EMPTY_STRING
         val settings = settingsSupplier.get()
         val timeFormat = settings.timeFormat
         return if (!DateFormat.is24HourFormat(settings.context) && timeFormat == AUTO || timeFormat == TWELVE) {
@@ -37,14 +37,14 @@ object DateUtil {
         )
     }
 
-    private fun formatDateTime(settings: InstanceSettings, dateTime: DateTime?, flags: Int): String {
+    private fun formatDateTime(settings: InstanceSettings, dateTime: DateTime, flags: Int): String {
         return DateUtils.formatDateRange(
             settings.context,
             Formatter(StringBuilder(50), Locale.getDefault()),
-            dateTime!!.millis,
+            dateTime.millis,
             dateTime.millis,
             flags,
-            settings.clock.zone.id
+            settings.timeZone.id
         )
             .toString()
     }

@@ -5,9 +5,8 @@ import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.util.StringUtil
 import org.andstatus.todoagenda.widget.WidgetEvent
 import org.joda.time.DateTime
-import org.joda.time.DateTimeZone
 
-class TaskEvent(private val settings: InstanceSettings, private val zone: DateTimeZone?) : WidgetEvent {
+class TaskEvent(private val settings: InstanceSettings) : WidgetEvent {
     override lateinit var eventSource: OrderedEventSource
         private set
     override var eventId: Long = 0
@@ -39,11 +38,11 @@ class TaskEvent(private val settings: InstanceSettings, private val zone: DateTi
     }
 
     private fun toStartDate(startMillis: Long?, dueMillis: Long?): DateTime? {
-        return if (startMillis == null) null else DateTime(startMillis, zone)
+        return if (startMillis == null) null else DateTime(startMillis, settings.timeZone)
     }
 
     private fun toDueDate(startMillis: Long?, dueMillis: Long?): DateTime? {
-        return if (dueMillis == null) null else DateTime(dueMillis, zone)
+        return if (dueMillis == null) null else DateTime(dueMillis, settings.timeZone)
     }
 
     fun hasStartDate(): Boolean {

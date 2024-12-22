@@ -51,7 +51,7 @@ class LastEntryVisualizer(context: Context, widgetId: Int) :
         when (entry.type) {
             LastEntryType.EMPTY, LastEntryType.NOT_LOADED -> return CalendarIntentUtil.newOpenCalendarAtDayIntent(
                 DateTime(
-                    settings.clock.zone
+                    settings.timeZone
                 )
             )
 

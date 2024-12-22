@@ -118,7 +118,7 @@ data class InstanceSettings(
         snapshotModeIn
     }
     val snapshotDate: DateTime? = if (snapshotMode.isSnapshotMode) resultsStorage?.executedAt?.get() else null
-    val zone: DateTimeZone = snapshotDate?.let<DateTime, DateTimeZone?> {
+    val timeZone: DateTimeZone = snapshotDate?.let<DateTime, DateTimeZone?> {
         if (snapshotMode == SnapshotMode.SNAPSHOT_TIME) it.zone else null
     } ?: if (StringUtil.nonEmpty(lockedTimeZoneId)) {
         DateTimeZone.forID(lockedTimeZoneId)
@@ -140,8 +140,7 @@ data class InstanceSettings(
     val clock = MyClock(
         snapshotMode = snapshotMode,
         snapshotDate = snapshotDate,
-        lockedTimeZoneId = lockedTimeZoneId,
-        zone = zone,
+        timeZone = timeZone,
     )
 
     val isEmpty: Boolean

@@ -49,10 +49,9 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 ?: return
         val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
         preference.isEnabled = snapshotMode != SnapshotMode.SNAPSHOT_TIME
-        val timeZone = settings.clock.zone
         preference.summary = String.format(
             getText(if (preference.isChecked) R.string.lock_time_zone_on_desc else R.string.lock_time_zone_off_desc).toString(),
-            timeZone.getName(DateTime.now(timeZone).millis)
+            settings.timeZone.getName(DateTime.now(settings.timeZone).millis)
         )
     }
 

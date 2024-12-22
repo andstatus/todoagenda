@@ -15,12 +15,11 @@ import kotlin.concurrent.Volatile
  * @author yvolk@yurivolkov.com
  */
 class MyClock(
-    val snapshotMode: SnapshotMode,
-    val snapshotDate: DateTime?,
-    val lockedTimeZoneId: String,
-    val zone: DateTimeZone,
+    private val snapshotMode: SnapshotMode,
+    private val snapshotDate: DateTime?,
+    private val timeZone: DateTimeZone,
 ) {
-    private var snapshotDateSetAt: DateTime? = if (snapshotDate != null) DateTime.now() else null
+    private val snapshotDateSetAt: DateTime = DateTime.now()
 
     private val startHourOfDayRef: AtomicInteger = AtomicInteger(0)
     var startHourOfDay: Int
@@ -32,8 +31,7 @@ class MyClock(
     /**
      * Usually returns real "now", but may be #setNow to some other time for testing purposes
      */
-    @JvmOverloads
-    fun now(zone: DateTimeZone? = this.zone): DateTime {
+    fun now(zone: DateTimeZone? = this.timeZone): DateTime {
         val snapshotDate = snapshotDate
         return if (snapshotMode == SnapshotMode.SNAPSHOT_TIME && snapshotDate != null) {
             if (PermissionsUtil.isTestMode) getTimeMachineDate(zone) else snapshotDate.withZone(zone)
@@ -43,21 +41,11 @@ class MyClock(
     }
 
     private fun getTimeMachineDate(zone: DateTimeZone?): DateTime {
-        var nowSetAt: DateTime?
-        var now: DateTime?
-        do {
-            nowSetAt = snapshotDateSetAt
-            now = snapshotDate
-        } while (nowSetAt !== snapshotDateSetAt) // Ensure concurrent consistency
-        return if (now == null) {
+        return if (snapshotDate == null) {
             DateTime.now(zone)
         } else {
-            val diffL = DateTime.now().millis - nowSetAt!!.millis
-            var diff = 0
-            if (diffL > 0 && diffL < Int.MAX_VALUE) {
-                diff = diffL.toInt()
-            }
-            DateTime(now, zone).plusMillis(diff)
+            val millisElapsed = DateTime.now().millis - snapshotDateSetAt.millis
+            DateTime(snapshotDate, zone).plusMillis(millisElapsed.toInt())
         }
     }
 
@@ -93,7 +81,7 @@ class MyClock(
     }
 
     fun startOfTomorrow(): DateTime {
-        return startOfNextDay(now(zone))
+        return startOfNextDay(now(timeZone))
     }
 
     companion object {

@@ -134,7 +134,10 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
                 JSONObject(RawResourceUtils.getString(InstrumentationRegistry.getInstrumentation().context, jsonResId))
             json.getJSONObject(QueryResultsStorage.KEY_SETTINGS).put(InstanceSettings.PREF_WIDGET_ID, widgetId)
             val widgetData = WidgetData.fromJson(json)
-            settings = widgetData.getSettingsForWidget(context, settings, widgetId)
+            settings = widgetData.getSettingsForWidget(
+                context,
+                settings, widgetId
+            )
             return settings.resultsStorage ?: throw IllegalStateException("No results storage")
         } catch (e: Exception) {
             throw IllegalStateException("loadResultsAndSettings" + e.message)

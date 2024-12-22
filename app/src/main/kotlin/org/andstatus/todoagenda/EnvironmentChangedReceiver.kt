@@ -45,7 +45,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             RemoteViewsFactory.ACTION_OPEN_CALENDAR -> {
                 val openCalendar = CalendarIntentUtil.newOpenCalendarAtDayIntent(
                     DateTime(
-                        settings!!.clock.zone
+                        settings!!.timeZone
                     )
                 )
                 startActivity(context, openCalendar, action, widgetId, "Open Calendar")

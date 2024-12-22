@@ -142,7 +142,7 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
             val sampleDate = sampleFormat.parse(sampleDateText!!.text.toString())
             result =
                 if (sampleDate == null) "null" else DateFormatter(this.context, dateFormatValue, settings.clock.now())
-                    .formatDate(DateTime(sampleDate.time, settings.clock.zone))
+                    .formatDate(DateTime(sampleDate.time, settings.timeZone))
         } catch (e: ParseException) {
             result = e.localizedMessage
         }

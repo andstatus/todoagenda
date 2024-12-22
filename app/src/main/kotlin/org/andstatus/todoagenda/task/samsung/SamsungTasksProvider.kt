@@ -81,7 +81,7 @@ class SamsungTasksProvider(type: EventProviderType, context: Context, widgetId: 
                 type,
                 cursor.getInt(cursor.getColumnIndex(SamsungTasksContract.Tasks.COLUMN_LIST_ID))
             )
-        val task = TaskEvent(settings, settings.clock.zone)
+        val task = TaskEvent(settings)
         task.setEventSource(source)
         task.setId(cursor.getLong(cursor.getColumnIndex(SamsungTasksContract.Tasks.COLUMN_ID)))
         task.title =

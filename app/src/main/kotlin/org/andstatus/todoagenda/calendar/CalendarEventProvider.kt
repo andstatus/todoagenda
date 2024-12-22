@@ -251,7 +251,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
     }
 
     override val addEventIntent: Intent
-        get() = CalendarIntentUtil.newAddCalendarEventIntent(settings.clock.zone)
+        get() = CalendarIntentUtil.newAddCalendarEventIntent(settings.timeZone)
 
     companion object {
         private val TAG = CalendarEventProvider::class.java.simpleName

@@ -48,7 +48,7 @@ open class BaseWidgetTest {
     ): DateTime {
         return DateTime(
             year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, 0, 0,
-            provider.settings.clock.zone
+            provider.settings.timeZone
         )
     }
 
