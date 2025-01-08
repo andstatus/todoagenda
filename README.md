@@ -28,6 +28,7 @@ selected calendars and task lists.
 * Fully resizable widget with alternative layouts.
 * Indicators for alerts and recurring events.
 * Lock time zone when travelling to different time zones.
+* Change start hour of a day if you stay up late or wake up early.
 * Turn off Widget header, Day headers, event icons, Days from today, etc. and see only what you need.
 * Hide duplicated events.
 * Backup and restore settings, cloning widgets on the same or different devices.

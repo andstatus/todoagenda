@@ -6,7 +6,7 @@
 * "Start hour of a day" option added to "Other settings" section.
 
   Changing its value from default 0 to e.g. 4 causes all events that start before 4 AM to be shown
-  under previous day's header. This may be convenient for people who stay up after midnight or
+  under previous day's header. This may be convenient for people who stay up after midnight
   or wake up early.
   Valid values are from -12 to 12.
   [#140](https://github.com/andstatus/todoagenda/issues/140)
