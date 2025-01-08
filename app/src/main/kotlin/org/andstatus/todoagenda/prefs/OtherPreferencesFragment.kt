@@ -153,8 +153,10 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                     snapshotModeIn = snapshotMode,
                     resultsStorage = if (snapshotMode.isSnapshotMode && !settings.hasResults) {
                         QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
-                    } else {
+                    } else if (snapshotMode.isSnapshotMode) {
                         settings.resultsStorage
+                    } else {
+                        null
                     }
                 )
                 settings.save(key, "newResultsForSnapshotMode")
