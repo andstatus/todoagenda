@@ -64,7 +64,7 @@ class CalendarEntry private constructor(
             val startStr: String?
             val endStr: String?
             var separator = SPACE_DASH_SPACE
-            if (!MyClock.isDateDefined(entryDate) || (isPartOfMultiDayEvent && DateUtil.isMidnight(entryDate)
+            if (!MyClock.isDateDefined(entryDate) || (isPartOfMultiDayEvent && settings.clock.isStartOfDay(entryDate)
                     && !isStartOfMultiDayEvent)
             ) {
                 startStr = ARROW

@@ -1,6 +1,7 @@
 package org.andstatus.todoagenda.calendar
 
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.R
@@ -95,47 +96,67 @@ class CalendarEventVisualizer(eventProvider: EventProvider) : WidgetEntryVisuali
     }
 
     private fun toCalendarEntryList(eventList: List<CalendarEvent>?): List<CalendarEntry> {
-        val fillAllDayEvents = settings.fillAllDayEvents
         val entryList: MutableList<CalendarEntry> = ArrayList()
         for (event in eventList!!) {
-            val dayOneEntry = getDayOneEntry(event)
+            val dayOneEntry = getFirstDayEntry(event)
             entryList.add(dayOneEntry)
-            if (fillAllDayEvents) {
-                addEntriesToFillAllDayEvents(entryList, dayOneEntry)
+            if (settings.logEvents) {
+                Log.i("toCalendarEntryList", "event: $event\nentry: $dayOneEntry")
+            }
+            if (settings.fillAllDayEvents) {
+                addEntriesToFillAllEventDays(entryList, dayOneEntry)
+            }
+        }
+        if (settings.logEvents) {
+            entryList.forEachIndexed { index, entry ->
+                Log.i("toCalendarEntryLAll", "${index + 1}. $entry")
             }
         }
         return entryList
     }
 
-    private fun getDayOneEntry(event: CalendarEvent): CalendarEntry {
+    private fun getFirstDayEntry(event: CalendarEvent): CalendarEntry {
         var firstDate = event.startDate
-        val dayOfStartOfTimeRange = calendarEventProvider.startOfTimeRange
-            .withTimeAtStartOfDay()
+        val timeRangeStartDay = settings.clock.dayOf(calendarEventProvider.startOfTimeRange)
         if (!event.hasDefaultCalendarColor() // ??? TODO: fix logic
             && firstDate.isBefore(calendarEventProvider.startOfTimeRange)
             && event.endDate.isAfter(calendarEventProvider.startOfTimeRange)
         ) {
-            if (event.isAllDay || firstDate.isBefore(dayOfStartOfTimeRange)) {
-                firstDate = dayOfStartOfTimeRange
+            if (event.isAllDay || firstDate.isBefore(timeRangeStartDay)) {
+                firstDate = settings.clock.withTimeAtStartHourOfDay(timeRangeStartDay)
             }
         }
-        val today = settings.clock.now(event.startDate.zone).withTimeAtStartOfDay()
+        val today = settings.clock.startOfToday()
         if (event.isActive && firstDate.isBefore(today)) {
             firstDate = today
         }
         return CalendarEntry.fromEvent(settings, event, firstDate)
     }
 
-    private fun addEntriesToFillAllDayEvents(entryList: MutableList<CalendarEntry>, dayOneEntry: CalendarEntry) {
-        var endDate = dayOneEntry.event.endDate
-        if (endDate.isAfter(calendarEventProvider.endOfTimeRange)) {
-            endDate = calendarEventProvider.endOfTimeRange
+    private fun addEntriesToFillAllEventDays(entryList: MutableList<CalendarEntry>, dayOneEntry: CalendarEntry) {
+        var endDay = if (dayOneEntry.event.endDate.isAfter(calendarEventProvider.endOfTimeRange)) {
+            calendarEventProvider.endOfTimeRange
+        } else {
+            dayOneEntry.event.endDate
+        }.let {
+            dayOneEntry.calcEntryDay(it.minusSeconds(1))
         }
-        var thisDay = dayOneEntry.entryDay.plusDays(1).withTimeAtStartOfDay()
-        while (thisDay.isBefore(endDate)) {
-            val nextEntry: CalendarEntry = CalendarEntry.fromEvent(settings, dayOneEntry.event, thisDay)
+        var nextDay = dayOneEntry.entryDay.plusDays(1)
+        var i = 1
+        if (settings.logEvents) {
+            Log.i("addEntriesToFillAllEventDays", "$i. endDay: $endDay, thisDay: $nextDay, $dayOneEntry")
+        }
+        while (!nextDay.isAfter(endDay)) {
+            val nextEntry: CalendarEntry = CalendarEntry.fromEvent(
+                settings, dayOneEntry.event,
+                entryDate = settings.clock.withTimeAtStartHourOfDay(nextDay)
+            )
+            if (settings.logEvents) {
+                i++
+                Log.i("addEntriesToFillAllEventDays", "$i. thisDay: $nextDay, $nextEntry")
+            }
             entryList.add(nextEntry)
-            thisDay = thisDay.plusDays(1)
+            nextDay = nextDay.plusDays(1)
         }
     }
 }

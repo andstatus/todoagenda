@@ -27,6 +27,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
         showSnapshotMode()
         setLockTimeZone()
         showLockTimeZone()
+        showStartHourOfDay()
         showRefreshPeriod()
         preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
     }
@@ -53,6 +54,19 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
             getText(if (preference.isChecked) R.string.lock_time_zone_on_desc else R.string.lock_time_zone_off_desc).toString(),
             settings.timeZone.getName(DateTime.now(settings.timeZone).millis)
         )
+    }
+
+    private fun showStartHourOfDay() {
+        val preference =
+            findPreference<Preference>(InstanceSettings.PREF_START_HOUR_OF_DAY) as EditTextPreference?
+        if (preference != null) {
+            val value = ApplicationPreferences.getIntStoredAsString(
+                requireActivity(),
+                InstanceSettings.PREF_START_HOUR_OF_DAY,
+                0
+            )
+            preference.summary = value.toString()
+        }
     }
 
     private fun showSnapshotMode() {
@@ -104,7 +118,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                     timeZone
                 )
                 settings.copy(lockedTimeZoneIdIn = timeZone)
-                    .let { AllSettings.addNew(TAG, requireActivity(), it) }
+                    .let { AllSettings.addOrReplace(TAG, requireActivity(), it) }
                 showLockTimeZone()
             }
 
@@ -131,6 +145,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 )
             }
 
+            InstanceSettings.PREF_START_HOUR_OF_DAY -> showStartHourOfDay()
             InstanceSettings.PREF_REFRESH_PERIOD_MINUTES -> showRefreshPeriod()
             InstanceSettings.PREF_SNAPSHOT_MODE -> {
                 val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
@@ -143,7 +158,7 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                     }
                 )
                 settings.save(key, "newResultsForSnapshotMode")
-                AllSettings.addNew(TAG, requireActivity(), settings)
+                AllSettings.addOrReplace(TAG, requireActivity(), settings)
                 showSnapshotMode()
                 setLockTimeZone()
                 showLockTimeZone()

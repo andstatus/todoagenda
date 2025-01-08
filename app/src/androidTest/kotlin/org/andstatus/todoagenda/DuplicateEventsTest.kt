@@ -13,10 +13,10 @@ class DuplicateEventsTest : BaseWidgetTest() {
     @Test
     fun testIssue354() {
         val method = "testIssue354"
-        val inputs = provider!!.loadResultsAndSettings(
+        val inputs = provider.loadResultsAndSettings(
             org.andstatus.todoagenda.test.R.raw.duplicates
         )
-        provider!!.addResults(inputs)
+        provider.addResults(inputs)
         playResults(method)
         Assert.assertEquals("Number of entries", 40, factory.widgetEntries.size.toLong())
     }

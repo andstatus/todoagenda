@@ -18,9 +18,6 @@ object DateUtil {
     private const val TWELVE = "12"
     private const val AUTO = "auto"
     const val EMPTY_STRING = ""
-    fun isMidnight(date: DateTime): Boolean {
-        return date.isEqual(date.withTimeAtStartOfDay())
-    }
 
     fun formatTime(settingsSupplier: Supplier<InstanceSettings>, time: DateTime?): String {
         if (time == null || !MyClock.isDateDefined(time)) return EMPTY_STRING

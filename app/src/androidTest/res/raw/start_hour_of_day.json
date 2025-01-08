@@ -1,0 +1,1636 @@
+{
+  "deviceInfo": {
+    "versionCode": 35,
+    "versionRelease": "15",
+    "versionCodename": "REL",
+    "buildManufacturer": "Google",
+    "buildBrand": "google",
+    "buildModel": "sdk_gphone64_x86_64"
+  },
+  "applicationInfo": {
+    "versionName": "4.10.2",
+    "versionCode": 708
+  },
+  "settings": {
+    "widgetId": 2,
+    "compactLayout": false,
+    "widgetHeaderLayout": "ONE_ROW",
+    "widgetHeaderDateFormat": "defaultWeekday:",
+    "showDayHeaders": true,
+    "dayHeaderDateFormat": "defaultWeekday:",
+    "showPastEventsUnderOneHeader": false,
+    "dayHeaderAlignment": "RIGHT",
+    "horizontalLineBelowDayHeader": false,
+    "showDaysWithoutEvents": false,
+    "eventEntryLayout": "DEFAULT",
+    "showEventIcon": true,
+    "entryDateFormat": "hidden:",
+    "multiline_title": false,
+    "maxLinesTitle": 5,
+    "multiline_details": false,
+    "maxLinesDetails": 5,
+    "widgetHeaderBackgroundColor": 0,
+    "pastEventsBackgroundColor": -1082623956,
+    "todaysEventsBackgroundColor": -620756993,
+    "backgroundColor": -2147483648,
+    "textColorSource": "shading",
+    "headerTheme": "DARK",
+    "widgetHeaderTextColor": -1694498817,
+    "dayHeaderThemePast": "DARK",
+    "dayHeaderTextColorPast": -3355444,
+    "entryThemePast": "BLACK",
+    "eventTextColorPast": -1,
+    "dayHeaderTheme": "LIGHT",
+    "dayHeaderTextColorToday": -8947849,
+    "entryTheme": "WHITE",
+    "eventTextColorToday": -16777216,
+    "dayHeaderThemeFuture": "DARK",
+    "dayHeaderTextColorFuture": -3355444,
+    "entryThemeFuture": "BLACK",
+    "eventTextColorFuture": -1,
+    "textShadow": "no",
+    "showEndTime": true,
+    "showLocation": true,
+    "showDescription": false,
+    "fillAllDay": true,
+    "indicateAlerts": true,
+    "indicateRecurring": false,
+    "eventsEnded": "ONE_WEEK",
+    "showPastEventsWithDefaultColor": false,
+    "eventRange": 7,
+    "hideBasedOnKeywords": "",
+    "showBasedOnKeywords": "",
+    "showOnlyClosestInstanceOfRecurringEvent": false,
+    "hideDuplicates": false,
+    "allDayEventsPlacement": "top_day",
+    "taskScheduling": "date_due",
+    "taskWithoutDates": "end_of_list",
+    "filterMode": "normal",
+    "activeSources": [
+      {
+        "providerType": 1,
+        "id": 2,
+        "title": "andstatus@gmail.com",
+        "summary": "andstatus@gmail.com",
+        "color": -6299161,
+        "isAvailable": true
+      },
+      {
+        "providerType": 1,
+        "id": 3,
+        "title": "ToDo Agenda Shared",
+        "summary": "calendar.widget.android@gmail.com",
+        "color": -6644481,
+        "isAvailable": true
+      }
+    ],
+    "widgetInstanceName": "Birthday test - Test replay",
+    "textSizeScale": "1.0",
+    "dateFormat": "auto",
+    "lockedTimeZoneId": "",
+    "startHourOfDay": 0,
+    "snapshotMode": "live_data",
+    "refreshPeriodMinutes": 10
+  },
+  "resultsVersion": 3,
+  "results": [
+    {
+      "providerType": 1,
+      "executedAt": 1734877251426,
+      "timeZoneId": "UTC",
+      "millisOffsetUtcToLocal": 0,
+      "standardMillisOffsetUtcToLocal": 0,
+      "uri": "content:\/\/com.android.calendar\/instances\/when\/1734048000000\/1735482051416",
+      "projection": [
+        "calendar_id",
+        "event_id",
+        "eventStatus",
+        "title",
+        "begin",
+        "end",
+        "allDay",
+        "eventLocation",
+        "description",
+        "hasAlarm",
+        "rrule",
+        "displayColor",
+        "calendar_color"
+      ],
+      "selection": "selfAttendeeStatus!=2 AND (calendar_id = 2 OR calendar_id = 3 )",
+      "selectionArgs": [],
+      "sortOrder": "startDay ASC, allDay DESC, begin ASC ",
+      "rows": [
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "All day weekly event1"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=WEEKLY;WKST=TU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 14
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734220800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734134400000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 2
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": ""
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "event_id": {
+            "type": 1,
+            "value": 9
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734307200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6299161
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734220800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6299161
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": "Secret cafe, Rhodyho, 4220 Bardejov, Slovakia"
+          },
+          "description": {
+            "type": 3,
+            "value": "Description of the event"
+          },
+          "title": {
+            "type": 3,
+            "value": "Test event 2 that is a recurring all day event and has a reminder"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=MONTHLY;WKST=SU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 18
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734566400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734480000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734573600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734570000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734660000000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734656400000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "All day weekly event1"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=WEEKLY;WKST=TU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 14
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734825600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734739200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734746400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734742800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Nine PM yesterday"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 28
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734818400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -12134693
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734814800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Nine thirty PM Yesterday"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 35
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734820200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -2350809
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734816600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Ten PM yesterday"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 25
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734822300000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734818700000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Last Midnight"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 26
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734826800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734825600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734832800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734829200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Four AM today"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 27
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734843600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -30596
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734840000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Ten PM today"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 29
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734908400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734904800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Eleven PM Today"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 30
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734912000000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734908400000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Eleven thirty PM Today"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 34
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734913800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -11421879
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734910200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Next Midnight"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 31
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734915600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734912000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734919200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734915600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Three thirty Tomorrow"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 33
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734928200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -2380289
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734924600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Noon Tomorrow"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 32
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734958800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -18312
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734955200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Six PM Tomorrow"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 36
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1734980400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1734976800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735005600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735002000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Two AM day after Tomorrow"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 37
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735009200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735005600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735092000000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735088400000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735178400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735174800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735264800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735261200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "All day weekly event1"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=WEEKLY;WKST=TU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 14
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735430400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735344000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735351200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735347600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "One AM whole week"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=DAILY;WKST=MO"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 38
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1735437600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -272549
+          },
+          "begin": {
+            "type": 1,
+            "value": 1735434000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        }
+      ]
+    }
+  ]
+}

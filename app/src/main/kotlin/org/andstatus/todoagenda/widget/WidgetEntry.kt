@@ -24,14 +24,14 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
 
     init {
         this.entryDate = fixEntryDate(entryPosition, entryDate)
-        entryDay = calcEntryDay(settings, entryPosition, this.entryDate)
+        entryDay = calcEntryDay(entryDate)
         timeSection = calcTimeSection(settings, entryPosition, entryDay, endDate)
     }
 
     val isLastEntryOfEvent: Boolean
         get() = endDate == null ||
             !entryPosition.entryDateIsRequired ||
-            endDate.isBefore(MyClock.startOfNextDay(entryDate))
+            !endDate.isAfter(settings.clock.startOfNextDay(entryDate))
     open val eventTimeString: String
         get() = ""
     abstract val source: OrderedEventSource
@@ -108,14 +108,24 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
         return entryPosition != WidgetEntryPosition.HIDDEN
     }
 
+    fun calcEntryDay(entryDate: DateTime): DateTime {
+        return when (entryPosition) {
+            WidgetEntryPosition.START_OF_TODAY, WidgetEntryPosition.END_OF_TODAY -> settings.clock.now()
+                .withTimeAtStartOfDay()
+
+            WidgetEntryPosition.DAY_HEADER -> entryDate.withTimeAtStartOfDay()
+
+            else -> if (allDay) entryDate.withTimeAtStartOfDay() else settings.clock.dayOf(entryDate)
+        }
+    }
+
     companion object {
         val EXTRA_WIDGET_ENTRY_ID: String = RemoteViewsFactory.PACKAGE + ".extra.WIDGET_ENTRY_ID"
         private val idGenerator = AtomicLong(0)
         private fun fixEntryDate(entryPosition: WidgetEntryPosition, entryDate: DateTime?): DateTime {
             return when (entryPosition) {
                 WidgetEntryPosition.ENTRY_DATE -> {
-                    throwIfNull(entryPosition, entryDate)
-                    entryDate!!
+                    requireNotNull(entryPosition, entryDate)
                 }
 
                 WidgetEntryPosition.PAST_AND_DUE_HEADER,
@@ -124,13 +134,11 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 WidgetEntryPosition.HIDDEN -> entryDate ?: MyClock.DATETIME_MIN
 
                 WidgetEntryPosition.DAY_HEADER, WidgetEntryPosition.START_OF_DAY -> {
-                    throwIfNull(entryPosition, entryDate)
-                    entryDate!!.withTimeAtStartOfDay()
+                    requireNotNull(entryPosition, entryDate).withTimeAtStartOfDay()
                 }
 
                 WidgetEntryPosition.END_OF_DAY -> {
-                    throwIfNull(entryPosition, entryDate)
-                    entryDate!!.withTimeAtStartOfDay().plusDays(1).minusMillis(1)
+                    requireNotNull(entryPosition, entryDate).withTimeAtStartOfDay().plusDays(1).minusMillis(1)
                 }
 
                 WidgetEntryPosition.END_OF_TODAY,
@@ -139,19 +147,6 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 WidgetEntryPosition.LIST_FOOTER -> entryDate ?: MyClock.DATETIME_MAX
 
                 else -> throw IllegalArgumentException("Invalid position $entryPosition; entryDate: $entryDate")
-            }
-        }
-
-        private fun calcEntryDay(
-            settings: InstanceSettings,
-            entryPosition: WidgetEntryPosition?,
-            entryDate: DateTime?
-        ): DateTime {
-            return when (entryPosition) {
-                WidgetEntryPosition.START_OF_TODAY, WidgetEntryPosition.END_OF_TODAY -> settings.clock.now()
-                    .withTimeAtStartOfDay()
-
-                else -> entryDate!!.withTimeAtStartOfDay()
             }
         }
 
@@ -165,19 +160,19 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 WidgetEntryPosition.END_OF_TODAY, WidgetEntryPosition.END_OF_LIST_HEADER, WidgetEntryPosition.END_OF_LIST, WidgetEntryPosition.LIST_FOOTER -> return TimeSection.FUTURE
                 else -> {}
             }
-            if (settings.clock.isToday(entryDay)) {
+            if (settings.clock.isDayToday(entryDay)) {
                 if (entryPosition == WidgetEntryPosition.DAY_HEADER) return TimeSection.TODAY
                 return if (settings.clock.isToday(endDate)) {
                     if (settings.clock.isBeforeNow(endDate)) TimeSection.PAST else TimeSection.TODAY
                 } else TimeSection.TODAY
             }
-            return if (settings.clock.isBeforeToday(entryDay)) TimeSection.PAST else if (settings.clock
+            return if (settings.clock.isDayBeforeToday(entryDay)) TimeSection.PAST else if (settings.clock
                     .isToday(endDate)
             ) TimeSection.TODAY else TimeSection.FUTURE
         }
 
-        private fun throwIfNull(entryPosition: WidgetEntryPosition, entryDate: DateTime?) {
-            requireNotNull(entryDate) { "Invalid entry date: $entryDate at position $entryPosition" }
+        private fun requireNotNull(entryPosition: WidgetEntryPosition, entryDate: DateTime?): DateTime {
+            return requireNotNull(entryDate) { "Invalid entry date: $entryDate at position $entryPosition" }
         }
 
         fun getEntryPosition(

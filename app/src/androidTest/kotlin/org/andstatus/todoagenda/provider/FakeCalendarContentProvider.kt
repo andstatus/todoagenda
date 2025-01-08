@@ -32,7 +32,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
             ?: throw java.lang.IllegalStateException("No settings stored")
         set(value) {
             settingsRef.set(value)
-            AllSettings.addNew(TAG, context, value)
+            AllSettings.addOrReplace(TAG, context, value)
         }
 
     init {
@@ -51,10 +51,11 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
 
     fun updateAppSettings(tag: String) {
         settings = settings.copy(
+            logEvents = true,
             resultsStorage = results,
             snapshotModeIn = SnapshotMode.SNAPSHOT_TIME
         )
-        AllSettings.addNew(tag, context, settings)
+        AllSettings.addOrReplace(tag, context, settings)
         if (results.results.isNotEmpty()) {
             Log.d(tag, "Results executed at " + settings.clock.now())
         }
@@ -136,7 +137,8 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
             val widgetData = WidgetData.fromJson(json)
             settings = widgetData.getSettingsForWidget(
                 context,
-                settings, widgetId
+                settings,
+                widgetId
             )
             return settings.resultsStorage ?: throw IllegalStateException("No results storage")
         } catch (e: Exception) {

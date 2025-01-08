@@ -223,6 +223,7 @@
     <string name="lock_time_zone_off_desc">Разблокирован, текущий часовой пояс: %s</string>
     <string name="lock_time_zone_on_desc">Заблокирован на %s</string>
     <string name="lock_time_zone_title">Блокировка часового пояса</string>
+    <string name="start_hour_of_day">Час начала дня</string>
     <string name="snapshot_mode">Заблокировать изменения списка событий (Режим снимка)</string>
     <string name="snapshot_mode_live_data">Живые данные из реальных источников</string>
     <string name="snapshot_mode_time">Снимок, как он был виден тогда, когда он был сделан: %s</string>

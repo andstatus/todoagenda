@@ -1,7 +1,6 @@
 package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.prefs.AllDayEventsPlacement
-import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.EndedSomeTimeAgo
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
@@ -21,16 +20,13 @@ class BirthdayTest : BaseWidgetTest() {
         val inputs = provider.loadResultsAndSettings(
             org.andstatus.todoagenda.test.R.raw.birthday
         )
-        provider.startEditingPreferences()
-        ApplicationPreferences.setWidgetHeaderDateFormat(
-            provider.context,
-            DateFormatValue.of(DateFormatType.CUSTOM, "YYYY-MM-dd")
+        provider.settings = settings.copy(
+            widgetHeaderDateFormat = DateFormatValue.of(DateFormatType.CUSTOM, "YYYY-MM-dd"),
+            allDayEventsPlacement = AllDayEventsPlacement.TOP_DAY,
+            eventsEnded = EndedSomeTimeAgo.NONE,
+            showPastEventsWithDefaultColor = false,
+            eventRange = 30
         )
-        ApplicationPreferences.setAllDayEventsPlacement(provider.context, AllDayEventsPlacement.TOP_DAY)
-        ApplicationPreferences.setEventsEnded(provider.context, EndedSomeTimeAgo.NONE)
-        ApplicationPreferences.setShowPastEventsWithDefaultColor(provider.context, false)
-        ApplicationPreferences.setEventRange(provider.context, 30)
-        provider.savePreferences()
         playAtOneTime(inputs, dateTime(2015, 8, 1, 17, 0), 0)
         playAtOneTime(inputs, dateTime(2015, 8, 9, 23, 59), 0)
         playAtOneTime(inputs, dateTime(2015, 8, 10, 0, 0).plusMillis(1), 2)
@@ -43,28 +39,33 @@ class BirthdayTest : BaseWidgetTest() {
         playAtOneTime(inputs, dateTime(2015, 9, 9, 23, 30), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 0, 30), 0)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 11, 0), 0)
-        ApplicationPreferences.setEventsEnded(provider.context, EndedSomeTimeAgo.ONE_HOUR)
-        provider.savePreferences()
+        provider.settings = settings.copy(
+            eventsEnded = EndedSomeTimeAgo.ONE_HOUR
+        )
         playAtOneTime(inputs, dateTime(2015, 9, 10, 0, 30), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 1, 30), 0)
-        ApplicationPreferences.setEventsEnded(provider.context, EndedSomeTimeAgo.TODAY)
-        provider.savePreferences()
+        provider.settings = settings.copy(
+            eventsEnded = EndedSomeTimeAgo.TODAY
+        )
         playAtOneTime(inputs, dateTime(2015, 9, 10, 1, 30), 0)
-        ApplicationPreferences.setEventsEnded(provider.context, EndedSomeTimeAgo.FOUR_HOURS)
-        provider.savePreferences()
+        provider.settings = settings.copy(
+            eventsEnded = EndedSomeTimeAgo.FOUR_HOURS
+        )
         playAtOneTime(inputs, dateTime(2015, 9, 10, 1, 30), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 3, 59), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 4, 0), 0)
-        ApplicationPreferences.setEventsEnded(provider.context, EndedSomeTimeAgo.YESTERDAY)
-        provider.savePreferences()
+        provider.settings = settings.copy(
+            eventsEnded = EndedSomeTimeAgo.YESTERDAY
+        )
         playAtOneTime(inputs, dateTime(2015, 9, 10, 4, 0), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 11, 0), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 17, 0), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 10, 23, 30), 2)
         playAtOneTime(inputs, dateTime(2015, 9, 11, 0, 0), 0)
         playAtOneTime(inputs, dateTime(2015, 9, 11, 0, 30), 0)
-        ApplicationPreferences.setShowPastEventsWithDefaultColor(provider.context, true)
-        provider.savePreferences()
+        provider.settings = settings.copy(
+            showPastEventsWithDefaultColor = true
+        )
         playAtOneTime(inputs, dateTime(2015, 9, 11, 0, 30), 0)
     }
 

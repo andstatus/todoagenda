@@ -6,7 +6,6 @@ import org.joda.time.DateTimeZone
 import org.joda.time.Days
 import org.joda.time.Minutes
 import java.util.TimeZone
-import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.Volatile
 
 /**
@@ -18,15 +17,11 @@ class MyClock(
     private val snapshotMode: SnapshotMode,
     private val snapshotDate: DateTime?,
     private val timeZone: DateTimeZone,
+    private val startHourOfDay: Int,
 ) {
     private val snapshotDateSetAt: DateTime = DateTime.now()
 
-    private val startHourOfDayRef: AtomicInteger = AtomicInteger(0)
-    var startHourOfDay: Int
-        get() = startHourOfDayRef.get()
-        set(value) {
-            startHourOfDayRef.set(value)
-        }
+    fun today(timeZone: DateTimeZone? = this.timeZone): DateTime = dayOf(now(timeZone))
 
     /**
      * Usually returns real "now", but may be #setNow to some other time for testing purposes
@@ -40,27 +35,31 @@ class MyClock(
         }
     }
 
-    private fun getTimeMachineDate(zone: DateTimeZone?): DateTime {
+    private fun getTimeMachineDate(timeZone: DateTimeZone?): DateTime {
         return if (snapshotDate == null) {
-            DateTime.now(zone)
+            DateTime.now(timeZone)
         } else {
             val millisElapsed = DateTime.now().millis - snapshotDateSetAt.millis
-            DateTime(snapshotDate, zone).plusMillis(millisElapsed.toInt())
+            DateTime(snapshotDate, timeZone).plusMillis(millisElapsed.toInt())
         }
     }
 
+    fun isDayToday(date: DateTime?): Boolean = isDateDefined(date) && date!!.isEqual(today(date.zone))
+
     fun isToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && !isBeforeToday(date) && date!!.isBefore(
-            now(date.zone).plusDays(1).withTimeAtStartOfDay()
-        )
+        return isDateDefined(date) && dayOf(date!!).isEqual(today(date.zone))
+    }
+
+    fun isDayBeforeToday(date: DateTime?): Boolean {
+        return isDateDefined(date) && date!!.isBefore(today(date.zone))
     }
 
     fun isBeforeToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && date!!.isBefore(now(date.zone).withTimeAtStartOfDay())
+        return isDateDefined(date) && date!!.isBefore(today(date.zone).withTimeAtStartHourOfDayInner())
     }
 
     fun isAfterToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && !date!!.isBefore(now(date.zone).withTimeAtStartOfDay().plusDays(1))
+        return isDateDefined(date) && !date!!.isBefore(today(date.zone).withTimeAtStartHourOfDayInner().plusDays(1))
     }
 
     fun isBeforeNow(date: DateTime?): Boolean {
@@ -81,7 +80,54 @@ class MyClock(
     }
 
     fun startOfTomorrow(): DateTime {
-        return startOfNextDay(now(timeZone))
+        return startOfToday().plusDays(1)
+    }
+
+    fun startOfToday(): DateTime {
+        return dayOf(now()).withTimeAtStartHourOfDayInner()
+    }
+
+    fun dayOf(date: DateTime): DateTime {
+        return when {
+            startHourOfDay == 0 -> date.withTimeAtStartOfDay()
+            startHourOfDay > 0 -> {
+                val startOfThisDay = date.withTimeAtStartHourOfDayInner()
+                if (startOfThisDay.isAfter(date)) {
+                    date.minusDays(1).withTimeAtStartOfDay()
+                } else {
+                    date.withTimeAtStartOfDay()
+                }
+            }
+
+            else -> {
+                val startOfNextDay = date.withTimeAtStartHourOfDayInner().plusDays(1)
+                if (date.isBefore(startOfNextDay)) {
+                    date.withTimeAtStartOfDay()
+                } else {
+                    date.plusDays(1).withTimeAtStartOfDay()
+                }
+            }
+        }
+    }
+
+    fun isStartOfDay(date: DateTime): Boolean {
+        return date.isEqual(startOfThisDay(date))
+    }
+
+    fun startOfNextDay(date: DateTime): DateTime {
+        return startOfThisDay(date).plusDays(1)
+    }
+
+    fun startOfThisDay(date: DateTime): DateTime {
+        return dayOf(date).withTimeAtStartHourOfDayInner()
+    }
+
+    fun withTimeAtStartHourOfDay(date: DateTime): DateTime {
+        return date.withTimeAtStartHourOfDayInner()
+    }
+
+    private fun DateTime.withTimeAtStartHourOfDayInner(): DateTime {
+        return withTimeAtStartOfDay().plusHours(startHourOfDay)
     }
 
     companion object {
@@ -91,10 +137,6 @@ class MyClock(
         @Volatile
         var myDefaultTimeZone: DateTimeZone? = null
         val defaultTimeZone: DateTimeZone get() = myDefaultTimeZone ?: DateTimeZone.forTimeZone(TimeZone.getDefault())
-
-        fun startOfNextDay(date: DateTime): DateTime {
-            return date.plusDays(1).withTimeAtStartOfDay()
-        }
 
         fun isDateDefined(dateTime: DateTime?): Boolean {
             return dateTime != null && dateTime.isAfter(DATETIME_MIN) && dateTime.isBefore(DATETIME_MAX)

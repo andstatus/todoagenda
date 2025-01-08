@@ -1,6 +1,5 @@
 package org.andstatus.todoagenda
 
-import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.provider.QueryRow
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.junit.Assert
@@ -21,9 +20,9 @@ class RecurringEventsTest : BaseWidgetTest() {
     fun testShowRecurringEvents() {
         generateEventInstances()
         Assert.assertEquals("Entries: " + factory.widgetEntries.size, 15, countCalendarEntries().toLong())
-        provider.startEditingPreferences()
-        ApplicationPreferences.setShowOnlyClosestInstanceOfRecurringEvent(provider.context, true)
-        provider.savePreferences()
+        provider.settings = settings.copy(
+            showOnlyClosestInstanceOfRecurringEvent = true
+        )
         generateEventInstances()
         Assert.assertEquals("Entries: " + factory.widgetEntries.size, 1, countCalendarEntries().toLong())
     }

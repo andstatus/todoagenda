@@ -261,6 +261,7 @@
     <string name="lock_time_zone_off_desc">Unlocked, current zone: %s</string>
     <string name="lock_time_zone_on_desc">Locked at %s</string>
     <string name="lock_time_zone_title">Lock time zone</string>
+    <string name="start_hour_of_day">Start hour of day</string>
     <string name="snapshot_mode">Lock list of events (Snapshot mode)</string>
     <string name="snapshot_mode_live_data">Live data from real sources</string>
     <string name="snapshot_mode_time">Snapshot as seen at the time, when it was taken: %s</string>

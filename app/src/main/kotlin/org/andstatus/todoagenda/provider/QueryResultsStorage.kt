@@ -2,7 +2,6 @@ package org.andstatus.todoagenda.provider
 
 import android.content.Context
 import android.content.Intent
-import android.text.TextUtils
 import android.util.Log
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.RemoteViewsFactory
@@ -156,24 +155,26 @@ class QueryResultsStorage {
             val method = "shareEventsForDebugging"
             Log.i(TAG, "$method started")
             val settings = AllSettings.instanceFromId(context, widgetId)
-            val storage = if (settings.isSnapshotMode) settings.resultsStorage else getNewResults(context, widgetId)
-            val results = storage!!.toJsonString(context, widgetId)
-            if (TextUtils.isEmpty(results)) {
-                Log.i(TAG, "$method; Nothing to share")
-            } else {
-                val fileName = (settings.widgetInstanceName + "-" + context.getText(R.string.app_name))
-                    .replace("\\W+".toRegex(), "-") +
-                    "-shareEvents-" + DateUtil.formatLogDateTime(System.currentTimeMillis()) +
-                    ".json"
-                val intent = Intent(Intent.ACTION_SEND)
-                intent.setType("application/json")
-                intent.putExtra(Intent.EXTRA_SUBJECT, fileName)
-                intent.putExtra(Intent.EXTRA_TEXT, results)
-                context.startActivity(
-                    Intent.createChooser(intent, context.getText(R.string.share_events_for_debugging_title))
-                )
-                Log.i(TAG, "$method; Shared $results")
+            val storage: QueryResultsStorage? =
+                if (settings.isSnapshotMode) settings.resultsStorage else getNewResults(context, widgetId)
+            if (storage == null || !storage.hasResults()) {
+                Log.w(TAG, "$method; Nothing to share")
+                return
             }
+            val results = storage.toJsonString(context, widgetId)
+            val fileName = (settings.widgetInstanceName + "-" + context.getText(R.string.app_name))
+                .replace("\\W+".toRegex(), "-") +
+                "-shareEvents-" + DateUtil.formatLogDateTime(System.currentTimeMillis()) +
+                ".json"
+            Log.d(TAG, "$method; Sharing ${results.length} bytes to $fileName")
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.setType("application/json")
+            intent.putExtra(Intent.EXTRA_SUBJECT, fileName)
+            intent.putExtra(Intent.EXTRA_TEXT, results)
+            context.startActivity(
+                Intent.createChooser(intent, context.getText(R.string.share_events_for_debugging_title))
+            )
+            Log.i(TAG, "$method; Shared $results")
         }
 
         fun getNewResults(context: Context, widgetId: Int): QueryResultsStorage? {

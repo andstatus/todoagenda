@@ -1,6 +1,5 @@
 package org.andstatus.todoagenda
 
-import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.LastEntry
 import org.joda.time.DateTime
@@ -21,9 +20,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
         inputs.executedAt.set(now)
         provider.addResults(inputs)
         val dateRange = 30
-        provider.startEditingPreferences()
-        ApplicationPreferences.setEventRange(provider.context, dateRange)
-        provider.savePreferences()
+        provider.settings = settings.copy(eventRange = dateRange)
         playResults(method)
         val today = now.withTimeAtStartOfDay()
         val endOfRangeTime = today.plusDays(dateRange)

@@ -78,7 +78,7 @@ object AllSettings {
         }
     }
 
-    fun addNew(tag: String, context: Context, settings: InstanceSettings) {
+    fun addOrReplace(tag: String, context: Context, settings: InstanceSettings) {
         save(tag, "addNew", settings)
     }
 

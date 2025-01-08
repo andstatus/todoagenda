@@ -116,7 +116,7 @@ class CalendarEventProvider(type: EventProviderType, context: Context, widgetId:
                         ", got " + eventList.size + " events"
                 )
                 val factory: RemoteViewsFactory? = RemoteViewsFactory.factories.get(widgetId)
-                if (factory != null) {
+                if (factory != null && settings.logEvents) {
                     factory.logWidgetEntries(tag)
                 }
             }

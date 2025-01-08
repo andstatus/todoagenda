@@ -26,13 +26,13 @@ class LastEntry(settings: InstanceSettings, val type: LastEntryType, date: DateT
             return LastEntry(settings, entryType, settings.clock.now())
         }
 
-        fun addLast(settings: InstanceSettings, widgetEntries: MutableList<WidgetEntry<*>>) {
+        fun addLast(settings: InstanceSettings, widgetEntries: List<WidgetEntry<*>>): List<WidgetEntry<*>> {
             val entry = if (widgetEntries.isEmpty()) forEmptyList(settings) else LastEntry(
                 settings,
                 LastEntryType.LAST,
                 widgetEntries[widgetEntries.size - 1].entryDate
             )
-            widgetEntries.add(entry)
+            return widgetEntries + entry
         }
     }
 }

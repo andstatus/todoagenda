@@ -27,6 +27,8 @@ import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.stream.Collectors
+import kotlin.Int
+import kotlin.math.abs
 
 /**
  * Loaded settings of one Widget
@@ -36,6 +38,7 @@ import java.util.stream.Collectors
 data class InstanceSettings(
     private val contextIn: Context?,
     val widgetId: Int,
+    val logEvents: Boolean = false,
 
     // ----------------------------------------------------------------------------------
     // Layout
@@ -99,6 +102,7 @@ data class InstanceSettings(
     val textSizeScale: TextSizeScale = TextSizeScale.MEDIUM,
     val timeFormat: String = PREF_TIME_FORMAT_DEFAULT,
     private val lockedTimeZoneIdIn: String = "",
+    private val startHourOfDayIn: Int = 0,
     private val snapshotModeIn: SnapshotMode = SnapshotMode.Companion.defaultValue,
     val resultsStorage: QueryResultsStorage? = null,
     private val refreshPeriodMinutesIn: Int = PREF_REFRESH_PERIOD_MINUTES_DEFAULT,
@@ -111,6 +115,7 @@ data class InstanceSettings(
         proposedInstanceName
     )
     val lockedTimeZoneId: String = DateUtil.validatedTimeZoneId(lockedTimeZoneIdIn)
+    val startHourOfDay: Int = startHourOfDayIn.takeIf { abs(it) < 13 } ?: 0
     val hasResults: Boolean get() = resultsStorage.hasResults()
     val snapshotMode: SnapshotMode = if (snapshotModeIn.isSnapshotMode && !hasResults) {
         SnapshotMode.LIVE_DATA
@@ -141,6 +146,7 @@ data class InstanceSettings(
         snapshotMode = snapshotMode,
         snapshotDate = snapshotDate,
         timeZone = timeZone,
+        startHourOfDay = startHourOfDay,
     )
 
     val isEmpty: Boolean
@@ -228,6 +234,7 @@ data class InstanceSettings(
         put(PREF_TEXT_SIZE_SCALE, textSizeScale.preferenceValue)
         put(PREF_TIME_FORMAT, timeFormat)
         put(PREF_LOCKED_TIME_ZONE_ID, lockedTimeZoneId)
+        put(PREF_START_HOUR_OF_DAY, startHourOfDay)
         put(PREF_SNAPSHOT_MODE, snapshotMode.value)
         put(PREF_REFRESH_PERIOD_MINUTES, refreshPeriodMinutes)
         if (resultsStorage.hasResults()) {
@@ -247,7 +254,8 @@ data class InstanceSettings(
     }
 
     val endOfTimeRange: DateTime
-        get() = (if (eventRange > 0) clock.now().plusDays(eventRange) else clock.now().withTimeAtStartOfDay()
+        get() = (if (eventRange > 0) clock.now().plusDays(eventRange)
+        else clock.startOfToday()
             .plusDays(1 - eventRange))
             .minusMillis(1)
     val startOfTimeRange: DateTime?
@@ -421,6 +429,7 @@ data class InstanceSettings(
         const val PREF_TIME_FORMAT_DEFAULT = "auto"
         const val PREF_LOCK_TIME_ZONE = "lockTimeZone"
         const val PREF_LOCKED_TIME_ZONE_ID = "lockedTimeZoneId"
+        const val PREF_START_HOUR_OF_DAY = "startHourOfDay"
         const val PREF_SNAPSHOT_MODE = "snapshotMode"
         const val PREF_RESULTS_STORAGE = "resultsStorage"
         const val PREF_REFRESH_PERIOD_MINUTES = "refreshPeriodMinutes"
@@ -557,6 +566,9 @@ data class InstanceSettings(
                 lockedTimeZoneIdIn = if (json.has(PREF_LOCKED_TIME_ZONE_ID)) {
                     json.getString(PREF_LOCKED_TIME_ZONE_ID)
                 } else EMPTY.lockedTimeZoneId,
+                startHourOfDayIn = if (json.has(PREF_START_HOUR_OF_DAY)) {
+                    json.getInt(PREF_START_HOUR_OF_DAY)
+                } else EMPTY.startHourOfDay,
                 refreshPeriodMinutesIn = if (json.has(PREF_REFRESH_PERIOD_MINUTES)) {
                     json.getInt(PREF_REFRESH_PERIOD_MINUTES)
                 } else EMPTY.refreshPeriodMinutes,
@@ -739,6 +751,7 @@ data class InstanceSettings(
                     ),
                     timeFormat = ApplicationPreferences.getTimeFormat(context),
                     lockedTimeZoneIdIn = ApplicationPreferences.getLockedTimeZoneId(context),
+                    startHourOfDayIn = ApplicationPreferences.getIntStoredAsString(context, PREF_START_HOUR_OF_DAY, 0),
                     snapshotModeIn = ApplicationPreferences.getSnapshotMode(context),
                     resultsStorage = resultsStorage,
                     refreshPeriodMinutesIn = ApplicationPreferences.getRefreshPeriodMinutes(context),

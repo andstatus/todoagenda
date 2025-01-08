@@ -100,6 +100,7 @@ object ApplicationPreferences {
             setString(context, InstanceSettings.PREF_TEXT_SIZE_SCALE, settings.textSizeScale.preferenceValue)
             setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
             setLockedTimeZoneId(context, settings.lockedTimeZoneId)
+            setString(context, InstanceSettings.PREF_START_HOUR_OF_DAY, settings.startHourOfDay.toString())
             setString(context, InstanceSettings.PREF_SNAPSHOT_MODE, settings.snapshotMode.value)
             setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
         }

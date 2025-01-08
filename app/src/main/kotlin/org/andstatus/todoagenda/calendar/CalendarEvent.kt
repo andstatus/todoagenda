@@ -178,7 +178,7 @@ class CalendarEvent(
             return startDate.isBefore(now) && endDate.isAfter(now)
         }
     val isPartOfMultiDayEvent: Boolean
-        get() = endDate.withTimeAtStartOfDay().isAfter(startDate.withTimeAtStartOfDay())
+        get() = settings.clock.dayOf(endDate).isAfter(settings.clock.dayOf(startDate))
 
     companion object {
         @Volatile

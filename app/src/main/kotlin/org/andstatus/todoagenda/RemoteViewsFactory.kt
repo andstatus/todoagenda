@@ -33,7 +33,6 @@ import org.andstatus.todoagenda.widget.WidgetLayout
 import org.joda.time.DateTime
 import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
-import java.util.stream.Collectors
 import kotlin.concurrent.Volatile
 
 class RemoteViewsFactory(val context: Context, private val widgetId: Int, createdByLauncher: Boolean) :
@@ -41,14 +40,14 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
     val instanceId = InstanceId.next()
 
     @Volatile
-    var widgetEntries: MutableList<WidgetEntry<*>> = ArrayList()
+    var widgetEntries: List<WidgetEntry<*>> = ArrayList()
 
     @Volatile
     private var visualizers: MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> = ArrayList()
 
     init {
         visualizers.add(LastEntryVisualizer(context, widgetId))
-        widgetEntries.add(LastEntry(settings, LastEntryType.NOT_LOADED, settings.clock.now()))
+        widgetEntries = listOf(LastEntry(settings, LastEntryType.NOT_LOADED, settings.clock.now()))
         logEvent("Init" + if (createdByLauncher) " by Launcher" else "")
     }
 
@@ -143,19 +142,31 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             return if (widgetEntries.isNotEmpty()) 0 else -1
         }
 
-    private fun queryWidgetEntries(settings: InstanceSettings): MutableList<WidgetEntry<*>> {
+    private fun queryWidgetEntries(settings: InstanceSettings): List<WidgetEntry<*>> {
         val eventEntries: MutableList<WidgetEntry<*>> = ArrayList()
         for (visualizer in visualizers) {
-            eventEntries.addAll(visualizer.queryEventEntries())
+            visualizer.queryEventEntries().let {
+                eventEntries.addAll(it)
+                if (settings.logEvents) {
+                    Log.i("visualizer_query", "${visualizer}")
+                    it.forEachIndexed { index, entry ->
+                        Log.i("visualizer_query", "${index+1}. $entry")
+                    }
+                }
+            }
+        }
+        if (settings.logEvents) {
+            eventEntries.forEachIndexed { index, entry ->
+                Log.i("queryWidgetEntries", "${index+1}. $entry")
+            }
         }
         eventEntries.sort()
-        val noHidden: MutableList<WidgetEntry<*>> =
-            eventEntries.stream().filter { obj: WidgetEntry<*>? -> obj!!.notHidden() }.collect(Collectors.toList())
+        val noHidden: List<WidgetEntry<*>> = eventEntries.filter { it.notHidden() }
         val deduplicated = if (settings.hideDuplicates) filterOutDuplicates(noHidden) else noHidden
-        val widgetEntries: MutableList<WidgetEntry<*>> =
+        val widgetEntries: List<WidgetEntry<*>> =
             if (settings.showDayHeaders) addDayHeaders(deduplicated) else deduplicated
-        LastEntry.addLast(settings, widgetEntries)
-        return widgetEntries
+        val withLast = LastEntry.addLast(settings, widgetEntries)
+        return withLast
     }
 
     private fun filterOutDuplicates(inputEntries: List<WidgetEntry<*>>): MutableList<WidgetEntry<*>> {
@@ -179,7 +190,6 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
     private fun addDayHeaders(listIn: List<WidgetEntry<*>>): MutableList<WidgetEntry<*>> {
         val listOut: MutableList<WidgetEntry<*>> = ArrayList()
         if (listIn.isNotEmpty()) {
-            val settings = settings
             var curDayBucket = DayHeader(settings, WidgetEntryPosition.DAY_HEADER, MyClock.DATETIME_MIN)
             var pastEventsHeaderAdded = false
             var endOfListHeaderAdded = false
