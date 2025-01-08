@@ -1,1 +1,1 @@
-v4.10.2. "All in one row" layout of Event entry improved. Updated for Android 15.
+v4.11.0. "Start hour of a day" option added.

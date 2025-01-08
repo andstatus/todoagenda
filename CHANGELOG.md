@@ -1,5 +1,16 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+<a id="v4.11"/>
+
+### 2025-01-08 v4.11.0 Start hour of a day option
+* "Start hour of a day" option added to "Other settings" section.
+
+  Changing its value from default 0 to e.g. 4 causes all events that start before 4 AM to be shown
+  under previous day's header. This may be convenient for people who stay up after midnight or
+  or wake up early.
+  Valid values are from -12 to 12.
+  [#140](https://github.com/andstatus/todoagenda/issues/140)
+
 <a id="v4.10"/>
 
 ### 2024-12-14 v4.10.2 Text shadow and Event description
