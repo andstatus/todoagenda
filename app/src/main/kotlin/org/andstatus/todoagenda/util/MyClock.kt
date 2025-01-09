@@ -21,7 +21,7 @@ class MyClock(
 ) {
     private val snapshotDateSetAt: DateTime = DateTime.now()
 
-    fun today(timeZone: DateTimeZone? = this.timeZone): DateTime = dayOf(now(timeZone))
+    fun thisDay(timeZone: DateTimeZone? = this.timeZone): DateTime = dayOf(now(timeZone))
 
     /**
      * Usually returns real "now", but may be #setNow to some other time for testing purposes
@@ -44,22 +44,22 @@ class MyClock(
         }
     }
 
-    fun isDayToday(date: DateTime?): Boolean = isDateDefined(date) && date!!.isEqual(today(date.zone))
+    fun isDayToday(date: DateTime?): Boolean = isDateDefined(date) && date!!.isEqual(thisDay(date.zone))
 
     fun isToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && dayOf(date!!).isEqual(today(date.zone))
+        return isDateDefined(date) && dayOf(date!!).isEqual(thisDay(date.zone))
     }
 
     fun isDayBeforeToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && date!!.isBefore(today(date.zone))
+        return isDateDefined(date) && date!!.isBefore(thisDay(date.zone))
     }
 
     fun isBeforeToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && date!!.isBefore(today(date.zone).withTimeAtStartHourOfDayInner())
+        return isDateDefined(date) && date!!.isBefore(startOfToday(date.zone))
     }
 
     fun isAfterToday(date: DateTime?): Boolean {
-        return isDateDefined(date) && !date!!.isBefore(today(date.zone).withTimeAtStartHourOfDayInner().plusDays(1))
+        return isDateDefined(date) && !date!!.isBefore(startOfTomorrow(date.zone))
     }
 
     fun isBeforeNow(date: DateTime?): Boolean {
@@ -79,12 +79,12 @@ class MyClock(
             .minutes
     }
 
-    fun startOfTomorrow(): DateTime {
-        return startOfToday().plusDays(1)
+    fun startOfTomorrow(timeZone: DateTimeZone? = this.timeZone): DateTime {
+        return startOfToday(timeZone).plusDays(1)
     }
 
-    fun startOfToday(): DateTime {
-        return dayOf(now()).withTimeAtStartHourOfDayInner()
+    fun startOfToday(timeZone: DateTimeZone? = this.timeZone): DateTime {
+        return thisDay(timeZone).withTimeAtStartHourOfDayInner()
     }
 
     fun dayOf(date: DateTime): DateTime {

@@ -1,5 +1,6 @@
 package org.andstatus.todoagenda.prefs
 
+import org.andstatus.todoagenda.util.MyClock
 import org.joda.time.DateTime
 
 enum class EndedSomeTimeAgo(private val value: String, private val hoursAgo: Int) {
@@ -8,53 +9,53 @@ enum class EndedSomeTimeAgo(private val value: String, private val hoursAgo: Int
     TWO_HOURS("TWO_HOURS", 2),
     FOUR_HOURS("FOUR_HOURS", 4),
     TODAY("TODAY", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay()
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday()
         }
     },
     YESTERDAY("YESTERDAY", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusDays(1)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusDays(1)
         }
     },
     ONE_WEEK("ONE_WEEK", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusDays(7)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusDays(7)
         }
     },
     TWO_WEEKS("TWO_WEEKS", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusDays(14)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusDays(14)
         }
     },
     ONE_MONTH("ONE_MONTH", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusMonths(1)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusMonths(1)
         }
     },
     TWO_MONTHS("TWO_MONTHS", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusMonths(2)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusMonths(2)
         }
     },
     THREE_MONTHS("THREE_MONTHS", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusMonths(3)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusMonths(3)
         }
     },
     SIX_MONTHS("SIX_MONTHS", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusMonths(6)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusMonths(6)
         }
     },
     ONE_YEAR("ONE_YEAR", 0) {
-        override fun endedAt(now: DateTime?): DateTime? {
-            return now!!.withTimeAtStartOfDay().minusYears(1)
+        override fun endedAt(clock: MyClock): DateTime? {
+            return clock.startOfToday().minusYears(1)
         }
     };
 
-    open fun endedAt(now: DateTime?): DateTime? {
-        return now!!.minusHours(hoursAgo)
+    open fun endedAt(clock: MyClock): DateTime? {
+        return clock.now().minusHours(hoursAgo)
     }
 
     fun save(): String {

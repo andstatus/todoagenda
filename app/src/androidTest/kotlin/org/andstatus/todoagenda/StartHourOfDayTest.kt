@@ -2,8 +2,10 @@ package org.andstatus.todoagenda
 
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertTrue
+import org.andstatus.todoagenda.prefs.EndedSomeTimeAgo
 import org.andstatus.todoagenda.provider.QueryResultsStorage
 import org.andstatus.todoagenda.widget.CalendarEntry
+import org.andstatus.todoagenda.widget.DayHeader
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.junit.Test
@@ -19,8 +21,26 @@ class StartHourOfDayTest : BaseWidgetTest() {
 
         assertSplitEvent(method, DateTime(2024, 12, 22, 23, 30, DateTimeZone.UTC))
 
-        provider.settings = settings.copy(startHourOfDayIn = 4)
+        val startHourOfDay = 4
+        provider.settings = settings.copy(startHourOfDayIn = startHourOfDay)
         assertSplitEvent(method, DateTime(2024, 12, 23, 3, 30, DateTimeZone.UTC))
+
+        provider.settings = settings.copy(eventsEnded = EndedSomeTimeAgo.TODAY)
+        assertSplitEvent(method, DateTime(2024, 12, 23, 3, 30, DateTimeZone.UTC))
+
+        val thisDay: DateTime = settings.resultsStorage!!.executedAt.get().withTimeAtStartOfDay()
+        val today: DateTime = thisDay.plusHours(startHourOfDay)
+        val firstEntry = factory.widgetEntries[0]
+        assertTrue(
+            "First entry should be be today's header: $firstEntry",
+            firstEntry is DayHeader && firstEntry.entryDay == thisDay
+        )
+        val secondEntry = factory.widgetEntries[1]
+        assertTrue(
+            "Second entry should not end before today: $secondEntry",
+            secondEntry is CalendarEntry && !secondEntry.event.endDate.isBefore(today)
+        )
+
     }
 
     private fun assertSplitEvent(

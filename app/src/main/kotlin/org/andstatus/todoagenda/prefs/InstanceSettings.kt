@@ -80,7 +80,7 @@ data class InstanceSettings(
 
     // ----------------------------------------------------------------------------------
     // Event filters
-    val eventsEnded: EndedSomeTimeAgo? = EndedSomeTimeAgo.NONE,
+    val eventsEnded: EndedSomeTimeAgo = EndedSomeTimeAgo.NONE,
     val showPastEventsWithDefaultColor: Boolean = false,
     val eventRange: Int = PREF_EVENT_RANGE_DEFAULT.toInt(),
     val hideBasedOnKeywords: String? = "",
@@ -212,7 +212,7 @@ data class InstanceSettings(
 
         // ----------------------------------------------------------------------------------
         // Event filters
-        put(PREF_EVENTS_ENDED, eventsEnded!!.save())
+        put(PREF_EVENTS_ENDED, eventsEnded.save())
         put(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, showPastEventsWithDefaultColor)
         put(PREF_EVENT_RANGE, eventRange)
         put(PREF_HIDE_BASED_ON_KEYWORDS, hideBasedOnKeywords)
@@ -259,7 +259,7 @@ data class InstanceSettings(
             .plusDays(1 - eventRange))
             .minusMillis(1)
     val startOfTimeRange: DateTime?
-        get() = eventsEnded!!.endedAt(clock.now())
+        get() = eventsEnded.endedAt(clock)
 
     fun colors(): ThemeColors {
         return if (!darkColors.isEmpty && isDarkThemeOn(context)) darkColors else defaultColors
