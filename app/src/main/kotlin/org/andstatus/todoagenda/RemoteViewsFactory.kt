@@ -150,22 +150,30 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
                 if (settings.logEvents) {
                     Log.i("visualizer_query", "${visualizer}")
                     it.forEachIndexed { index, entry ->
-                        Log.i("visualizer_query", "${index+1}. $entry")
+                        Log.i("visualizer_query", "${index + 1}. $entry")
                     }
                 }
             }
         }
         if (settings.logEvents) {
             eventEntries.forEachIndexed { index, entry ->
-                Log.i("queryWidgetEntries", "${index+1}. $entry")
+                Log.i("queryWidgetEntries", "${index + 1}. $entry")
             }
         }
         eventEntries.sort()
         val noHidden: List<WidgetEntry<*>> = eventEntries.filter { it.notHidden() }
         val deduplicated = if (settings.hideDuplicates) filterOutDuplicates(noHidden) else noHidden
-        val widgetEntries: List<WidgetEntry<*>> =
-            if (settings.showDayHeaders) addDayHeaders(deduplicated) else deduplicated
-        val withLast = LastEntry.addLast(settings, widgetEntries)
+        val limited = if (settings.maxNumberOfEvents > 0) {
+            deduplicated.take(settings.maxNumberOfEvents)
+        } else {
+            deduplicated
+        }
+        val withDayHeaders = if (settings.showDayHeaders) addDayHeaders(limited) else limited
+        val withLast = if (settings.maxNumberOfEvents > 0 && limited.size == settings.maxNumberOfEvents) {
+            withDayHeaders
+        } else {
+            LastEntry.addLast(settings, withDayHeaders)
+        }
         return withLast
     }
 

@@ -87,6 +87,7 @@ data class InstanceSettings(
     val showBasedOnKeywords: String? = "",
     val showOnlyClosestInstanceOfRecurringEvent: Boolean = false,
     val hideDuplicates: Boolean = false,
+    val maxNumberOfEventsIn: Int = -1,
     val allDayEventsPlacement: AllDayEventsPlacement = AllDayEventsPlacement.defaultValue,
     val taskScheduling: TaskScheduling = TaskScheduling.defaultValue,
     val taskWithoutDates: TasksWithoutDates = TasksWithoutDates.defaultValue,
@@ -130,6 +131,7 @@ data class InstanceSettings(
     } else {
         defaultTimeZone
     }
+    val maxNumberOfEvents: Int = if (maxNumberOfEventsIn < 1) -1 else maxNumberOfEventsIn
     val filterMode: FilterMode = if (filterModeIn == FilterMode.NORMAL_FILTER &&
         snapshotMode.isSnapshotMode
     ) FilterMode.DEBUG_FILTER else filterModeIn
@@ -219,6 +221,7 @@ data class InstanceSettings(
         put(PREF_SHOW_BASED_ON_KEYWORDS, showBasedOnKeywords)
         put(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, showOnlyClosestInstanceOfRecurringEvent)
         put(PREF_HIDE_DUPLICATES, hideDuplicates)
+        put(PREF_MAX_NUMBER_OF_EVENTS, maxNumberOfEvents)
         put(PREF_ALL_DAY_EVENTS_PLACEMENT, allDayEventsPlacement.value)
         put(PREF_TASK_SCHEDULING, taskScheduling.value)
         put(PREF_TASK_WITHOUT_DATES, taskWithoutDates.value)
@@ -410,6 +413,7 @@ data class InstanceSettings(
         const val PREF_HIDE_BASED_ON_KEYWORDS = "hideBasedOnKeywords"
         const val PREF_SHOW_BASED_ON_KEYWORDS = "showBasedOnKeywords"
         const val PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT = "showOnlyClosestInstanceOfRecurringEvent"
+        const val PREF_MAX_NUMBER_OF_EVENTS = "maxNumberOfEvents"
         const val PREF_HIDE_DUPLICATES = "hideDuplicates"
         const val PREF_ALL_DAY_EVENTS_PLACEMENT = "allDayEventsPlacement"
         const val PREF_TASK_SCHEDULING = "taskScheduling"
@@ -595,6 +599,9 @@ data class InstanceSettings(
                 hideDuplicates = if (json.has(PREF_HIDE_DUPLICATES)) {
                     json.getBoolean(PREF_HIDE_DUPLICATES)
                 } else EMPTY.hideDuplicates,
+                maxNumberOfEventsIn = if (json.has(PREF_MAX_NUMBER_OF_EVENTS)) {
+                    json.getInt(PREF_MAX_NUMBER_OF_EVENTS)
+                } else EMPTY.maxNumberOfEvents,
                 allDayEventsPlacement = if (json.has(PREF_ALL_DAY_EVENTS_PLACEMENT)) {
                     AllDayEventsPlacement.fromValue(
                         json.getString(
@@ -731,6 +738,7 @@ data class InstanceSettings(
                         context
                     ),
                     hideDuplicates = ApplicationPreferences.getHideDuplicates(context),
+                    maxNumberOfEventsIn = ApplicationPreferences.getMaxNumberOfEvents(context),
                     allDayEventsPlacement = ApplicationPreferences.getAllDayEventsPlacement(context),
                     taskScheduling = ApplicationPreferences.getTaskScheduling(context),
                     taskWithoutDates = ApplicationPreferences.getTasksWithoutDates(context),

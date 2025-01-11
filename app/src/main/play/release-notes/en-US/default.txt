@@ -1,1 +1,2 @@
-v4.11.0. "Start hour of a day" option added.
+v4.11.1. "Maximum number of events" option added to "Event filters" section.
+  "Start hour of a day" option added to "Other settings" section.

@@ -38,29 +38,33 @@
             android:defaultValue="false"
             android:key="hideDuplicates"
             android:title="@string/hide_duplicates" />
+        <org.andstatus.todoagenda.prefs.MultilineEditTextPreference
+            android:defaultValue=""
+            android:key="maxNumberOfEvents"
+            android:title="@string/max_number_of_events_title" />
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:key="allDayEventsPlacement"
             android:defaultValue="top_day"
             android:entries="@array/pref_all_day_events_placement_entries"
             android:entryValues="@array/pref_all_day_events_placement_values"
+            android:key="allDayEventsPlacement"
             android:title="@string/all_day_events_placement_title" />
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:key="taskScheduling"
             android:defaultValue="date_due"
             android:entries="@array/pref_task_scheduling_entries"
             android:entryValues="@array/pref_task_scheduling_values"
+            android:key="taskScheduling"
             android:title="@string/task_scheduling_title" />
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:key="taskWithoutDates"
             android:defaultValue="end_of_list"
             android:entries="@array/pref_tasks_wo_dates_entries"
             android:entryValues="@array/pref_tasks_wo_dates_values"
+            android:key="taskWithoutDates"
             android:title="@string/tasks_wo_dates_title" />
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:key="filterMode"
             android:defaultValue="normal"
             android:entries="@array/pref_filter_mode_entries"
             android:entryValues="@array/pref_filter_mode_values"
+            android:key="filterMode"
             android:title="@string/filter_mode" />
     </PreferenceCategory>
 </PreferenceScreen>

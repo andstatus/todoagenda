@@ -183,6 +183,7 @@
     <string name="pref_show_based_on_keywords_title">Показать только при начичии ключевых слов в названии</string>
     <string name="show_only_closest_instance_of_recurring_event">Показать только ближайший экземпляр повторяющегося события</string>
     <string name="hide_duplicates">Убрать дубликаты</string>
+    <string name="max_number_of_events_title">Максимальное количество событий</string>
     <string name="all_day_events_placement_title">Размещение событий \"Весь день\" (у которых нех времени)</string>
     <string name="all_day_events_placement_top_of_the_days_events">В верхней части дня события</string>
     <string name="all_day_events_placement_bottom_of_the_days_events">В нижней части дня события</string>

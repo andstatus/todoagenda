@@ -8,6 +8,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.ApplicationPreferences.limitToString
 
 class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -25,6 +26,7 @@ class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPref
         showEvenRange()
         showHideBasedOnKeywords()
         showShowBasedOnKeywords()
+        showMaximumNumberOfEvents()
         showAllDayEventsPlacement()
         showTaskScheduling()
         showTasksWithoutDates()
@@ -62,6 +64,12 @@ class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPref
             preference.summary = filter.toString()
         }
     }
+
+    private fun showMaximumNumberOfEvents() =
+        findPreference<Preference>(InstanceSettings.PREF_MAX_NUMBER_OF_EVENTS)?.setSummary(
+            ApplicationPreferences.getMaxNumberOfEvents(requireActivity()).limitToString()
+        )
+
 
     private fun showAllDayEventsPlacement() {
         val preference = findPreference<Preference>(InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT)

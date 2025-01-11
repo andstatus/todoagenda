@@ -3,6 +3,7 @@ package org.andstatus.todoagenda.prefs
 import android.content.Context
 import android.text.TextUtils
 import androidx.preference.PreferenceManager
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_MAX_NUMBER_OF_EVENTS
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW_DEFAULT
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
@@ -85,6 +86,11 @@ object ApplicationPreferences {
                     .showOnlyClosestInstanceOfRecurringEvent
             )
             setHideDuplicates(context, settings.hideDuplicates)
+            setString(
+                context,
+                PREF_MAX_NUMBER_OF_EVENTS,
+                settings.maxNumberOfEvents.limitToString()
+            )
             setAllDayEventsPlacement(context, settings.allDayEventsPlacement)
             setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
             setString(context, InstanceSettings.PREF_TASK_WITHOUT_DATES, settings.taskWithoutDates.value)
@@ -443,6 +449,11 @@ object ApplicationPreferences {
         return getBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, false)
     }
 
+    fun getMaxNumberOfEvents(context: Context): Int = getIntStoredAsString(
+        context, PREF_MAX_NUMBER_OF_EVENTS,
+        InstanceSettings.EMPTY.maxNumberOfEvents
+    )
+
     fun setHideDuplicates(context: Context?, value: Boolean) {
         setBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, value)
     }
@@ -555,4 +566,6 @@ object ApplicationPreferences {
             0
         }
     }
+
+    fun Int.limitToString(): String = if (this < 1) "" else toString()
 }

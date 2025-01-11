@@ -2,7 +2,7 @@
 
 <a id="v4.11"/>
 
-### 2025-01-08 v4.11.0 Start hour of a day option
+### 2025-01-11 v4.11.1 Start hour of a day option
 * "Start hour of a day" option added to "Other settings" section.
 
   Changing its value from default 0 to e.g. 4 causes all events that start before 4 AM to be shown
@@ -10,6 +10,8 @@
   or wake up early.
   Valid values are from -12 to 12.
   [#140](https://github.com/andstatus/todoagenda/issues/140)
+* "Maximum number of events" option added to "Event filters" section.
+  [#139](https://github.com/andstatus/todoagenda/issues/139)
 
 <a id="v4.10"/>
 
