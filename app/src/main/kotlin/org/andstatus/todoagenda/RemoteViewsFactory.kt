@@ -382,6 +382,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             } else {
                 rv.setViewVisibility(R.id.add_event, View.VISIBLE)
                 rv.setOnClickPendingIntent(R.id.add_event, getActionPendingIntent(settings, ACTION_ADD_CALENDAR_EVENT))
+                RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.add_event)
             }
         }
 
@@ -391,15 +392,18 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             } else {
                 rv.setViewVisibility(R.id.add_task, View.VISIBLE)
                 rv.setOnClickPendingIntent(R.id.add_task, getActionPendingIntent(settings, ACTION_ADD_TASK))
+                RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.add_task)
             }
         }
 
         private fun configureRefresh(settings: InstanceSettings, rv: RemoteViews) {
             rv.setOnClickPendingIntent(R.id.refresh, getActionPendingIntent(settings, ACTION_REFRESH))
+            RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.refresh)
         }
 
         private fun configureOverflowMenu(settings: InstanceSettings, rv: RemoteViews) {
             rv.setOnClickPendingIntent(R.id.overflow_menu, getActionPendingIntent(settings, ACTION_CONFIGURE))
+            RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.overflow_menu)
         }
 
         private fun configureWidgetEntriesList(settings: InstanceSettings, rv: RemoteViews) {
@@ -412,6 +416,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
 
         private fun configureGotoToday(settings: InstanceSettings, rv: RemoteViews) {
             rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
+            RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.go_to_today)
         }
 
         fun getActionPendingIntent(settings: InstanceSettings, action: String): PendingIntent {

@@ -4,12 +4,14 @@ import android.content.Context
 import android.content.res.Resources.NotFoundException
 import android.graphics.Color
 import android.graphics.Paint
+import android.os.Build
 import android.util.Log
 import android.util.TypedValue
 import android.widget.RemoteViews
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
 import androidx.annotation.IdRes
+import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 
@@ -43,6 +45,17 @@ object RemoteViewsUtil {
         rv.setInt(viewId, METHOD_SET_COLOR_FILTER, color)
     }
 
+    // Didn't decide yet on actual scale values, see https://github.com/andstatus/todoagenda/issues/160
+    fun setHeaderButtonSize(settings: InstanceSettings, rv: RemoteViews, viewId: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val valuePixels = getDimension(settings.context, R.dimen.widget_header_button_size)
+            // TODO: Scale it
+            val scaledValue = valuePixels
+            rv.setViewLayoutWidth(viewId, scaledValue, TypedValue.COMPLEX_UNIT_PX)
+            rv.setViewLayoutHeight(viewId, scaledValue, TypedValue.COMPLEX_UNIT_PX)
+        }
+    }
+
     fun setViewWidth(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
         rv.setInt(viewId, METHOD_SET_WIDTH, getScaledValueInPixels(settings, dimenId))
     }
@@ -63,7 +76,7 @@ object RemoteViewsUtil {
         settings: InstanceSettings, textColorPref: TextColorPref?,
         rv: RemoteViews, viewId: Int, colorAttrId: Int
     ) {
-        val color = settings.colors()!!.getTextColor(textColorPref, colorAttrId)
+        val color = settings.colors().getTextColor(textColorPref, colorAttrId)
         rv.setTextColor(viewId, color)
     }
 
