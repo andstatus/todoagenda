@@ -1,5 +1,15 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+<a id="v4.12"/>
+
+### 2025-02-08 v4.12.0 Widget header buttons size
+* "Buttons size" option added to "Other settings" section allowing to make widget header buttons larger or smaller,
+  for Android 12+.
+  [#160](https://github.com/andstatus/todoagenda/issues/160)
+* Improved sticking to App Language for Custom date format patterns. 
+  App language can be changed in Android Settings since Android 13.
+  [#161](https://github.com/andstatus/todoagenda/issues/161)
+
 <a id="v4.11"/>
 
 ### 2025-01-11 v4.11.1 Start hour of a day option

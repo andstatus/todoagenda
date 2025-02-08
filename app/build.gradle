@@ -12,8 +12,8 @@ android {
     }
 
     defaultConfig {
-        versionCode 710
-        versionName '4.11.1'
+        versionCode 711
+        versionName '4.12.0'
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
 
