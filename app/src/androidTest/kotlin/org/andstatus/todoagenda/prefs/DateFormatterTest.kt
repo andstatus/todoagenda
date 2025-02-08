@@ -9,7 +9,6 @@ import org.joda.time.DateTime
 import org.junit.Assert
 import org.junit.Test
 import java.text.SimpleDateFormat
-import java.util.Locale
 
 /**
  * @author yvolk@yurivolkov.com
@@ -155,7 +154,7 @@ class DateFormatterTest : BaseWidgetTest() {
 
     companion object {
         private fun javaFormatted(javaPattern: String, date: DateTime): String {
-            val locale = Locale.getDefault()
+            val locale = MyLocale.locale
             return SimpleDateFormat(javaPattern, locale).format(DateFormatter.toJavaDate(date))
         }
     }

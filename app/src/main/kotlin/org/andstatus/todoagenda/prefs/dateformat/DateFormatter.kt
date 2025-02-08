@@ -18,20 +18,20 @@ package org.andstatus.todoagenda.prefs.dateformat
 import android.content.Context
 import android.text.format.DateUtils
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.util.StringUtil
 import org.joda.time.DateTime
 import org.joda.time.Days
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Formatter
-import java.util.Locale
 
 class DateFormatter(
     private val context: Context?,
     private val dateFormatValue: DateFormatValue?,
     private val now: DateTime?
 ) {
-    var locale = Locale.getDefault()
+
     fun formatDate(date: DateTime?): CharSequence {
         return try {
             if (dateFormatValue!!.hasPattern()) {
@@ -79,7 +79,7 @@ class DateFormatter(
         val millis = toJavaDate(date).time
         return DateUtils.formatDateRange(
             context,
-            Formatter(StringBuilder(50), locale),
+            Formatter(StringBuilder(50), MyLocale.locale),
             millis,
             millis,
             flags,
@@ -99,7 +99,7 @@ class DateFormatter(
     private fun formatDateCustom(date: DateTime?, pattern: String?): String {
         return if (StringUtil.isEmpty(pattern)) "" else try {
             val pattern2 = preProcessNumberOfDaysToEvent(date, pattern)
-            val simpleDateFormat = SimpleDateFormat(pattern2, locale)
+            val simpleDateFormat = SimpleDateFormat(pattern2, MyLocale.locale)
             simpleDateFormat.format(toJavaDate(date))
         } catch (e: Exception) {
             e.localizedMessage

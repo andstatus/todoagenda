@@ -20,7 +20,7 @@ class GenerateLocalizedDescriptions {
             val language = languages[ind]
             val locale = locales[ind]
             val context = context1.applicationContext as ContextWrapper
-            MyLocale.setLocale(context, locale)
+            TestLocale.setLocale(context, locale)
             val builder = StringBuilder("---- $language, $locale\n")
             builder.append(context.getText(R.string.app_description_80_chars_max).toString() + "\n\n")
             builder.append(context.getText(R.string.app_description_4000_chars_max_part01).toString() + "\n")

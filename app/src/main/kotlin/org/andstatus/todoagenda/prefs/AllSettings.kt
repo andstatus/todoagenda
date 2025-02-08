@@ -6,11 +6,12 @@ import android.util.Log
 import org.andstatus.todoagenda.AppWidgetProvider
 import org.andstatus.todoagenda.EnvironmentChangedReceiver
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.MyLocale.setLocale
 import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.provider.WidgetData
 import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.concurrent.Volatile
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Singleton holder of settings for all widgets
@@ -19,8 +20,7 @@ import kotlin.concurrent.Volatile
 object AllSettings {
     private val TAG = AllSettings::class.java.simpleName
 
-    @Volatile
-    private var instancesLoaded = false
+    private val instancesLoaded = AtomicBoolean()
     private val instances: MutableMap<Int, InstanceSettings> = ConcurrentHashMap()
     fun instanceFromId(context: Context, widgetId: Int): InstanceSettings {
         ensureLoadedFromFiles(context)
@@ -52,9 +52,10 @@ object AllSettings {
     fun reInitialize(context: Context) = ensureLoadedFromFiles(context, true)
 
     fun ensureLoadedFromFiles(context: Context, reInitialize: Boolean = false) {
-        if (instancesLoaded && !reInitialize) return
+        if (instancesLoaded.get() && !reInitialize) return
         synchronized(instances) {
-            if (instancesLoaded && !reInitialize) return
+            if (reInitialize) setLocale(context)
+            if (instancesLoaded.get() && !reInitialize) return
             instances.clear()
             EventProviderType.initialize(context, reInitialize)
             for (widgetId in AppWidgetProvider.getWidgetIds(context)) {
@@ -73,7 +74,7 @@ object AllSettings {
                     newInstance(context, widgetId)
                 }
             }
-            instancesLoaded = true
+            instancesLoaded.set(true)
             EnvironmentChangedReceiver.registerReceivers(instances)
         }
     }
@@ -162,7 +163,7 @@ object AllSettings {
     fun forget() {
         synchronized(instances) {
             instances.clear()
-            instancesLoaded = false
+            instancesLoaded.set(false)
         }
     }
 

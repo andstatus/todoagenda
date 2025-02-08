@@ -11,6 +11,7 @@ import android.view.View
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
 import org.andstatus.todoagenda.prefs.colors.Shading
@@ -31,7 +32,6 @@ import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
 import org.andstatus.todoagenda.widget.WidgetHeaderLayout
 import org.andstatus.todoagenda.widget.WidgetLayout
 import org.joda.time.DateTime
-import java.util.Locale
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.Volatile
 
@@ -351,7 +351,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             rv.setOnClickPendingIntent(viewId, getActionPendingIntent(settings, ACTION_OPEN_CALENDAR))
             val formattedDate = settings.widgetHeaderDateFormatter()
                 .formatDate(settings.clock.now()).toString()
-                .uppercase(Locale.getDefault())
+                .uppercase(MyLocale.locale)
             rv.setTextViewText(viewId, if (StringUtil.isEmpty(formattedDate)) "                    " else formattedDate)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.widget_header_title)
             RemoteViewsUtil.setTextColor(settings, TextColorPref.WIDGET_HEADER, rv, viewId, R.attr.header)
@@ -424,7 +424,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             val requestCode = action.hashCode() + settings.widgetId
             val intent = Intent(settings.context.applicationContext, EnvironmentChangedReceiver::class.java)
                 .setAction(action)
-                .setData(Uri.parse("intent:" + action.lowercase(Locale.getDefault()) + settings.widgetId))
+                .setData(Uri.parse("intent:" + action.lowercase(MyLocale.locale) + settings.widgetId))
                 .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.widgetId)
             var flags = PendingIntent.FLAG_UPDATE_CURRENT
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {

@@ -5,13 +5,13 @@ import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.util.Log
 import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.MyLocale
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.text.FieldPosition
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Formatter
-import java.util.Locale
 import java.util.function.Supplier
 
 object DateUtil {
@@ -37,7 +37,7 @@ object DateUtil {
     private fun formatDateTime(settings: InstanceSettings, dateTime: DateTime, flags: Int): String {
         return DateUtils.formatDateRange(
             settings.context,
-            Formatter(StringBuilder(50), Locale.getDefault()),
+            Formatter(StringBuilder(50), MyLocale.locale),
             dateTime.millis,
             dateTime.millis,
             flags,

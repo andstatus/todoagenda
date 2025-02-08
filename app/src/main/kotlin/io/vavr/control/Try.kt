@@ -18,7 +18,6 @@
  */
 package io.vavr.control
 
-import org.andstatus.todoagenda.R
 import java.io.Serializable
 import java.lang.Error
 import java.util.Collections

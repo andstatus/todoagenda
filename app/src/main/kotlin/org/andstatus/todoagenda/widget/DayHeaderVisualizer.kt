@@ -6,13 +6,13 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.provider.EventProvider
 import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.util.CalendarIntentUtil
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.RemoteViewsUtil
-import java.util.Locale
 
 class DayHeaderVisualizer(context: Context, widgetId: Int) :
     WidgetEntryVisualizer<DayHeader>(EventProvider(EventProviderType.DAY_HEADER, context, widgetId)) {
@@ -67,7 +67,7 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
     }
 
     private fun setDayHeaderTitle(position: Int, entry: DayHeader, rv: RemoteViews, textColorPref: TextColorPref?) {
-        val dateString = getTitleString(entry).toString().uppercase(Locale.getDefault())
+        val dateString = getTitleString(entry).toString().uppercase(MyLocale.locale)
         rv.setTextViewText(R.id.day_header_title, dateString)
         RemoteViewsUtil.setTextSize(settings, rv, R.id.day_header_title, R.dimen.day_header_title)
         RemoteViewsUtil.setTextColor(settings, textColorPref, rv, R.id.day_header_title, R.attr.dayHeaderTitle)
