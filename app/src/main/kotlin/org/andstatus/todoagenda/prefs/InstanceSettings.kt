@@ -174,7 +174,9 @@ data class InstanceSettings(
         return false
     }
 
-    fun toJson(): JSONObject = JSONObject().apply {
+    fun toShortJson(): JSONObject = toJson(true)
+
+    fun toJson(skipQueryResults: Boolean = false): JSONObject = JSONObject().apply {
         put(PREF_WIDGET_ID, widgetId)
 
         // ----------------------------------------------------------------------------------
@@ -243,7 +245,11 @@ data class InstanceSettings(
         put(PREF_SNAPSHOT_MODE, snapshotMode.value)
         put(PREF_REFRESH_PERIOD_MINUTES, refreshPeriodMinutes)
         if (resultsStorage.hasResults()) {
-            put(PREF_RESULTS_STORAGE, resultsStorage?.toJson(context, widgetId, false))
+            if (skipQueryResults) {
+                put(PREF_RESULTS_STORAGE_HASH, resultsStorage!!.hashCode())
+            } else {
+                put(PREF_RESULTS_STORAGE, resultsStorage!!.toJson(context, widgetId, false))
+            }
         }
     }
 
@@ -291,15 +297,15 @@ data class InstanceSettings(
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val settings = other as InstanceSettings
-        return toJson().toString() == settings.toJson().toString()
+        return toShortJson().toString() == settings.toShortJson().toString()
     }
 
     override fun hashCode(): Int {
-        return toJson().toString().hashCode()
+        return toShortJson().toString().hashCode()
     }
 
     fun logMe(tag: String?, message: String, widgetId: Int) {
-        Log.v(tag, "$message, widgetId:$widgetId instance:$instanceId\n${toJson()}")
+        Log.v(tag, "$message, widgetId:$widgetId instance:$instanceId\n${toShortJson()}")
     }
 
     fun noPastEvents(): Boolean {
@@ -439,6 +445,7 @@ data class InstanceSettings(
         const val PREF_START_HOUR_OF_DAY = "startHourOfDay"
         const val PREF_SNAPSHOT_MODE = "snapshotMode"
         const val PREF_RESULTS_STORAGE = "resultsStorage"
+        const val PREF_RESULTS_STORAGE_HASH = "resultsStorageHash"
         const val PREF_REFRESH_PERIOD_MINUTES = "refreshPeriodMinutes"
         const val PREF_REFRESH_PERIOD_MINUTES_DEFAULT = 10
 

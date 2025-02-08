@@ -13,6 +13,7 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.util.Arrays
+import kotlin.math.min
 
 /**
  * Useful for logging and mocking ContentProviders
@@ -148,7 +149,7 @@ class QueryResult internal constructor(
         json.put(KEY_SELECTION_ARGS, arrayOfStingsToJson(selectionArgs))
         json.put(KEY_SORT_ORDER, if (sortOrder != null) sortOrder else "")
         val jsonArray = JSONArray()
-        for (row in rows) {
+        rows.take(rowsToTake("toJson", rows.size)).forEach { row ->
             jsonArray.put(row.toJson())
         }
         json.put(KEY_ROWS, jsonArray)
@@ -164,6 +165,7 @@ class QueryResult internal constructor(
 
     companion object {
         private val TAG = QueryResult::class.java.simpleName
+        const val MAX_ROWS_TO_STORE = 2000
         private const val KEY_ROWS = "rows"
         private const val KEY_PROVIDER_TYPE = "providerType"
         private const val KEY_EXECUTED_AT = "executedAt"
@@ -175,6 +177,15 @@ class QueryResult internal constructor(
         private const val KEY_SELECTION = "selection"
         private const val KEY_SELECTION_ARGS = "selectionArgs"
         private const val KEY_SORT_ORDER = "sortOrder"
+
+        fun rowsToTake(message: String, rowsCount: Int): Int {
+            val rowsTotake = min(MAX_ROWS_TO_STORE, rowsCount)
+            if (rowsTotake < rowsCount) {
+                Log.i(TAG, "$message, Too many rows: $rowsCount. taking: $rowsTotake")
+            }
+            return rowsTotake
+        }
+
         @Throws(JSONException::class)
         fun fromJson(json: JSONObject, widgetId: Int): QueryResult {
             val result = QueryResult(
@@ -188,7 +199,7 @@ class QueryResult internal constructor(
             result.selectionArgs = jsonToArrayOfStrings(json.getJSONArray(KEY_SELECTION_ARGS))
             result.sortOrder = json.getString(KEY_SORT_ORDER)
             val jsonArray = json.getJSONArray(KEY_ROWS)
-            for (ind in 0 until jsonArray.length()) {
+            for (ind in 0 until rowsToTake("fromJson", jsonArray.length())) {
                 result.addRow(QueryRow.fromJson(jsonArray.getJSONObject(ind)))
             }
             return result
@@ -201,7 +212,7 @@ class QueryResult internal constructor(
 
         @Throws(JSONException::class)
         private fun jsonToArrayOfStrings(jsonArray: JSONArray): Array<String> {
-            return Array<String>(jsonArray.length()) {ind ->
+            return Array<String>(jsonArray.length()) { ind ->
                 jsonArray.getString(ind)
             }
         }

@@ -6,6 +6,7 @@ import android.util.Log
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.RemoteViewsFactory
 import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.provider.QueryResult.Companion.rowsToTake
 import org.andstatus.todoagenda.util.DateUtil
 import org.joda.time.DateTime
 import org.json.JSONArray
@@ -14,7 +15,6 @@ import org.json.JSONObject
 import java.util.Optional
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicReference
-import java.util.stream.Collectors
 import kotlin.concurrent.Volatile
 
 /**
@@ -37,10 +37,12 @@ class QueryResultsStorage {
     }
 
     fun getResults(type: EventProviderType, widgetId: Int): List<QueryResult> {
-        return results.stream()
+        return results
             .filter { result: QueryResult -> type === EventProviderType.EMPTY || result.providerType === type }
             .filter { result: QueryResult -> widgetId == 0 || result.widgetId == widgetId }
-            .collect(Collectors.toList())
+            .let {
+                it.take(rowsToTake("$TAG:getResults", it.size))
+            }
     }
 
     fun findLast(type: EventProviderType): Optional<QueryResult> {
@@ -73,7 +75,7 @@ class QueryResultsStorage {
     @Throws(JSONException::class)
     fun toJson(context: Context?, widgetId: Int, withSettings: Boolean): JSONObject {
         val resultsArray = JSONArray()
-        for (result in results) {
+        results.take(rowsToTake("$TAG:toJson", results.size)).forEach { result ->
             if (result.widgetId == widgetId) {
                 resultsArray.put(result.toJson())
             }
@@ -113,7 +115,7 @@ class QueryResultsStorage {
     }
 
     override fun toString(): String {
-        return TAG + ":" + results
+        return "$TAG:$results"
     }
 
     fun clear() {

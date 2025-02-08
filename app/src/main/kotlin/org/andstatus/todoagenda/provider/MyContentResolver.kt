@@ -7,6 +7,7 @@ import android.util.Log
 import io.vavr.control.Try
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.provider.QueryResult.Companion.rowsToTake
 import java.util.Arrays
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Function
@@ -89,7 +90,7 @@ class MyContentResolver(val type: EventProviderType, val context: Context, val w
         try {
             queryForEvents(uri, projection, selection, selectionArgs, sortOrder).use { cursor ->
                 if (cursor != null) {
-                    for (i in 0 until cursor.count) {
+                    for (i in 0 until rowsToTake("queryForEvents", cursor.count)) {
                         cursor.moveToPosition(i)
                         if (needToStoreResults) result!!.addRow(cursor)
                         folded = foldingFunction.apply(folded).apply(cursor)
@@ -100,9 +101,9 @@ class MyContentResolver(val type: EventProviderType, val context: Context, val w
             Log.w(
                 type.name, widgetId.toString() + " Failed to query events" +
                     " uri:" + uri +
-                    ", projection:" + Arrays.toString(projection) +
+                    ", projection:" + projection.contentToString() +
                     ", selection:" + selection +
-                    ", args:" + Arrays.toString(selectionArgs) +
+                    ", args:" + selectionArgs.contentToString() +
                     ", sort:" + sortOrder, e
             )
         }
