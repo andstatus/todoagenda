@@ -8,6 +8,14 @@
         android:defaultValue="1.0"
         android:entries="@array/pref_text_size_entries"
         android:entryValues="@array/pref_text_size_values"
+        android:key="widgetHeaderButtonsScale"
+        android:summary="@string/buttons_size_desc"
+        android:title="@string/buttons_size_title" />
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="1.0"
+        android:entries="@array/pref_text_size_entries"
+        android:entryValues="@array/pref_text_size_values"
         android:key="textSizeScale"
         android:summary="@string/appearance_text_size_desc"
         android:title="@string/appearance_text_size_title" />

@@ -209,6 +209,8 @@
     <string name="other_prefs_title">Другие настройки</string>
     <string name="appearance_prefs">Отображение</string>
     <string name="appearance_prefs_desc">Изменить отображение виджета</string>
+    <string name="buttons_size_title">Размер кнопок</string>
+    <string name="buttons_size_desc">Изменить размер кнопок</string>
     <string name="appearance_text_size_title">Размер текста</string>
     <string name="appearance_text_size_desc">Изменить размер текста</string>
     <string name="appearance_text_size_very_small">Очень маленький</string>

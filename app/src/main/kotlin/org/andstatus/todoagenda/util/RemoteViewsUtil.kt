@@ -46,13 +46,24 @@ object RemoteViewsUtil {
     }
 
     // Didn't decide yet on actual scale values, see https://github.com/andstatus/todoagenda/issues/160
-    fun setHeaderButtonSize(settings: InstanceSettings, rv: RemoteViews, viewId: Int) {
+    fun setHeaderButtonSize1(settings: InstanceSettings, rv: RemoteViews, viewId: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val valuePixels = getDimension(settings.context, R.dimen.widget_header_button_size)
             // TODO: Scale it
             val scaledValue = valuePixels
             rv.setViewLayoutWidth(viewId, scaledValue, TypedValue.COMPLEX_UNIT_PX)
             rv.setViewLayoutHeight(viewId, scaledValue, TypedValue.COMPLEX_UNIT_PX)
+        }
+    }
+
+    // Didn't decide yet on actual scale values, see https://github.com/andstatus/todoagenda/issues/160
+    fun setHeaderButtonSize(settings: InstanceSettings, rv: RemoteViews, viewId: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val valuePixels = getDimension(settings.context, R.dimen.widget_header_button_size)
+//            val density = settings.context.resources.displayMetrics.density
+            val scaledValue = valuePixels * settings.widgetHeaderButtonsScale.scaleValue // / density
+            rv.setViewLayoutWidth(viewId, scaledValue, TypedValue.COMPLEX_UNIT_DIP)
+            rv.setViewLayoutHeight(viewId, scaledValue, TypedValue.COMPLEX_UNIT_DIP)
         }
     }
 

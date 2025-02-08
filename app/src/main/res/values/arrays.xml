@@ -11,18 +11,18 @@
         <item>HIDDEN</item>
     </string-array>
     <string-array name="pref_text_size_entries">
-        <item>@string/appearance_text_size_very_small</item>
-        <item>@string/appearance_text_size_small</item>
-        <item>@string/appearance_text_size_medium</item>
-        <item>@string/appearance_text_size_large</item>
         <item>@string/appearance_text_size_very_large</item>
+        <item>@string/appearance_text_size_large</item>
+        <item>@string/appearance_text_size_medium</item>
+        <item>@string/appearance_text_size_small</item>
+        <item>@string/appearance_text_size_very_small</item>
     </string-array>
     <string-array name="pref_text_size_values" tools:ignore="MissingTranslation">
-        <item>0.6</item>
-        <item>0.8</item>
-        <item>1.0</item>
-        <item>1.25</item>
         <item>1.75</item>
+        <item>1.25</item>
+        <item>1.0</item>
+        <item>0.8</item>
+        <item>0.6</item>
     </string-array>
     <string-array name="pref_date_format_entries">
         <item>@string/appearance_date_format_auto</item>

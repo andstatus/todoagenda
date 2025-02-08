@@ -100,6 +100,7 @@ data class InstanceSettings(
     // ----------------------------------------------------------------------------------
     // Other
     private val proposedInstanceName: String? = null,
+    val widgetHeaderButtonsScale: TextSizeScale = TextSizeScale.MEDIUM,
     val textSizeScale: TextSizeScale = TextSizeScale.MEDIUM,
     val timeFormat: String = PREF_TIME_FORMAT_DEFAULT,
     private val lockedTimeZoneIdIn: String = "",
@@ -234,6 +235,7 @@ data class InstanceSettings(
         // ----------------------------------------------------------------------------------
         // Other
         put(PREF_WIDGET_INSTANCE_NAME, widgetInstanceName)
+        put(PREF_WIDGET_HEADER_BUTTONS_SCALE, widgetHeaderButtonsScale.preferenceValue)
         put(PREF_TEXT_SIZE_SCALE, textSizeScale.preferenceValue)
         put(PREF_TIME_FORMAT, timeFormat)
         put(PREF_LOCKED_TIME_ZONE_ID, lockedTimeZoneId)
@@ -428,6 +430,7 @@ data class InstanceSettings(
         // Other
         const val PREF_WIDGET_INSTANCE_NAME = "widgetInstanceName"
         const val TEST_REPLAY_SUFFIX = "Test replay"
+        const val PREF_WIDGET_HEADER_BUTTONS_SCALE = "widgetHeaderButtonsScale"
         const val PREF_TEXT_SIZE_SCALE = "textSizeScale"
         const val PREF_TIME_FORMAT = "dateFormat" // Legacy value...
         const val PREF_TIME_FORMAT_DEFAULT = "auto"
@@ -630,6 +633,9 @@ data class InstanceSettings(
                 widgetHeaderLayout = if (json.has(PREF_WIDGET_HEADER_LAYOUT)) {
                     WidgetHeaderLayout.fromValue(json.getString(PREF_WIDGET_HEADER_LAYOUT))
                 } else EMPTY.widgetHeaderLayout,
+                widgetHeaderButtonsScale = if (json.has(PREF_WIDGET_HEADER_BUTTONS_SCALE)) {
+                    TextSizeScale.fromPreferenceValue(json.getString(PREF_WIDGET_HEADER_BUTTONS_SCALE))
+                } else EMPTY.widgetHeaderButtonsScale,
                 textSizeScale = if (json.has(PREF_TEXT_SIZE_SCALE)) {
                     TextSizeScale.fromPreferenceValue(json.getString(PREF_TEXT_SIZE_SCALE))
                 } else EMPTY.textSizeScale,
@@ -753,6 +759,9 @@ data class InstanceSettings(
                     proposedInstanceName = ApplicationPreferences.getString(
                         context, PREF_WIDGET_INSTANCE_NAME,
                         ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, "")
+                    ),
+                    widgetHeaderButtonsScale = TextSizeScale.fromPreferenceValue(
+                        ApplicationPreferences.getString(context, PREF_WIDGET_HEADER_BUTTONS_SCALE, "")
                     ),
                     textSizeScale = TextSizeScale.fromPreferenceValue(
                         ApplicationPreferences.getString(context, PREF_TEXT_SIZE_SCALE, "")

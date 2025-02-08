@@ -103,6 +103,7 @@ object ApplicationPreferences {
             // ----------------------------------------------------------------------------------
             // Other
             setString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, settings.widgetInstanceName)
+            setString(context, InstanceSettings.PREF_WIDGET_HEADER_BUTTONS_SCALE, settings.widgetHeaderButtonsScale.preferenceValue)
             setString(context, InstanceSettings.PREF_TEXT_SIZE_SCALE, settings.textSizeScale.preferenceValue)
             setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
             setLockedTimeZoneId(context, settings.lockedTimeZoneId)

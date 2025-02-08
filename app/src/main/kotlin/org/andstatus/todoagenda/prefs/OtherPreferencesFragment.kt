@@ -2,6 +2,7 @@ package org.andstatus.todoagenda.prefs
 
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.os.Build
 import android.os.Bundle
 import androidx.preference.CheckBoxPreference
 import androidx.preference.EditTextPreference
@@ -9,6 +10,7 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_WIDGET_HEADER_BUTTONS_SCALE
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatter
 import org.andstatus.todoagenda.provider.QueryResultsStorage
@@ -19,10 +21,12 @@ import java.util.TimeZone
 class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChangeListener {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences_other)
+        removeUnavailablePreferences()
     }
 
     override fun onResume() {
         super.onResume()
+        removeUnavailablePreferences()
         showWidgetInstanceName()
         showSnapshotMode()
         setLockTimeZone()
@@ -177,4 +181,15 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 " (id:" + ApplicationPreferences.getWidgetId(activity) + ")"
         }
     }
+
+    private fun removeUnavailablePreferences() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            val screen = preferenceScreen
+            val preference = findPreference<Preference>(PREF_WIDGET_HEADER_BUTTONS_SCALE)
+            if (screen != null && preference != null) {
+                screen.removePreference(preference)
+            }
+        }
+    }
+
 }

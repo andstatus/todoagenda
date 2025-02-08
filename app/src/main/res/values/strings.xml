@@ -247,6 +247,8 @@
     <string name="other_prefs_title">Other settings</string>
     <string name="appearance_prefs">Appearance</string>
     <string name="appearance_prefs_desc">Adjust the appearance of the widget</string>
+    <string name="buttons_size_title">Buttons size</string>
+    <string name="buttons_size_desc">Adjust the buttons size</string>
     <string name="appearance_text_size_title">Text size</string>
     <string name="appearance_text_size_desc">Adjust the text size</string>
     <string name="appearance_text_size_very_small">Very small</string>
