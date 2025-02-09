@@ -13,9 +13,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
     @Test
     fun testInsidePeriod() {
         val method = "testInsidePeriod"
-        val inputs = provider.loadResultsAndSettings(
-            org.andstatus.todoagenda.test.R.raw.multi_day
-        )
+        val inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.multi_day)
         val now = DateTime(2015, 8, 30, 0, 0, 1, 0, settings.timeZone)
         inputs.executedAt.set(now)
         provider.addResults(inputs)
@@ -56,7 +54,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
                     Assert.assertEquals(
                         "Day not filled $logMsg",
                         (dayOfEventEntryPrev + 1).toLong(),
-                        dayOfEntry.toLong()
+                        dayOfEntry.toLong(),
                     )
                 }
                 dayOfEventEntryPrev = dayOfEntry
@@ -65,12 +63,12 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
         Assert.assertEquals(
             "Wrong last day header $method",
             endOfRangeTime.dayOfYear.toLong(),
-            dayOfHeaderPrev.toLong()
+            dayOfHeaderPrev.toLong(),
         )
         Assert.assertEquals(
             "Wrong last filled day $method",
             endOfRangeTime.dayOfYear.toLong(),
-            dayOfEventEntryPrev.toLong()
+            dayOfEventEntryPrev.toLong(),
         )
     }
 }

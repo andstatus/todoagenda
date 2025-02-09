@@ -12,7 +12,7 @@ class OngoingEventTest : BaseWidgetTest() {
     private var eventId = 0
 
     /**
-     * @see [Issue 199](https://github.com/plusonelabs/calendar-widget/issues/199)
+     * See [Issue 199](https://github.com/plusonelabs/calendar-widget/issues/199)
      */
     @Test
     fun testTodaysOngoingEvent() {
@@ -40,7 +40,7 @@ class OngoingEventTest : BaseWidgetTest() {
     }
 
     /**
-     * @see [Issue 199](https://github.com/plusonelabs/calendar-widget/issues/199)
+     * See [Issue 199](https://github.com/plusonelabs/calendar-widget/issues/199)
      */
     @Test
     fun testYesterdaysOngoingEvent() {

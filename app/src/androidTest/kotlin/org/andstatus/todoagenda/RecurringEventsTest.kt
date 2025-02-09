@@ -13,7 +13,7 @@ class RecurringEventsTest : BaseWidgetTest() {
     private var eventId = 0
 
     /**
-     * @see [Issue 191](https://github.com/plusonelabs/calendar-widget/issues/191) and
+     * See [Issue 191](https://github.com/plusonelabs/calendar-widget/issues/191) and
      * [Issue 46](https://github.com/plusonelabs/calendar-widget/issues/46)
      */
     @Test
