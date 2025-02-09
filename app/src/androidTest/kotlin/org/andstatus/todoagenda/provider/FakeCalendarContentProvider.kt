@@ -21,40 +21,49 @@ import java.util.concurrent.atomic.AtomicReference
 /**
  * @author yvolk@yurivolkov.com
  */
-class FakeCalendarContentProvider private constructor(val context: Context) {
+class FakeCalendarContentProvider private constructor(
+    val context: Context,
+) {
     private val results = QueryResultsStorage()
     val widgetId: Int
     val usesActualWidget: Boolean
 
     val settingsRef = AtomicReference<InstanceSettings>()
     var settings: InstanceSettings
-        get() = settingsRef.get()
-            ?: throw java.lang.IllegalStateException("No settings stored")
+        get() = settingsRef.get() ?: throw java.lang.IllegalStateException("No settings stored")
         set(value) {
             settingsRef.set(value)
             AllSettings.addOrReplace(TAG, context, value)
         }
 
     init {
-        val instanceToReuse = AllSettings.getInstances(context).values.stream()
-            .filter { obj: InstanceSettings -> obj.isForTestsReplaying }.findFirst().orElse(null)
+        val instanceToReuse =
+            AllSettings
+                .getInstances(context)
+                .values
+                .stream()
+                .filter { obj: InstanceSettings -> obj.isForTestsReplaying }
+                .findFirst()
+                .orElse(null)
         usesActualWidget = instanceToReuse != null
         widgetId = if (usesActualWidget) instanceToReuse.widgetId else lastWidgetId.incrementAndGet()
         val timeZoneId = ZONE_IDS[(System.currentTimeMillis() % ZONE_IDS.size).toInt()]
-        settings = InstanceSettings(
-            contextIn = context,
-            widgetId = widgetId,
-            proposedInstanceName = "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX,
-            lockedTimeZoneIdIn = timeZoneId
-        )
+        settings =
+            InstanceSettings(
+                contextIn = context,
+                widgetId = widgetId,
+                proposedInstanceName = "ToDo Agenda " + widgetId + " " + InstanceSettings.TEST_REPLAY_SUFFIX,
+                lockedTimeZoneIdIn = timeZoneId,
+            )
     }
 
     fun updateAppSettings(tag: String) {
-        settings = settings.copy(
-            logEvents = true,
-            resultsStorage = results,
-            snapshotModeIn = SnapshotMode.SNAPSHOT_TIME
-        )
+        settings =
+            settings.copy(
+                logEvents = true,
+                resultsStorage = results,
+                snapshotModeIn = SnapshotMode.SNAPSHOT_TIME,
+            )
         AllSettings.addOrReplace(tag, context, settings)
         if (results.results.isNotEmpty()) {
             Log.d(tag, "Results executed at " + settings.clock.now())
@@ -65,7 +74,9 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
         results.addResults(newResults)
     }
 
-    fun setExecutedAt(executedAt: DateTime?) {
+    val executedAt: DateTime get() = results.executedAt.get()
+
+    fun setExecutedAt(executedAt: DateTime) {
         results.executedAt.set(executedAt)
     }
 
@@ -82,7 +93,7 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
                 .setEventLocation(event.location)
                 .setDescription(event.description)
                 .setHasAlarm(if (event.isAlarmActive) 1 else 0)
-                .setRRule(if (event.isRecurring) "FREQ=WEEKLY;WKST=MO;BYDAY=MO,WE,FR" else null)
+                .setRRule(if (event.isRecurring) "FREQ=WEEKLY;WKST=MO;BYDAY=MO,WE,FR" else null),
         )
     }
 
@@ -100,19 +111,16 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
     }
 
     private fun ensureOneActiveEventSource(type: EventProviderType) {
-        if (settings.activeEventSources.stream()
-                .noneMatch { source: OrderedEventSource -> source.source.providerType === type }
+        if (settings.activeEventSources
+                .none { source: OrderedEventSource -> source.source.providerType === type }
         ) {
             val sourceId = settings.activeEventSources.size + 1
-            val source = EventSource(
-                type, sourceId,
-                "(Mocked $type #$sourceId)",
-                "", 0, true
-            )
+            val source = EventSource(type, sourceId, "(Mocked $type #$sourceId)", "", 0, true)
             val newSource = OrderedEventSource(source, 1)
-            settings = settings.copy(
-                activeEventSourcesIn = settings.activeEventSources + newSource
-            )
+            settings =
+                settings.copy(
+                    activeEventSourcesIn = settings.activeEventSources + newSource,
+                )
         }
     }
 
@@ -129,22 +137,25 @@ class FakeCalendarContentProvider private constructor(val context: Context) {
         settings = AllSettings.instanceFromId(context, widgetId)
     }
 
-    fun loadResultsAndSettings(@RawRes jsonResId: Int): QueryResultsStorage {
+    fun loadResultsAndSettings(
+        @RawRes jsonResId: Int,
+    ): QueryResultsStorage =
         try {
             val json =
                 JSONObject(RawResourceUtils.getString(InstrumentationRegistry.getInstrumentation().context, jsonResId))
             json.getJSONObject(QueryResultsStorage.KEY_SETTINGS).put(InstanceSettings.PREF_WIDGET_ID, widgetId)
             val widgetData = WidgetData.fromJson(json)
-            settings = widgetData.getSettingsForWidget(
-                context,
-                settings,
-                widgetId
-            )
-            return settings.resultsStorage ?: throw IllegalStateException("No results storage")
+            settings =
+                widgetData.getSettingsForWidget(
+                    context,
+                    settings,
+                    widgetId,
+                )
+            settings.resultsStorage?.also { addResults(it) }
+                ?: throw IllegalStateException("No results storage")
         } catch (e: Exception) {
             throw IllegalStateException("loadResultsAndSettings" + e.message)
         }
-    }
 
     val firstActiveEventSource: OrderedEventSource
         get() {

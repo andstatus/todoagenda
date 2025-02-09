@@ -14,21 +14,25 @@ class RealTasksTest : BaseWidgetTest() {
     @Test
     fun testTasksWithoutStartAndDueDates() {
         val method = "testTasksWithoutStartAndDueDates"
-        val inputs = provider.loadResultsAndSettings(
-            org.andstatus.todoagenda.test.R.raw.real_tasks
-        )
-        provider.addResults(inputs)
+        provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.real_tasks)
         playResults(method)
-        Assert.assertTrue("No End of list entries although filters are off",
-            factory.widgetEntries.stream()
-                .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST })
-        provider.settings = settings.copy(
-            filterModeIn = FilterMode.DEBUG_FILTER,
-            taskWithoutDates = TasksWithoutDates.HIDE
+        Assert.assertTrue(
+            "No End of list entries although filters are off",
+            factory.widgetEntries
+                .stream()
+                .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST },
         )
+        provider.settings =
+            settings.copy(
+                filterModeIn = FilterMode.DEBUG_FILTER,
+                taskWithoutDates = TasksWithoutDates.HIDE,
+            )
         playResults(method)
-        Assert.assertFalse("End of list entries although filters are on",
-            factory.widgetEntries.stream()
-                .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST })
+        Assert.assertFalse(
+            "End of list entries although filters are on",
+            factory.widgetEntries
+                .stream()
+                .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST },
+        )
     }
 }

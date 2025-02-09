@@ -14,15 +14,24 @@ class WrongDatesLostEventsTest : BaseWidgetTest() {
     @Test
     fun testIssue205() {
         val method = "testIssue205"
-        val inputs = provider!!.loadResultsAndSettings(
-            org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events
-        )
-        provider!!.addResults(inputs)
+        provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events)
         playResults(method)
         Assert.assertEquals("Number of entries", 11, factory.widgetEntries.size.toLong())
         Assert.assertEquals("On Saturday", "Maker Fair", (factory.widgetEntries[4] as CalendarEntry).event.title)
-        Assert.assertEquals("On Saturday", 6, factory.widgetEntries[4].entryDate.dayOfWeek.toLong())
+        Assert.assertEquals(
+            "On Saturday",
+            6,
+            factory.widgetEntries[4]
+                .entryDate.dayOfWeek
+                .toLong(),
+        )
         Assert.assertEquals("On Sunday", "Ribakovs", (factory.widgetEntries[7] as CalendarEntry).event.title)
-        Assert.assertEquals("On Sunday", 7, factory.widgetEntries[7].entryDate.dayOfWeek.toLong())
+        Assert.assertEquals(
+            "On Sunday",
+            7,
+            factory.widgetEntries[7]
+                .entryDate.dayOfWeek
+                .toLong(),
+        )
     }
 }

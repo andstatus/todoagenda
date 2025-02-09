@@ -110,9 +110,7 @@ class FakeCalendarContentProviderTest : BaseWidgetTest() {
     @Test
     @Throws(JSONException::class)
     fun testJsonToAndFrom() {
-        val inputs1 = provider.loadResultsAndSettings(
-            org.andstatus.todoagenda.test.R.raw.birthday
-        )
+        val inputs1 = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday)
         val jsonOutput = inputs1.toJson(provider.context, provider.widgetId, true)
         val inputs2 = QueryResultsStorage.fromJson(provider.widgetId, jsonOutput)
         Assert.assertEquals(inputs1, inputs2)

@@ -20,9 +20,10 @@ class RecurringEventsTest : BaseWidgetTest() {
     fun testShowRecurringEvents() {
         generateEventInstances()
         Assert.assertEquals("Entries: " + factory.widgetEntries.size, 15, countCalendarEntries().toLong())
-        provider.settings = settings.copy(
-            showOnlyClosestInstanceOfRecurringEvent = true
-        )
+        provider.settings =
+            settings.copy(
+                showOnlyClosestInstanceOfRecurringEvent = true,
+            )
         generateEventInstances()
         Assert.assertEquals("Entries: " + factory.widgetEntries.size, 1, countCalendarEntries().toLong())
     }
@@ -38,15 +39,18 @@ class RecurringEventsTest : BaseWidgetTest() {
     }
 
     fun generateEventInstances() {
-        provider!!.clear()
+        provider.clear()
         val date = settings.clock.now().withTimeAtStartOfDay()
         var millis = date.millis + TimeUnit.HOURS.toMillis(10)
         eventId++
         for (ind in 0..14) {
             millis += TimeUnit.DAYS.toMillis(1)
-            provider!!.addRow(
-                QueryRow().setEventId(eventId).setTitle("Work each day")
-                    .setBegin(millis).setEnd(millis + TimeUnit.HOURS.toMillis(9))
+            provider.addRow(
+                QueryRow()
+                    .setEventId(eventId)
+                    .setTitle("Work each day")
+                    .setBegin(millis)
+                    .setEnd(millis + TimeUnit.HOURS.toMillis(9)),
             )
         }
         playResults(BaseWidgetTest.Companion.TAG)

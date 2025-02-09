@@ -44,13 +44,8 @@ open class BaseWidgetTest {
         monthOfYear: Int,
         dayOfMonth: Int,
         hourOfDay: Int = 0,
-        minuteOfHour: Int = 0
-    ): DateTime {
-        return DateTime(
-            year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, 0, 0,
-            provider.settings.timeZone
-        )
-    }
+        minuteOfHour: Int = 0,
+    ): DateTime = DateTime(year, monthOfYear, dayOfMonth, hourOfDay, minuteOfHour, 0, 0, provider.settings.timeZone)
 
     protected fun playResults(tag: String) {
         Log.d(tag, provider.widgetId.toString() + " playResults started")
@@ -122,18 +117,22 @@ open class BaseWidgetTest {
         get() = provider.settings
 
     protected fun ensureNonEmptyResults() {
-        val inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday)
-        provider.settings = settings.copy(
-            filterModeIn = FilterMode.NO_FILTERING
-        )
-        provider.addResults(inputs)
+        provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.birthday)
+        provider.settings =
+            settings.copy(
+                filterModeIn = FilterMode.NO_FILTERING,
+            )
     }
 
-    protected fun assertPosition(ind: Int, position: WidgetEntryPosition) {
+    protected fun assertPosition(
+        ind: Int,
+        position: WidgetEntryPosition,
+    ) {
         val widgetEntries = factory.widgetEntries
         Assert.assertTrue(
             "Expecting " + position + " at " + (ind + 1) + "th entry, but found only " +
-                widgetEntries.size + " entries", widgetEntries.size > ind
+                widgetEntries.size + " entries",
+            widgetEntries.size > ind,
         )
         Assert.assertEquals(widgetEntries[ind].toString(), position, widgetEntries[ind].entryPosition)
     }

@@ -2,7 +2,6 @@ package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.LastEntry
-import org.joda.time.DateTime
 import org.junit.Assert
 import org.junit.Test
 
@@ -13,14 +12,11 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
     @Test
     fun testInsidePeriod() {
         val method = "testInsidePeriod"
-        val inputs = provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.multi_day)
-        val now = DateTime(2015, 8, 30, 0, 0, 1, 0, settings.timeZone)
-        inputs.executedAt.set(now)
-        provider.addResults(inputs)
+        provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.multi_day)
         val dateRange = 30
         provider.settings = settings.copy(eventRange = dateRange)
         playResults(method)
-        val today = now.withTimeAtStartOfDay()
+        val today = provider.executedAt.withTimeAtStartOfDay()
         val endOfRangeTime = today.plusDays(dateRange)
         var dayOfEventEntryPrev = 0
         var dayOfHeaderPrev = 0

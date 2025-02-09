@@ -13,22 +13,23 @@ class ShowOnlyClosestInstanceTest : BaseWidgetTest() {
     @Test
     fun testShowOnlyClosestInstance() {
         val method = "testShowOnlyClosestInstance"
-        val inputs = provider!!.loadResultsAndSettings(
-            org.andstatus.todoagenda.test.R.raw.closest_event
-        )
-        provider!!.addResults(inputs)
+        provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.closest_event)
         playResults(method)
         Assert.assertEquals(
-            "SnaphotDate", dateTime(2020, 2, 15),
-            settings.clock.now().withTimeAtStartOfDay()
+            "SnaphotDate",
+            dateTime(2020, 2, 15),
+            settings.clock.now().withTimeAtStartOfDay(),
         )
-        val entries = factory.widgetEntries.stream()
-            .filter { e: WidgetEntry<*> -> e.title.startsWith("Test event 2 that") }.collect(Collectors.toList())
+        val entries =
+            factory.widgetEntries
+                .stream()
+                .filter { e: WidgetEntry<*> -> e.title.startsWith("Test event 2 that") }
+                .collect(Collectors.toList())
         Assert.assertEquals("Number of entries of the test event $entries", 2, entries.size.toLong())
         Assert.assertNotEquals(
             "Entries should have different IDs\n$entries\n",
             (entries[0] as CalendarEntry).event.eventId,
-            (entries[1] as CalendarEntry).event.eventId
+            (entries[1] as CalendarEntry).event.eventId,
         )
     }
 }

@@ -13,6 +13,7 @@ import org.junit.Test
  */
 class SingleEventTest : BaseWidgetTest() {
     private var eventId = 0
+
     @Test
     fun testEventAttributes() {
         val today = settings.clock.now().withTimeAtStartOfDay()
@@ -64,29 +65,35 @@ class SingleEventTest : BaseWidgetTest() {
         Assert.assertEquals(event.endDate.toString(), today.plusDays(1).millis, event.endMillis)
     }
 
-    private fun assertOneEvent(executedAt: DateTime, event: CalendarEvent, equal: Boolean) {
+    private fun assertOneEvent(
+        executedAt: DateTime,
+        event: CalendarEvent,
+        equal: Boolean,
+    ) {
         provider.clear()
         provider.setExecutedAt(executedAt)
         provider.addRow(event)
         playResults(TAG)
         Assert.assertFalse(
             settings.toString(),
-            settings.getActiveEventSources(EventProviderType.CALENDAR).isEmpty()
+            settings.getActiveEventSources(EventProviderType.CALENDAR).isEmpty(),
         )
         val source = provider.firstActiveEventSource
         Assert.assertTrue(source.toString(), source.source.isAvailable)
         Assert.assertTrue(
             settings.toString(),
-            settings.getActiveEventSource(
-                EventProviderType.CALENDAR,
-                source.source.id
-            ).source.isAvailable
+            settings
+                .getActiveEventSource(
+                    EventProviderType.CALENDAR,
+                    source.source.id,
+                ).source.isAvailable,
         )
         Assert.assertEquals(factory.widgetEntries.toString(), 3, factory.widgetEntries.size.toLong())
         val entry = factory.widgetEntries[1]
         Assert.assertTrue(entry is CalendarEntry)
         val eventOut = (entry as CalendarEntry).event
-        val msgLog = """
+        val msgLog =
+            """
             Comparing events:
             in: $event
             out:$eventOut
