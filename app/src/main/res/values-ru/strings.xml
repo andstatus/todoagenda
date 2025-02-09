@@ -42,16 +42,16 @@
     <string name="app_description_4000_chars_max_part04">Обновляется автоматически, когда Вы добавляете/удаляете/изменяете событие. Или Вы можете обновить список немедленно.</string>
     <string name="app_description_4000_chars_max_part05">Выберите только те календари и списки задач, которые Вы хотите видеть в виджете.</string>
     <string name="app_description_4000_chars_max_part06">Если необходимо, создайте несколько виджетов. Каждый виджет будет иметь свои собственные настройки, включая макеты, цвета, фильтры, выбранные календари и списки задач.</string>
-    <string name="app_description_4000_chars_max_part07">Настройте цвет фона и прозрачность различных частей виджета, черный и белый оттенки для текстов.</string>
+    <string name="app_description_4000_chars_max_part07">Настройте цвет фона и прозрачность различных частей виджета и текста.</string>
     <string name="app_description_4000_chars_max_part08">Прокрутка списка событий.  Используйте кнопку \"Перейти к сегодняшней дате\", чтобы вернуться к сегодняшнему дню моментально.</string>
-    <string name="app_description_4000_chars_max_part09">Настройка размера текста виджета.</string>
+    <string name="app_description_4000_chars_max_part09">Настройка размера текста и кнопок виджета.</string>
     <string name="app_description_4000_chars_max_part10">Виджет изменяемого размера, использующий альтернативные макеты.</string>
     <string name="app_description_4000_chars_max_part11">Индикаторы для оповещений и повторяющихся событий.</string>
     <string name="app_description_4000_chars_max_part12">Блокировка часового пояса при путешествии в разных часовых поясах.</string>
     <string name="app_description_4000_chars_max_part13">Выключите заголовок виджета, заголовки дней, иконки событий, количество дней и т.д., и виджет покажет Вам только то, что Вам нужно.</string>
     <string name="app_description_4000_chars_max_part16">Скрыть дубликаты событий.</string>
     <string name="app_description_4000_chars_max_part17">Резервное копирование и восстановление настроек, клонирование виджетов на том же или на других устройствах.</string>
-    <string name="app_description_4000_chars_max_part14">Поддержка Android версий 4+. Поддержка планшетов.</string>
+    <string name="app_description_4000_chars_max_part14">Поддержка Android версий 7+. Поддержка планшетов.</string>
     <!-- Preference frame: Layout -->
     <string name="compact_layout_title">Компактный макет</string>
     <string name="compact_layout_off_desc">Обычные промежутки между частями виджета</string>
