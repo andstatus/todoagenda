@@ -2,7 +2,7 @@
 
 <a id="v4.12"/>
 
-### 2025-02-08 v4.12.0 Widget header buttons size
+### 2025-02-08 v4.12.1 Widget header buttons size
 * "Buttons size" option added to "Other settings" section allowing to make widget header buttons larger or smaller,
   for Android 12+.
   [#160](https://github.com/andstatus/todoagenda/issues/160)
