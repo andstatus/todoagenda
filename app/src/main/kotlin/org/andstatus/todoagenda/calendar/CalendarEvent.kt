@@ -17,7 +17,7 @@ import kotlin.concurrent.Volatile
 class CalendarEvent(
     val settings: InstanceSettings,
     val context: Context,
-    val isAllDay: Boolean
+    val isAllDay: Boolean,
 ) : WidgetEvent {
     override lateinit var eventSource: OrderedEventSource
         private set
@@ -35,6 +35,7 @@ class CalendarEvent(
     var isAlarmActive = false
     var isRecurring = false
     var status = EventStatus.CONFIRMED
+
     fun setEventSource(eventSource: OrderedEventSource): CalendarEvent {
         this.eventSource = eventSource
         return this
@@ -53,9 +54,7 @@ class CalendarEvent(
             fixEndDate()
         }
 
-    private fun dateFromMillis(millis: Long): DateTime {
-        return if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.timeZone)
-    }
+    private fun dateFromMillis(millis: Long): DateTime = if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.timeZone)
 
     /**
      * Implemented based on this answer: http://stackoverflow.com/a/5451245/297710
@@ -65,11 +64,12 @@ class CalendarEvent(
         val fixed: DateTime
         try {
             val utcDate = DateTime(millis, DateTimeZone.UTC)
-            var ldt = LocalDateTime()
-                .withYear(utcDate.year)
-                .withMonthOfYear(utcDate.monthOfYear)
-                .withDayOfMonth(utcDate.dayOfMonth)
-                .withMillisOfDay(0)
+            var ldt =
+                LocalDateTime()
+                    .withYear(utcDate.year)
+                    .withMonthOfYear(utcDate.monthOfYear)
+                    .withDayOfMonth(utcDate.dayOfMonth)
+                    .withMillisOfDay(0)
             var hour = 0
             while (settings.timeZone.isLocalDateTimeGap(ldt)) {
                 Log.v("fixTimeOfAllDayEvent", "Local Date Time Gap: $ldt; $msgLog")
@@ -109,49 +109,56 @@ class CalendarEvent(
             fixEndDate()
         }
 
-    private fun dateToMillis(date: DateTime?): Long {
-        return if (isAllDay) toAllDayMillis(date) else date!!.millis
-    }
+    private fun dateToMillis(date: DateTime?): Long = if (isAllDay) toAllDayMillis(date) else date!!.millis
 
     private fun toAllDayMillis(date: DateTime?): Long {
-        val utcDate = DateTime(
-            date!!.year, date.monthOfYear, date.dayOfMonth, 0, 0,
-            DateTimeZone.UTC
-        )
+        val utcDate =
+            DateTime(
+                date!!.year,
+                date.monthOfYear,
+                date.dayOfMonth,
+                0,
+                0,
+                DateTimeZone.UTC,
+            )
         return utcDate.millis
     }
 
-    fun getCalendarColor(): Int {
-        return calendarColor.orElse(color)
-    }
+    fun getCalendarColor(): Int = calendarColor.orElse(color)
 
     fun setCalendarColor(color: Int) {
         calendarColor = Optional.of(color)
     }
 
-    fun hasDefaultCalendarColor(): Boolean {
-        return calendarColor.map { cc: Int -> cc == color }.orElse(true)
-    }
+    fun hasDefaultCalendarColor(): Boolean = calendarColor.map { cc: Int -> cc == color }.orElse(true)
 
-    override fun toString(): String {
-        return ("CalendarEvent [eventId=" + eventId
-            + (if (StringUtil.nonEmpty(title)) ", title=$title" else "")
-            + ", startDate=" + startDate
-            + (", endDate=$endDate")
-            + ", color=" + color
-            + (if (hasDefaultCalendarColor()) " is default" else ", calendarColor=" + calendarColor.map { obj: Int? ->
-            java.lang.String.valueOf(
-                obj
-            )
-        }
-            .orElse("???"))
-            + ", allDay=" + isAllDay
-            + ", alarmActive=" + isAlarmActive
-            + ", recurring=" + isRecurring +
-            (if (location.isNullOrBlank()) "" else ", location='$location'") +
-            (if (description.isNullOrBlank()) "" else ", description='$description'") +
-            "; Source [" + eventSource + "]]")
-    }
+    override fun toString(): String =
+        (
+            "CalendarEvent [eventId=" + eventId +
+                (if (StringUtil.nonEmpty(title)) ", title=$title" else "") +
+                ", startDate=" + startDate +
+                (", endDate=$endDate") +
+                ", color=" + color +
+                (
+                    if (hasDefaultCalendarColor()) {
+                        " is default"
+                    } else {
+                        ", calendarColor=" +
+                            calendarColor
+                                .map { obj: Int? ->
+                                    java.lang.String.valueOf(
+                                        obj,
+                                    )
+                                }.orElse("???")
+                    }
+                ) +
+                ", allDay=" + isAllDay +
+                ", alarmActive=" + isAlarmActive +
+                ", recurring=" + isRecurring +
+                (if (location.isNullOrBlank()) "" else ", location='$location'") +
+                (if (description.isNullOrBlank()) "" else ", description='$description'") +
+                "; Source [" + eventSource + "]]"
+        )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
@@ -163,7 +170,9 @@ class CalendarEvent(
         val that = other as CalendarEvent
         return if (eventId != that.eventId || startDate != that.startDate) {
             false
-        } else true
+        } else {
+            true
+        }
     }
 
     override fun hashCode(): Int {
@@ -175,10 +184,19 @@ class CalendarEvent(
     val isActive: Boolean
         get() {
             val now = settings.clock.now()
-            return startDate.isBefore(now) && endDate.isAfter(now)
+            return !startDate.isAfter(now) && endDate.isAfter(now)
         }
     val isPartOfMultiDayEvent: Boolean
         get() = settings.clock.dayOf(endDate).isAfter(settings.clock.dayOf(startDate))
+    val closestTime: DateTime
+        get() {
+            val now = settings.clock.now()
+            return when {
+                startDate.isAfter(now) -> startDate
+                endDate.isBefore(now) -> endDate
+                else -> now
+            }
+        }
 
     companion object {
         @Volatile

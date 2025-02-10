@@ -1,7 +1,6 @@
 package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.util.MyClock
-import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.LastEntry
 import org.andstatus.todoagenda.widget.TaskEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
@@ -13,7 +12,7 @@ import org.junit.Test
  */
 class PastDueHeaderWithTasksTest : BaseWidgetTest() {
     /**
-     * https://github.com/plusonelabs/calendar-widget/issues/205
+     * [Issue 205](https://github.com/plusonelabs/calendar-widget/issues/205)
      */
     @Test
     fun testPastDueHeaderWithTasks() {
@@ -22,8 +21,8 @@ class PastDueHeaderWithTasksTest : BaseWidgetTest() {
         playResults(method)
         Assert.assertEquals("Past and Due header", MyClock.DATETIME_MIN, factory.widgetEntries[0].entryDate)
         Assert.assertEquals(WidgetEntryPosition.PAST_AND_DUE_HEADER, factory.widgetEntries[0].entryPosition)
-        Assert.assertEquals("Past Calendar Entry", CalendarEntry::class.java, factory.widgetEntries[1].javaClass)
-        Assert.assertEquals("Due task Entry", TaskEntry::class.java, factory.widgetEntries[2].javaClass)
+        Assert.assertEquals("Closest event: Past Calendar Entry", "Call John Smith", factory.widgetEntries[1].title)
+        Assert.assertEquals("Due task Entry", "Due task 002, without start date", factory.widgetEntries[2].title)
         Assert.assertEquals(
             "Due task Entry",
             dateTime(2019, 8, 1, 9, 0),
