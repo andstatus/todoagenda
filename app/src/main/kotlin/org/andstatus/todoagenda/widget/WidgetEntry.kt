@@ -15,7 +15,7 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
     val entryPosition: WidgetEntryPosition,
     entryDate: DateTime,
     val allDay: Boolean,
-    val endDate: DateTime?
+    val endDate: DateTime?,
 ) : Comparable<WidgetEntry<*>> {
     val entryId = idGenerator.incrementAndGet()
     val entryDate: DateTime
@@ -29,9 +29,10 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
     }
 
     val isLastEntryOfEvent: Boolean
-        get() = endDate == null ||
-            !entryPosition.entryDateIsRequired ||
-            !endDate.isAfter(settings.clock.startOfNextDay(entryDate))
+        get() =
+            endDate == null ||
+                !entryPosition.entryDateIsRequired ||
+                !endDate.isAfter(settings.clock.startOfNextDay(entryDate))
     open val eventTimeString: String
         get() = ""
     abstract val source: OrderedEventSource
@@ -40,18 +41,30 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
     open val status: EventStatus?
         get() = EventStatus.CONFIRMED
     val locationShown: String?
-        get() = location?.let {
-            if (it.isBlank() || !settings.showLocation) null else it
-        }
+        get() =
+            location?.let {
+                if (it.isBlank() || !settings.showLocation) null else it
+            }
 
     val descriptionShown: String?
-        get() = description?.let {
-            if (it.isBlank() || !settings.showDescription) null else it
-        }
+        get() =
+            description?.let {
+                if (it.isBlank() || !settings.showDescription) null else it
+            }
 
     open val location: String? = null
 
     open val description: String? = null
+
+    val entryClosestTime: DateTime
+        get() {
+            val now = settings.clock.now()
+            return when {
+                entryDay.isAfter(now) -> entryDay
+                entryDay.plusDays(1).isBefore(now) -> entryDay.plusDays(1).minusMillis(1)
+                else -> now
+            }
+        }
 
     override operator fun compareTo(other: WidgetEntry<*>): Int {
         val globalSignum = Integer.signum(entryPosition.globalOrder - other.entryPosition.globalOrder)
@@ -75,55 +88,70 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
         return if (sourceSignum == 0) title.compareTo(other.title) else sourceSignum
     }
 
-    fun duplicates(other: WidgetEntry<*>): Boolean {
-        return entryPosition == other.entryPosition && entryDate == other.entryDate &&
-            DateUtil.isSameDate(endDate, other.endDate) && title == other.title &&
+    fun duplicates(other: WidgetEntry<*>): Boolean =
+        entryPosition == other.entryPosition &&
+            entryDate == other.entryDate &&
+            DateUtil.isSameDate(endDate, other.endDate) &&
+            title == other.title &&
             (!settings.showLocation || location == other.location) &&
             (!settings.showDescription || description == other.description)
-    }
 
-    fun formatEntryDate(): CharSequence {
-        return if (settings.entryDateFormat.type == DateFormatType.HIDDEN || !MyClock.isDateDefined(entryDate)) ""
-        else settings.entryDateFormatter()
-            .formatDate(entryDate)
-    }
+    fun formatEntryDate(): CharSequence =
+        if (settings.entryDateFormat.type == DateFormatType.HIDDEN || !MyClock.isDateDefined(entryDate)) {
+            ""
+        } else {
+            settings
+                .entryDateFormatter()
+                .formatDate(entryDate)
+        }
 
-    fun newOnClickFillInIntent(): Intent {
-        return Intent().putExtra(EXTRA_WIDGET_ENTRY_ID, entryId)
-    }
+    fun newOnClickFillInIntent(): Intent = Intent().putExtra(EXTRA_WIDGET_ENTRY_ID, entryId)
 
-    override fun toString(): String {
-        return entryPosition.value + " [" +
+    override fun toString(): String =
+        entryPosition.value + " [" +
             "entryDate=" +
-            (if (entryDate === MyClock.DATETIME_MIN) "min" else if (entryDate === MyClock.DATETIME_MAX) "max" else entryDate) +
+            (
+                if (entryDate === MyClock.DATETIME_MIN) {
+                    "min"
+                } else if (entryDate === MyClock.DATETIME_MAX) {
+                    "max"
+                } else {
+                    entryDate
+                }
+            ) +
             ", endDate=" + endDate +
             (if (allDay) ", allDay" else "") +
             "]"
-    }
 
     open val event: WidgetEvent?
         get() = null
 
-    fun notHidden(): Boolean {
-        return entryPosition != WidgetEntryPosition.HIDDEN
-    }
+    fun notHidden(): Boolean = entryPosition != WidgetEntryPosition.HIDDEN
 
-    fun calcEntryDay(entryDate: DateTime): DateTime {
-        return when (entryPosition) {
-            WidgetEntryPosition.START_OF_TODAY, WidgetEntryPosition.END_OF_TODAY -> settings.clock.now()
-                .withTimeAtStartOfDay()
+    fun calcEntryDay(entryDate: DateTime): DateTime =
+        when (entryPosition) {
+            WidgetEntryPosition.START_OF_TODAY, WidgetEntryPosition.END_OF_TODAY ->
+                settings.clock
+                    .now()
+                    .withTimeAtStartOfDay()
 
             WidgetEntryPosition.DAY_HEADER -> entryDate.withTimeAtStartOfDay()
 
             else -> if (allDay) entryDate.withTimeAtStartOfDay() else settings.clock.dayOf(entryDate)
         }
-    }
+
+    val shouldBeCalendarEntry: CalendarEntry
+        get() = this as? CalendarEntry ?: error("Should be CalendarEntry: $this")
 
     companion object {
         val EXTRA_WIDGET_ENTRY_ID: String = RemoteViewsFactory.PACKAGE + ".extra.WIDGET_ENTRY_ID"
         private val idGenerator = AtomicLong(0)
-        private fun fixEntryDate(entryPosition: WidgetEntryPosition, entryDate: DateTime?): DateTime {
-            return when (entryPosition) {
+
+        private fun fixEntryDate(
+            entryPosition: WidgetEntryPosition,
+            entryDate: DateTime?,
+        ): DateTime =
+            when (entryPosition) {
                 WidgetEntryPosition.ENTRY_DATE -> {
                     requireNotNull(entryPosition, entryDate)
                 }
@@ -131,7 +159,8 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 WidgetEntryPosition.PAST_AND_DUE_HEADER,
                 WidgetEntryPosition.PAST_AND_DUE,
                 WidgetEntryPosition.START_OF_TODAY,
-                WidgetEntryPosition.HIDDEN -> entryDate ?: MyClock.DATETIME_MIN
+                WidgetEntryPosition.HIDDEN,
+                -> entryDate ?: MyClock.DATETIME_MIN
 
                 WidgetEntryPosition.DAY_HEADER, WidgetEntryPosition.START_OF_DAY -> {
                     requireNotNull(entryPosition, entryDate).withTimeAtStartOfDay()
@@ -144,15 +173,17 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 WidgetEntryPosition.END_OF_TODAY,
                 WidgetEntryPosition.END_OF_LIST_HEADER,
                 WidgetEntryPosition.END_OF_LIST,
-                WidgetEntryPosition.LIST_FOOTER -> entryDate ?: MyClock.DATETIME_MAX
+                WidgetEntryPosition.LIST_FOOTER,
+                -> entryDate ?: MyClock.DATETIME_MAX
 
                 else -> throw IllegalArgumentException("Invalid position $entryPosition; entryDate: $entryDate")
             }
-        }
 
         private fun calcTimeSection(
-            settings: InstanceSettings, entryPosition: WidgetEntryPosition?,
-            entryDay: DateTime, endDate: DateTime?
+            settings: InstanceSettings,
+            entryPosition: WidgetEntryPosition?,
+            entryDay: DateTime,
+            endDate: DateTime?,
         ): TimeSection {
             when (entryPosition) {
                 WidgetEntryPosition.PAST_AND_DUE_HEADER -> return TimeSection.PAST
@@ -164,22 +195,34 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
                 if (entryPosition == WidgetEntryPosition.DAY_HEADER) return TimeSection.TODAY
                 return if (settings.clock.isToday(endDate)) {
                     if (settings.clock.isBeforeNow(endDate)) TimeSection.PAST else TimeSection.TODAY
-                } else TimeSection.TODAY
+                } else {
+                    TimeSection.TODAY
+                }
             }
-            return if (settings.clock.isDayBeforeToday(entryDay)) TimeSection.PAST else if (settings.clock
+            return if (settings.clock.isDayBeforeToday(entryDay)) {
+                TimeSection.PAST
+            } else if (settings.clock
                     .isToday(endDate)
-            ) TimeSection.TODAY else TimeSection.FUTURE
+            ) {
+                TimeSection.TODAY
+            } else {
+                TimeSection.FUTURE
+            }
         }
 
-        private fun requireNotNull(entryPosition: WidgetEntryPosition, entryDate: DateTime?): DateTime {
-            return requireNotNull(entryDate) { "Invalid entry date: $entryDate at position $entryPosition" }
-        }
+        private fun requireNotNull(
+            entryPosition: WidgetEntryPosition,
+            entryDate: DateTime?,
+        ): DateTime =
+            requireNotNull(entryDate) {
+                "Invalid entry date: $entryDate at position $entryPosition"
+            }
 
         fun getEntryPosition(
             settings: InstanceSettings,
             allDay: Boolean,
             mainDate: DateTime?,
-            otherDate: DateTime?
+            otherDate: DateTime?,
         ): WidgetEntryPosition {
             if (mainDate == null && otherDate == null) return settings.taskWithoutDates.widgetEntryPosition
             val refDate = mainDate ?: otherDate

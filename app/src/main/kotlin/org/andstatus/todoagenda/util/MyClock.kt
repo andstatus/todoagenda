@@ -4,6 +4,7 @@ import org.andstatus.todoagenda.prefs.SnapshotMode
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Days
+import org.joda.time.LocalDate
 import org.joda.time.Minutes
 import java.util.TimeZone
 import kotlin.concurrent.Volatile
@@ -70,6 +71,13 @@ class MyClock(
     fun startOfTomorrow(timeZone: DateTimeZone? = this.timeZone): DateTime = startOfToday(timeZone).plusDays(1)
 
     fun startOfToday(timeZone: DateTimeZone? = this.timeZone): DateTime = thisDay(timeZone).withTimeAtStartHourOfDayInner()
+
+    fun dayOf(
+        year: Int,
+        monthOfYear: Int,
+        dayOfMonth: Int,
+        timeZone: DateTimeZone? = this.timeZone,
+    ): DateTime = LocalDate(year, monthOfYear, dayOfMonth).toDateTimeAtStartOfDay(timeZone)
 
     fun dayOf(date: DateTime): DateTime =
         when {

@@ -39,7 +39,6 @@ import org.andstatus.todoagenda.widget.EventStatus
 import org.joda.time.DateTime
 import java.util.Optional
 import java.util.function.Function
-import java.util.stream.Collectors
 
 class CalendarEventProvider(
     type: EventProviderType,
@@ -203,9 +202,7 @@ class CalendarEventProvider(
             ContentUris.appendId(builder, 0)
             ContentUris.appendId(builder, settings.clock.now().millis)
             return queryList(builder.build(), pastEventsWithColorSelection)
-                .stream()
                 .filter { ev: CalendarEvent -> settings.filterMode != FilterMode.DEBUG_FILTER || ev.hasDefaultCalendarColor() }
-                .collect(Collectors.toList())
         }
     private val pastEventsWithColorSelection: String
         get() =
