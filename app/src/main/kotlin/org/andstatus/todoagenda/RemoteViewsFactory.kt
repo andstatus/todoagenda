@@ -35,8 +35,11 @@ import org.joda.time.DateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.Volatile
 
-class RemoteViewsFactory(val context: Context, private val widgetId: Int, createdByLauncher: Boolean) :
-    android.widget.RemoteViewsService.RemoteViewsFactory {
+class RemoteViewsFactory(
+    val context: Context,
+    private val widgetId: Int,
+    createdByLauncher: Boolean,
+) : android.widget.RemoteViewsService.RemoteViewsFactory {
     val instanceId = InstanceId.next()
 
     @Volatile
@@ -115,10 +118,11 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
 
     private fun getVisualizers(): MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> {
         val visualizers: MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> = ArrayList()
-        val dayHeaderVisualizer = DayHeaderVisualizer(
-            settings.context,
-            widgetId
-        )
+        val dayHeaderVisualizer =
+            DayHeaderVisualizer(
+                settings.context,
+                widgetId,
+            )
         visualizers.add(dayHeaderVisualizer)
         for (type in settings.typesOfActiveEventProviders) {
             visualizers.add(type.getVisualizer(settings.context, widgetId))
@@ -148,7 +152,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             visualizer.queryEventEntries().let {
                 eventEntries.addAll(it)
                 if (settings.logEvents) {
-                    Log.i("visualizer_query", "${visualizer}")
+                    Log.i("visualizer_query", "$visualizer")
                     it.forEachIndexed { index, entry ->
                         Log.i("visualizer_query", "${index + 1}. $entry")
                     }
@@ -163,17 +167,19 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
         eventEntries.sort()
         val noHidden: List<WidgetEntry<*>> = eventEntries.filter { it.notHidden() }
         val deduplicated = if (settings.hideDuplicates) filterOutDuplicates(noHidden) else noHidden
-        val limited = if (settings.maxNumberOfEvents > 0) {
-            deduplicated.take(settings.maxNumberOfEvents)
-        } else {
-            deduplicated
-        }
+        val limited =
+            if (settings.maxNumberOfEvents > 0) {
+                deduplicated.take(settings.maxNumberOfEvents)
+            } else {
+                deduplicated
+            }
         val withDayHeaders = if (settings.showDayHeaders) addDayHeaders(limited) else limited
-        val withLast = if (settings.maxNumberOfEvents > 0 && limited.size == settings.maxNumberOfEvents) {
-            withDayHeaders
-        } else {
-            LastEntry.addLast(settings, withDayHeaders)
-        }
+        val withLast =
+            if (settings.maxNumberOfEvents > 0) {
+                withDayHeaders
+            } else {
+                LastEntry.addLast(settings, withDayHeaders)
+            }
         return withLast
     }
 
@@ -204,27 +210,30 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             for (entry in listIn) {
                 val nextEntryDay = entry.entryDay
                 when (entry.entryPosition) {
-                    WidgetEntryPosition.PAST_AND_DUE -> if (!pastEventsHeaderAdded) {
-                        curDayBucket =
-                            DayHeader(settings, WidgetEntryPosition.PAST_AND_DUE_HEADER, MyClock.DATETIME_MIN)
-                        listOut.add(curDayBucket)
-                        pastEventsHeaderAdded = true
-                    }
-
-                    WidgetEntryPosition.END_OF_LIST -> if (!endOfListHeaderAdded) {
-                        endOfListHeaderAdded = true
-                        curDayBucket =
-                            DayHeader(settings, WidgetEntryPosition.END_OF_LIST_HEADER, MyClock.DATETIME_MAX)
-                        listOut.add(curDayBucket)
-                    }
-
-                    else -> if (!nextEntryDay.isEqual(curDayBucket.entryDay)) {
-                        if (settings.showDaysWithoutEvents) {
-                            addEmptyDayHeadersBetweenTwoDays(listOut, curDayBucket.entryDay, nextEntryDay)
+                    WidgetEntryPosition.PAST_AND_DUE ->
+                        if (!pastEventsHeaderAdded) {
+                            curDayBucket =
+                                DayHeader(settings, WidgetEntryPosition.PAST_AND_DUE_HEADER, MyClock.DATETIME_MIN)
+                            listOut.add(curDayBucket)
+                            pastEventsHeaderAdded = true
                         }
-                        curDayBucket = DayHeader(settings, WidgetEntryPosition.DAY_HEADER, nextEntryDay)
-                        listOut.add(curDayBucket)
-                    }
+
+                    WidgetEntryPosition.END_OF_LIST ->
+                        if (!endOfListHeaderAdded) {
+                            endOfListHeaderAdded = true
+                            curDayBucket =
+                                DayHeader(settings, WidgetEntryPosition.END_OF_LIST_HEADER, MyClock.DATETIME_MAX)
+                            listOut.add(curDayBucket)
+                        }
+
+                    else ->
+                        if (!nextEntryDay.isEqual(curDayBucket.entryDay)) {
+                            if (settings.showDaysWithoutEvents) {
+                                addEmptyDayHeadersBetweenTwoDays(listOut, curDayBucket.entryDay, nextEntryDay)
+                            }
+                            curDayBucket = DayHeader(settings, WidgetEntryPosition.DAY_HEADER, nextEntryDay)
+                            listOut.add(curDayBucket)
+                        }
                 }
                 listOut.add(entry)
             }
@@ -243,7 +252,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
     private fun addEmptyDayHeadersBetweenTwoDays(
         entries: MutableList<WidgetEntry<*>>,
         fromDayExclusive: DateTime?,
-        toDayExclusive: DateTime?
+        toDayExclusive: DateTime?,
     ) {
         var emptyDay = fromDayExclusive!!.plusDays(1)
         val today = settings.clock.now().withTimeAtStartOfDay()
@@ -256,9 +265,7 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
         }
     }
 
-    override fun getLoadingView(): RemoteViews? {
-        return null
-    }
+    override fun getLoadingView(): RemoteViews? = null
 
     override fun getViewTypeCount(): Int {
         val result = 14 // Actually this is maximum number of different layoutIDs
@@ -270,12 +277,12 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
         logEvent("getItemId: $position")
         return if (position < widgetEntries.size) {
             (position + 1).toLong()
-        } else 0
+        } else {
+            0
+        }
     }
 
-    override fun hasStableIds(): Boolean {
-        return false
-    }
+    override fun hasStableIds(): Boolean = false
 
     companion object {
         private val TAG = RemoteViewsFactory::class.java.simpleName
@@ -294,19 +301,29 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
         const val ACTION_CONFIGURE = "$PACKAGE.action.CONFIGURE"
         const val ACTION_MIDNIGHT_ALARM = "$PACKAGE.action.MIDNIGHT_ALARM"
         const val ACTION_PERIODIC_ALARM = "$PACKAGE.action.PERIODIC_ALARM"
-        fun getOnClickIntent(widgetId: Int, entryId: Long): Intent? {
+
+        fun getOnClickIntent(
+            widgetId: Int,
+            entryId: Long,
+        ): Intent? {
             if (widgetId == 0 || entryId == 0L) return null
             val factory = factories[widgetId] ?: return null
-            val entry = factory.widgetEntries.stream()
-                .filter { we: WidgetEntry<*>? -> we!!.entryId == entryId }
-                .findFirst().orElse(null)
+            val entry =
+                factory.widgetEntries
+                    .stream()
+                    .filter { we: WidgetEntry<*>? -> we!!.entryId == entryId }
+                    .findFirst()
+                    .orElse(null)
             factory.logEvent("Clicked entryId:$entryId, entry: $entry")
             if (entry == null) return null
             val visualizer = factory.visualizerFor(entry)
             return visualizer?.newViewEntryIntent(entry)
         }
 
-        fun updateWidget(context: Context, widgetId: Int) {
+        fun updateWidget(
+            context: Context,
+            widgetId: Int,
+        ) {
             try {
                 val appWidgetManager = AppWidgetManager.getInstance(context)
                 if (appWidgetManager == null) {
@@ -323,18 +340,23 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             }
         }
 
-        private fun configureWidgetHeader(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureWidgetHeader(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             Log.d(TAG, settings.widgetId.toString() + " configureWidgetHeader, layout:" + settings.widgetHeaderLayout)
             rv.removeAllViews(R.id.header_parent)
             if (settings.widgetHeaderLayout != WidgetHeaderLayout.HIDDEN) {
-                val headerView = RemoteViews(
-                    settings.context.packageName,
-                    settings.widgetHeaderLayout.widgetLayout?.shadowed(settings.textShadow) ?: 0
-                )
+                val headerView =
+                    RemoteViews(
+                        settings.context.packageName,
+                        settings.widgetHeaderLayout.widgetLayout?.shadowed(settings.textShadow) ?: 0,
+                    )
                 rv.addView(R.id.header_parent, headerView)
                 RemoteViewsUtil.setBackgroundColor(
-                    rv, R.id.action_bar,
-                    settings.colors().getBackgroundColor(BackgroundColorPref.WIDGET_HEADER)
+                    rv,
+                    R.id.action_bar,
+                    settings.colors().getBackgroundColor(BackgroundColorPref.WIDGET_HEADER),
                 )
                 configureCurrentDate(settings, rv)
                 setActionIcons(settings, rv)
@@ -346,18 +368,27 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             }
         }
 
-        private fun configureCurrentDate(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureCurrentDate(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             val viewId = R.id.calendar_current_date
             rv.setOnClickPendingIntent(viewId, getActionPendingIntent(settings, ACTION_OPEN_CALENDAR))
-            val formattedDate = settings.widgetHeaderDateFormatter()
-                .formatDate(settings.clock.now()).toString()
-                .uppercase(MyLocale.locale)
+            val formattedDate =
+                settings
+                    .widgetHeaderDateFormatter()
+                    .formatDate(settings.clock.now())
+                    .toString()
+                    .uppercase(MyLocale.locale)
             rv.setTextViewText(viewId, if (StringUtil.isEmpty(formattedDate)) "                    " else formattedDate)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.widget_header_title)
             RemoteViewsUtil.setTextColor(settings, TextColorPref.WIDGET_HEADER, rv, viewId, R.attr.header)
         }
 
-        private fun setActionIcons(settings: InstanceSettings, rv: RemoteViews) {
+        private fun setActionIcons(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             val themeContext = settings.colors().getThemeContext(TextColorPref.WIDGET_HEADER)
             RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.go_to_today, R.attr.header_action_go_to_today)
             RemoteViewsUtil.setImageFromAttr(themeContext, rv, R.id.add_event, R.attr.header_action_add_event)
@@ -376,7 +407,10 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             RemoteViewsUtil.setAlpha(rv, R.id.overflow_menu, alpha)
         }
 
-        private fun configureAddCalendarEvent(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureAddCalendarEvent(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             if (settings.getFirstSource(true) === OrderedEventSource.EMPTY) {
                 rv.setViewVisibility(R.id.add_event, View.GONE)
             } else {
@@ -386,7 +420,10 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             }
         }
 
-        private fun configureAddTask(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureAddTask(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             if (settings.getFirstSource(false) === OrderedEventSource.EMPTY) {
                 rv.setViewVisibility(R.id.add_task, View.GONE)
             } else {
@@ -396,17 +433,26 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             }
         }
 
-        private fun configureRefresh(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureRefresh(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             rv.setOnClickPendingIntent(R.id.refresh, getActionPendingIntent(settings, ACTION_REFRESH))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.refresh)
         }
 
-        private fun configureOverflowMenu(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureOverflowMenu(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             rv.setOnClickPendingIntent(R.id.overflow_menu, getActionPendingIntent(settings, ACTION_CONFIGURE))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.overflow_menu)
         }
 
-        private fun configureWidgetEntriesList(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureWidgetEntriesList(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             val intent = Intent(settings.context, RemoteViewsService::class.java)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.widgetId)
             intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)))
@@ -414,18 +460,25 @@ class RemoteViewsFactory(val context: Context, private val widgetId: Int, create
             rv.setPendingIntentTemplate(R.id.event_list, getActionPendingIntent(settings, ACTION_VIEW_ENTRY))
         }
 
-        private fun configureGotoToday(settings: InstanceSettings, rv: RemoteViews) {
+        private fun configureGotoToday(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
             rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.go_to_today)
         }
 
-        fun getActionPendingIntent(settings: InstanceSettings, action: String): PendingIntent {
+        fun getActionPendingIntent(
+            settings: InstanceSettings,
+            action: String,
+        ): PendingIntent {
             // We need unique request codes for each widget
             val requestCode = action.hashCode() + settings.widgetId
-            val intent = Intent(settings.context.applicationContext, EnvironmentChangedReceiver::class.java)
-                .setAction(action)
-                .setData(Uri.parse("intent:" + action.lowercase(MyLocale.locale) + settings.widgetId))
-                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.widgetId)
+            val intent =
+                Intent(settings.context.applicationContext, EnvironmentChangedReceiver::class.java)
+                    .setAction(action)
+                    .setData(Uri.parse("intent:" + action.lowercase(MyLocale.locale) + settings.widgetId))
+                    .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, settings.widgetId)
             var flags = PendingIntent.FLAG_UPDATE_CURRENT
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 flags += PendingIntent.FLAG_MUTABLE
