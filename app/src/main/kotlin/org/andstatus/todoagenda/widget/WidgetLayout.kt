@@ -18,7 +18,7 @@ enum class WidgetLayout(
         R.layout.day_header_separator_below_shadow_dark,
         R.layout.day_header_separator_below_shadow_light,
     ),
-    EVENT_ENTRY_DEFAULT(R.layout.event_entry, R.layout.event_entry_shadow_dark, R.layout.event_entry_shadow_light),
+    EVENT_ENTRY_TIME_BELOW_TITLE(R.layout.event_entry, R.layout.event_entry_shadow_dark, R.layout.event_entry_shadow_light),
     EVENT_ENTRY_ONE_LINE(
         R.layout.event_entry_one_line,
         R.layout.event_entry_one_line_shadow_dark,

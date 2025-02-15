@@ -11,25 +11,16 @@ import org.andstatus.todoagenda.provider.EventProvider
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.widget.AlarmIndicatorScaled
 import org.andstatus.todoagenda.widget.CalendarEntry
+import org.andstatus.todoagenda.widget.EventEntryVisualizer
 import org.andstatus.todoagenda.widget.RecurringIndicatorScaled
 import org.andstatus.todoagenda.widget.WidgetEntry
-import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
+import kotlin.math.abs
 
 class CalendarEventVisualizer(
     eventProvider: EventProvider,
-) : WidgetEntryVisualizer(eventProvider) {
+) : EventEntryVisualizer(eventProvider) {
     private val calendarEventProvider: CalendarEventProvider
         get() = eventProvider as CalendarEventProvider
-
-    override fun getRemoteViews(
-        eventEntry: WidgetEntry,
-        position: Int,
-    ): RemoteViews {
-        val rv = super.getRemoteViews(eventEntry, position)
-        val entry = eventEntry as CalendarEntry
-        setIcon(entry, rv)
-        return rv
-    }
 
     override fun newViewEntryIntent(entry: WidgetEntry): Intent {
         val calendarEntry = entry as CalendarEntry
@@ -99,24 +90,22 @@ class CalendarEventVisualizer(
         }
     }
 
-    private fun setIcon(
-        entry: CalendarEntry,
+    override fun setIcon(
+        entry: WidgetEntry,
         rv: RemoteViews,
     ) {
         if (settings.showEventIcon) {
             rv.setViewVisibility(R.id.event_entry_color, View.VISIBLE)
-            RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry_color, entry.color)
+            RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry_color, (entry as CalendarEntry).color)
         } else {
             rv.setViewVisibility(R.id.event_entry_color, View.GONE)
         }
         rv.setViewVisibility(R.id.event_entry_icon, View.GONE)
     }
 
-    override fun queryEventEntries(): List<CalendarEntry> = toCalendarEntryList(calendarEventProvider.queryEvents())
-
-    private fun toCalendarEntryList(eventList: List<CalendarEvent>?): List<CalendarEntry> {
-        val entryList: MutableList<CalendarEntry> = ArrayList()
-        for (event in eventList!!) {
+    override fun queryEventEntries(): List<CalendarEntry> {
+        val entryList = mutableListOf<CalendarEntry>()
+        calendarEventProvider.queryEvents().forEach { event ->
             val firstDayEntry = getFirstDayEntry(event)
             if (firstDayEntry.entryDay.isBefore(settings.clock.thisDay()) || settings.fillAllDayEvents) {
                 val oneEventEntries = allEventEntries(firstDayEntry)
@@ -125,15 +114,17 @@ class CalendarEventVisualizer(
                 } else {
                     // Decide, which one entry to add
                     val best: CalendarEntry =
-                        oneEventEntries.drop(1).fold(oneEventEntries.first()) { acc, entry ->
-                            if (Math.abs(settings.clock.getNumberOfMinutesTo(entry.entryClosestTime)) <
-                                Math.abs(settings.clock.getNumberOfMinutesTo(acc.entryClosestTime))
-                            ) {
-                                entry
-                            } else {
-                                acc
+                        oneEventEntries
+                            .drop(1)
+                            .fold(oneEventEntries.first()) { acc, entry ->
+                                if (abs(settings.clock.getNumberOfMinutesTo(entry.entryClosestTime)) <
+                                    abs(settings.clock.getNumberOfMinutesTo(acc.entryClosestTime))
+                                ) {
+                                    entry
+                                } else {
+                                    acc
+                                }
                             }
-                        }
                     entryList.add(best)
                 }
             } else {
@@ -144,7 +135,7 @@ class CalendarEventVisualizer(
             }
         }
         if (settings.logEvents) {
-            entryList.forEachIndexed { index, entry ->
+            entryList.forEachIndexed<CalendarEntry> { index, entry ->
                 Log.i("toCalendarEntryLAll", "${index + 1}. $entry")
             }
         }

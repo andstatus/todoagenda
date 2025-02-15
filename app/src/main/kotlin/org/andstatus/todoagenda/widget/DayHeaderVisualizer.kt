@@ -65,7 +65,7 @@ class DayHeaderVisualizer(
                 R.dimen.entry_bottom_padding,
             )
         }
-        setDayHeaderTitle(position, entry, rv, textColorPref)
+        setTitle(position, entry, rv, textColorPref)
         setDayHeaderSeparator(position, rv, themeContext)
         return rv
     }
@@ -75,7 +75,7 @@ class DayHeaderVisualizer(
         return CalendarIntentUtil.newOpenCalendarAtDayIntent(entry.entryDate)
     }
 
-    private fun setDayHeaderTitle(
+    private fun setTitle(
         position: Int,
         entry: DayHeader,
         rv: RemoteViews,
@@ -120,7 +120,7 @@ class DayHeaderVisualizer(
         }
     }
 
-    protected fun getTitleString(entry: DayHeader): CharSequence =
+    fun getTitleString(entry: DayHeader): CharSequence =
         when (entry.entryPosition) {
             WidgetEntryPosition.PAST_AND_DUE_HEADER -> context.getString(R.string.past_header)
             WidgetEntryPosition.END_OF_LIST_HEADER -> context.getString(R.string.end_of_list_header)

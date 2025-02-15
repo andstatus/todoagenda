@@ -9,15 +9,17 @@ import org.andstatus.todoagenda.R
 enum class EventEntryLayout(
     val widgetLayout: WidgetLayout,
     val value: String,
-    @field:StringRes val summaryResId: Int
+    @field:StringRes val summaryResId: Int,
 ) {
-    DEFAULT(WidgetLayout.EVENT_ENTRY_DEFAULT, "DEFAULT", R.string.default_multiline_layout),
-    ONE_LINE(WidgetLayout.EVENT_ENTRY_ONE_LINE, "ONE_LINE", R.string.single_line_layout);
+    TIME_BELOW_TITLE(WidgetLayout.EVENT_ENTRY_TIME_BELOW_TITLE, "DEFAULT", R.string.default_multiline_layout),
+    ONE_LINE(WidgetLayout.EVENT_ENTRY_ONE_LINE, "ONE_LINE", R.string.single_line_layout),
+    ;
 
     companion object {
         const val SPACE_PIPE_SPACE = "  |  "
+
         fun fromValue(value: String?): EventEntryLayout {
-            var layout = DEFAULT
+            var layout = TIME_BELOW_TITLE
             for (item in entries) {
                 if (item.value == value) {
                     layout = item

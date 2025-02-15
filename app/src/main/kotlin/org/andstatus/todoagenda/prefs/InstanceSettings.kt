@@ -39,7 +39,7 @@ data class InstanceSettings(
     private val contextIn: Context?,
     val widgetId: Int,
     val logEvents: Boolean = false,
-
+    //
     // ----------------------------------------------------------------------------------
     // Layout
     val isCompactLayout: Boolean = false,
@@ -51,24 +51,25 @@ data class InstanceSettings(
     val dayHeaderAlignment: String = PREF_DAY_HEADER_ALIGNMENT_DEFAULT,
     val horizontalLineBelowDayHeader: Boolean = false,
     val showDaysWithoutEvents: Boolean = false,
-    val eventEntryLayout: EventEntryLayout = EventEntryLayout.DEFAULT,
+    val eventEntryLayout: EventEntryLayout = EventEntryLayout.TIME_BELOW_TITLE,
     val showEventIcon: Boolean = true,
     val entryDateFormat: DateFormatValue = PREF_ENTRY_DATE_FORMAT_DEFAULT,
     val isMultilineTitle: Boolean = PREF_MULTILINE_TITLE_DEFAULT,
     val maxLinesTitle: Int = PREF_MAXLINES_TITLE_DEFAULT,
     val isMultilineDetails: Boolean = PREF_MULTILINE_DETAILS_DEFAULT,
     val maxLinesDetails: Int = PREF_MAXLINES_DETAILS_DEFAULT,
-
+    //
     // ----------------------------------------------------------------------------------
     // Colors
-    private val defaultColors: ThemeColors = if (contextIn == null) {
-        ThemeColors.EMPTY
-    } else {
-        ThemeColors(contextIn, ColorThemeType.SINGLE)
-    },
+    private val defaultColors: ThemeColors =
+        if (contextIn == null) {
+            ThemeColors.EMPTY
+        } else {
+            ThemeColors(contextIn, ColorThemeType.SINGLE)
+        },
     private val darkColors: ThemeColors = ThemeColors.EMPTY,
     val textShadow: TextShadow = TextShadow.NO_SHADOW,
-
+    //
     // ----------------------------------------------------------------------------------
     // Event details
     val showEndTime: Boolean = PREF_SHOW_END_TIME_DEFAULT,
@@ -77,7 +78,7 @@ data class InstanceSettings(
     val fillAllDayEvents: Boolean = PREF_FILL_ALL_DAY_DEFAULT,
     val indicateAlerts: Boolean = true,
     val indicateRecurring: Boolean = false,
-
+    //
     // ----------------------------------------------------------------------------------
     // Event filters
     val eventsEnded: EndedSomeTimeAgo = EndedSomeTimeAgo.NONE,
@@ -92,11 +93,11 @@ data class InstanceSettings(
     val taskScheduling: TaskScheduling = TaskScheduling.defaultValue,
     val taskWithoutDates: TasksWithoutDates = TasksWithoutDates.defaultValue,
     private val filterModeIn: FilterMode = FilterMode.defaultValue,
-
+    //
     // ----------------------------------------------------------------------------------
     // Calendars and task lists
     private val activeEventSourcesIn: List<OrderedEventSource> = emptyList(),
-
+    //
     // ----------------------------------------------------------------------------------
     // Other
     private val proposedInstanceName: String? = null,
@@ -111,46 +112,62 @@ data class InstanceSettings(
 ) {
     private val instanceId: Long = InstanceId.next()
     val context: Context get() = contextIn ?: throw IllegalStateException("Context is null")
-    val widgetInstanceName: String = if (contextIn == null) "(empty)" else AllSettings.uniqueInstanceName(
-        contextIn,
-        widgetId,
-        proposedInstanceName
-    )
+    val widgetInstanceName: String =
+        if (contextIn == null) {
+            "(empty)"
+        } else {
+            AllSettings.uniqueInstanceName(
+                contextIn,
+                widgetId,
+                proposedInstanceName,
+            )
+        }
     val lockedTimeZoneId: String = DateUtil.validatedTimeZoneId(lockedTimeZoneIdIn)
     val startHourOfDay: Int = startHourOfDayIn.takeIf { abs(it) < 13 } ?: 0
     val hasResults: Boolean get() = resultsStorage.hasResults()
-    val snapshotMode: SnapshotMode = if (snapshotModeIn.isSnapshotMode && !hasResults) {
-        SnapshotMode.LIVE_DATA
-    } else {
-        snapshotModeIn
-    }
+    val snapshotMode: SnapshotMode =
+        if (snapshotModeIn.isSnapshotMode && !hasResults) {
+            SnapshotMode.LIVE_DATA
+        } else {
+            snapshotModeIn
+        }
     val snapshotDate: DateTime? = if (snapshotMode.isSnapshotMode) resultsStorage?.executedAt?.get() else null
-    val timeZone: DateTimeZone = snapshotDate?.let<DateTime, DateTimeZone?> {
-        if (snapshotMode == SnapshotMode.SNAPSHOT_TIME) it.zone else null
-    } ?: if (StringUtil.nonEmpty(lockedTimeZoneId)) {
-        DateTimeZone.forID(lockedTimeZoneId)
-    } else {
-        defaultTimeZone
-    }
+    val timeZone: DateTimeZone =
+        snapshotDate?.let<DateTime, DateTimeZone?> {
+            if (snapshotMode == SnapshotMode.SNAPSHOT_TIME) it.zone else null
+        } ?: if (StringUtil.nonEmpty(lockedTimeZoneId)) {
+            DateTimeZone.forID(lockedTimeZoneId)
+        } else {
+            defaultTimeZone
+        }
     val maxNumberOfEvents: Int = if (maxNumberOfEventsIn < 1) -1 else maxNumberOfEventsIn
-    val filterMode: FilterMode = if (filterModeIn == FilterMode.NORMAL_FILTER &&
-        snapshotMode.isSnapshotMode
-    ) FilterMode.DEBUG_FILTER else filterModeIn
+    val filterMode: FilterMode =
+        if (filterModeIn == FilterMode.NORMAL_FILTER &&
+            snapshotMode.isSnapshotMode
+        ) {
+            FilterMode.DEBUG_FILTER
+        } else {
+            filterModeIn
+        }
 
     val snapshotActiveEventSources: MutableList<OrderedEventSource> = CopyOnWriteArrayList()
     val activeEventSources: List<OrderedEventSource>
-        get() = (activeEventSourcesIn
-            .takeIf { it.isNotEmpty() }
-            ?: EventProviderType.availableSources) + snapshotActiveEventSources
+        get() =
+            (
+                activeEventSourcesIn
+                    .takeIf { it.isNotEmpty() }
+                    ?: EventProviderType.availableSources
+            ) + snapshotActiveEventSources
 
     val refreshPeriodMinutes: Int = refreshPeriodMinutesIn.takeIf { it > 0 } ?: 10
 
-    val clock = MyClock(
-        snapshotMode = snapshotMode,
-        snapshotDate = snapshotDate,
-        timeZone = timeZone,
-        startHourOfDay = startHourOfDay,
-    )
+    val clock =
+        MyClock(
+            snapshotMode = snapshotMode,
+            snapshotDate = snapshotDate,
+            timeZone = timeZone,
+            startHourOfDay = startHourOfDay,
+        )
 
     val isEmpty: Boolean
         get() = widgetId == 0
@@ -158,7 +175,10 @@ data class InstanceSettings(
     /**
      * @return true if success
      */
-    fun save(tag: String?, method: String): Boolean {
+    fun save(
+        tag: String?,
+        method: String,
+    ): Boolean {
         val msgLog = "save from $method"
         if (widgetId == 0) {
             logMe(tag, "Skipped $msgLog", widgetId)
@@ -176,82 +196,83 @@ data class InstanceSettings(
 
     fun toShortJson(): JSONObject = toJson(true)
 
-    fun toJson(skipQueryResults: Boolean = false): JSONObject = JSONObject().apply {
-        put(PREF_WIDGET_ID, widgetId)
+    fun toJson(skipQueryResults: Boolean = false): JSONObject =
+        JSONObject().apply {
+            put(PREF_WIDGET_ID, widgetId)
 
-        // ----------------------------------------------------------------------------------
-        // Layout
-        put(PREF_COMPACT_LAYOUT, isCompactLayout)
-        put(PREF_WIDGET_HEADER_LAYOUT, widgetHeaderLayout.value)
-        put(PREF_WIDGET_HEADER_DATE_FORMAT, widgetHeaderDateFormat.save())
-        put(PREF_SHOW_DAY_HEADERS, showDayHeaders)
-        put(PREF_DAY_HEADER_DATE_FORMAT, dayHeaderDateFormat.save())
-        put(PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, showPastEventsUnderOneHeader)
-        put(PREF_DAY_HEADER_ALIGNMENT, dayHeaderAlignment)
-        put(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, horizontalLineBelowDayHeader)
-        put(PREF_SHOW_DAYS_WITHOUT_EVENTS, showDaysWithoutEvents)
-        put(PREF_EVENT_ENTRY_LAYOUT, eventEntryLayout.value)
-        put(PREF_SHOW_EVENT_ICON, showEventIcon)
-        put(PREF_ENTRY_DATE_FORMAT, entryDateFormat.save())
-        put(PREF_MULTILINE_TITLE, isMultilineTitle)
-        put(PREF_MAXLINES_TITLE, maxLinesTitle)
-        put(PREF_MULTILINE_DETAILS, isMultilineDetails)
-        put(PREF_MAXLINES_DETAILS, maxLinesDetails)
+            // ----------------------------------------------------------------------------------
+            // Layout
+            put(PREF_COMPACT_LAYOUT, isCompactLayout)
+            put(PREF_WIDGET_HEADER_LAYOUT, widgetHeaderLayout.value)
+            put(PREF_WIDGET_HEADER_DATE_FORMAT, widgetHeaderDateFormat.save())
+            put(PREF_SHOW_DAY_HEADERS, showDayHeaders)
+            put(PREF_DAY_HEADER_DATE_FORMAT, dayHeaderDateFormat.save())
+            put(PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, showPastEventsUnderOneHeader)
+            put(PREF_DAY_HEADER_ALIGNMENT, dayHeaderAlignment)
+            put(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, horizontalLineBelowDayHeader)
+            put(PREF_SHOW_DAYS_WITHOUT_EVENTS, showDaysWithoutEvents)
+            put(PREF_EVENT_ENTRY_LAYOUT, eventEntryLayout.value)
+            put(PREF_SHOW_EVENT_ICON, showEventIcon)
+            put(PREF_ENTRY_DATE_FORMAT, entryDateFormat.save())
+            put(PREF_MULTILINE_TITLE, isMultilineTitle)
+            put(PREF_MAXLINES_TITLE, maxLinesTitle)
+            put(PREF_MULTILINE_DETAILS, isMultilineDetails)
+            put(PREF_MAXLINES_DETAILS, maxLinesDetails)
 
-        // ----------------------------------------------------------------------------------
-        // Colors
-        defaultColors.toJson(this)
-        if (!darkColors.isEmpty) {
-            put(PREF_DARK_THEME, darkColors.toJson(JSONObject()))
-        }
-        put(PREF_TEXT_SHADOW, textShadow.value)
+            // ----------------------------------------------------------------------------------
+            // Colors
+            defaultColors.toJson(this)
+            if (!darkColors.isEmpty) {
+                put(PREF_DARK_THEME, darkColors.toJson(JSONObject()))
+            }
+            put(PREF_TEXT_SHADOW, textShadow.value)
 
-        // ----------------------------------------------------------------------------------
-        // Event details
-        put(PREF_SHOW_END_TIME, showEndTime)
-        put(PREF_SHOW_LOCATION, showLocation)
-        put(PREF_SHOW_DESCRIPTION, showDescription)
-        put(PREF_FILL_ALL_DAY, fillAllDayEvents)
-        put(PREF_INDICATE_ALERTS, indicateAlerts)
-        put(PREF_INDICATE_RECURRING, indicateRecurring)
+            // ----------------------------------------------------------------------------------
+            // Event details
+            put(PREF_SHOW_END_TIME, showEndTime)
+            put(PREF_SHOW_LOCATION, showLocation)
+            put(PREF_SHOW_DESCRIPTION, showDescription)
+            put(PREF_FILL_ALL_DAY, fillAllDayEvents)
+            put(PREF_INDICATE_ALERTS, indicateAlerts)
+            put(PREF_INDICATE_RECURRING, indicateRecurring)
 
-        // ----------------------------------------------------------------------------------
-        // Event filters
-        put(PREF_EVENTS_ENDED, eventsEnded.save())
-        put(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, showPastEventsWithDefaultColor)
-        put(PREF_EVENT_RANGE, eventRange)
-        put(PREF_HIDE_BASED_ON_KEYWORDS, hideBasedOnKeywords)
-        put(PREF_SHOW_BASED_ON_KEYWORDS, showBasedOnKeywords)
-        put(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, showOnlyClosestInstanceOfRecurringEvent)
-        put(PREF_HIDE_DUPLICATES, hideDuplicates)
-        put(PREF_MAX_NUMBER_OF_EVENTS, maxNumberOfEvents)
-        put(PREF_ALL_DAY_EVENTS_PLACEMENT, allDayEventsPlacement.value)
-        put(PREF_TASK_SCHEDULING, taskScheduling.value)
-        put(PREF_TASK_WITHOUT_DATES, taskWithoutDates.value)
-        put(PREF_FILTER_MODE, filterMode.value)
+            // ----------------------------------------------------------------------------------
+            // Event filters
+            put(PREF_EVENTS_ENDED, eventsEnded.save())
+            put(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR, showPastEventsWithDefaultColor)
+            put(PREF_EVENT_RANGE, eventRange)
+            put(PREF_HIDE_BASED_ON_KEYWORDS, hideBasedOnKeywords)
+            put(PREF_SHOW_BASED_ON_KEYWORDS, showBasedOnKeywords)
+            put(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, showOnlyClosestInstanceOfRecurringEvent)
+            put(PREF_HIDE_DUPLICATES, hideDuplicates)
+            put(PREF_MAX_NUMBER_OF_EVENTS, maxNumberOfEvents)
+            put(PREF_ALL_DAY_EVENTS_PLACEMENT, allDayEventsPlacement.value)
+            put(PREF_TASK_SCHEDULING, taskScheduling.value)
+            put(PREF_TASK_WITHOUT_DATES, taskWithoutDates.value)
+            put(PREF_FILTER_MODE, filterMode.value)
 
-        // ----------------------------------------------------------------------------------
-        // Calendars and task lists
-        put(PREF_ACTIVE_SOURCES, OrderedEventSource.toJsonArray(activeEventSources))
+            // ----------------------------------------------------------------------------------
+            // Calendars and task lists
+            put(PREF_ACTIVE_SOURCES, OrderedEventSource.toJsonArray(activeEventSources))
 
-        // ----------------------------------------------------------------------------------
-        // Other
-        put(PREF_WIDGET_INSTANCE_NAME, widgetInstanceName)
-        put(PREF_WIDGET_HEADER_BUTTONS_SCALE, widgetHeaderButtonsScale.preferenceValue)
-        put(PREF_TEXT_SIZE_SCALE, textSizeScale.preferenceValue)
-        put(PREF_TIME_FORMAT, timeFormat)
-        put(PREF_LOCKED_TIME_ZONE_ID, lockedTimeZoneId)
-        put(PREF_START_HOUR_OF_DAY, startHourOfDay)
-        put(PREF_SNAPSHOT_MODE, snapshotMode.value)
-        put(PREF_REFRESH_PERIOD_MINUTES, refreshPeriodMinutes)
-        if (resultsStorage.hasResults()) {
-            if (skipQueryResults) {
-                put(PREF_RESULTS_STORAGE_HASH, resultsStorage!!.hashCode())
-            } else {
-                put(PREF_RESULTS_STORAGE, resultsStorage!!.toJson(context, widgetId, false))
+            // ----------------------------------------------------------------------------------
+            // Other
+            put(PREF_WIDGET_INSTANCE_NAME, widgetInstanceName)
+            put(PREF_WIDGET_HEADER_BUTTONS_SCALE, widgetHeaderButtonsScale.preferenceValue)
+            put(PREF_TEXT_SIZE_SCALE, textSizeScale.preferenceValue)
+            put(PREF_TIME_FORMAT, timeFormat)
+            put(PREF_LOCKED_TIME_ZONE_ID, lockedTimeZoneId)
+            put(PREF_START_HOUR_OF_DAY, startHourOfDay)
+            put(PREF_SNAPSHOT_MODE, snapshotMode.value)
+            put(PREF_REFRESH_PERIOD_MINUTES, refreshPeriodMinutes)
+            if (resultsStorage.hasResults()) {
+                if (skipQueryResults) {
+                    put(PREF_RESULTS_STORAGE_HASH, resultsStorage!!.hashCode())
+                } else {
+                    put(PREF_RESULTS_STORAGE, resultsStorage!!.toJson(context, widgetId, false))
+                }
             }
         }
-    }
 
     val isForTestsReplaying: Boolean
         get() = widgetInstanceName.endsWith(TEST_REPLAY_SUFFIX)
@@ -265,28 +286,26 @@ data class InstanceSettings(
     }
 
     val endOfTimeRange: DateTime
-        get() = (if (eventRange > 0) clock.now().plusDays(eventRange)
-        else clock.startOfToday()
-            .plusDays(1 - eventRange))
-            .minusMillis(1)
+        get() =
+            (
+                if (eventRange > 0) {
+                    clock.now().plusDays(eventRange)
+                } else {
+                    clock
+                        .startOfToday()
+                        .plusDays(1 - eventRange)
+                }
+            ).minusMillis(1)
     val startOfTimeRange: DateTime?
         get() = eventsEnded.endedAt(clock)
 
-    fun colors(): ThemeColors {
-        return if (!darkColors.isEmpty && isDarkThemeOn(context)) darkColors else defaultColors
-    }
+    fun colors(): ThemeColors = if (!darkColors.isEmpty && isDarkThemeOn(context)) darkColors else defaultColors
 
-    fun widgetHeaderDateFormatter(): DateFormatter {
-        return DateFormatter(context, widgetHeaderDateFormat, clock.now())
-    }
+    fun widgetHeaderDateFormatter(): DateFormatter = DateFormatter(context, widgetHeaderDateFormat, clock.now())
 
-    fun dayHeaderDateFormatter(): DateFormatter {
-        return DateFormatter(context, dayHeaderDateFormat, clock.now())
-    }
+    fun dayHeaderDateFormatter(): DateFormatter = DateFormatter(context, dayHeaderDateFormat, clock.now())
 
-    fun entryDateFormatter(): DateFormatter {
-        return DateFormatter(context, entryDateFormat, clock.now())
-    }
+    fun entryDateFormatter(): DateFormatter = DateFormatter(context, entryDateFormat, clock.now())
 
     val isSnapshotMode: Boolean
         get() = snapshotMode.isSnapshotMode
@@ -300,19 +319,21 @@ data class InstanceSettings(
         return toShortJson().toString() == settings.toShortJson().toString()
     }
 
-    override fun hashCode(): Int {
-        return toShortJson().toString().hashCode()
-    }
+    override fun hashCode(): Int = toShortJson().toString().hashCode()
 
-    fun logMe(tag: String?, message: String, widgetId: Int) {
+    fun logMe(
+        tag: String?,
+        message: String,
+        widgetId: Int,
+    ) {
         Log.v(tag, "$message, widgetId:$widgetId instance:$instanceId\n${toShortJson()}")
     }
 
-    fun noPastEvents(): Boolean {
-        return filterMode != FilterMode.NO_FILTERING &&
-            !showPastEventsWithDefaultColor && eventsEnded === EndedSomeTimeAgo.NONE &&
+    fun noPastEvents(): Boolean =
+        filterMode != FilterMode.NO_FILTERING &&
+            !showPastEventsWithDefaultColor &&
+            eventsEnded === EndedSomeTimeAgo.NONE &&
             noTaskSources()
-    }
 
     fun noTaskSources(): Boolean {
         for (orderedSource in activeEventSources) {
@@ -322,12 +343,19 @@ data class InstanceSettings(
     }
 
     val typesOfActiveEventProviders: List<EventProviderType>
-        get() = activeEventSources.stream().map { s: OrderedEventSource? -> s!!.source.providerType }.distinct()
-            .collect(
-                Collectors.toList()
-            )
+        get() =
+            activeEventSources
+                .stream()
+                .map { s: OrderedEventSource? -> s!!.source.providerType }
+                .distinct()
+                .collect(
+                    Collectors.toList(),
+                )
 
-    fun getActiveEventSource(type: EventProviderType, sourceId: Int): OrderedEventSource {
+    fun getActiveEventSource(
+        type: EventProviderType,
+        sourceId: Int,
+    ): OrderedEventSource {
         for (orderedSource in activeEventSources) {
             if (orderedSource.source.providerType === type && orderedSource.source.id == sourceId) {
                 return orderedSource
@@ -335,10 +363,15 @@ data class InstanceSettings(
         }
         if (isSnapshotMode) {
             // TODO: Map Calendars when moving between devices
-            val eventSource = EventSource(
-                type, sourceId, "($type #$sourceId)",
-                "", 0, false
-            )
+            val eventSource =
+                EventSource(
+                    type,
+                    sourceId,
+                    "($type #$sourceId)",
+                    "",
+                    0,
+                    false,
+                )
             val orderedSource = OrderedEventSource(eventSource, activeEventSources.size + 1)
             snapshotActiveEventSources.add(orderedSource)
             return orderedSource
@@ -449,7 +482,11 @@ data class InstanceSettings(
         const val PREF_REFRESH_PERIOD_MINUTES = "refreshPeriodMinutes"
         const val PREF_REFRESH_PERIOD_MINUTES_DEFAULT = 10
 
-        fun fromJson(context: Context?, storedSettings: InstanceSettings?, json: JSONObject): InstanceSettings {
+        fun fromJson(
+            context: Context?,
+            storedSettings: InstanceSettings?,
+            json: JSONObject,
+        ): InstanceSettings {
             val widgetId = json.optInt(PREF_WIDGET_ID)
             return if (widgetId == 0 || context == null) {
                 EMPTY
@@ -462,209 +499,364 @@ data class InstanceSettings(
             context: Context,
             storedSettings: InstanceSettings?,
             json: JSONObject,
-            widgetId: Int
-        ): InstanceSettings = try {
-            val proposedInstanceName = json.optString(PREF_WIDGET_INSTANCE_NAME).let { prevName ->
-                if (storedSettings != null && storedSettings.isForTestsReplaying &&
-                    !prevName.endsWith(TEST_REPLAY_SUFFIX)
-                ) {
-                    (if (prevName.isEmpty()) "" else "$prevName - ") + TEST_REPLAY_SUFFIX
-                } else {
-                    prevName
-                }
-            }
-            val differentColorsForDark: Boolean = ColorThemeType.canHaveDifferentColorsForDark() && json.has(
-                PREF_DARK_THEME
-            )
-            val eventEntryLayout = if (json.has(PREF_EVENT_ENTRY_LAYOUT)) {
-                EventEntryLayout.fromValue(json.getString(PREF_EVENT_ENTRY_LAYOUT))
-            } else EventEntryLayout.DEFAULT
-
-            val resultsStorage = if (json.has(PREF_RESULTS_STORAGE)) {
-                QueryResultsStorage.fromJson(widgetId, json.getJSONObject(PREF_RESULTS_STORAGE))
-            } else EMPTY.resultsStorage
-
-            InstanceSettings(
-                contextIn = context,
-                widgetId = widgetId,
-                proposedInstanceName = proposedInstanceName,
-                widgetHeaderDateFormat = if (json.has(PREF_WIDGET_HEADER_DATE_FORMAT)) {
-                    DateFormatValue.load(
-                        json.getString(PREF_WIDGET_HEADER_DATE_FORMAT), PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
-                    )
-                } else if (json.has(PREF_SHOW_DATE_ON_WIDGET_HEADER)) {
-                    if (json.getBoolean(PREF_SHOW_DATE_ON_WIDGET_HEADER)) {
-                        PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
-                    } else {
-                        DateFormatType.HIDDEN.defaultValue
+            widgetId: Int,
+        ): InstanceSettings =
+            try {
+                val proposedInstanceName =
+                    json.optString(PREF_WIDGET_INSTANCE_NAME).let { prevName ->
+                        if (storedSettings != null &&
+                            storedSettings.isForTestsReplaying &&
+                            !prevName.endsWith(TEST_REPLAY_SUFFIX)
+                        ) {
+                            (if (prevName.isEmpty()) "" else "$prevName - ") + TEST_REPLAY_SUFFIX
+                        } else {
+                            prevName
+                        }
                     }
-                } else {
-                    PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
-                },
-                activeEventSourcesIn = if (json.has(PREF_ACTIVE_SOURCES)) {
-                    val jsonArray = json.getJSONArray(PREF_ACTIVE_SOURCES)
-                    OrderedEventSource.fromJsonArray(jsonArray)
-                } else EMPTY.activeEventSourcesIn,
-                eventRange = if (json.has(PREF_EVENT_RANGE)) {
-                    json.getInt(PREF_EVENT_RANGE)
-                } else EMPTY.eventRange,
-                eventsEnded = if (json.has(PREF_EVENTS_ENDED)) {
-                    EndedSomeTimeAgo.fromValue(json.getString(PREF_EVENTS_ENDED))
-                } else EMPTY.eventsEnded,
-                fillAllDayEvents = if (json.has(PREF_FILL_ALL_DAY)) {
-                    json.getBoolean(PREF_FILL_ALL_DAY)
-                } else EMPTY.fillAllDayEvents,
-                hideBasedOnKeywords = if (json.has(PREF_HIDE_BASED_ON_KEYWORDS)) {
-                    json.getString(PREF_HIDE_BASED_ON_KEYWORDS)
-                } else EMPTY.hideBasedOnKeywords,
-                showBasedOnKeywords = if (json.has(PREF_SHOW_BASED_ON_KEYWORDS)) {
-                    json.getString(PREF_SHOW_BASED_ON_KEYWORDS)
-                } else EMPTY.showBasedOnKeywords,
-                defaultColors = ThemeColors.fromJson(
-                    context,
-                    if (differentColorsForDark) ColorThemeType.LIGHT else ColorThemeType.SINGLE, json
-                ),
-                darkColors = if (differentColorsForDark) {
-                    ThemeColors.fromJson(
-                        context, ColorThemeType.DARK, json.getJSONObject(
-                            PREF_DARK_THEME
+                val differentColorsForDark: Boolean =
+                    ColorThemeType.canHaveDifferentColorsForDark() &&
+                        json.has(
+                            PREF_DARK_THEME,
                         )
-                    )
-                } else {
-                    ThemeColors.EMPTY
-                },
-                textShadow = if (json.has(PREF_TEXT_SHADOW)) {
-                    TextShadow.fromValue(json.getString(PREF_TEXT_SHADOW))
-                } else EMPTY.textShadow,
-                showDaysWithoutEvents = if (json.has(PREF_SHOW_DAYS_WITHOUT_EVENTS)) {
-                    json.getBoolean(PREF_SHOW_DAYS_WITHOUT_EVENTS)
-                } else EMPTY.showDaysWithoutEvents,
-                showDayHeaders = if (json.has(PREF_SHOW_DAY_HEADERS)) {
-                    json.getBoolean(PREF_SHOW_DAY_HEADERS)
-                } else EMPTY.showDayHeaders,
-                dayHeaderDateFormat = if (json.has(PREF_DAY_HEADER_DATE_FORMAT)) {
-                    DateFormatValue.load(
-                        json.getString(PREF_DAY_HEADER_DATE_FORMAT), PREF_DAY_HEADER_DATE_FORMAT_DEFAULT
-                    )
-                } else EMPTY.dayHeaderDateFormat,
-                horizontalLineBelowDayHeader = if (json.has(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER)) {
-                    json.getBoolean(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER)
-                } else EMPTY.horizontalLineBelowDayHeader,
-                showPastEventsUnderOneHeader = if (json.has(PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER)) {
-                    json.getBoolean(PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER)
-                } else EMPTY.showPastEventsUnderOneHeader,
-                showPastEventsWithDefaultColor = if (json.has(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR)) {
-                    json.getBoolean(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR)
-                } else EMPTY.showPastEventsWithDefaultColor,
-                showEventIcon = if (json.has(PREF_SHOW_EVENT_ICON)) {
-                    json.getBoolean(PREF_SHOW_EVENT_ICON)
-                } else EMPTY.showEventIcon,
-                eventEntryLayout = eventEntryLayout,
-                entryDateFormat = if (json.has(PREF_ENTRY_DATE_FORMAT)) {
-                    DateFormatValue.load(
-                        json.getString(PREF_ENTRY_DATE_FORMAT), PREF_ENTRY_DATE_FORMAT_DEFAULT
-                    )
-                } else EMPTY.entryDateFormat,
-                showEndTime = if (json.has(PREF_SHOW_END_TIME)) {
-                    json.getBoolean(PREF_SHOW_END_TIME)
-                } else EMPTY.showEndTime,
-                showLocation = if (json.has(PREF_SHOW_LOCATION)) {
-                    json.getBoolean(PREF_SHOW_LOCATION)
-                } else EMPTY.showLocation,
-                showDescription = if (json.has(PREF_SHOW_DESCRIPTION)) {
-                    json.getBoolean(PREF_SHOW_DESCRIPTION)
-                } else EMPTY.showDescription,
-                timeFormat = if (json.has(PREF_TIME_FORMAT)) {
-                    json.getString(PREF_TIME_FORMAT)
-                } else EMPTY.timeFormat,
-                lockedTimeZoneIdIn = if (json.has(PREF_LOCKED_TIME_ZONE_ID)) {
-                    json.getString(PREF_LOCKED_TIME_ZONE_ID)
-                } else EMPTY.lockedTimeZoneId,
-                startHourOfDayIn = if (json.has(PREF_START_HOUR_OF_DAY)) {
-                    json.getInt(PREF_START_HOUR_OF_DAY)
-                } else EMPTY.startHourOfDay,
-                refreshPeriodMinutesIn = if (json.has(PREF_REFRESH_PERIOD_MINUTES)) {
-                    json.getInt(PREF_REFRESH_PERIOD_MINUTES)
-                } else EMPTY.refreshPeriodMinutes,
-                isMultilineTitle = if (json.has(PREF_MULTILINE_TITLE)) {
-                    json.getBoolean(PREF_MULTILINE_TITLE)
-                } else EMPTY.isMultilineTitle,
-                maxLinesTitle = if (json.has(PREF_MAXLINES_TITLE)) {
-                    json.getInt(PREF_MAXLINES_TITLE)
-                } else EMPTY.maxLinesTitle,
-                isMultilineDetails = if (json.has(PREF_MULTILINE_DETAILS)) {
-                    json.getBoolean(PREF_MULTILINE_DETAILS)
-                } else EMPTY.isMultilineDetails,
-                maxLinesDetails = if (json.has(PREF_MAXLINES_DETAILS)) {
-                    json.getInt(PREF_MAXLINES_DETAILS)
-                } else EMPTY.maxLinesDetails,
-                showOnlyClosestInstanceOfRecurringEvent = if (json.has(
-                        PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT
-                    )
-                ) {
-                    json.getBoolean(
-                        PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT
-                    )
-                } else EMPTY.showOnlyClosestInstanceOfRecurringEvent,
-                hideDuplicates = if (json.has(PREF_HIDE_DUPLICATES)) {
-                    json.getBoolean(PREF_HIDE_DUPLICATES)
-                } else EMPTY.hideDuplicates,
-                maxNumberOfEventsIn = if (json.has(PREF_MAX_NUMBER_OF_EVENTS)) {
-                    json.getInt(PREF_MAX_NUMBER_OF_EVENTS)
-                } else EMPTY.maxNumberOfEvents,
-                allDayEventsPlacement = if (json.has(PREF_ALL_DAY_EVENTS_PLACEMENT)) {
-                    AllDayEventsPlacement.fromValue(
-                        json.getString(
-                            PREF_ALL_DAY_EVENTS_PLACEMENT
-                        )
-                    )
-                } else EMPTY.allDayEventsPlacement,
-                taskScheduling = if (json.has(PREF_TASK_SCHEDULING)) {
-                    TaskScheduling.fromValue(json.getString(PREF_TASK_SCHEDULING))
-                } else EMPTY.taskScheduling,
-                taskWithoutDates = if (json.has(PREF_TASK_WITHOUT_DATES)) {
-                    TasksWithoutDates.fromValue(json.getString(PREF_TASK_WITHOUT_DATES))
-                } else EMPTY.taskWithoutDates,
-                filterModeIn = if (json.has(PREF_FILTER_MODE)) {
-                    FilterMode.fromValue(json.getString(PREF_FILTER_MODE))
-                } else EMPTY.filterMode,
-                indicateAlerts = if (json.has(PREF_INDICATE_ALERTS)) {
-                    json.getBoolean(PREF_INDICATE_ALERTS)
-                } else EMPTY.indicateAlerts,
-                indicateRecurring = if (json.has(PREF_INDICATE_RECURRING)) {
-                    json.getBoolean(PREF_INDICATE_RECURRING)
-                } else EMPTY.indicateRecurring,
-                isCompactLayout = if (json.has(PREF_COMPACT_LAYOUT)) {
-                    json.getBoolean(PREF_COMPACT_LAYOUT)
-                } else EMPTY.isCompactLayout,
-                widgetHeaderLayout = if (json.has(PREF_WIDGET_HEADER_LAYOUT)) {
-                    WidgetHeaderLayout.fromValue(json.getString(PREF_WIDGET_HEADER_LAYOUT))
-                } else EMPTY.widgetHeaderLayout,
-                widgetHeaderButtonsScale = if (json.has(PREF_WIDGET_HEADER_BUTTONS_SCALE)) {
-                    TextSizeScale.fromPreferenceValue(json.getString(PREF_WIDGET_HEADER_BUTTONS_SCALE))
-                } else EMPTY.widgetHeaderButtonsScale,
-                textSizeScale = if (json.has(PREF_TEXT_SIZE_SCALE)) {
-                    TextSizeScale.fromPreferenceValue(json.getString(PREF_TEXT_SIZE_SCALE))
-                } else EMPTY.textSizeScale,
-                dayHeaderAlignment = if (json.has(PREF_DAY_HEADER_ALIGNMENT)) {
-                    json.getString(PREF_DAY_HEADER_ALIGNMENT)
-                } else EMPTY.dayHeaderAlignment,
-                resultsStorage = resultsStorage,
-                snapshotModeIn = SnapshotMode.fromValue(json.optString(PREF_SNAPSHOT_MODE)),
-            )
-        } catch (e: JSONException) {
-            Log.w(TAG, "setFromJson failed, widgetId:$widgetId\n$json, $e")
-            EMPTY
-        }
+                val eventEntryLayout =
+                    if (json.has(PREF_EVENT_ENTRY_LAYOUT)) {
+                        EventEntryLayout.fromValue(json.getString(PREF_EVENT_ENTRY_LAYOUT))
+                    } else {
+                        EventEntryLayout.TIME_BELOW_TITLE
+                    }
+
+                val resultsStorage =
+                    if (json.has(PREF_RESULTS_STORAGE)) {
+                        QueryResultsStorage.fromJson(widgetId, json.getJSONObject(PREF_RESULTS_STORAGE))
+                    } else {
+                        EMPTY.resultsStorage
+                    }
+
+                InstanceSettings(
+                    contextIn = context,
+                    widgetId = widgetId,
+                    proposedInstanceName = proposedInstanceName,
+                    widgetHeaderDateFormat =
+                        if (json.has(PREF_WIDGET_HEADER_DATE_FORMAT)) {
+                            DateFormatValue.load(
+                                json.getString(PREF_WIDGET_HEADER_DATE_FORMAT),
+                                PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT,
+                            )
+                        } else if (json.has(PREF_SHOW_DATE_ON_WIDGET_HEADER)) {
+                            if (json.getBoolean(PREF_SHOW_DATE_ON_WIDGET_HEADER)) {
+                                PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
+                            } else {
+                                DateFormatType.HIDDEN.defaultValue
+                            }
+                        } else {
+                            PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT
+                        },
+                    activeEventSourcesIn =
+                        if (json.has(PREF_ACTIVE_SOURCES)) {
+                            val jsonArray = json.getJSONArray(PREF_ACTIVE_SOURCES)
+                            OrderedEventSource.fromJsonArray(jsonArray)
+                        } else {
+                            EMPTY.activeEventSourcesIn
+                        },
+                    eventRange =
+                        if (json.has(PREF_EVENT_RANGE)) {
+                            json.getInt(PREF_EVENT_RANGE)
+                        } else {
+                            EMPTY.eventRange
+                        },
+                    eventsEnded =
+                        if (json.has(PREF_EVENTS_ENDED)) {
+                            EndedSomeTimeAgo.fromValue(json.getString(PREF_EVENTS_ENDED))
+                        } else {
+                            EMPTY.eventsEnded
+                        },
+                    fillAllDayEvents =
+                        if (json.has(PREF_FILL_ALL_DAY)) {
+                            json.getBoolean(PREF_FILL_ALL_DAY)
+                        } else {
+                            EMPTY.fillAllDayEvents
+                        },
+                    hideBasedOnKeywords =
+                        if (json.has(PREF_HIDE_BASED_ON_KEYWORDS)) {
+                            json.getString(PREF_HIDE_BASED_ON_KEYWORDS)
+                        } else {
+                            EMPTY.hideBasedOnKeywords
+                        },
+                    showBasedOnKeywords =
+                        if (json.has(PREF_SHOW_BASED_ON_KEYWORDS)) {
+                            json.getString(PREF_SHOW_BASED_ON_KEYWORDS)
+                        } else {
+                            EMPTY.showBasedOnKeywords
+                        },
+                    defaultColors =
+                        ThemeColors.fromJson(
+                            context,
+                            if (differentColorsForDark) ColorThemeType.LIGHT else ColorThemeType.SINGLE,
+                            json,
+                        ),
+                    darkColors =
+                        if (differentColorsForDark) {
+                            ThemeColors.fromJson(
+                                context,
+                                ColorThemeType.DARK,
+                                json.getJSONObject(
+                                    PREF_DARK_THEME,
+                                ),
+                            )
+                        } else {
+                            ThemeColors.EMPTY
+                        },
+                    textShadow =
+                        if (json.has(PREF_TEXT_SHADOW)) {
+                            TextShadow.fromValue(json.getString(PREF_TEXT_SHADOW))
+                        } else {
+                            EMPTY.textShadow
+                        },
+                    showDaysWithoutEvents =
+                        if (json.has(PREF_SHOW_DAYS_WITHOUT_EVENTS)) {
+                            json.getBoolean(PREF_SHOW_DAYS_WITHOUT_EVENTS)
+                        } else {
+                            EMPTY.showDaysWithoutEvents
+                        },
+                    showDayHeaders =
+                        if (json.has(PREF_SHOW_DAY_HEADERS)) {
+                            json.getBoolean(PREF_SHOW_DAY_HEADERS)
+                        } else {
+                            EMPTY.showDayHeaders
+                        },
+                    dayHeaderDateFormat =
+                        if (json.has(PREF_DAY_HEADER_DATE_FORMAT)) {
+                            DateFormatValue.load(
+                                json.getString(PREF_DAY_HEADER_DATE_FORMAT),
+                                PREF_DAY_HEADER_DATE_FORMAT_DEFAULT,
+                            )
+                        } else {
+                            EMPTY.dayHeaderDateFormat
+                        },
+                    horizontalLineBelowDayHeader =
+                        if (json.has(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER)) {
+                            json.getBoolean(PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER)
+                        } else {
+                            EMPTY.horizontalLineBelowDayHeader
+                        },
+                    showPastEventsUnderOneHeader =
+                        if (json.has(PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER)) {
+                            json.getBoolean(PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER)
+                        } else {
+                            EMPTY.showPastEventsUnderOneHeader
+                        },
+                    showPastEventsWithDefaultColor =
+                        if (json.has(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR)) {
+                            json.getBoolean(PREF_SHOW_PAST_EVENTS_WITH_DEFAULT_COLOR)
+                        } else {
+                            EMPTY.showPastEventsWithDefaultColor
+                        },
+                    showEventIcon =
+                        if (json.has(PREF_SHOW_EVENT_ICON)) {
+                            json.getBoolean(PREF_SHOW_EVENT_ICON)
+                        } else {
+                            EMPTY.showEventIcon
+                        },
+                    eventEntryLayout = eventEntryLayout,
+                    entryDateFormat =
+                        if (json.has(PREF_ENTRY_DATE_FORMAT)) {
+                            DateFormatValue.load(
+                                json.getString(PREF_ENTRY_DATE_FORMAT),
+                                PREF_ENTRY_DATE_FORMAT_DEFAULT,
+                            )
+                        } else {
+                            EMPTY.entryDateFormat
+                        },
+                    showEndTime =
+                        if (json.has(PREF_SHOW_END_TIME)) {
+                            json.getBoolean(PREF_SHOW_END_TIME)
+                        } else {
+                            EMPTY.showEndTime
+                        },
+                    showLocation =
+                        if (json.has(PREF_SHOW_LOCATION)) {
+                            json.getBoolean(PREF_SHOW_LOCATION)
+                        } else {
+                            EMPTY.showLocation
+                        },
+                    showDescription =
+                        if (json.has(PREF_SHOW_DESCRIPTION)) {
+                            json.getBoolean(PREF_SHOW_DESCRIPTION)
+                        } else {
+                            EMPTY.showDescription
+                        },
+                    timeFormat =
+                        if (json.has(PREF_TIME_FORMAT)) {
+                            json.getString(PREF_TIME_FORMAT)
+                        } else {
+                            EMPTY.timeFormat
+                        },
+                    lockedTimeZoneIdIn =
+                        if (json.has(PREF_LOCKED_TIME_ZONE_ID)) {
+                            json.getString(PREF_LOCKED_TIME_ZONE_ID)
+                        } else {
+                            EMPTY.lockedTimeZoneId
+                        },
+                    startHourOfDayIn =
+                        if (json.has(PREF_START_HOUR_OF_DAY)) {
+                            json.getInt(PREF_START_HOUR_OF_DAY)
+                        } else {
+                            EMPTY.startHourOfDay
+                        },
+                    refreshPeriodMinutesIn =
+                        if (json.has(PREF_REFRESH_PERIOD_MINUTES)) {
+                            json.getInt(PREF_REFRESH_PERIOD_MINUTES)
+                        } else {
+                            EMPTY.refreshPeriodMinutes
+                        },
+                    isMultilineTitle =
+                        if (json.has(PREF_MULTILINE_TITLE)) {
+                            json.getBoolean(PREF_MULTILINE_TITLE)
+                        } else {
+                            EMPTY.isMultilineTitle
+                        },
+                    maxLinesTitle =
+                        if (json.has(PREF_MAXLINES_TITLE)) {
+                            json.getInt(PREF_MAXLINES_TITLE)
+                        } else {
+                            EMPTY.maxLinesTitle
+                        },
+                    isMultilineDetails =
+                        if (json.has(PREF_MULTILINE_DETAILS)) {
+                            json.getBoolean(PREF_MULTILINE_DETAILS)
+                        } else {
+                            EMPTY.isMultilineDetails
+                        },
+                    maxLinesDetails =
+                        if (json.has(PREF_MAXLINES_DETAILS)) {
+                            json.getInt(PREF_MAXLINES_DETAILS)
+                        } else {
+                            EMPTY.maxLinesDetails
+                        },
+                    showOnlyClosestInstanceOfRecurringEvent =
+                        if (json.has(
+                                PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT,
+                            )
+                        ) {
+                            json.getBoolean(
+                                PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT,
+                            )
+                        } else {
+                            EMPTY.showOnlyClosestInstanceOfRecurringEvent
+                        },
+                    hideDuplicates =
+                        if (json.has(PREF_HIDE_DUPLICATES)) {
+                            json.getBoolean(PREF_HIDE_DUPLICATES)
+                        } else {
+                            EMPTY.hideDuplicates
+                        },
+                    maxNumberOfEventsIn =
+                        if (json.has(PREF_MAX_NUMBER_OF_EVENTS)) {
+                            json.getInt(PREF_MAX_NUMBER_OF_EVENTS)
+                        } else {
+                            EMPTY.maxNumberOfEvents
+                        },
+                    allDayEventsPlacement =
+                        if (json.has(PREF_ALL_DAY_EVENTS_PLACEMENT)) {
+                            AllDayEventsPlacement.fromValue(
+                                json.getString(
+                                    PREF_ALL_DAY_EVENTS_PLACEMENT,
+                                ),
+                            )
+                        } else {
+                            EMPTY.allDayEventsPlacement
+                        },
+                    taskScheduling =
+                        if (json.has(PREF_TASK_SCHEDULING)) {
+                            TaskScheduling.fromValue(json.getString(PREF_TASK_SCHEDULING))
+                        } else {
+                            EMPTY.taskScheduling
+                        },
+                    taskWithoutDates =
+                        if (json.has(PREF_TASK_WITHOUT_DATES)) {
+                            TasksWithoutDates.fromValue(json.getString(PREF_TASK_WITHOUT_DATES))
+                        } else {
+                            EMPTY.taskWithoutDates
+                        },
+                    filterModeIn =
+                        if (json.has(PREF_FILTER_MODE)) {
+                            FilterMode.fromValue(json.getString(PREF_FILTER_MODE))
+                        } else {
+                            EMPTY.filterMode
+                        },
+                    indicateAlerts =
+                        if (json.has(PREF_INDICATE_ALERTS)) {
+                            json.getBoolean(PREF_INDICATE_ALERTS)
+                        } else {
+                            EMPTY.indicateAlerts
+                        },
+                    indicateRecurring =
+                        if (json.has(PREF_INDICATE_RECURRING)) {
+                            json.getBoolean(PREF_INDICATE_RECURRING)
+                        } else {
+                            EMPTY.indicateRecurring
+                        },
+                    isCompactLayout =
+                        if (json.has(PREF_COMPACT_LAYOUT)) {
+                            json.getBoolean(PREF_COMPACT_LAYOUT)
+                        } else {
+                            EMPTY.isCompactLayout
+                        },
+                    widgetHeaderLayout =
+                        if (json.has(
+                                PREF_WIDGET_HEADER_LAYOUT,
+                            )
+                        ) {
+                            WidgetHeaderLayout.fromValue(json.getString(PREF_WIDGET_HEADER_LAYOUT))
+                        } else {
+                            EMPTY.widgetHeaderLayout
+                        },
+                    widgetHeaderButtonsScale =
+                        if (json.has(
+                                PREF_WIDGET_HEADER_BUTTONS_SCALE,
+                            )
+                        ) {
+                            TextSizeScale.fromPreferenceValue(json.getString(PREF_WIDGET_HEADER_BUTTONS_SCALE))
+                        } else {
+                            EMPTY.widgetHeaderButtonsScale
+                        },
+                    textSizeScale =
+                        if (json.has(
+                                PREF_TEXT_SIZE_SCALE,
+                            )
+                        ) {
+                            TextSizeScale.fromPreferenceValue(json.getString(PREF_TEXT_SIZE_SCALE))
+                        } else {
+                            EMPTY.textSizeScale
+                        },
+                    dayHeaderAlignment =
+                        if (json.has(
+                                PREF_DAY_HEADER_ALIGNMENT,
+                            )
+                        ) {
+                            json.getString(PREF_DAY_HEADER_ALIGNMENT)
+                        } else {
+                            EMPTY.dayHeaderAlignment
+                        },
+                    resultsStorage = resultsStorage,
+                    snapshotModeIn = SnapshotMode.fromValue(json.optString(PREF_SNAPSHOT_MODE)),
+                )
+            } catch (e: JSONException) {
+                Log.w(TAG, "setFromJson failed, widgetId:$widgetId\n$json, $e")
+                EMPTY
+            }
 
         fun fromApplicationPreferences(
             context: Context,
             widgetId: Int,
-            settingsStored: InstanceSettings?
+            settingsStored: InstanceSettings?,
         ): InstanceSettings {
-            val resultsStorage = if (settingsStored != null && settingsStored.hasResults) {
-                settingsStored.resultsStorage
-            } else null
+            val resultsStorage =
+                if (settingsStored != null && settingsStored.hasResults) {
+                    settingsStored.resultsStorage
+                } else {
+                    null
+                }
 
             return synchronized(ApplicationPreferences::class) {
                 var darkColors: ThemeColors
@@ -672,18 +864,32 @@ data class InstanceSettings(
                 when (ApplicationPreferences.getEditingColorThemeType(context)) {
                     ColorThemeType.DARK -> {
                         darkColors = ThemeColors(context, ColorThemeType.DARK).setFromApplicationPreferences()
-                        defaultColors = if (settingsStored == null) darkColors else settingsStored.defaultColors.copy(
-                            context,
-                            ColorThemeType.LIGHT
-                        )
+                        defaultColors =
+                            if (settingsStored == null) {
+                                darkColors
+                            } else {
+                                settingsStored.defaultColors.copy(
+                                    context,
+                                    ColorThemeType.LIGHT,
+                                )
+                            }
                     }
 
                     ColorThemeType.LIGHT -> {
                         defaultColors = ThemeColors(context, ColorThemeType.LIGHT).setFromApplicationPreferences()
                         darkColors =
-                            if (settingsStored == null) defaultColors else if (settingsStored.darkColors.isEmpty) settingsStored.defaultColors.copy(
-                                context, ColorThemeType.DARK
-                            ) else settingsStored.darkColors.copy(context, ColorThemeType.DARK)
+                            if (settingsStored ==
+                                null
+                            ) {
+                                defaultColors
+                            } else if (settingsStored.darkColors.isEmpty) {
+                                settingsStored.defaultColors.copy(
+                                    context,
+                                    ColorThemeType.DARK,
+                                )
+                            } else {
+                                settingsStored.darkColors.copy(context, ColorThemeType.DARK)
+                            }
                     }
 
                     ColorThemeType.SINGLE -> {
@@ -693,16 +899,21 @@ data class InstanceSettings(
 
                     else -> {
                         darkColors = ThemeColors.EMPTY
-                        defaultColors = if (settingsStored == null) darkColors else settingsStored.defaultColors.copy(
-                            context,
-                            ColorThemeType.SINGLE
-                        )
+                        defaultColors =
+                            if (settingsStored == null) {
+                                darkColors
+                            } else {
+                                settingsStored.defaultColors.copy(
+                                    context,
+                                    ColorThemeType.SINGLE,
+                                )
+                            }
                     }
                 }
 
                 InstanceSettings(
-                    contextIn = context, widgetId = widgetId,
-
+                    contextIn = context,
+                    widgetId = widgetId,
                     // ----------------------------------------------------------------------------------
                     // Layout
                     isCompactLayout = ApplicationPreferences.isCompactLayout(context),
@@ -711,10 +922,12 @@ data class InstanceSettings(
                     showDayHeaders = ApplicationPreferences.getShowDayHeaders(context),
                     dayHeaderDateFormat = ApplicationPreferences.getDayHeaderDateFormat(context),
                     showPastEventsUnderOneHeader = ApplicationPreferences.getShowPastEventsUnderOneHeader(context),
-                    dayHeaderAlignment = ApplicationPreferences.getString(
-                        context, PREF_DAY_HEADER_ALIGNMENT,
-                        PREF_DAY_HEADER_ALIGNMENT_DEFAULT
-                    ),
+                    dayHeaderAlignment =
+                        ApplicationPreferences.getString(
+                            context,
+                            PREF_DAY_HEADER_ALIGNMENT,
+                            PREF_DAY_HEADER_ALIGNMENT_DEFAULT,
+                        ),
                     horizontalLineBelowDayHeader = ApplicationPreferences.getHorizontalLineBelowDayHeader(context),
                     showDaysWithoutEvents = ApplicationPreferences.getShowDaysWithoutEvents(context),
                     eventEntryLayout = ApplicationPreferences.getEventEntryLayout(context),
@@ -724,13 +937,11 @@ data class InstanceSettings(
                     maxLinesTitle = ApplicationPreferences.getMaxLinesTitle(context),
                     isMultilineDetails = ApplicationPreferences.isMultilineDetails(context),
                     maxLinesDetails = ApplicationPreferences.getMaxLinesDetails(context),
-
                     // ----------------------------------------------------------------------------------
                     // Colors
                     darkColors = darkColors,
                     defaultColors = defaultColors,
                     textShadow = ApplicationPreferences.getTextShadow(context),
-
                     // ----------------------------------------------------------------------------------
                     // Event details
                     showEndTime = ApplicationPreferences.getShowEndTime(context),
@@ -739,7 +950,6 @@ data class InstanceSettings(
                     fillAllDayEvents = ApplicationPreferences.getFillAllDayEvents(context),
                     indicateAlerts = ApplicationPreferences.getBoolean(context, PREF_INDICATE_ALERTS, true),
                     indicateRecurring = ApplicationPreferences.getBoolean(context, PREF_INDICATE_RECURRING, false),
-
                     // ----------------------------------------------------------------------------------
                     // Event filters
                     eventsEnded = ApplicationPreferences.getEventsEnded(context),
@@ -747,32 +957,35 @@ data class InstanceSettings(
                     eventRange = ApplicationPreferences.getEventRange(context),
                     hideBasedOnKeywords = ApplicationPreferences.getHideBasedOnKeywords(context),
                     showBasedOnKeywords = ApplicationPreferences.getShowBasedOnKeywords(context),
-                    showOnlyClosestInstanceOfRecurringEvent = ApplicationPreferences.getShowOnlyClosestInstanceOfRecurringEvent(
-                        context
-                    ),
+                    showOnlyClosestInstanceOfRecurringEvent =
+                        ApplicationPreferences.getShowOnlyClosestInstanceOfRecurringEvent(
+                            context,
+                        ),
                     hideDuplicates = ApplicationPreferences.getHideDuplicates(context),
                     maxNumberOfEventsIn = ApplicationPreferences.getMaxNumberOfEvents(context),
                     allDayEventsPlacement = ApplicationPreferences.getAllDayEventsPlacement(context),
                     taskScheduling = ApplicationPreferences.getTaskScheduling(context),
                     taskWithoutDates = ApplicationPreferences.getTasksWithoutDates(context),
                     filterModeIn = ApplicationPreferences.getFilterMode(context),
-
                     // ----------------------------------------------------------------------------------
                     // Calendars and task lists
                     activeEventSourcesIn = ApplicationPreferences.getActiveEventSources(context),
-
                     // ----------------------------------------------------------------------------------
                     // Other
-                    proposedInstanceName = ApplicationPreferences.getString(
-                        context, PREF_WIDGET_INSTANCE_NAME,
-                        ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, "")
-                    ),
-                    widgetHeaderButtonsScale = TextSizeScale.fromPreferenceValue(
-                        ApplicationPreferences.getString(context, PREF_WIDGET_HEADER_BUTTONS_SCALE, "")
-                    ),
-                    textSizeScale = TextSizeScale.fromPreferenceValue(
-                        ApplicationPreferences.getString(context, PREF_TEXT_SIZE_SCALE, "")
-                    ),
+                    proposedInstanceName =
+                        ApplicationPreferences.getString(
+                            context,
+                            PREF_WIDGET_INSTANCE_NAME,
+                            ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, ""),
+                        ),
+                    widgetHeaderButtonsScale =
+                        TextSizeScale.fromPreferenceValue(
+                            ApplicationPreferences.getString(context, PREF_WIDGET_HEADER_BUTTONS_SCALE, ""),
+                        ),
+                    textSizeScale =
+                        TextSizeScale.fromPreferenceValue(
+                            ApplicationPreferences.getString(context, PREF_TEXT_SIZE_SCALE, ""),
+                        ),
                     timeFormat = ApplicationPreferences.getTimeFormat(context),
                     lockedTimeZoneIdIn = ApplicationPreferences.getLockedTimeZoneId(context),
                     startHourOfDayIn = ApplicationPreferences.getIntStoredAsString(context, PREF_START_HOUR_OF_DAY, 0),
@@ -783,9 +996,7 @@ data class InstanceSettings(
             }
         }
 
-        private fun getStorageKey(widgetId: Int): String {
-            return "instanceSettings$widgetId"
-        }
+        private fun getStorageKey(widgetId: Int): String = "instanceSettings$widgetId"
 
         fun isDarkThemeOn(context: Context?): Boolean {
             val configuration = context!!.applicationContext.resources.configuration
