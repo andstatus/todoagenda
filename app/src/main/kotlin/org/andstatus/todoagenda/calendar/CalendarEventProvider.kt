@@ -39,6 +39,7 @@ import org.andstatus.todoagenda.widget.EventStatus
 import org.joda.time.DateTime
 import java.util.Optional
 import java.util.function.Function
+import kotlin.math.abs
 
 class CalendarEventProvider(
     type: EventProviderType,
@@ -83,8 +84,8 @@ class CalendarEventProvider(
                 eventIds[event.eventId] = event
                 return@forEach
             }
-            if (Math.abs(settings.clock.getNumberOfMinutesTo(event.closestTime)) <
-                Math.abs(settings.clock.getNumberOfMinutesTo(otherEvent.closestTime))
+            if (abs(settings.clock.getNumberOfMinutesTo(event.closestTime)) <
+                abs(settings.clock.getNumberOfMinutesTo(otherEvent.closestTime))
             ) {
                 toRemove.add(otherEvent)
                 eventIds[event.eventId] = event

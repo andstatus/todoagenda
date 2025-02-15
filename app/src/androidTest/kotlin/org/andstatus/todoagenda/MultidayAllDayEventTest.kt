@@ -1,5 +1,6 @@
 package org.andstatus.todoagenda
 
+import org.andstatus.todoagenda.test.R
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.LastEntry
 import org.junit.Assert
@@ -12,7 +13,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
     @Test
     fun testInsidePeriod() {
         val method = "testInsidePeriod"
-        provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.multi_day)
+        provider.loadResultsAndSettings(R.raw.multi_day)
         val dateRange = 30
         provider.settings = settings.copy(eventRange = dateRange)
         playResults(method)
@@ -66,5 +67,12 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
             endOfRangeTime.dayOfYear.toLong(),
             dayOfEventEntryPrev.toLong(),
         )
+    }
+
+    @Test
+    fun testMultiDayOngoingEvent() {
+        val method = "testMultiDayOngoingEvent"
+        provider.loadResultsAndSettings(R.raw.multi_day_ongoing)
+        playResults(method)
     }
 }

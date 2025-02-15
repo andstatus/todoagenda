@@ -72,6 +72,7 @@ data class InstanceSettings(
     //
     // ----------------------------------------------------------------------------------
     // Event details
+    val showDayXY: Boolean = true,
     val showEndTime: Boolean = PREF_SHOW_END_TIME_DEFAULT,
     val showLocation: Boolean = PREF_SHOW_LOCATION_DEFAULT,
     val showDescription: Boolean = PREF_SHOW_DESCRIPTION_DEFAULT,
