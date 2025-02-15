@@ -17,12 +17,12 @@ import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
 
 class CalendarEventVisualizer(
     eventProvider: EventProvider,
-) : WidgetEntryVisualizer<CalendarEntry>(eventProvider) {
+) : WidgetEntryVisualizer(eventProvider) {
     private val calendarEventProvider: CalendarEventProvider
         get() = eventProvider as CalendarEventProvider
 
     override fun getRemoteViews(
-        eventEntry: WidgetEntry<*>,
+        eventEntry: WidgetEntry,
         position: Int,
     ): RemoteViews {
         val rv = super.getRemoteViews(eventEntry, position)
@@ -31,13 +31,13 @@ class CalendarEventVisualizer(
         return rv
     }
 
-    override fun newViewEntryIntent(entry: WidgetEntry<*>): Intent {
+    override fun newViewEntryIntent(entry: WidgetEntry): Intent {
         val calendarEntry = entry as CalendarEntry
         return calendarEventProvider.newViewEventIntent(calendarEntry.event)
     }
 
     override fun setIndicators(
-        entry: WidgetEntry<*>?,
+        entry: WidgetEntry?,
         rv: RemoteViews,
     ) {
         val calendarEntry = entry as CalendarEntry

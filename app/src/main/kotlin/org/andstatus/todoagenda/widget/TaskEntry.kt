@@ -9,26 +9,36 @@ import org.andstatus.todoagenda.util.MyClock
 import org.joda.time.DateTime
 
 class TaskEntry private constructor(
-    settings: InstanceSettings, entryPosition: WidgetEntryPosition, private val mainDate: DateTime?,
-    entryDate: DateTime, override val event: TaskEvent
-) : WidgetEntry<TaskEntry>(settings, entryPosition, entryDate, event.isAllDay, event.dueDate) {
+    settings: InstanceSettings,
+    entryPosition: WidgetEntryPosition,
+    private val mainDate: DateTime?,
+    entryDate: DateTime,
+    override val event: TaskEvent,
+) : WidgetEntry(settings, entryPosition, entryDate, event.isAllDay, event.dueDate) {
     override val source: OrderedEventSource
         get() = event.eventSource
     override val title: String
         get() = event.title
     override val eventTimeString: String
-        get() = if (allDay || entryPosition != WidgetEntryPosition.ENTRY_DATE) "" else DateUtil.formatTime(
-            { settings },
-            mainDate
-        )
+        get() =
+            if (allDay || entryPosition != WidgetEntryPosition.ENTRY_DATE) {
+                ""
+            } else {
+                DateUtil.formatTime(
+                    { settings },
+                    mainDate,
+                )
+            }
 
-    override fun toString(): String {
-        return super.toString() + " TaskEntry [title='" + event.title + "', startDate=" + event.startDate +
+    override fun toString(): String =
+        super.toString() + " TaskEntry [title='" + event.title + "', startDate=" + event.startDate +
             ", dueDate=" + event.dueDate + "]"
-    }
 
     companion object {
-        fun fromEvent(settings: InstanceSettings, event: TaskEvent): TaskEntry {
+        fun fromEvent(
+            settings: InstanceSettings,
+            event: TaskEvent,
+        ): TaskEntry {
             val mainDate = calcMainDate(settings, event)
             val entryPosition = getEntryPosition(settings, mainDate, event)
             return TaskEntry(settings, entryPosition, mainDate, getEntryDate(settings, entryPosition, event), event)
@@ -38,7 +48,7 @@ class TaskEntry private constructor(
         private fun getEntryPosition(
             settings: InstanceSettings,
             mainDate: DateTime?,
-            event: TaskEvent
+            event: TaskEvent,
         ): WidgetEntryPosition {
             if (!event.hasStartDate() && !event.hasDueDate()) return settings.taskWithoutDates.widgetEntryPosition
             if (mainDate != null) {
@@ -58,51 +68,61 @@ class TaskEntry private constructor(
             return WidgetEntry.getEntryPosition(settings, event.isAllDay, mainDate, otherDate)
         }
 
-        private fun calcMainDate(settings: InstanceSettings, event: TaskEvent): DateTime? {
-            return if (settings.taskScheduling == TaskScheduling.DATE_DUE) event.dueDate else event.startDate
-        }
+        private fun calcMainDate(
+            settings: InstanceSettings,
+            event: TaskEvent,
+        ): DateTime? = if (settings.taskScheduling == TaskScheduling.DATE_DUE) event.dueDate else event.startDate
 
-        private fun otherDate(settings: InstanceSettings, event: TaskEvent): DateTime? {
-            return if (settings.taskScheduling == TaskScheduling.DATE_DUE) event.startDate else event.dueDate
-        }
+        private fun otherDate(
+            settings: InstanceSettings,
+            event: TaskEvent,
+        ): DateTime? = if (settings.taskScheduling == TaskScheduling.DATE_DUE) event.startDate else event.dueDate
 
         private fun getEntryDate(
             settings: InstanceSettings,
             entryPosition: WidgetEntryPosition?,
-            event: TaskEvent
-        ): DateTime {
-            return when (entryPosition) {
+            event: TaskEvent,
+        ): DateTime =
+            when (entryPosition) {
                 WidgetEntryPosition.END_OF_TODAY,
                 WidgetEntryPosition.END_OF_DAY,
                 WidgetEntryPosition.END_OF_LIST,
                 WidgetEntryPosition.END_OF_LIST_HEADER,
                 WidgetEntryPosition.LIST_FOOTER,
-                WidgetEntryPosition.HIDDEN -> getEntryDateOrElse(
-                    settings,
-                    event,
-                    MyClock.DATETIME_MAX
-                )
+                WidgetEntryPosition.HIDDEN,
+                ->
+                    getEntryDateOrElse(
+                        settings,
+                        event,
+                        MyClock.DATETIME_MAX,
+                    )
 
                 else -> getEntryDateOrElse(settings, event, MyClock.DATETIME_MIN)
             }
-        }
 
         private fun getEntryDateOrElse(
             settings: InstanceSettings,
             event: TaskEvent,
-            defaultDate: DateTime
-        ): DateTime {
-            return if (settings.taskScheduling == TaskScheduling.DATE_DUE) {
-                if (event.hasDueDate()) event.dueDate else if (event.hasStartDate()) event.startDate else defaultDate
+            defaultDate: DateTime,
+        ): DateTime =
+            if (settings.taskScheduling == TaskScheduling.DATE_DUE) {
+                if (event.hasDueDate()) {
+                    event.dueDate
+                } else if (event.hasStartDate()) {
+                    event.startDate
+                } else {
+                    defaultDate
+                }
             } else {
                 if (event.hasStartDate()) {
                     if (settings.clock.isBeforeToday(event.startDate)) {
                         if (event.hasDueDate()) event.dueDate else defaultDate
-                    } else event.startDate
+                    } else {
+                        event.startDate
+                    }
                 } else {
                     if (event.hasDueDate()) event.dueDate else defaultDate
                 }
             }!!
-        }
     }
 }

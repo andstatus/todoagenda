@@ -76,7 +76,7 @@ enum class EventProviderType(
         return EventProvider(this, context, widgetId)
     }
 
-    fun getVisualizer(context: Context, widgetId: Int): WidgetEntryVisualizer<out WidgetEntry<*>> {
+    fun getVisualizer(context: Context, widgetId: Int): WidgetEntryVisualizer {
         val eventProvider = getEventProvider(context, widgetId)
         return if (isCalendar) CalendarEventVisualizer(eventProvider) else TaskVisualizer(eventProvider)
     }

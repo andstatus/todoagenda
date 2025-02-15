@@ -7,16 +7,21 @@ import org.joda.time.DateTime
 
 /** @author yvolk@yurivolkov.com
  */
-class LastEntry(settings: InstanceSettings, val type: LastEntryType, date: DateTime) :
-    WidgetEntry<LastEntry>(settings, WidgetEntryPosition.LIST_FOOTER, date, true, null) {
+class LastEntry(
+    settings: InstanceSettings,
+    val type: LastEntryType,
+    date: DateTime,
+) : WidgetEntry(settings, WidgetEntryPosition.LIST_FOOTER, date, true, null) {
     override val source: OrderedEventSource
         get() = OrderedEventSource.LAST_ENTRY
 
-    enum class LastEntryType(val widgetLayout: WidgetLayout) {
+    enum class LastEntryType(
+        val widgetLayout: WidgetLayout,
+    ) {
         NOT_LOADED(WidgetLayout.ITEM_NOT_LOADED),
         NO_PERMISSIONS(WidgetLayout.ITEM_NO_PERMISSIONS),
         EMPTY(WidgetLayout.ITEM_EMPTY_LIST),
-        LAST(WidgetLayout.ITEM_LAST)
+        LAST(WidgetLayout.ITEM_LAST),
     }
 
     companion object {
@@ -26,12 +31,20 @@ class LastEntry(settings: InstanceSettings, val type: LastEntryType, date: DateT
             return LastEntry(settings, entryType, settings.clock.now())
         }
 
-        fun addLast(settings: InstanceSettings, widgetEntries: List<WidgetEntry<*>>): List<WidgetEntry<*>> {
-            val entry = if (widgetEntries.isEmpty()) forEmptyList(settings) else LastEntry(
-                settings,
-                LastEntryType.LAST,
-                widgetEntries[widgetEntries.size - 1].entryDate
-            )
+        fun addLast(
+            settings: InstanceSettings,
+            widgetEntries: List<WidgetEntry>,
+        ): List<WidgetEntry> {
+            val entry =
+                if (widgetEntries.isEmpty()) {
+                    forEmptyList(settings)
+                } else {
+                    LastEntry(
+                        settings,
+                        LastEntryType.LAST,
+                        widgetEntries[widgetEntries.size - 1].entryDate,
+                    )
+                }
             return widgetEntries + entry
         }
     }

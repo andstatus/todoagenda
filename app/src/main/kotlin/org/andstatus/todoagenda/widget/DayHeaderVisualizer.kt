@@ -14,8 +14,10 @@ import org.andstatus.todoagenda.util.CalendarIntentUtil
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 
-class DayHeaderVisualizer(context: Context, widgetId: Int) :
-    WidgetEntryVisualizer<DayHeader>(EventProvider(EventProviderType.DAY_HEADER, context, widgetId)) {
+class DayHeaderVisualizer(
+    context: Context,
+    widgetId: Int,
+) : WidgetEntryVisualizer(EventProvider(EventProviderType.DAY_HEADER, context, widgetId)) {
     private val alignment: Alignment
     private val horizontalLineBelowDayHeader: Boolean
 
@@ -24,13 +26,20 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
         horizontalLineBelowDayHeader = settings.horizontalLineBelowDayHeader
     }
 
-    override fun getRemoteViews(eventEntry: WidgetEntry<*>, position: Int): RemoteViews {
+    override fun getRemoteViews(
+        eventEntry: WidgetEntry,
+        position: Int,
+    ): RemoteViews {
         val entry = eventEntry as DayHeader
-        val rv = RemoteViews(
-            context.packageName,
-            if (horizontalLineBelowDayHeader) WidgetLayout.DAY_HEADER_SEPARATOR_BELOW.shadowed(settings.textShadow)
-            else WidgetLayout.DAY_HEADER_SEPARATOR_ABOVE.shadowed(settings.textShadow)
-        )
+        val rv =
+            RemoteViews(
+                context.packageName,
+                if (horizontalLineBelowDayHeader) {
+                    WidgetLayout.DAY_HEADER_SEPARATOR_BELOW.shadowed(settings.textShadow)
+                } else {
+                    WidgetLayout.DAY_HEADER_SEPARATOR_ABOVE.shadowed(settings.textShadow)
+                },
+            )
         rv.setInt(R.id.day_header_title_wrapper, "setGravity", alignment.gravity)
         val textColorPref: TextColorPref = TextColorPref.forDayHeader(entry)
         val themeContext = settings.colors().getThemeContext(textColorPref)
@@ -43,7 +52,7 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
                 R.dimen.zero,
                 R.dimen.zero,
                 R.dimen.zero,
-                R.dimen.zero
+                R.dimen.zero,
             )
         } else {
             RemoteViewsUtil.setPadding(
@@ -53,7 +62,7 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
                 R.dimen.calender_padding,
                 R.dimen.zero,
                 R.dimen.calender_padding,
-                R.dimen.entry_bottom_padding
+                R.dimen.entry_bottom_padding,
             )
         }
         setDayHeaderTitle(position, entry, rv, textColorPref)
@@ -61,43 +70,75 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
         return rv
     }
 
-    override fun newViewEntryIntent(eventEntry: WidgetEntry<*>): Intent {
+    override fun newViewEntryIntent(eventEntry: WidgetEntry): Intent {
         val entry = eventEntry as DayHeader
         return CalendarIntentUtil.newOpenCalendarAtDayIntent(entry.entryDate)
     }
 
-    private fun setDayHeaderTitle(position: Int, entry: DayHeader, rv: RemoteViews, textColorPref: TextColorPref?) {
+    private fun setDayHeaderTitle(
+        position: Int,
+        entry: DayHeader,
+        rv: RemoteViews,
+        textColorPref: TextColorPref?,
+    ) {
         val dateString = getTitleString(entry).toString().uppercase(MyLocale.locale)
         rv.setTextViewText(R.id.day_header_title, dateString)
         RemoteViewsUtil.setTextSize(settings, rv, R.id.day_header_title, R.dimen.day_header_title)
         RemoteViewsUtil.setTextColor(settings, textColorPref, rv, R.id.day_header_title, R.attr.dayHeaderTitle)
         if (settings.isCompactLayout) {
             RemoteViewsUtil.setPadding(
-                settings, rv, R.id.day_header_title,
-                R.dimen.zero, R.dimen.zero, R.dimen.zero, R.dimen.zero
+                settings,
+                rv,
+                R.id.day_header_title,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero,
             )
         } else {
             val paddingTopId =
-                if (horizontalLineBelowDayHeader) R.dimen.day_header_padding_bottom else if (position == 0) R.dimen.day_header_padding_top_first else R.dimen.day_header_padding_top
+                if (horizontalLineBelowDayHeader) {
+                    R.dimen.day_header_padding_bottom
+                } else if (position ==
+                    0
+                ) {
+                    R.dimen.day_header_padding_top_first
+                } else {
+                    R.dimen.day_header_padding_top
+                }
             val paddingBottomId =
                 if (horizontalLineBelowDayHeader) R.dimen.day_header_padding_top else R.dimen.day_header_padding_bottom
             RemoteViewsUtil.setPadding(
-                settings, rv, R.id.day_header_title,
-                R.dimen.day_header_padding_left, paddingTopId, R.dimen.day_header_padding_right, paddingBottomId
+                settings,
+                rv,
+                R.id.day_header_title,
+                R.dimen.day_header_padding_left,
+                paddingTopId,
+                R.dimen.day_header_padding_right,
+                paddingBottomId,
             )
         }
     }
 
-    protected fun getTitleString(entry: DayHeader): CharSequence {
-        return when (entry.entryPosition) {
+    protected fun getTitleString(entry: DayHeader): CharSequence =
+        when (entry.entryPosition) {
             WidgetEntryPosition.PAST_AND_DUE_HEADER -> context.getString(R.string.past_header)
             WidgetEntryPosition.END_OF_LIST_HEADER -> context.getString(R.string.end_of_list_header)
-            else -> if (MyClock.isDateDefined(entry.entryDate)) settings.dayHeaderDateFormatter()
-                .formatDate(entry.entryDate) else "??? " + entry.entryPosition
+            else ->
+                if (MyClock.isDateDefined(entry.entryDate)) {
+                    settings
+                        .dayHeaderDateFormatter()
+                        .formatDate(entry.entryDate)
+                } else {
+                    "??? " + entry.entryPosition
+                }
         }
-    }
 
-    private fun setDayHeaderSeparator(position: Int, rv: RemoteViews, shadingContext: ContextThemeWrapper?) {
+    private fun setDayHeaderSeparator(
+        position: Int,
+        rv: RemoteViews,
+        shadingContext: ContextThemeWrapper?,
+    ) {
         val viewId = R.id.day_header_separator
         if (horizontalLineBelowDayHeader) {
             RemoteViewsUtil.setBackgroundColorFromAttr(shadingContext, rv, viewId, R.attr.dayHeaderSeparator)
@@ -111,7 +152,5 @@ class DayHeaderVisualizer(context: Context, widgetId: Int) :
         }
     }
 
-    override fun queryEventEntries(): List<DayHeader> {
-        return emptyList()
-    }
+    override fun queryEventEntries(): List<DayHeader> = emptyList()
 }

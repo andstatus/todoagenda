@@ -12,8 +12,13 @@ import org.andstatus.todoagenda.provider.EventProvider
 import org.andstatus.todoagenda.util.MyStringBuilder
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 
-abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProvider: EventProvider) {
-    open fun getRemoteViews(entry: WidgetEntry<*>, position: Int): RemoteViews {
+abstract class WidgetEntryVisualizer(
+    protected val eventProvider: EventProvider,
+) {
+    open fun getRemoteViews(
+        entry: WidgetEntry,
+        position: Int,
+    ): RemoteViews {
         val rv = RemoteViews(context.packageName, settings.eventEntryLayout.widgetLayout.shadowed(settings.textShadow))
         setTitle(entry, rv)
         setDetails(entry, rv)
@@ -29,7 +34,7 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
                 R.dimen.zero,
                 R.dimen.zero,
                 R.dimen.zero,
-                R.dimen.zero
+                R.dimen.zero,
             )
         } else {
             RemoteViewsUtil.setPadding(
@@ -39,14 +44,17 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
                 R.dimen.calender_padding,
                 R.dimen.zero,
                 R.dimen.calender_padding,
-                R.dimen.entry_bottom_padding
+                R.dimen.entry_bottom_padding,
             )
         }
         RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
         return rv
     }
 
-    protected open fun setIndicators(entry: WidgetEntry<*>?, rv: RemoteViews) {
+    protected open fun setIndicators(
+        entry: WidgetEntry?,
+        rv: RemoteViews,
+    ) {
         for (indicator in AlarmIndicatorScaled.entries) {
             rv.setViewVisibility(indicator.indicatorResId, View.GONE)
         }
@@ -60,8 +68,12 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
     val context: Context
         get() = eventProvider.context
 
-    abstract fun queryEventEntries(): List<T>
-    protected fun setTitle(entry: WidgetEntry<*>, rv: RemoteViews) {
+    abstract fun queryEventEntries(): List<WidgetEntry>
+
+    protected fun setTitle(
+        entry: WidgetEntry,
+        rv: RemoteViews,
+    ) {
         val viewId = R.id.event_entry_title
         rv.setTextViewText(viewId, getTitleString(entry))
         RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
@@ -70,7 +82,7 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
             TextColorPref.forTitle(entry),
             rv,
             viewId,
-            R.attr.eventEntryTitle
+            R.attr.eventEntryTitle,
         )
         RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineTitle)
         if (settings.isMultilineTitle) {
@@ -78,22 +90,27 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
         }
     }
 
-    protected fun getTitleString(event: WidgetEntry<*>): CharSequence {
-        return if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) {
+    protected fun getTitleString(event: WidgetEntry): CharSequence =
+        if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) {
             event.title
         } else {
-            MyStringBuilder.of(event.title)
+            MyStringBuilder
+                .of(event.title)
                 .withSeparator(event.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
                 .withSeparator(event.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
         }
-    }
 
-    protected fun setDetails(entry: WidgetEntry<*>, rv: RemoteViews) {
+    protected fun setDetails(
+        entry: WidgetEntry,
+        rv: RemoteViews,
+    ) {
         if (settings.eventEntryLayout == EventEntryLayout.ONE_LINE) return
-        val eventDetails: MyStringBuilder = MyStringBuilder.of(entry.formatEntryDate())
-            .withSpace(entry.eventTimeString)
-            .withSeparator(entry.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
-            .withSeparator(entry.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
+        val eventDetails: MyStringBuilder =
+            MyStringBuilder
+                .of(entry.formatEntryDate())
+                .withSpace(entry.eventTimeString)
+                .withSeparator(entry.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
+                .withSeparator(entry.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
         val viewId = R.id.event_entry_details
         if (eventDetails.isEmpty()) {
             rv.setViewVisibility(viewId, View.GONE)
@@ -106,7 +123,7 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
                 TextColorPref.forDetails(entry),
                 rv,
                 viewId,
-                R.attr.dayHeaderTitle
+                R.attr.dayHeaderTitle,
             )
             RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineDetails)
             if (settings.isMultilineDetails) {
@@ -115,12 +132,18 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
         }
     }
 
-    protected fun setTextStrikethrough(entry: WidgetEntry<*>, rv: RemoteViews) {
+    protected fun setTextStrikethrough(
+        entry: WidgetEntry,
+        rv: RemoteViews,
+    ) {
         val viewId = R.id.event_entry_title
         RemoteViewsUtil.setTextStrikethrough(rv, viewId, entry.status == EventStatus.CANCELED)
     }
 
-    protected fun setDate(entry: WidgetEntry<*>, rv: RemoteViews) {
+    protected fun setDate(
+        entry: WidgetEntry,
+        rv: RemoteViews,
+    ) {
         if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) return
         if (settings.entryDateFormat.type == DateFormatType.HIDDEN) {
             rv.setViewVisibility(R.id.event_entry_days, View.GONE)
@@ -137,7 +160,7 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
                 settings,
                 rv,
                 viewToShow,
-                if (daysAsText) R.dimen.days_to_event_width else R.dimen.days_to_event_right_width
+                if (daysAsText) R.dimen.days_to_event_width else R.dimen.days_to_event_right_width,
             )
             RemoteViewsUtil.setTextSize(settings, rv, viewToShow, R.dimen.event_entry_details)
             RemoteViewsUtil.setTextColor(
@@ -145,12 +168,15 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
                 TextColorPref.forDetails(entry),
                 rv,
                 viewToShow,
-                R.attr.dayHeaderTitle
+                R.attr.dayHeaderTitle,
             )
         }
     }
 
-    protected fun setTime(entry: WidgetEntry<*>, rv: RemoteViews) {
+    protected fun setTime(
+        entry: WidgetEntry,
+        rv: RemoteViews,
+    ) {
         if (settings.eventEntryLayout == EventEntryLayout.DEFAULT) return
         val viewId = R.id.event_entry_time
         RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineDetails)
@@ -167,15 +193,11 @@ abstract class WidgetEntryVisualizer<T : WidgetEntry<T>>(protected val eventProv
             TextColorPref.forDetails(entry),
             rv,
             viewId,
-            R.attr.dayHeaderTitle
+            R.attr.dayHeaderTitle,
         )
     }
 
-    fun isFor(entry: WidgetEntry<*>): Boolean {
-        return entry.source.source.providerType === eventProvider.type
-    }
+    fun isFor(entry: WidgetEntry): Boolean = entry.source.source.providerType === eventProvider.type
 
-    open fun newViewEntryIntent(entry: WidgetEntry<*>): Intent? {
-        return null
-    }
+    open fun newViewEntryIntent(entry: WidgetEntry): Intent? = null
 }

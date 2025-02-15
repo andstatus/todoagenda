@@ -15,6 +15,7 @@ import org.andstatus.todoagenda.task.AbstractTaskProvider
 import org.andstatus.todoagenda.task.TaskEvent
 import org.andstatus.todoagenda.task.TaskStatus
 import org.andstatus.todoagenda.util.IntentUtil
+import org.andstatus.todoagenda.widget.WidgetEvent
 import java.util.function.Function
 
 class DmfsOpenTasksProvider(type: EventProviderType, context: Context, widgetId: Int) :
@@ -143,7 +144,7 @@ class DmfsOpenTasksProvider(type: EventProviderType, context: Context, widgetId:
         }
     }
 
-    override fun newViewEventIntent(event: TaskEvent): Intent {
+    override fun newViewEventIntent(event: WidgetEvent): Intent {
         return IntentUtil.newViewIntent()
             .setData(ContentUris.withAppendedId(DmfsOpenTasksContract.Tasks.PROVIDER_URI, event.eventId))
     }

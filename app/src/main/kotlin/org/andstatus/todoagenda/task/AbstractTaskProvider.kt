@@ -6,6 +6,7 @@ import org.andstatus.todoagenda.prefs.FilterMode
 import org.andstatus.todoagenda.prefs.TaskScheduling
 import org.andstatus.todoagenda.provider.EventProvider
 import org.andstatus.todoagenda.provider.EventProviderType
+import org.andstatus.todoagenda.widget.WidgetEvent
 import org.joda.time.DateTime
 
 abstract class AbstractTaskProvider(type: EventProviderType, context: Context, widgetId: Int) :
@@ -46,5 +47,5 @@ abstract class AbstractTaskProvider(type: EventProviderType, context: Context, w
         } else showBasedOnKeywordsFilter!!.matched(task.title)
     }
 
-    abstract fun newViewEventIntent(event: TaskEvent): Intent
+    abstract fun newViewEventIntent(event: WidgetEvent): Intent
 }

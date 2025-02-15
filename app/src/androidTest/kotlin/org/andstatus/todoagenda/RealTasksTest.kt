@@ -20,7 +20,7 @@ class RealTasksTest : BaseWidgetTest() {
             "No End of list entries although filters are off",
             factory.widgetEntries
                 .stream()
-                .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST },
+                .anyMatch { entry: WidgetEntry -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST },
         )
         provider.settings =
             settings.copy(
@@ -32,7 +32,7 @@ class RealTasksTest : BaseWidgetTest() {
             "End of list entries although filters are on",
             factory.widgetEntries
                 .stream()
-                .anyMatch { entry: WidgetEntry<*> -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST },
+                .anyMatch { entry: WidgetEntry -> entry.entryPosition == WidgetEntryPosition.END_OF_LIST },
         )
     }
 }

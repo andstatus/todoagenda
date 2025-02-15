@@ -23,7 +23,7 @@ class ShowOnlyClosestInstanceTest : BaseWidgetTest() {
         val entries =
             factory.widgetEntries
                 .stream()
-                .filter { e: WidgetEntry<*> -> e.title.startsWith("Test event 2 that") }
+                .filter { e: WidgetEntry -> e.title.startsWith("Test event 2 that") }
                 .collect(Collectors.toList())
         Assert.assertEquals("Number of entries of the test event $entries", 2, entries.size.toLong())
         Assert.assertNotEquals(

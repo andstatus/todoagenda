@@ -43,10 +43,10 @@ class RemoteViewsFactory(
     val instanceId = InstanceId.next()
 
     @Volatile
-    var widgetEntries: List<WidgetEntry<*>> = ArrayList()
+    var widgetEntries: List<WidgetEntry> = ArrayList()
 
     @Volatile
-    private var visualizers: MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> = ArrayList()
+    private var visualizers: MutableList<WidgetEntryVisualizer> = ArrayList()
 
     init {
         visualizers.add(LastEntryVisualizer(context, widgetId))
@@ -94,7 +94,7 @@ class RemoteViewsFactory(
         return null
     }
 
-    private fun visualizerFor(entry: WidgetEntry<*>?): WidgetEntryVisualizer<out WidgetEntry<*>>? {
+    private fun visualizerFor(entry: WidgetEntry?): WidgetEntryVisualizer? {
         for (visualizer in visualizers) {
             if (visualizer.isFor(entry!!)) return visualizer
         }
@@ -116,8 +116,8 @@ class RemoteViewsFactory(
         logEvent("reload, visualizers:" + visualizers.size + ", entries:" + widgetEntries.size)
     }
 
-    private fun getVisualizers(): MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> {
-        val visualizers: MutableList<WidgetEntryVisualizer<out WidgetEntry<*>>> = ArrayList()
+    private fun getVisualizers(): MutableList<WidgetEntryVisualizer> {
+        val visualizers: MutableList<WidgetEntryVisualizer> = ArrayList()
         val dayHeaderVisualizer =
             DayHeaderVisualizer(
                 settings.context,
@@ -146,8 +146,8 @@ class RemoteViewsFactory(
             return if (widgetEntries.isNotEmpty()) 0 else -1
         }
 
-    private fun queryWidgetEntries(settings: InstanceSettings): List<WidgetEntry<*>> {
-        val eventEntries: MutableList<WidgetEntry<*>> = ArrayList()
+    private fun queryWidgetEntries(settings: InstanceSettings): List<WidgetEntry> {
+        val eventEntries: MutableList<WidgetEntry> = ArrayList()
         for (visualizer in visualizers) {
             visualizer.queryEventEntries().let {
                 eventEntries.addAll(it)
@@ -165,7 +165,7 @@ class RemoteViewsFactory(
             }
         }
         eventEntries.sort()
-        val noHidden: List<WidgetEntry<*>> = eventEntries.filter { it.notHidden() }
+        val noHidden: List<WidgetEntry> = eventEntries.filter { it.notHidden() }
         val deduplicated = if (settings.hideDuplicates) filterOutDuplicates(noHidden) else noHidden
         val limited =
             if (settings.maxNumberOfEvents > 0) {
@@ -183,9 +183,9 @@ class RemoteViewsFactory(
         return withLast
     }
 
-    private fun filterOutDuplicates(inputEntries: List<WidgetEntry<*>>): MutableList<WidgetEntry<*>> {
-        val deduplicated: MutableList<WidgetEntry<*>> = ArrayList()
-        val hidden: MutableList<WidgetEntry<*>> = ArrayList()
+    private fun filterOutDuplicates(inputEntries: List<WidgetEntry>): MutableList<WidgetEntry> {
+        val deduplicated: MutableList<WidgetEntry> = ArrayList()
+        val hidden: MutableList<WidgetEntry> = ArrayList()
         for (ind1 in inputEntries.indices) {
             val inputEntry = inputEntries[ind1]
             if (!hidden.contains(inputEntry)) {
@@ -201,8 +201,8 @@ class RemoteViewsFactory(
         return deduplicated
     }
 
-    private fun addDayHeaders(listIn: List<WidgetEntry<*>>): MutableList<WidgetEntry<*>> {
-        val listOut: MutableList<WidgetEntry<*>> = ArrayList()
+    private fun addDayHeaders(listIn: List<WidgetEntry>): MutableList<WidgetEntry> {
+        val listOut: MutableList<WidgetEntry> = ArrayList()
         if (listIn.isNotEmpty()) {
             var curDayBucket = DayHeader(settings, WidgetEntryPosition.DAY_HEADER, MyClock.DATETIME_MIN)
             var pastEventsHeaderAdded = false
@@ -250,7 +250,7 @@ class RemoteViewsFactory(
     }
 
     private fun addEmptyDayHeadersBetweenTwoDays(
-        entries: MutableList<WidgetEntry<*>>,
+        entries: MutableList<WidgetEntry>,
         fromDayExclusive: DateTime?,
         toDayExclusive: DateTime?,
     ) {
@@ -311,7 +311,7 @@ class RemoteViewsFactory(
             val entry =
                 factory.widgetEntries
                     .stream()
-                    .filter { we: WidgetEntry<*>? -> we!!.entryId == entryId }
+                    .filter { we: WidgetEntry? -> we!!.entryId == entryId }
                     .findFirst()
                     .orElse(null)
             factory.logEvent("Clicked entryId:$entryId, entry: $entry")

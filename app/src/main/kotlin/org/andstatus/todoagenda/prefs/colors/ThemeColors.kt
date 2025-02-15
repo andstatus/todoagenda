@@ -169,7 +169,7 @@ class ThemeColors(val contextIn: Context?, val colorThemeType: ColorThemeType) {
         }
     }
 
-    fun getEntryBackgroundColor(entry: WidgetEntry<*>): Int {
+    fun getEntryBackgroundColor(entry: WidgetEntry): Int {
         return getBackgroundColor(BackgroundColorPref.forTimeSection(entry.timeSection))
     }
 

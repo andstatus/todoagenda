@@ -81,15 +81,15 @@ enum class TextColorPref(
     }
 
     companion object {
-        fun forDayHeader(entry: WidgetEntry<*>): TextColorPref {
+        fun forDayHeader(entry: WidgetEntry): TextColorPref {
             return entry.timeSection.select(DAY_HEADER_PAST, DAY_HEADER_TODAY, DAY_HEADER_FUTURE)
         }
 
-        fun forDetails(entry: WidgetEntry<*>): TextColorPref {
+        fun forDetails(entry: WidgetEntry): TextColorPref {
             return entry.timeSection.select(DAY_HEADER_PAST, DAY_HEADER_TODAY, DAY_HEADER_FUTURE)
         }
 
-        fun forTitle(entry: WidgetEntry<*>): TextColorPref {
+        fun forTitle(entry: WidgetEntry): TextColorPref {
             return entry.timeSection.select(EVENT_PAST, EVENT_TODAY, EVENT_FUTURE)
         }
     }

@@ -14,12 +14,14 @@ import org.joda.time.DateTime
 class CalendarEntry private constructor(
     settings: InstanceSettings,
     override val event: CalendarEvent,
-    entryDate: DateTime
-) : WidgetEntry<CalendarEntry>(
-    settings, getEntryPosition(settings, event.isAllDay, entryDate, event.endDate),
-    entryDate, event.isAllDay, event.endDate
-) {
-
+    entryDate: DateTime,
+) : WidgetEntry(
+        settings,
+        getEntryPosition(settings, event.isAllDay, entryDate, event.endDate),
+        entryDate,
+        event.isAllDay,
+        event.endDate,
+    ) {
     override val title: String
         get() {
             var title = event.title
@@ -47,25 +49,27 @@ class CalendarEntry private constructor(
     val isEndOfMultiDayEvent: Boolean
         get() = isPartOfMultiDayEvent && isLastEntryOfEvent
 
-    fun spansOneFullDay(): Boolean {
-        return entryDate.plusDays(1).isEqual(event.endDate)
-    }
+    fun spansOneFullDay(): Boolean = entryDate.plusDays(1).isEqual(event.endDate)
 
     override val eventTimeString: String
         get() = if (hideEventTime()) "" else timeSpanString
 
-    private fun hideEventTime(): Boolean {
-        return spansOneFullDay() && !(isStartOfMultiDayEvent || isEndOfMultiDayEvent) ||
+    private fun hideEventTime(): Boolean =
+        spansOneFullDay() &&
+            !(isStartOfMultiDayEvent || isEndOfMultiDayEvent) ||
             allDay
-    }
 
     private val timeSpanString: String
         get() {
             val startStr: String?
             val endStr: String?
             var separator = SPACE_DASH_SPACE
-            if (!MyClock.isDateDefined(entryDate) || (isPartOfMultiDayEvent && settings.clock.isStartOfDay(entryDate)
-                    && !isStartOfMultiDayEvent)
+            if (!MyClock.isDateDefined(entryDate) ||
+                (
+                    isPartOfMultiDayEvent &&
+                        settings.clock.isStartOfDay(entryDate) &&
+                        !isStartOfMultiDayEvent
+                )
             ) {
                 startStr = ARROW
                 separator = SPACE
@@ -85,13 +89,14 @@ class CalendarEntry private constructor(
             }
             return if (startStr == endStr) {
                 startStr
-            } else startStr + separator + endStr
+            } else {
+                startStr + separator + endStr
+            }
         }
     val context: Context
         get() = event.context
 
-
-//  TODO: Delete?
+    //  TODO: Delete?
 //    override val settings: InstanceSettings
 //        get() = event.settings
     override val source: OrderedEventSource
@@ -99,13 +104,15 @@ class CalendarEntry private constructor(
 
     override fun toString(): String {
         val timeString = eventTimeString
-        return (super.toString() + " CalendarEntry [" +
-            (if (allDay) "allDay" else "") +
-            (if (StringUtil.nonEmpty(timeString)) ", time=$timeString" else "") +
-            (if (locationShown.isNullOrBlank()) "" else ", location='$locationShown'") +
-            (if (descriptionShown.isNullOrBlank()) "" else ", description='$descriptionShown'") +
-            ", event=" + event +
-            "]")
+        return (
+            super.toString() + " CalendarEntry [" +
+                (if (allDay) "allDay" else "") +
+                (if (StringUtil.nonEmpty(timeString)) ", time=$timeString" else "") +
+                (if (locationShown.isNullOrBlank()) "" else ", location='$locationShown'") +
+                (if (descriptionShown.isNullOrBlank()) "" else ", description='$descriptionShown'") +
+                ", event=" + event +
+                "]"
+        )
     }
 
     override fun equals(other: Any?): Boolean {
@@ -130,8 +137,11 @@ class CalendarEntry private constructor(
         private const val ARROW = "→"
         private const val SPACE = " "
         const val SPACE_DASH_SPACE = " - "
-        fun fromEvent(settings: InstanceSettings, event: CalendarEvent, entryDate: DateTime): CalendarEntry {
-            return CalendarEntry(settings, event, entryDate)
-        }
+
+        fun fromEvent(
+            settings: InstanceSettings,
+            event: CalendarEvent,
+            entryDate: DateTime,
+        ): CalendarEntry = CalendarEntry(settings, event, entryDate)
     }
 }

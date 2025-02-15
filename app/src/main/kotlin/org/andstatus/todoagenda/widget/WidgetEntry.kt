@@ -10,13 +10,13 @@ import org.andstatus.todoagenda.util.MyClock
 import org.joda.time.DateTime
 import java.util.concurrent.atomic.AtomicLong
 
-abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
+abstract class WidgetEntry protected constructor(
     val settings: InstanceSettings,
     val entryPosition: WidgetEntryPosition,
     entryDate: DateTime,
     val allDay: Boolean,
     val endDate: DateTime?,
-) : Comparable<WidgetEntry<*>> {
+) : Comparable<WidgetEntry> {
     val entryId = idGenerator.incrementAndGet()
     val entryDate: DateTime
     val entryDay: DateTime
@@ -66,7 +66,7 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
             }
         }
 
-    override operator fun compareTo(other: WidgetEntry<*>): Int {
+    override operator fun compareTo(other: WidgetEntry): Int {
         val globalSignum = Integer.signum(entryPosition.globalOrder - other.entryPosition.globalOrder)
         if (globalSignum != 0) return globalSignum
         if (DateUtil.isSameDay(entryDay, other.entryDay)) {
@@ -88,7 +88,7 @@ abstract class WidgetEntry<T : WidgetEntry<T>> protected constructor(
         return if (sourceSignum == 0) title.compareTo(other.title) else sourceSignum
     }
 
-    fun duplicates(other: WidgetEntry<*>): Boolean =
+    fun duplicates(other: WidgetEntry): Boolean =
         entryPosition == other.entryPosition &&
             entryDate == other.entryDate &&
             DateUtil.isSameDate(endDate, other.endDate) &&

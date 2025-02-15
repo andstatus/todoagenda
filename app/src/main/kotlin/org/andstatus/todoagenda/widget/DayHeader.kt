@@ -4,8 +4,11 @@ import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.joda.time.DateTime
 
-class DayHeader(settings: InstanceSettings, entryPosition: WidgetEntryPosition, date: DateTime) :
-    WidgetEntry<DayHeader>(settings, entryPosition, date, true, null) {
+class DayHeader(
+    settings: InstanceSettings,
+    entryPosition: WidgetEntryPosition,
+    date: DateTime,
+) : WidgetEntry(settings, entryPosition, date, true, null) {
     override val source: OrderedEventSource
         get() = OrderedEventSource.DAY_HEADER
 }
