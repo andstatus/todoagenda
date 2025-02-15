@@ -17,24 +17,22 @@ data class CalendarEvent(
     val settings: InstanceSettings,
     val context: Context,
     val isAllDay: Boolean,
-    override var eventSource: OrderedEventSource,
-    override var eventId: Long = 0L,
-    var title: String = "",
-    val startMillisIn: Long? = null,
-    val endMillisIn: Long? = null,
-    var startDateIn: DateTime? = null,
-    var endDateIn: DateTime? = null,
-    var color: Int = 0,
-    var calendarColor: Int? = null,
-    var location: String? = null,
-    var description: String? = null,
-    var isAlarmActive: Boolean = false,
-    var isRecurring: Boolean = false,
-    var status: EventStatus = EventStatus.CONFIRMED,
+    override val eventSource: OrderedEventSource,
+    override val eventId: Long = 0L,
+    val title: String = "",
+    private val startMillisIn: Long? = null,
+    private val endMillisIn: Long? = null,
+    private val startDateIn: DateTime? = null,
+    private val endDateIn: DateTime? = null,
+    val color: Int = 0,
+    private val calendarColorIn: Int? = null,
+    val location: String? = null,
+    val description: String? = null,
+    val isAlarmActive: Boolean = false,
+    val isRecurring: Boolean = false,
+    val status: EventStatus = EventStatus.CONFIRMED,
 ) : WidgetEvent {
-    var startDate: DateTime = calcStartDate()
-
-    private fun calcStartDate(): DateTime = startDateIn ?: startMillisIn?.let { dateFromMillis(it) } ?: error("")
+    var startDate: DateTime = startDateIn ?: startMillisIn?.let { dateFromMillis(it) } ?: error("")
 
     var endDate: DateTime =
         endDateIn?.let { if (isAllDay) it.withTimeAtStartOfDay() else it } ?: endMillisIn
@@ -49,24 +47,6 @@ data class CalendarEvent(
 
     val startMillis: Long = dateToMillis(startDate)
     val endMillis: Long = dateToMillis(endDate)
-
-//    fun setEventSource(eventSource: OrderedEventSource): CalendarEvent {
-//        this.eventSource = eventSource
-//        return this
-//    }
-
-//    fun setStartDate(startDate: DateTime): CalendarEvent {
-//        this.startDate = if (isAllDay) startDate.withTimeAtStartOfDay() else startDate
-//        fixEndDate()
-//        return this
-//    }
-
-//    var startMillis: Long
-//        get() = dateToMillis(startDate)
-//        set(startMillis) {
-//            startDate = dateFromMillis(startMillis)
-//            fixEndDate()
-//        }
 
     private fun dateFromMillis(millis: Long): DateTime = if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.timeZone)
 
@@ -101,28 +81,6 @@ data class CalendarEvent(
         return fixed
     }
 
-//    private fun fixEndDate() {
-//        if (endDateIn?.isAfter(startDate) != true) {
-//            endDate = if (isAllDay) startDate.plusDays(1) else startDate.plusSeconds(1)
-//        }
-//    }
-
-//    fun setEventId(eventId: Int) {
-//        this.eventId = eventId.toLong()
-//    }
-
-//    fun setEndDate(endDate: DateTime) {
-//        this.endDate = if (isAllDay) endDate.withTimeAtStartOfDay() else endDate
-//        fixEndDate()
-//    }
-
-//    var endMillis: Long
-//        get() = dateToMillis(endDate)
-//        set(endMillis) {
-//            endDate = dateFromMillis(endMillis)
-//            fixEndDate()
-//        }
-
     private fun dateToMillis(date: DateTime): Long = if (isAllDay) toAllDayMillis(date) else date.millis
 
     private fun toAllDayMillis(date: DateTime): Long {
@@ -138,13 +96,8 @@ data class CalendarEvent(
         return utcDate.millis
     }
 
-    fun getCalendarColor(): Int = calendarColor ?: color
-
-//    fun setCalendarColor(color: Int) {
-//        calendarColor = Optional.of(color)
-//    }
-
-    fun hasDefaultCalendarColor(): Boolean = calendarColor?.let { cc: Int -> cc == color } ?: true
+    val calendarColor: Int = calendarColorIn ?: color
+    val hasDefaultCalendarColor: Boolean = calendarColorIn?.let { it == color } ?: true
 
     override fun toString(): String =
         (
@@ -154,12 +107,12 @@ data class CalendarEvent(
                 (", endDate=$endDate") +
                 ", color=" + color +
                 (
-                    if (hasDefaultCalendarColor()) {
+                    if (hasDefaultCalendarColor) {
                         " is default"
                     } else {
                         ", calendarColor=" +
                             (
-                                calendarColor
+                                calendarColorIn
                                     ?.let { obj: Int? ->
                                         java.lang.String.valueOf(
                                             obj,
@@ -197,17 +150,14 @@ data class CalendarEvent(
         return result
     }
 
-    val isActive: Boolean
-        get() {
-            val now = settings.clock.now()
-            return !startDate.isAfter(now) && endDate.isAfter(now)
+    val isActive: Boolean =
+        settings.clock.now().let { now ->
+            !startDate.isAfter(now) && endDate.isAfter(now)
         }
-    val isPartOfMultiDayEvent: Boolean
-        get() = settings.clock.dayOf(endDate).isAfter(settings.clock.dayOf(startDate))
-    val closestTime: DateTime
-        get() {
-            val now = settings.clock.now()
-            return when {
+    val isPartOfMultiDayEvent: Boolean = settings.clock.dayOf(endDate).isAfter(settings.clock.dayOf(startDate))
+    val closestTime: DateTime =
+        settings.clock.now().let { now ->
+            when {
                 startDate.isAfter(now) -> startDate
                 endDate.isBefore(now) -> endDate
                 else -> now

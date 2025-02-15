@@ -202,7 +202,7 @@ class CalendarEventProvider(
             ContentUris.appendId(builder, 0)
             ContentUris.appendId(builder, settings.clock.now().millis)
             return queryList(builder.build(), pastEventsWithColorSelection)
-                .filter { ev: CalendarEvent -> settings.filterMode != FilterMode.DEBUG_FILTER || ev.hasDefaultCalendarColor() }
+                .filter { ev: CalendarEvent -> settings.filterMode != FilterMode.DEBUG_FILTER || ev.hasDefaultCalendarColor }
         }
     private val pastEventsWithColorSelection: String
         get() =
@@ -232,7 +232,7 @@ class CalendarEventProvider(
                 startMillisIn = cursor.getLong(cursor.getColumnIndex(BEGIN)),
                 endMillisIn = cursor.getLong(cursor.getColumnIndex(END)),
                 color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(DISPLAY_COLOR))),
-                calendarColor = calendarColor,
+                calendarColorIn = calendarColor,
                 location = cursor.getStringOrNull(cursor.getColumnIndex(EVENT_LOCATION)),
                 description = cursor.getStringOrNull(cursor.getColumnIndex(DESCRIPTION)),
                 isAlarmActive = cursor.getInt(cursor.getColumnIndex(HAS_ALARM)) > 0,

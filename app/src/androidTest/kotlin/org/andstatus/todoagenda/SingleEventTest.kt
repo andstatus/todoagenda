@@ -34,10 +34,13 @@ class SingleEventTest : BaseWidgetTest() {
             )
         val executedAt = today.plusHours(10)
         assertOneEvent(executedAt, event, true)
-        event.isAlarmActive = false
-        assertOneEvent(executedAt, event, true)
-        event.isRecurring = false
-        assertOneEvent(executedAt, event, true)
+        val event2 = event.copy(isAlarmActive = false)
+        assertOneEvent(executedAt, event2, true)
+        assertOneEvent(
+            executedAt,
+            event2.copy(isRecurring = false),
+            true,
+        )
     }
 
     @Test
