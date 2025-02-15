@@ -3,6 +3,7 @@ package org.andstatus.todoagenda.widget
 import android.view.View
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.layout.EventEntryLayout
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.provider.EventProvider

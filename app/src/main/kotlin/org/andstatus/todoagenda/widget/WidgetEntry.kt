@@ -2,6 +2,7 @@ package org.andstatus.todoagenda.widget
 
 import android.content.Intent
 import org.andstatus.todoagenda.RemoteViewsFactory
+import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType

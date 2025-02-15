@@ -1,10 +1,10 @@
 package org.andstatus.todoagenda
 
+import org.andstatus.todoagenda.layout.EventEntryLayout
 import org.andstatus.todoagenda.prefs.FilterMode
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.TaskScheduling
 import org.andstatus.todoagenda.prefs.TasksWithoutDates
-import org.andstatus.todoagenda.widget.EventEntryLayout
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.hamcrest.MatcherAssert
 import org.hamcrest.core.StringStartsWith

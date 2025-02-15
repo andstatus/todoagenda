@@ -13,12 +13,12 @@ import com.rarepebble.colorpicker.ColorPreferenceDialog
 import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.WidgetConfigurationActivity
+import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
 import org.andstatus.todoagenda.prefs.MyPreferenceFragment
-import org.andstatus.todoagenda.widget.TextShadow
-import org.andstatus.todoagenda.widget.TimeSection
+import org.andstatus.todoagenda.layout.TimeSection
 import java.util.Arrays
 import java.util.stream.Collectors
 
@@ -26,8 +26,13 @@ import java.util.stream.Collectors
  * based on this answer: https://stackoverflow.com/a/53290775/297710
  * and on the code of https://github.com/koji-1009/ChronoDialogPreference
  */
-class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChangeListener {
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+class ColorsPreferencesFragment :
+    MyPreferenceFragment(),
+    OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         setTitle()
         addPreferencesFromResource(R.xml.preferences_colors)
         removeUnavailablePreferences()
@@ -52,7 +57,8 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
             val textColorSource = ApplicationPreferences.getTextColorSource(context)
             val preference = findPreference<Preference>(ThemeColors.PREF_TEXT_COLOR_SOURCE)
             if (preference != null) {
-                preference.summary = """
+                preference.summary =
+                    """
                     ${context.getString(textColorSource.titleResId)}
                     ${context.getString(textColorSource.summaryResId)}
                     """.trimIndent()
@@ -69,9 +75,11 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
         for (backgroundColorPref in BackgroundColorPref.entries) {
             val colorPreference = findPreference<ColorPreference>(backgroundColorPref.colorPreferenceName)
             if (colorPreference != null) {
-                val toPreview = Arrays.stream(TextColorPref.entries.toTypedArray())
-                    .filter { pref: TextColorPref -> pref.backgroundColorPref == backgroundColorPref }
-                    .collect(Collectors.toList())
+                val toPreview =
+                    Arrays
+                        .stream(TextColorPref.entries.toTypedArray())
+                        .filter { pref: TextColorPref -> pref.backgroundColorPref == backgroundColorPref }
+                        .collect(Collectors.toList())
                 if (toPreview.size > 0) {
                     val pref = toPreview[0]
                     colorPreference.setSampleTextColor1(colors.getTextColor(pref, pref.colorAttrId))
@@ -87,8 +95,11 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
     private fun removeUnavailablePreferences() {
         val context = activity ?: return
         val colorThemeType = ApplicationPreferences.getColorThemeType(context)
-        if (!ColorThemeType.canHaveDifferentColorsForDark() || colorThemeType == ColorThemeType.LIGHT || colorThemeType == ColorThemeType.SINGLE && !InstanceSettings.isDarkThemeOn(
-                context
+        if (!ColorThemeType.canHaveDifferentColorsForDark() ||
+            colorThemeType == ColorThemeType.LIGHT ||
+            colorThemeType == ColorThemeType.SINGLE &&
+            !InstanceSettings.isDarkThemeOn(
+                context,
             )
         ) {
             val screen = preferenceScreen
@@ -158,34 +169,39 @@ class ColorsPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChan
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    override fun onSharedPreferenceChanged(
+        sharedPreferences: SharedPreferences?,
+        key: String?,
+    ) {
         val activity = activity
         when (key) {
-            ApplicationPreferences.PREF_DIFFERENT_COLORS_FOR_DARK -> if (activity != null) {
-                if (ApplicationPreferences.getEditingColorThemeType(activity) == ColorThemeType.NONE) {
-                    activity.startActivity(
-                        MainActivity.intentToConfigure(
-                            activity,
-                            ApplicationPreferences.getWidgetId(activity)
+            ApplicationPreferences.PREF_DIFFERENT_COLORS_FOR_DARK ->
+                if (activity != null) {
+                    if (ApplicationPreferences.getEditingColorThemeType(activity) == ColorThemeType.NONE) {
+                        activity.startActivity(
+                            MainActivity.intentToConfigure(
+                                activity,
+                                ApplicationPreferences.getWidgetId(activity),
+                            ),
                         )
+                        activity.finish()
+                        return
+                    }
+                    setTitle()
+                }
+
+            ThemeColors.PREF_TEXT_COLOR_SOURCE ->
+                if (activity != null) {
+                    val intent: Intent =
+                        MainActivity.intentToConfigure(activity, ApplicationPreferences.getWidgetId(activity))
+                    intent.putExtra(
+                        WidgetConfigurationActivity.EXTRA_GOTO_PREFERENCES_SECTION,
+                        WidgetConfigurationActivity.EXTRA_GOTO_SECTION_COLORS,
                     )
+                    activity.startActivity(intent)
                     activity.finish()
                     return
                 }
-                setTitle()
-            }
-
-            ThemeColors.PREF_TEXT_COLOR_SOURCE -> if (activity != null) {
-                val intent: Intent =
-                    MainActivity.intentToConfigure(activity, ApplicationPreferences.getWidgetId(activity))
-                intent.putExtra(
-                    WidgetConfigurationActivity.EXTRA_GOTO_PREFERENCES_SECTION,
-                    WidgetConfigurationActivity.EXTRA_GOTO_SECTION_COLORS
-                )
-                activity.startActivity(intent)
-                activity.finish()
-                return
-            }
 
             else -> {
                 saveSettings()

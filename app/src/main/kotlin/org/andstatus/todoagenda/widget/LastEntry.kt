@@ -1,5 +1,6 @@
 package org.andstatus.todoagenda.widget
 
+import org.andstatus.todoagenda.layout.WidgetLayout
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.util.PermissionsUtil

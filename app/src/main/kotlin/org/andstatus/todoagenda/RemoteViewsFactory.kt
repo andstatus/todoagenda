@@ -9,6 +9,8 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import org.andstatus.todoagenda.layout.WidgetHeaderLayout
+import org.andstatus.todoagenda.layout.WidgetLayout
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.MyLocale
@@ -25,12 +27,10 @@ import org.andstatus.todoagenda.widget.DayHeaderVisualizer
 import org.andstatus.todoagenda.widget.LastEntry
 import org.andstatus.todoagenda.widget.LastEntry.LastEntryType
 import org.andstatus.todoagenda.widget.LastEntryVisualizer
-import org.andstatus.todoagenda.widget.TimeSection
+import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
-import org.andstatus.todoagenda.widget.WidgetHeaderLayout
-import org.andstatus.todoagenda.widget.WidgetLayout
 import org.joda.time.DateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.Volatile

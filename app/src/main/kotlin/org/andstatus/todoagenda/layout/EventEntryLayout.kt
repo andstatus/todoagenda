@@ -1,4 +1,4 @@
-package org.andstatus.todoagenda.widget
+package org.andstatus.todoagenda.layout
 
 import androidx.annotation.StringRes
 import org.andstatus.todoagenda.R

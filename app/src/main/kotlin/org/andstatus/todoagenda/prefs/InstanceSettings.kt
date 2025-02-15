@@ -3,6 +3,9 @@ package org.andstatus.todoagenda.prefs
 import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
+import org.andstatus.todoagenda.layout.EventEntryLayout
+import org.andstatus.todoagenda.layout.TextShadow
+import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType
 import org.andstatus.todoagenda.prefs.colors.ThemeColors
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
@@ -17,9 +20,6 @@ import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.MyClock.Companion.defaultTimeZone
 import org.andstatus.todoagenda.util.StringUtil
 import org.andstatus.todoagenda.widget.Alignment
-import org.andstatus.todoagenda.widget.EventEntryLayout
-import org.andstatus.todoagenda.widget.TextShadow
-import org.andstatus.todoagenda.widget.WidgetHeaderLayout
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.json.JSONException

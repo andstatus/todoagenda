@@ -6,6 +6,7 @@ import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.layout.WidgetLayout
 import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.provider.EventProvider

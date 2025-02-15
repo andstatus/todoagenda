@@ -3,7 +3,7 @@ package org.andstatus.todoagenda.prefs.colors
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import org.andstatus.todoagenda.R
-import org.andstatus.todoagenda.widget.TimeSection
+import org.andstatus.todoagenda.layout.TimeSection
 
 enum class BackgroundColorPref(
     val colorPreferenceName: String,

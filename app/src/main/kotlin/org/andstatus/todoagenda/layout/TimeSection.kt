@@ -1,4 +1,4 @@
-package org.andstatus.todoagenda.widget
+package org.andstatus.todoagenda.layout
 
 enum class TimeSection(val preferenceCategoryKey: String) {
     PAST("PastTime"),
