@@ -79,6 +79,8 @@ class MyClock(
         timeZone: DateTimeZone? = this.timeZone,
     ): DateTime = LocalDate(year, monthOfYear, dayOfMonth).toDateTimeAtStartOfDay(timeZone)
 
+    /** This is like LocalDate without time.
+     * Always 0 hours, for any StartHourOfDay */
     fun dayOf(date: DateTime): DateTime =
         when {
             startHourOfDay == 0 -> date.withTimeAtStartOfDay()

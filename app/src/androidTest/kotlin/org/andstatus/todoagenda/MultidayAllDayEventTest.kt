@@ -1,9 +1,11 @@
 package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.test.R
+import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.LastEntry
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
@@ -21,8 +23,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
         val endOfRangeTime = today.plusDays(dateRange)
         var dayOfEventEntryPrev = 0
         var dayOfHeaderPrev = 0
-        for (ind in factory.widgetEntries.indices) {
-            val entry = factory.widgetEntries[ind]
+        factory.widgetEntries.forEachIndexed { ind, entry ->
             val logMsg = method + "; " + String.format("%02d ", ind) + entry.toString()
             if (entry.entryDay.isBefore(today)) {
                 Assert.fail("Is present before today $logMsg")
@@ -37,18 +38,20 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
                         Assert.fail("No today's header $logMsg")
                     }
                 } else {
-                    Assert.assertEquals("No header $logMsg", (dayOfHeaderPrev + 1).toLong(), dayOfEntry.toLong())
+                    assertEquals("No header $logMsg", (dayOfHeaderPrev + 1).toLong(), dayOfEntry.toLong())
                 }
                 dayOfHeaderPrev = dayOfEntry
             } else if (entry is LastEntry) {
-                Assert.assertEquals(LastEntry.LastEntryType.LAST, entry.type)
-            } else {
+                assertEquals(LastEntry.LastEntryType.LAST, entry.type)
+            } else if (entry is CalendarEntry) {
                 if (dayOfEventEntryPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {
                         Assert.fail("Today not filled $logMsg")
                     }
+                    assertEquals("Day of event", 4, entry.event.dayOfEvent(entry.entryDay))
+                    assertEquals("Days of event", 37, entry.event.daysOfEvent)
                 } else {
-                    Assert.assertEquals(
+                    assertEquals(
                         "Day not filled $logMsg",
                         (dayOfEventEntryPrev + 1).toLong(),
                         dayOfEntry.toLong(),
@@ -57,22 +60,15 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
                 dayOfEventEntryPrev = dayOfEntry
             }
         }
-        Assert.assertEquals(
+        assertEquals(
             "Wrong last day header $method",
             endOfRangeTime.dayOfYear.toLong(),
             dayOfHeaderPrev.toLong(),
         )
-        Assert.assertEquals(
+        assertEquals(
             "Wrong last filled day $method",
             endOfRangeTime.dayOfYear.toLong(),
             dayOfEventEntryPrev.toLong(),
         )
-    }
-
-    @Test
-    fun testMultiDayOngoingEvent() {
-        val method = "testMultiDayOngoingEvent"
-        provider.loadResultsAndSettings(R.raw.multi_day_ongoing)
-        playResults(method)
     }
 }

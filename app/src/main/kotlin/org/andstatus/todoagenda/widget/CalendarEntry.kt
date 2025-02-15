@@ -96,9 +96,6 @@ class CalendarEntry private constructor(
     val context: Context
         get() = event.context
 
-    //  TODO: Delete?
-//    override val settings: InstanceSettings
-//        get() = event.settings
     override val source: OrderedEventSource
         get() = event.eventSource
 

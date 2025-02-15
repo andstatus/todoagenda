@@ -1,8 +1,11 @@
 package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.calendar.CalendarEvent
+import org.andstatus.todoagenda.test.R
 import org.andstatus.todoagenda.widget.CalendarEntry
+import org.andstatus.todoagenda.widget.WidgetEntry
 import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
@@ -110,5 +113,23 @@ class OngoingEventTest : BaseWidgetTest() {
         Assert.assertFalse("Is not an end of Multi Day Event", entry.isEndOfMultiDayEvent)
         Assert.assertEquals("Start Time didn't change for today's event", event.startDate, entry.entryDate)
         Assert.assertEquals("Entry end time is the same as Event end time", event.endDate, entry.endDate)
+    }
+
+    @Test
+    fun testMultiDayOngoingEvents() {
+        val method = "testMultiDayOngoingEvents"
+        provider.loadResultsAndSettings(R.raw.multi_day_ongoing)
+        playResults(method)
+        val thisDay = settings.clock.dayOf(provider.executedAt)
+        assertEquals(settings.clock.dayOf(2025, 2, 8), thisDay)
+        assertEquals(2, settings.startHourOfDay)
+        val title = "Event that lasts till next week"
+        val entries: List<WidgetEntry> = factory.widgetEntries.filter { it.title == title }
+        assertEquals("Only one entry", 1, entries.size)
+        val entry = entries[0].shouldBeCalendarEntry
+        assertEquals(thisDay, entry.entryDay)
+        val event = entry.event
+        assertEquals("Days of event $event, ${event.firstDay} - ${event.lastDay}", 4, event.daysOfEvent)
+        assertEquals("The second day of event", 2, event.dayOfEvent(entry.entryDay))
     }
 }

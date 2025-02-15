@@ -24,6 +24,7 @@ class EventEntryTimeBelowTitleLayoutApplier(
         val eventDetails: MyStringBuilder =
             MyStringBuilder
                 .of(entry.formatEntryDate())
+                .withSpace(dayXY(entry))
                 .withSpace(entry.eventTimeString)
                 .withSeparator(entry.locationShown, SPACE_PIPE_SPACE)
                 .withSeparator(entry.descriptionShown, SPACE_PIPE_SPACE)

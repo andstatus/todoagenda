@@ -37,6 +37,7 @@
     <string name="todays_events">Today\'s events</string>
     <string name="future_events">Future events</string>
     <string name="not_found">Not found</string>
+    <string name="day">Day</string>
 
     <!-- Descriptions for app markets -->
     <string name="app_description_80_chars_max">Home screen widgets displaying events from selected calendars and task lists</string>

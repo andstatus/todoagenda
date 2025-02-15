@@ -9,6 +9,7 @@ import org.andstatus.todoagenda.widget.EventStatus
 import org.andstatus.todoagenda.widget.WidgetEvent
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
+import org.joda.time.Days
 import org.joda.time.IllegalInstantException
 import org.joda.time.LocalDateTime
 import kotlin.concurrent.Volatile
@@ -154,7 +155,14 @@ data class CalendarEvent(
         settings.clock.now().let { now ->
             !startDate.isAfter(now) && endDate.isAfter(now)
         }
-    val isPartOfMultiDayEvent: Boolean = settings.clock.dayOf(endDate).isAfter(settings.clock.dayOf(startDate))
+    val firstDay: DateTime = if (isAllDay) startDate else settings.clock.dayOf(startDate)
+
+    val lastDay: DateTime = if (isAllDay) endDate.minusDays(1) else settings.clock.dayOf(endDate)
+    val daysOfEvent: Int = Days.daysBetween(firstDay, lastDay).days + 1
+    val isPartOfMultiDayEvent: Boolean = daysOfEvent > 1
+
+    fun dayOfEvent(day: DateTime): Int = Days.daysBetween(firstDay, day).days + 1
+
     val closestTime: DateTime =
         settings.clock.now().let { now ->
             when {

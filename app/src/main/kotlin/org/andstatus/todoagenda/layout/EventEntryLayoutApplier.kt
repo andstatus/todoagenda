@@ -5,6 +5,7 @@ import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.util.RemoteViewsUtil
+import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.EventEntryVisualizer
 import org.andstatus.todoagenda.widget.EventStatus
 import org.andstatus.todoagenda.widget.WidgetEntry
@@ -106,6 +107,16 @@ abstract class EventEntryLayoutApplier(
     ) {
         RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
     }
+
+    fun dayXY(entry: WidgetEntry): String? =
+        if (settings.showDayXY && entry is CalendarEntry && entry.isPartOfMultiDayEvent) {
+            val day = entry.context.resources.getString(R.string.day)
+            val dayOfEvent = entry.event.dayOfEvent(entry.entryDay)
+            val daysOfEvent = entry.event.daysOfEvent
+            "($day $dayOfEvent/$daysOfEvent)"
+        } else {
+            null
+        }
 
     val settings: InstanceSettings
         get() = visualizer.settings

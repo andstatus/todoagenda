@@ -2,7 +2,7 @@ package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.test.R
 import org.andstatus.todoagenda.widget.WidgetEntry
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
@@ -17,12 +17,12 @@ class ClosestEntriesTest : BaseWidgetTest() {
         playResults(method)
         val title = "Daily all day event"
         val entries: List<WidgetEntry> = factory.widgetEntries.filter { it.title == title }
-        Assert.assertEquals("Only closest event", 1, entries.size)
+        assertEquals("Only closest event", 1, entries.size)
         val today = settings.clock.dayOf(provider.executedAt)
-        Assert.assertEquals(today, entries[0].shouldBeCalendarEntry.entryDay)
+        assertEquals(today, entries[0].shouldBeCalendarEntry.entryDay)
 
         val firstEntry = factory.widgetEntries.first()
-        Assert.assertEquals(
+        assertEquals(
             "Past events filter check. First entry should not be more than a week ago: $firstEntry",
             settings.clock.dayOf(2025, 2, 2),
             firstEntry.entryDay,
@@ -37,7 +37,10 @@ class ClosestEntriesTest : BaseWidgetTest() {
         playResults(method)
         val title = "Monday's one week event"
         val entries: List<WidgetEntry> = factory.widgetEntries.filter { it.title == title }
-        Assert.assertEquals("Only one entry", 1, entries.size)
-        Assert.assertEquals(settings.clock.dayOf(2025, 2, 3), entries[0].shouldBeCalendarEntry.entryDay)
+        assertEquals("Only one entry", 1, entries.size)
+        val entry = entries[0].shouldBeCalendarEntry
+        assertEquals(settings.clock.dayOf(2025, 2, 3), entry.entryDay)
+        assertEquals("Days of event", 8, entry.event.daysOfEvent)
+        assertEquals("The last day of event", 8, entry.event.dayOfEvent(entry.entryDay))
     }
 }

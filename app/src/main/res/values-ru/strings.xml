@@ -33,6 +33,7 @@
     <string name="todays_events">Сегодняшние события</string>
     <string name="future_events">Будущие события</string>
     <string name="not_found">Не найдено</string>
+    <string name="day">День</string>
     <!-- Descriptions for app markets -->
     <string name="app_description_80_chars_max">Виджеты домашнего экрана, отображают события выбранных календарей, списков задач</string>
     <string name="app_description_4000_chars_max_part01">Todo Agenda - это виджеты домашнего экрана для Вашего Android устройства. Каждый виджет имеет свои собственные настройки и отображает список событий и задач календаря так, что Вы можете легко видеть ваши прошедшие, текущие и предстоящие встречи.</string>

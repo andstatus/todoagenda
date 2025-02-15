@@ -4,6 +4,10 @@ import org.andstatus.todoagenda.calendar.CalendarEvent
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.joda.time.DateTime
 import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -17,7 +21,7 @@ class MultidayEventTest : BaseWidgetTest() {
      */
     @Test
     fun testEventWhichCarryOverToTheNextDay() {
-        val today = settings.clock.now().withTimeAtStartOfDay()
+        val today = settings.clock.thisDay()
         val event =
             CalendarEvent(
                 settings = settings,
@@ -43,20 +47,23 @@ class MultidayEventTest : BaseWidgetTest() {
                 }
             }
         }
-        Assert.assertNotNull(entry1)
-        Assert.assertFalse("Is not active event", entry1!!.event.isActive)
-        Assert.assertTrue("Is Part of Multi Day Event", entry1.isPartOfMultiDayEvent)
-        Assert.assertTrue("Is start of Multi Day Event", entry1.isStartOfMultiDayEvent)
-        Assert.assertFalse("Is not an end of Multi Day Event", entry1.isEndOfMultiDayEvent)
-        Assert.assertEquals("Start Time didn't change for today's event", event.startDate, entry1.entryDate)
-        Assert.assertEquals("Entry end time should be the same as Event end time", event.endDate, entry1.endDate)
-        Assert.assertNotNull(entry2)
-        Assert.assertFalse("Is not active event", entry2!!.event.isActive)
-        Assert.assertTrue("Is Part of Multi Day Event", entry2.isPartOfMultiDayEvent)
-        Assert.assertFalse("Is not start of Multi Day Event", entry2.isStartOfMultiDayEvent)
-        Assert.assertTrue("Is end of Multi Day Event", entry2.isEndOfMultiDayEvent)
-        Assert.assertEquals("Start Time of tomorrow's entry is midnight", today.plusDays(1), entry2.entryDate)
-        Assert.assertEquals(
+        assertNotNull(entry1)
+        assertFalse("Is not active event", entry1!!.event.isActive)
+        assertEquals("Days of event", 2, entry1.event.daysOfEvent)
+        assertEquals("First day of event", 1, entry1.event.dayOfEvent(entry1.entryDay))
+        assertTrue("Is Part of Multi Day Event", entry1.isPartOfMultiDayEvent)
+        assertTrue("Is start of Multi Day Event", entry1.isStartOfMultiDayEvent)
+        assertFalse("Is not an end of Multi Day Event", entry1.isEndOfMultiDayEvent)
+        assertEquals("Start Time didn't change for today's event", event.startDate, entry1.entryDate)
+        assertEquals("Entry end time should be the same as Event end time", event.endDate, entry1.endDate)
+        assertNotNull(entry2)
+        assertFalse("Is not active event", entry2!!.event.isActive)
+        assertEquals("Second day of event", 2, entry2.event.dayOfEvent(entry2.entryDay))
+        assertTrue("Is Part of Multi Day Event", entry2.isPartOfMultiDayEvent)
+        assertFalse("Is not start of Multi Day Event", entry2.isStartOfMultiDayEvent)
+        assertTrue("Is end of Multi Day Event", entry2.isEndOfMultiDayEvent)
+        assertEquals("Start Time of tomorrow's entry is midnight", today.plusDays(1), entry2.entryDate)
+        assertEquals(
             "Tomorrow event entry end time is the same as for the event",
             entry2.event.endDate,
             entry2.endDate,
@@ -81,6 +88,7 @@ class MultidayEventTest : BaseWidgetTest() {
                 startDateIn = friday.plusHours(19),
                 endDateIn = sunday.plusHours(15),
             )
+        assertEquals("Days of event", 3, event.daysOfEvent)
         assertSundayEntryAt(event, sunday, friday.plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(1).plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(2).plusHours(14))
@@ -92,12 +100,12 @@ class MultidayEventTest : BaseWidgetTest() {
         currentDateTime: DateTime,
     ) {
         val entry1 = getSundayEntryAt(event, currentDateTime)
-        Assert.assertEquals(sunday, entry1!!.entryDate)
-        Assert.assertEquals(event.endDate, entry1.endDate)
-        Assert.assertEquals(event.title, entry1.title)
+        assertEquals(sunday, entry1!!.entryDate)
+        assertEquals(event.endDate, entry1.endDate)
+        assertEquals(event.title, entry1.title)
         val timeString = entry1.eventTimeString
-        Assert.assertTrue(timeString, timeString.contains(ARROW))
-        Assert.assertEquals(timeString, timeString.indexOf(ARROW).toLong(), timeString.lastIndexOf(ARROW).toLong())
+        assertTrue(timeString, timeString.contains(ARROW))
+        assertEquals(timeString, timeString.indexOf(ARROW).toLong(), timeString.lastIndexOf(ARROW).toLong())
     }
 
     private fun getSundayEntryAt(
@@ -117,7 +125,7 @@ class MultidayEventTest : BaseWidgetTest() {
                 }
             }
         }
-        Assert.assertNotNull(sundayEntry)
+        assertNotNull(sundayEntry)
         return sundayEntry
     }
 
