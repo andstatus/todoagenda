@@ -14,7 +14,7 @@ abstract class WidgetEntryVisualizer(
         position: Int,
     ): RemoteViews
 
-    protected val settings: InstanceSettings
+    val settings: InstanceSettings
         get() = eventProvider.settings
     val context: Context
         get() = eventProvider.context
