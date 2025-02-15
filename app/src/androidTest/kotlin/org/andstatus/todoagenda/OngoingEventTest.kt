@@ -9,7 +9,7 @@ import org.junit.Test
  * @author yvolk@yurivolkov.com
  */
 class OngoingEventTest : BaseWidgetTest() {
-    private var eventId = 0
+    private var eventId = 0L
 
     /**
      * See [Issue 199](https://github.com/plusonelabs/calendar-widget/issues/199)
@@ -17,12 +17,17 @@ class OngoingEventTest : BaseWidgetTest() {
     @Test
     fun testTodaysOngoingEvent() {
         val today = settings.clock.now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, false)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Ongoing event shows original start time"
-        event.setStartDate(today.plusHours(9))
-        event.setEndDate(today.plusHours(12))
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = false,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Ongoing event shows original start time",
+                startDateIn = today.plusHours(9),
+                endDateIn = today.plusHours(12),
+            )
         provider.setExecutedAt(today.plusHours(10).plusMinutes(33))
         provider.addRow(event)
         playResults(TAG)
@@ -45,12 +50,17 @@ class OngoingEventTest : BaseWidgetTest() {
     @Test
     fun testYesterdaysOngoingEvent() {
         val today = settings.clock.now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, false)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Ongoing event, which started yesterday, shows no start time"
-        event.setStartDate(today.minusDays(1).plusHours(9))
-        event.setEndDate(today.plusHours(12))
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = false,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Ongoing event, which started yesterday, shows no start time",
+                startDateIn = today.minusDays(1).plusHours(9),
+                endDateIn = today.plusHours(12),
+            )
         provider.setExecutedAt(today.plusHours(10).plusMinutes(33))
         provider.addRow(event)
         playResults(TAG)
@@ -72,12 +82,17 @@ class OngoingEventTest : BaseWidgetTest() {
     @Test
     fun testEventWhichCarryOverToTheNextDay() {
         val today = settings.clock.now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, false)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Event that carry over to the next day, show as ending midnight"
-        event.setStartDate(today.plusHours(19))
-        event.setEndDate(today.plusDays(1).plusHours(7))
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = false,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Event that carry over to the next day, show as ending midnight",
+                startDateIn = today.plusHours(19),
+                endDateIn = today.plusDays(1).plusHours(7),
+            )
         provider.setExecutedAt(today.plusHours(20).plusMinutes(33))
         provider.addRow(event)
         playResults(TAG)

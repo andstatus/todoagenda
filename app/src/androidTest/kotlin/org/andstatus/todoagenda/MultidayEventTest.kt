@@ -10,7 +10,7 @@ import org.junit.Test
  * @author yvolk@yurivolkov.com
  */
 class MultidayEventTest : BaseWidgetTest() {
-    private var eventId = 0
+    private var eventId = 0L
 
     /**
      * Issue #206 https://github.com/plusonelabs/calendar-widget/issues/206
@@ -18,12 +18,17 @@ class MultidayEventTest : BaseWidgetTest() {
     @Test
     fun testEventWhichCarryOverToTheNextDay() {
         val today = settings.clock.now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, false)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Event that carry over to the next day, show as ending midnight"
-        event.setStartDate(today.plusHours(19))
-        event.setEndDate(today.plusDays(1).plusHours(7))
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = false,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Event that carry over to the next day, show as ending midnight",
+                startDateIn = today.plusHours(19),
+                endDateIn = today.plusDays(1).plusHours(7),
+            )
         provider.setExecutedAt(today.plusHours(10).plusMinutes(33))
         provider.addRow(event)
         playResults(TAG)
@@ -54,7 +59,7 @@ class MultidayEventTest : BaseWidgetTest() {
         Assert.assertEquals(
             "Tomorrow event entry end time is the same as for the event",
             entry2.event.endDate,
-            entry2.endDate
+            entry2.endDate,
         )
     }
 
@@ -65,18 +70,27 @@ class MultidayEventTest : BaseWidgetTest() {
     fun testThreeDaysEvent() {
         val friday = dateTime(2015, 9, 18)
         val sunday = friday.plusDays(2)
-        val event = CalendarEvent(settings, provider.context, false)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Leader's weekend"
-        event.setStartDate(friday.plusHours(19))
-        event.setEndDate(sunday.plusHours(15))
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = false,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Leader's weekend",
+                startDateIn = friday.plusHours(19),
+                endDateIn = sunday.plusHours(15),
+            )
         assertSundayEntryAt(event, sunday, friday.plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(1).plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(2).plusHours(14))
     }
 
-    private fun assertSundayEntryAt(event: CalendarEvent, sunday: DateTime, currentDateTime: DateTime) {
+    private fun assertSundayEntryAt(
+        event: CalendarEvent,
+        sunday: DateTime,
+        currentDateTime: DateTime,
+    ) {
         val entry1 = getSundayEntryAt(event, currentDateTime)
         Assert.assertEquals(sunday, entry1!!.entryDate)
         Assert.assertEquals(event.endDate, entry1.endDate)
@@ -86,7 +100,10 @@ class MultidayEventTest : BaseWidgetTest() {
         Assert.assertEquals(timeString, timeString.indexOf(ARROW).toLong(), timeString.lastIndexOf(ARROW).toLong())
     }
 
-    private fun getSundayEntryAt(event: CalendarEvent, currentDateTime: DateTime): CalendarEntry? {
+    private fun getSundayEntryAt(
+        event: CalendarEvent,
+        currentDateTime: DateTime,
+    ): CalendarEntry? {
         provider.clear()
         provider.setExecutedAt(currentDateTime)
         provider.addRow(event)

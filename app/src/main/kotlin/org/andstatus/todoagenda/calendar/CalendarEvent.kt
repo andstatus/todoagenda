@@ -11,48 +11,62 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.IllegalInstantException
 import org.joda.time.LocalDateTime
-import java.util.Optional
 import kotlin.concurrent.Volatile
 
-class CalendarEvent(
+data class CalendarEvent(
     val settings: InstanceSettings,
     val context: Context,
     val isAllDay: Boolean,
+    override var eventSource: OrderedEventSource,
+    override var eventId: Long = 0L,
+    var title: String = "",
+    val startMillisIn: Long? = null,
+    val endMillisIn: Long? = null,
+    var startDateIn: DateTime? = null,
+    var endDateIn: DateTime? = null,
+    var color: Int = 0,
+    var calendarColor: Int? = null,
+    var location: String? = null,
+    var description: String? = null,
+    var isAlarmActive: Boolean = false,
+    var isRecurring: Boolean = false,
+    var status: EventStatus = EventStatus.CONFIRMED,
 ) : WidgetEvent {
-    override lateinit var eventSource: OrderedEventSource
-        private set
-    override var eventId = 0L
-    var title: String = ""
-    lateinit var startDate: DateTime
-        private set
-    lateinit var endDate: DateTime
-        private set
+    var startDate: DateTime = calcStartDate()
 
-    var color = 0
-    var calendarColor = Optional.empty<Int>()
-    var location: String? = null
-    var description: String? = null
-    var isAlarmActive = false
-    var isRecurring = false
-    var status = EventStatus.CONFIRMED
+    private fun calcStartDate(): DateTime = startDateIn ?: startMillisIn?.let { dateFromMillis(it) } ?: error("")
 
-    fun setEventSource(eventSource: OrderedEventSource): CalendarEvent {
-        this.eventSource = eventSource
-        return this
-    }
+    var endDate: DateTime =
+        endDateIn?.let { if (isAllDay) it.withTimeAtStartOfDay() else it } ?: endMillisIn
+            ?.let { dateFromMillis(it) }
+            .let { toFix ->
+                if (toFix == null || !toFix.isAfter(startDate)) {
+                    if (isAllDay) startDate.plusDays(1) else startDate.plusSeconds(1)
+                } else {
+                    toFix
+                }
+            }
 
-    fun setStartDate(startDate: DateTime): CalendarEvent {
-        this.startDate = if (isAllDay) startDate.withTimeAtStartOfDay() else startDate
-        fixEndDate()
-        return this
-    }
+    val startMillis: Long = dateToMillis(startDate)
+    val endMillis: Long = dateToMillis(endDate)
 
-    var startMillis: Long
-        get() = dateToMillis(startDate)
-        set(startMillis) {
-            startDate = dateFromMillis(startMillis)
-            fixEndDate()
-        }
+//    fun setEventSource(eventSource: OrderedEventSource): CalendarEvent {
+//        this.eventSource = eventSource
+//        return this
+//    }
+
+//    fun setStartDate(startDate: DateTime): CalendarEvent {
+//        this.startDate = if (isAllDay) startDate.withTimeAtStartOfDay() else startDate
+//        fixEndDate()
+//        return this
+//    }
+
+//    var startMillis: Long
+//        get() = dateToMillis(startDate)
+//        set(startMillis) {
+//            startDate = dateFromMillis(startMillis)
+//            fixEndDate()
+//        }
 
     private fun dateFromMillis(millis: Long): DateTime = if (isAllDay) fromAllDayMillis(millis) else DateTime(millis, settings.timeZone)
 
@@ -87,34 +101,34 @@ class CalendarEvent(
         return fixed
     }
 
-    private fun fixEndDate() {
-        if (!this::endDate.isInitialized || !endDate.isAfter(startDate)) {
-            endDate = if (isAllDay) startDate.plusDays(1) else startDate.plusSeconds(1)
-        }
-    }
+//    private fun fixEndDate() {
+//        if (endDateIn?.isAfter(startDate) != true) {
+//            endDate = if (isAllDay) startDate.plusDays(1) else startDate.plusSeconds(1)
+//        }
+//    }
 
-    fun setEventId(eventId: Int) {
-        this.eventId = eventId.toLong()
-    }
+//    fun setEventId(eventId: Int) {
+//        this.eventId = eventId.toLong()
+//    }
 
-    fun setEndDate(endDate: DateTime) {
-        this.endDate = if (isAllDay) endDate.withTimeAtStartOfDay() else endDate
-        fixEndDate()
-    }
+//    fun setEndDate(endDate: DateTime) {
+//        this.endDate = if (isAllDay) endDate.withTimeAtStartOfDay() else endDate
+//        fixEndDate()
+//    }
 
-    var endMillis: Long
-        get() = dateToMillis(endDate)
-        set(endMillis) {
-            endDate = dateFromMillis(endMillis)
-            fixEndDate()
-        }
+//    var endMillis: Long
+//        get() = dateToMillis(endDate)
+//        set(endMillis) {
+//            endDate = dateFromMillis(endMillis)
+//            fixEndDate()
+//        }
 
-    private fun dateToMillis(date: DateTime?): Long = if (isAllDay) toAllDayMillis(date) else date!!.millis
+    private fun dateToMillis(date: DateTime): Long = if (isAllDay) toAllDayMillis(date) else date.millis
 
-    private fun toAllDayMillis(date: DateTime?): Long {
+    private fun toAllDayMillis(date: DateTime): Long {
         val utcDate =
             DateTime(
-                date!!.year,
+                date.year,
                 date.monthOfYear,
                 date.dayOfMonth,
                 0,
@@ -124,13 +138,13 @@ class CalendarEvent(
         return utcDate.millis
     }
 
-    fun getCalendarColor(): Int = calendarColor.orElse(color)
+    fun getCalendarColor(): Int = calendarColor ?: color
 
-    fun setCalendarColor(color: Int) {
-        calendarColor = Optional.of(color)
-    }
+//    fun setCalendarColor(color: Int) {
+//        calendarColor = Optional.of(color)
+//    }
 
-    fun hasDefaultCalendarColor(): Boolean = calendarColor.map { cc: Int -> cc == color }.orElse(true)
+    fun hasDefaultCalendarColor(): Boolean = calendarColor?.let { cc: Int -> cc == color } ?: true
 
     override fun toString(): String =
         (
@@ -144,12 +158,14 @@ class CalendarEvent(
                         " is default"
                     } else {
                         ", calendarColor=" +
-                            calendarColor
-                                .map { obj: Int? ->
-                                    java.lang.String.valueOf(
-                                        obj,
-                                    )
-                                }.orElse("???")
+                            (
+                                calendarColor
+                                    ?.let { obj: Int? ->
+                                        java.lang.String.valueOf(
+                                            obj,
+                                        )
+                                    } ?: "???"
+                            )
                     }
                 ) +
                 ", allDay=" + isAllDay +

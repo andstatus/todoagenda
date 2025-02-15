@@ -12,21 +12,26 @@ import org.junit.Test
  * @author yvolk@yurivolkov.com
  */
 class SingleEventTest : BaseWidgetTest() {
-    private var eventId = 0
+    private var eventId = 0L
 
     @Test
     fun testEventAttributes() {
         val today = settings.clock.now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, false)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Single Event today with all known attributes"
-        event.setStartDate(today.plusHours(12))
-        event.setEndDate(today.plusHours(13))
-        event.color = -0x6d1e40
-        event.location = "somewhere"
-        event.isAlarmActive = true
-        event.isRecurring = true
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = false,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Single Event today with all known attributes",
+                startDateIn = today.plusHours(12),
+                endDateIn = today.plusHours(13),
+                color = -0x6d1e40,
+                location = "somewhere",
+                isAlarmActive = true,
+                isRecurring = true,
+            )
         val executedAt = today.plusHours(10)
         assertOneEvent(executedAt, event, true)
         event.isAlarmActive = false
@@ -38,29 +43,42 @@ class SingleEventTest : BaseWidgetTest() {
     @Test
     fun testAlldayEventAttributes() {
         val today = settings.clock.now().withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, true)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Single AllDay event today with all known attributes"
-        event.setStartDate(today.minusDays(1))
-        event.setEndDate(today.plusDays(1))
-        event.color = -0x6d1e40
-        event.location = "somewhere"
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = true,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Single AllDay event today with all known attributes",
+                startDateIn = today.minusDays(1),
+                endDateIn = today.plusDays(1),
+                color = -0x6d1e40,
+                location = "somewhere",
+            )
         val executedAt = today.plusHours(10)
         assertOneEvent(executedAt, event, false)
-        event.setStartDate(today)
-        event.setEndDate(today.plusDays(1))
-        assertOneEvent(executedAt, event, true)
+        val event2 =
+            event.copy(
+                startDateIn = today,
+                endDateIn = today.plusDays(1),
+            )
+        assertOneEvent(executedAt, event2, true)
     }
 
     @Test
     fun testAlldayEventMillis() {
         val today = settings.clock.now(DateTimeZone.UTC).withTimeAtStartOfDay()
-        val event = CalendarEvent(settings, provider.context, true)
-        event.setEventSource(provider.firstActiveEventSource)
-        event.setEventId(++eventId)
-        event.title = "Single All day event from millis"
-        event.startMillis = today.millis
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = provider.context,
+                isAllDay = true,
+                eventSource = provider.firstActiveEventSource,
+                eventId = ++eventId,
+                title = "Single All day event from millis",
+                startMillisIn = today.millis,
+            )
         Assert.assertEquals(event.startDate.toString(), today.millis, event.startMillis)
         Assert.assertEquals(event.endDate.toString(), today.plusDays(1).millis, event.endMillis)
     }

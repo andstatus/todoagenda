@@ -37,7 +37,6 @@ import org.andstatus.todoagenda.util.IntentUtil
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.widget.EventStatus
 import org.joda.time.DateTime
-import java.util.Optional
 import java.util.function.Function
 import kotlin.math.abs
 
@@ -218,22 +217,28 @@ class CalendarEventProvider(
             settings
                 .getActiveEventSource(type, cursor.getInt(cursor.getColumnIndex(CALENDAR_ID)))
         val allDay = cursor.getInt(cursor.getColumnIndex(ALL_DAY)) > 0
-        val event = CalendarEvent(settings, context, allDay)
-        event.setEventSource(source)
-        event.setEventId(cursor.getInt(cursor.getColumnIndex(EVENT_ID)))
-        event.status =
-            EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(STATUS)))
-        event.title = cursor.getStringOrNull(cursor.getColumnIndex(TITLE)) ?: ""
-        event.startMillis = cursor.getLong(cursor.getColumnIndex(BEGIN))
-        event.endMillis = cursor.getLong(cursor.getColumnIndex(END))
-        event.location = cursor.getStringOrNull(cursor.getColumnIndex(EVENT_LOCATION))
-        event.description = cursor.getStringOrNull(cursor.getColumnIndex(DESCRIPTION))
-        event.isAlarmActive = cursor.getInt(cursor.getColumnIndex(HAS_ALARM)) > 0
-        event.isRecurring = cursor.getStringOrNull(cursor.getColumnIndex(RRULE)) != null
-        event.color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(DISPLAY_COLOR)))
+        var calendarColor: Int? = null
         getColumnIndex(cursor, CALENDAR_COLOR)
-            .map<Int>({ ind: Int? -> getAsOpaque(cursor.getInt(ind!!)) })
-            .ifPresent({ color: Int -> event.calendarColor = Optional.of(color) })
+            .map<Int> { ind: Int -> getAsOpaque(cursor.getInt(ind)) }
+            .ifPresent { color: Int -> calendarColor = color }
+        val event =
+            CalendarEvent(
+                settings = settings,
+                context = context,
+                isAllDay = allDay,
+                eventSource = source,
+                eventId = cursor.getInt(cursor.getColumnIndex(EVENT_ID)).toLong(),
+                title = cursor.getStringOrNull(cursor.getColumnIndex(TITLE)) ?: "",
+                startMillisIn = cursor.getLong(cursor.getColumnIndex(BEGIN)),
+                endMillisIn = cursor.getLong(cursor.getColumnIndex(END)),
+                color = getAsOpaque(cursor.getInt(cursor.getColumnIndex(DISPLAY_COLOR))),
+                calendarColor = calendarColor,
+                location = cursor.getStringOrNull(cursor.getColumnIndex(EVENT_LOCATION)),
+                description = cursor.getStringOrNull(cursor.getColumnIndex(DESCRIPTION)),
+                isAlarmActive = cursor.getInt(cursor.getColumnIndex(HAS_ALARM)) > 0,
+                isRecurring = cursor.getStringOrNull(cursor.getColumnIndex(RRULE)) != null,
+                status = EventStatus.fromCalendarStatus(cursor.getInt(cursor.getColumnIndex(STATUS))),
+            )
         return event
     }
 
@@ -249,7 +254,7 @@ class CalendarEventProvider(
                     val indId = cursor.getColumnIndex(CalendarContract.Calendars._ID)
                     val indTitle = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
                     val indSummary = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)
-                    val indColor = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_COLOR)
+                    val indColor = cursor.getColumnIndex(CALENDAR_COLOR)
                     val source =
                         EventSource(
                             type,
@@ -282,7 +287,7 @@ class CalendarEventProvider(
             arrayOf<String>(
                 CalendarContract.Calendars._ID,
                 CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
-                CalendarContract.Calendars.CALENDAR_COLOR,
+                CALENDAR_COLOR,
                 CalendarContract.Calendars.ACCOUNT_NAME,
             )
         const val EVENT_SORT_ORDER = "${START_DAY} ASC, ${ALL_DAY} DESC, $BEGIN ASC "
