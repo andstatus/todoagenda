@@ -200,7 +200,7 @@ data class InstanceSettings(
     fun toJson(skipQueryResults: Boolean = false): JSONObject =
         JSONObject().apply {
             put(PREF_WIDGET_ID, widgetId)
-
+            //
             // ----------------------------------------------------------------------------------
             // Layout
             put(PREF_COMPACT_LAYOUT, isCompactLayout)
@@ -219,7 +219,7 @@ data class InstanceSettings(
             put(PREF_MAXLINES_TITLE, maxLinesTitle)
             put(PREF_MULTILINE_DETAILS, isMultilineDetails)
             put(PREF_MAXLINES_DETAILS, maxLinesDetails)
-
+            //
             // ----------------------------------------------------------------------------------
             // Colors
             defaultColors.toJson(this)
@@ -227,16 +227,17 @@ data class InstanceSettings(
                 put(PREF_DARK_THEME, darkColors.toJson(JSONObject()))
             }
             put(PREF_TEXT_SHADOW, textShadow.value)
-
+            //
             // ----------------------------------------------------------------------------------
             // Event details
+            put(PREF_SHOW_DAY_XY, showDayXY)
             put(PREF_SHOW_END_TIME, showEndTime)
             put(PREF_SHOW_LOCATION, showLocation)
             put(PREF_SHOW_DESCRIPTION, showDescription)
             put(PREF_FILL_ALL_DAY, fillAllDayEvents)
             put(PREF_INDICATE_ALERTS, indicateAlerts)
             put(PREF_INDICATE_RECURRING, indicateRecurring)
-
+            //
             // ----------------------------------------------------------------------------------
             // Event filters
             put(PREF_EVENTS_ENDED, eventsEnded.save())
@@ -251,11 +252,11 @@ data class InstanceSettings(
             put(PREF_TASK_SCHEDULING, taskScheduling.value)
             put(PREF_TASK_WITHOUT_DATES, taskWithoutDates.value)
             put(PREF_FILTER_MODE, filterMode.value)
-
+            //
             // ----------------------------------------------------------------------------------
             // Calendars and task lists
             put(PREF_ACTIVE_SOURCES, OrderedEventSource.toJsonArray(activeEventSources))
-
+            //
             // ----------------------------------------------------------------------------------
             // Other
             put(PREF_WIDGET_INSTANCE_NAME, widgetInstanceName)
@@ -396,6 +397,7 @@ data class InstanceSettings(
         }
         const val PREF_WIDGET_ID = "widgetId"
 
+        //
         // ----------------------------------------------------------------------------------
         // Layout
         const val PREF_COMPACT_LAYOUT = "compactLayout"
@@ -426,13 +428,16 @@ data class InstanceSettings(
         const val PREF_MAXLINES_DETAILS_DEFAULT = 5
         const val PREF_DARK_THEME = "darkTheme"
 
+        //
         // ----------------------------------------------------------------------------------
         // Color
         const val PREF_TEXT_SHADOW = "textShadow"
         val PREF_TEXT_SHADOW_DEFAULT = TextShadow.NO_SHADOW.name
 
+        //
         // ----------------------------------------------------------------------------------
         // Event details
+        const val PREF_SHOW_DAY_XY = "showDayXY"
         const val PREF_SHOW_END_TIME = "showEndTime"
         const val PREF_SHOW_END_TIME_DEFAULT = true
         const val PREF_SHOW_LOCATION = "showLocation"
@@ -444,6 +449,7 @@ data class InstanceSettings(
         const val PREF_INDICATE_ALERTS = "indicateAlerts"
         const val PREF_INDICATE_RECURRING = "indicateRecurring"
 
+        //
         // ----------------------------------------------------------------------------------
         // Event filters
         const val PREF_EVENTS_ENDED = "eventsEnded"
@@ -462,10 +468,12 @@ data class InstanceSettings(
         const val PREF_TASK_WITHOUT_DATES = "taskWithoutDates"
         const val PREF_FILTER_MODE = "filterMode"
 
+        //
         // ----------------------------------------------------------------------------------
         // Calendars and task lists
         const val PREF_ACTIVE_SOURCES = "activeSources"
 
+        //
         // ----------------------------------------------------------------------------------
         // Other
         const val PREF_WIDGET_INSTANCE_NAME = "widgetInstanceName"
@@ -667,6 +675,12 @@ data class InstanceSettings(
                             )
                         } else {
                             EMPTY.entryDateFormat
+                        },
+                    showDayXY =
+                        if (json.has(PREF_SHOW_DAY_XY)) {
+                            json.getBoolean(PREF_SHOW_DAY_XY)
+                        } else {
+                            EMPTY.showDayXY
                         },
                     showEndTime =
                         if (json.has(PREF_SHOW_END_TIME)) {
@@ -945,6 +959,7 @@ data class InstanceSettings(
                     textShadow = ApplicationPreferences.getTextShadow(context),
                     // ----------------------------------------------------------------------------------
                     // Event details
+                    showDayXY = ApplicationPreferences.getBoolean(context, PREF_SHOW_DAY_XY, true),
                     showEndTime = ApplicationPreferences.getShowEndTime(context),
                     showLocation = ApplicationPreferences.getShowLocation(context),
                     showDescription = ApplicationPreferences.getShowDescription(context),

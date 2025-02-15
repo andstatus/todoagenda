@@ -167,6 +167,8 @@
     <string name="appearance_theme_white">Black</string>
 
     <!-- Preference frame: Event details -->
+    <string name="show_day_xy_title">(Day x/y)</string>
+    <string name="show_day_xy_desc">Show current day number / total number of days for multi-day events</string>
     <string name="event_details_prefs">Event details</string>
     <string name="event_details_prefs_desc">Configure what details to show for an event</string>
     <string name="event_details_show_end_time_title">End time</string>

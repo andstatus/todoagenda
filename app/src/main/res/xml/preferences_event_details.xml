@@ -1,6 +1,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
+        android:key="showDayXY"
+        android:title="@string/show_day_xy_title"
+        android:summary="@string/show_day_xy_desc"
+        android:defaultValue="true" />
+
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:key="showEndTime"
         android:title="@string/event_details_show_end_time_title"
         android:summary="@string/event_details_show_end_time_desc"

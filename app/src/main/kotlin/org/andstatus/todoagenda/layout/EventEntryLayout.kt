@@ -17,13 +17,13 @@ enum class EventEntryLayout(
         widgetLayout = WidgetLayout.EVENT_ENTRY_TIME_BELOW_TITLE,
         value = "DEFAULT",
         summaryResId = R.string.default_multiline_layout,
-        applier = ::EventEntryTimeBelowTitleLayoutApplier,
+        applier = ::TimeBelowTitleLayoutApplier,
     ),
     ONE_LINE(
         widgetLayout = WidgetLayout.EVENT_ENTRY_ONE_LINE,
         value = "ONE_LINE",
         summaryResId = R.string.single_line_layout,
-        applier = ::EventEntryOneLineLayoutApplier,
+        applier = ::OneLineLayoutApplier,
     ),
     ;
 

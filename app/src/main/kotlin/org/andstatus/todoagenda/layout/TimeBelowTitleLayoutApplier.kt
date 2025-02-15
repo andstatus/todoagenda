@@ -12,7 +12,7 @@ import org.andstatus.todoagenda.widget.WidgetEntry
 /**
  * @author yvolk@yurivolkov.com
  */
-class EventEntryTimeBelowTitleLayoutApplier(
+class TimeBelowTitleLayoutApplier(
     visualizer: EventEntryVisualizer,
 ) : EventEntryLayoutApplier(visualizer) {
     override fun getTitleString(event: WidgetEntry): CharSequence = event.title

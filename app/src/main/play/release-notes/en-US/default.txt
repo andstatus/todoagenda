@@ -1,2 +1,1 @@
-v4.11.1. "Maximum number of events" option added to "Event filters" section.
-  "Start hour of a day" option added to "Other settings" section.
+v4.12.2. "(Day x/y)" option added to "Event details" showing current day number / total number of days for multi-day events.

@@ -29,7 +29,7 @@ object ApplicationPreferences {
         synchronized(ApplicationPreferences::class) {
             val settings = AllSettings.instanceFromId(context, widgetId)
             setWidgetId(context, if (widgetId == 0) settings.widgetId else widgetId)
-
+            //
             // ----------------------------------------------------------------------------------
             // Layout
             setBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, settings.isCompactLayout)
@@ -52,7 +52,7 @@ object ApplicationPreferences {
             setString(context, InstanceSettings.PREF_MAXLINES_TITLE, settings.maxLinesTitle.toString())
             setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
             setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
-
+            //
             // ----------------------------------------------------------------------------------
             // Colors
             val colors = settings.colors()
@@ -67,16 +67,17 @@ object ApplicationPreferences {
                 setInt(context, pref.colorPreferenceName, colors.getTextColorStored(pref).color)
             }
             setString(context, PREF_TEXT_SHADOW, settings.textShadow.value)
-
+            //
             // ----------------------------------------------------------------------------------
             // Event details
+            setBoolean(context, InstanceSettings.PREF_SHOW_DAY_XY, settings.showDayXY)
             setBoolean(context, InstanceSettings.PREF_SHOW_END_TIME, settings.showEndTime)
             setBoolean(context, InstanceSettings.PREF_SHOW_LOCATION, settings.showLocation)
             setBoolean(context, InstanceSettings.PREF_SHOW_DESCRIPTION, settings.showDescription)
             setFillAllDayEvents(context, settings.fillAllDayEvents)
             setBoolean(context, InstanceSettings.PREF_INDICATE_ALERTS, settings.indicateAlerts)
             setBoolean(context, InstanceSettings.PREF_INDICATE_RECURRING, settings.indicateRecurring)
-
+            //
             // ----------------------------------------------------------------------------------
             // Event filters
             setEventsEnded(context, settings.eventsEnded)
@@ -100,11 +101,11 @@ object ApplicationPreferences {
             setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
             setString(context, InstanceSettings.PREF_TASK_WITHOUT_DATES, settings.taskWithoutDates.value)
             setString(context, InstanceSettings.PREF_FILTER_MODE, settings.filterMode.value)
-
+            //
             // ----------------------------------------------------------------------------------
             // Calendars and task lists
             setActiveEventSources(context, settings.activeEventSources)
-
+            //
             // ----------------------------------------------------------------------------------
             // Other
             setString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, settings.widgetInstanceName)

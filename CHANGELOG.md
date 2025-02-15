@@ -2,10 +2,13 @@
 
 <a id="v4.12"/>
 
-### 2025-02-08 v4.12.1 Widget header buttons size
+### 2025-02-15 v4.12.2 Widget header buttons size
 * "Buttons size" option added to "Other settings" section allowing to make widget header buttons larger or smaller,
   for Android 12+.
   [#160](https://github.com/andstatus/todoagenda/issues/160)
+* "(Day x/y)" option added to "Event details" showing current day number / total number of days
+  for multi-day events.
+  [#81](https://github.com/andstatus/todoagenda/issues/81)
 * Improved sticking to App Language for Custom date format patterns. 
   App language can be changed in Android Settings since Android 13.
   [#161](https://github.com/andstatus/todoagenda/issues/161)

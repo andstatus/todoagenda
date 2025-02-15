@@ -14,14 +14,15 @@ import org.andstatus.todoagenda.widget.WidgetEntry
 /**
  * @author yvolk@yurivolkov.com
  */
-class EventEntryOneLineLayoutApplier(
+class OneLineLayoutApplier(
     visualizer: EventEntryVisualizer,
 ) : EventEntryLayoutApplier(visualizer) {
-    override fun getTitleString(event: WidgetEntry): CharSequence =
+    override fun getTitleString(entry: WidgetEntry): CharSequence =
         MyStringBuilder
-            .of(event.title)
-            .withSeparator(event.locationShown, SPACE_PIPE_SPACE)
-            .withSeparator(event.descriptionShown, SPACE_PIPE_SPACE)
+            .of(entry.title)
+            .withSpace(dayXY(entry))
+            .withSeparator(entry.locationShown, SPACE_PIPE_SPACE)
+            .withSeparator(entry.descriptionShown, SPACE_PIPE_SPACE)
 
     override fun setDetails(
         entry: WidgetEntry,

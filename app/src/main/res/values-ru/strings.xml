@@ -132,6 +132,8 @@
     <string name="text_shadow_dark">Тёмная тень</string>
     <string name="text_shadow_light">Светлая тень</string>
     <!-- Preference frame: Event details -->
+    <string name="show_day_xy_title">(День x/y)</string>
+    <string name="show_day_xy_desc">Показать номер текущего дня / общее количество дней многодневных событий</string>
     <string name="event_details_prefs">Подробности о событии</string>
     <string name="event_details_prefs_desc">Укажите, какую информацию о событиях показывать</string>
     <string name="event_details_show_end_time_title">Время окончания</string>
