@@ -25,8 +25,8 @@ class EventEntryTimeBelowTitleLayoutApplier(
             MyStringBuilder
                 .of(entry.formatEntryDate())
                 .withSpace(entry.eventTimeString)
-                .withSeparator(entry.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
-                .withSeparator(entry.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
+                .withSeparator(entry.locationShown, SPACE_PIPE_SPACE)
+                .withSeparator(entry.descriptionShown, SPACE_PIPE_SPACE)
         val viewId = R.id.event_entry_details
         if (eventDetails.isEmpty()) {
             rv.setViewVisibility(viewId, View.GONE)

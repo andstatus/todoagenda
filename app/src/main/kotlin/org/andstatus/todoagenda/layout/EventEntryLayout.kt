@@ -28,8 +28,6 @@ enum class EventEntryLayout(
     ;
 
     companion object {
-        const val SPACE_PIPE_SPACE = "  |  "
-
         fun fromValue(value: String?): EventEntryLayout {
             var layout = TIME_BELOW_TITLE
             for (item in entries) {

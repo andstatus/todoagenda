@@ -20,8 +20,8 @@ class EventEntryOneLineLayoutApplier(
     override fun getTitleString(event: WidgetEntry): CharSequence =
         MyStringBuilder
             .of(event.title)
-            .withSeparator(event.locationShown, EventEntryLayout.SPACE_PIPE_SPACE)
-            .withSeparator(event.descriptionShown, EventEntryLayout.SPACE_PIPE_SPACE)
+            .withSeparator(event.locationShown, SPACE_PIPE_SPACE)
+            .withSeparator(event.descriptionShown, SPACE_PIPE_SPACE)
 
     override fun setDetails(
         entry: WidgetEntry,

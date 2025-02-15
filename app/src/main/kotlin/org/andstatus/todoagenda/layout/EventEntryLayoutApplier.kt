@@ -109,4 +109,8 @@ abstract class EventEntryLayoutApplier(
 
     val settings: InstanceSettings
         get() = visualizer.settings
+
+    companion object {
+        const val SPACE_PIPE_SPACE = "  |  "
+    }
 }
