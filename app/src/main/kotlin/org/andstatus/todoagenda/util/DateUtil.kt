@@ -6,6 +6,7 @@ import android.text.format.DateUtils
 import android.util.Log
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.MyLocale
+import org.andstatus.todoagenda.prefs.MyLocale.APP_DEFAULT_LOCALE
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import java.text.FieldPosition
@@ -64,7 +65,7 @@ object DateUtil {
         for (ind in 0..1) {
             // see http://stackoverflow.com/questions/16763968/android-text-format-dateformat-hh-is-not-recognized-like-with-java-text-simple
             val formatString = if (ind == 0) "yyyy-MM-dd-HH-mm-ss-SSS" else "yyyy-MM-dd-kk-mm-ss-SSS"
-            val format = SimpleDateFormat(formatString)
+            val format = SimpleDateFormat(formatString, APP_DEFAULT_LOCALE)
             val buffer = StringBuffer()
             format.format(Date(time), buffer, FieldPosition(0))
             val strTime = buffer.toString()

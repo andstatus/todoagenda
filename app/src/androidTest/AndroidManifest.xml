@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:compileSdkVersion="29">
-
-    <uses-sdk
-        android:minSdkVersion="24"
-        android:targetSdkVersion="29" />
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <instrumentation
         android:label="Tests for DoTo Agenda"

@@ -34,13 +34,17 @@ import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.MyLocale.APP_DEFAULT_LOCALE
 import org.joda.time.DateTime
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.Locale
 
-class DateFormatDialog(private val preference: DateFormatPreference) : PreferenceDialogFragmentCompat(),
-    OnItemSelectedListener, View.OnKeyListener, TextWatcher {
+class DateFormatDialog(
+    private val preference: DateFormatPreference,
+) : PreferenceDialogFragmentCompat(),
+    OnItemSelectedListener,
+    View.OnKeyListener,
+    TextWatcher {
     private var typeSpinner: Spinner? = null
     private var customPatternText: EditText? = null
     private var sampleDateText: EditText? = null
@@ -56,31 +60,36 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
 
     override fun onCreateDialogView(context: Context): View {
         val dialogView = LayoutInflater.from(context).inflate(R.layout.dateformat_preference, null) as LinearLayout
-        typeSpinner = dialogView.findViewById<Spinner?>(R.id.date_format_type).also {
-            val adapter: ArrayAdapter<CharSequence> = ArrayAdapter<CharSequence>(
-                context, android.R.layout.simple_spinner_item, DateFormatType.getSpinnerEntryList(context)
-            )
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            it.setAdapter(adapter)
-            it.setSelection(preference.value.type.spinnerPosition)
-            it.setOnItemSelectedListener(this)
-        }
-        customPatternText = dialogView.findViewById<EditText?>(R.id.custom_pattern).apply {
-            setText(preference.value.pattern)
-            addTextChangedListener(this@DateFormatDialog)
-        }
-        sampleDateText = dialogView.findViewById<EditText?>(R.id.sample_date).apply {
-            setText(getSampleDateText())
-            addTextChangedListener(this@DateFormatDialog)
-        }
+        typeSpinner =
+            dialogView.findViewById<Spinner?>(R.id.date_format_type).also {
+                val adapter: ArrayAdapter<CharSequence> =
+                    ArrayAdapter<CharSequence>(
+                        context,
+                        android.R.layout.simple_spinner_item,
+                        DateFormatType.getSpinnerEntryList(context),
+                    )
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                it.setAdapter(adapter)
+                it.setSelection(preference.value.type.spinnerPosition)
+                it.setOnItemSelectedListener(this)
+            }
+        customPatternText =
+            dialogView.findViewById<EditText?>(R.id.custom_pattern).apply {
+                setText(preference.value.pattern)
+                addTextChangedListener(this@DateFormatDialog)
+            }
+        sampleDateText =
+            dialogView.findViewById<EditText?>(R.id.sample_date).apply {
+                setText(getSampleDateText())
+                addTextChangedListener(this@DateFormatDialog)
+            }
         resultText = dialogView.findViewById(R.id.result)
         return dialogView
     }
 
-    private fun getSampleDateText(): CharSequence {
-        return DateFormatter(context, sampleDateFormatValue, settings.clock.now())
+    private fun getSampleDateText(): CharSequence =
+        DateFormatter(context, sampleDateFormatValue, settings.clock.now())
             .formatDate(settings.clock.now())
-    }
 
     override fun onResume() {
         super.onResume()
@@ -88,7 +97,12 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
     }
 
     // Two methods to listen for the Spinner changes
-    override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+    override fun onItemSelected(
+        parent: AdapterView<*>?,
+        view: View,
+        position: Int,
+        id: Long,
+    ) {
         if (value.type.hasPattern()) {
             customPatternText!!.setText(value.type.pattern)
         } else if (!value.hasPattern() && value.type.isCustomPattern) {
@@ -102,15 +116,29 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
     }
 
     // Four methods to listen to the Custom pattern text changes
-    override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-    override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+    override fun beforeTextChanged(
+        s: CharSequence,
+        start: Int,
+        count: Int,
+        after: Int,
+    ) {}
+
+    override fun onTextChanged(
+        s: CharSequence,
+        start: Int,
+        before: Int,
+        count: Int,
+    ) {}
+
     override fun afterTextChanged(s: Editable) {
         calcResult()
     }
 
-    override fun onKey(v: View, keyCode: Int, event: KeyEvent): Boolean {
-        return false
-    }
+    override fun onKey(
+        v: View,
+        keyCode: Int,
+        event: KeyEvent,
+    ): Boolean = false
 
     override fun onDialogClosed(positiveResult: Boolean) {
         if (positiveResult) {
@@ -141,8 +169,12 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
             }
             val sampleDate = sampleFormat.parse(sampleDateText!!.text.toString())
             result =
-                if (sampleDate == null) "null" else DateFormatter(this.context, dateFormatValue, settings.clock.now())
-                    .formatDate(DateTime(sampleDate.time, settings.timeZone))
+                if (sampleDate == null) {
+                    "null"
+                } else {
+                    DateFormatter(this.context, dateFormatValue, settings.clock.now())
+                        .formatDate(DateTime(sampleDate.time, settings.timeZone))
+                }
         } catch (e: ParseException) {
             result = e.localizedMessage
         }
@@ -150,7 +182,7 @@ class DateFormatDialog(private val preference: DateFormatPreference) : Preferenc
     }
 
     private val sampleDateFormat: SimpleDateFormat
-        get() = SimpleDateFormat(sampleDateFormatValue.pattern, Locale.ENGLISH)
+        get() = SimpleDateFormat(sampleDateFormatValue.pattern, APP_DEFAULT_LOCALE)
     private val settings: InstanceSettings
         get() {
             val widgetId = ApplicationPreferences.getWidgetId(activity)

@@ -2,6 +2,7 @@ package org.andstatus.todoagenda
 
 import android.util.Log
 import org.andstatus.todoagenda.calendar.CalendarEvent
+import org.andstatus.todoagenda.prefs.MyLocale.APP_DEFAULT_LOCALE
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.provider.QueryRow
 import org.andstatus.todoagenda.util.DateUtil
@@ -15,7 +16,6 @@ import org.junit.Test
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 /**
@@ -110,7 +110,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
     private fun toMillis(iso8601time: String): Long {
         val date: Date =
             try {
-                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz", Locale.GERMANY).parse(iso8601time)!!
+                SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz", APP_DEFAULT_LOCALE).parse(iso8601time)!!
             } catch (e: ParseException) {
                 throw IllegalArgumentException(iso8601time, e)
             }

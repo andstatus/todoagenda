@@ -6,6 +6,7 @@ import java.util.Locale
 import java.util.concurrent.atomic.AtomicReference
 
 object MyLocale {
+    val APP_DEFAULT_LOCALE: Locale = Locale.US
     private val TAG = MyLocale::class.java.simpleName
     private val localeRef: AtomicReference<Locale?> = AtomicReference()
     private val localePrevCurrent: AtomicReference<Locale?> = AtomicReference()
