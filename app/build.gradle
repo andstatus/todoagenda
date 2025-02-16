@@ -43,6 +43,9 @@ android {
         abortOnError false
     }
     namespace 'org.andstatus.todoagenda'
+    buildFeatures {
+        buildConfig true
+    }
 
     if (project.hasProperty('todoagendaStoreFile')) {
         signingConfigs {
