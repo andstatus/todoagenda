@@ -331,7 +331,7 @@ class RemoteViewsFactory(
                     return
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
-                val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_INITIAL.shadowed(settings.textShadow))
+                val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_SCROLLABLE.shadowed(settings.textShadow))
                 configureWidgetHeader(settings, rv)
                 configureWidgetEntriesList(settings, rv)
                 appWidgetManager.updateAppWidget(widgetId, rv)
@@ -345,7 +345,6 @@ class RemoteViewsFactory(
             rv: RemoteViews,
         ) {
             Log.d(TAG, settings.widgetId.toString() + " configureWidgetHeader, layout:" + settings.widgetHeaderLayout)
-            rv.removeAllViews(R.id.header_parent)
             if (settings.widgetHeaderLayout != WidgetHeaderLayout.HIDDEN) {
                 val headerView =
                     RemoteViews(

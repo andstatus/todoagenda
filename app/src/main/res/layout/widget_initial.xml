@@ -8,9 +8,9 @@
 
     <LinearLayout
         android:id="@+id/header_parent"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/header_initial"
@@ -33,13 +33,13 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center"
+                    android:layout_marginStart="@dimen/calender_padding"
+                    android:layout_marginLeft="@dimen/calender_padding"
                     android:background="#32000000"
+                    android:gravity="center"
                     android:padding="@dimen/calender_padding"
                     android:text="@string/widget_name"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_marginLeft="@dimen/calender_padding"
-                    android:layout_marginStart="@dimen/calender_padding" />
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
             </LinearLayout>
 
             <TextView
@@ -55,12 +55,4 @@
                 android:textAppearance="?android:attr/textAppearanceMedium" />
         </LinearLayout>
     </LinearLayout>
-
-    <ListView
-        android:id="@+id/event_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="@null"
-        android:dividerHeight="0dp" />
-
 </LinearLayout>
