@@ -89,6 +89,8 @@
     <string name="maxlines_details_title">Максимальное количество строк в подробностях</string>
     <string name="multiline_details_title">Многострочные подробности</string>
     <string name="multiline_details_desc">Длинный текст с информацией о времени и местоположении продолжается на несколько строк</string>
+    <string name="show_current_time_line_title">Показать Линию текущего времени</string>
+    <string name="show_current_time_line_desc">Показать горизонтальную линию, представляющую текущее время</string>
     <!-- Date format preference -->
     <string name="simple_options">Простые варианты</string>
     <string name="date_format_default_weekday">По умолчанию, с днём недели</string>
@@ -131,6 +133,7 @@
     <string name="text_shadow_no_shadow">Без тени</string>
     <string name="text_shadow_dark">Тёмная тень</string>
     <string name="text_shadow_light">Светлая тень</string>
+    <string name="current_time_line_color_title">Цвет Линии текущего времени</string>
     <!-- Preference frame: Event details -->
     <string name="show_day_xy_title">(День x/y)</string>
     <string name="show_day_xy_desc">Показать номер текущего дня / общее количество дней многодневных событий</string>

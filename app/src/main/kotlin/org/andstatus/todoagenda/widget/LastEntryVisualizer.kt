@@ -67,8 +67,6 @@ class LastEntryVisualizer(
         return MainActivity.intentToConfigure(settings.context, settings.widgetId)
     }
 
-    override fun queryEventEntries(): List<LastEntry> = emptyList()
-
     companion object {
         private val TAG = LastEntryVisualizer::class.java.simpleName
     }

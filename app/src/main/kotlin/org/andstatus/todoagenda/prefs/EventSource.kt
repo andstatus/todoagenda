@@ -12,10 +12,11 @@ class EventSource(
     title: String?,
     summary: String?,
     val color: Int,
-    val isAvailable: Boolean
+    val isAvailable: Boolean,
 ) {
     val title: String
     val summary: String
+
     fun toAvailable(): EventSource {
         if (this === EMPTY || isAvailable) return this
         for (orderedSource in EventProviderType.availableSources) {
@@ -67,14 +68,15 @@ class EventSource(
         return json
     }
 
-    override fun toString(): String {
-        return if (this === EMPTY) "(Empty)" else providerType.name + " " + title + ", " + summary + ", id:" + id +
-            if (isAvailable) "" else ", unavailable"
-    }
+    override fun toString(): String =
+        if (this === EMPTY) {
+            "(Empty)"
+        } else {
+            providerType.name + " " + title + ", " + summary + ", id:" + id +
+                if (isAvailable) "" else ", unavailable"
+        }
 
-    fun toStoredString(): String {
-        return providerType.id.toString() + STORE_SEPARATOR + id
-    }
+    fun toStoredString(): String = providerType.id.toString() + STORE_SEPARATOR + id
 
     init {
         this.title = title ?: ""
@@ -99,6 +101,7 @@ class EventSource(
         val EMPTY = EventSource(EventProviderType.EMPTY, 0, "Empty", "", 0, false)
         val DAY_HEADER = EventSource(EventProviderType.DAY_HEADER, 1, "Day header", "", 0, false)
         val LAST_ENTRY = EventSource(EventProviderType.LAST_ENTRY, 1, "Last entry", "", 0, false)
+        val CURRENT_TIME = EventSource(EventProviderType.CURRENT_TIME, 1, "Current time", "", 0, false)
         const val STORE_SEPARATOR = ","
         private const val KEY_PROVIDER_TYPE = "providerType"
         private const val KEY_ID = "id"
@@ -106,25 +109,31 @@ class EventSource(
         private const val KEY_SUMMARY = "summary"
         private const val KEY_COLOR = "color"
         private const val KEY_IS_AVAILABLE = "isAvailable"
+
         fun fromStoredString(stored: String?): EventSource {
             if (stored == null) return EMPTY
             val values = stored.split(STORE_SEPARATOR.toRegex(), limit = 2).toTypedArray()
             return when (values.size) {
-                1 -> fromTypeAndId(
-                    EventProviderType.CALENDAR,
-                    ApplicationPreferences.parseIntSafe(values[0])
-                )
+                1 ->
+                    fromTypeAndId(
+                        EventProviderType.CALENDAR,
+                        ApplicationPreferences.parseIntSafe(values[0]),
+                    )
 
-                2 -> fromTypeAndId(
-                    EventProviderType.fromId(ApplicationPreferences.parseIntSafe(values[0])),
-                    ApplicationPreferences.parseIntSafe(values[1])
-                )
+                2 ->
+                    fromTypeAndId(
+                        EventProviderType.fromId(ApplicationPreferences.parseIntSafe(values[0])),
+                        ApplicationPreferences.parseIntSafe(values[1]),
+                    )
 
                 else -> EMPTY
             }
         }
 
-        private fun fromTypeAndId(providerType: EventProviderType, id: Int): EventSource {
+        private fun fromTypeAndId(
+            providerType: EventProviderType,
+            id: Int,
+        ): EventSource {
             if (providerType === EventProviderType.EMPTY || id == 0) {
                 return EMPTY
             }
@@ -147,7 +156,9 @@ class EventSource(
             val color = json.optInt(KEY_COLOR)
             return if (providerType === EventProviderType.EMPTY || id == 0) {
                 EMPTY
-            } else EventSource(providerType, id, title, summary, color, false)
+            } else {
+                EventSource(providerType, id, title, summary, color, false)
+            }
         }
     }
 }

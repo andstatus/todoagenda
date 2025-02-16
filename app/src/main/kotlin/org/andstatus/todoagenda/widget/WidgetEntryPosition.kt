@@ -8,7 +8,7 @@ enum class WidgetEntryPosition(
     val value: String,
     val entryDateIsRequired: Boolean,
     val globalOrder: Int,
-    val sameDayOrder: Int
+    val sameDayOrder: Int,
 ) {
     PAST_AND_DUE_HEADER("PastAndDueHeader", false, 1, 1),
     PAST_AND_DUE("PastAndDue", false, 2, 2),
@@ -22,10 +22,12 @@ enum class WidgetEntryPosition(
     END_OF_LIST("EndOfList", false, 5, 1),
     LIST_FOOTER("ListFooter", false, 6, 1),
     HIDDEN("Hidden", false, 9, 9),
-    UNKNOWN("Unknown", false, 9, 9);
+    UNKNOWN("Unknown", false, 9, 9),
+    ;
 
     companion object {
         var defaultValue = UNKNOWN
+
         fun fromValue(value: String): WidgetEntryPosition {
             for (item in entries) {
                 if (item.value == value) {

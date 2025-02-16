@@ -8,7 +8,10 @@ import org.json.JSONObject
 /**
  * @author yvolk@yurivolkov.com
  */
-class OrderedEventSource(val source: EventSource, val order: Int) {
+class OrderedEventSource(
+    val source: EventSource,
+    val order: Int,
+) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
@@ -16,36 +19,41 @@ class OrderedEventSource(val source: EventSource, val order: Int) {
         return source == that.source
     }
 
-    override fun hashCode(): Int {
-        return source.hashCode()
-    }
+    override fun hashCode(): Int = source.hashCode()
 
-    override fun toString(): String {
-        return "order:$order, $source"
-    }
+    override fun toString(): String = "order:$order, $source"
 
     companion object {
         private val TAG = OrderedEventSource::class.java.simpleName
         val EMPTY = OrderedEventSource(EventSource.EMPTY, 0)
         val DAY_HEADER = OrderedEventSource(EventSource.DAY_HEADER, 0)
         val LAST_ENTRY = OrderedEventSource(EventSource.LAST_ENTRY, 0)
-        fun fromJsonString(sources: String?): MutableList<OrderedEventSource> {
-            return if (sources.isNullOrBlank()) mutableListOf() else try {
-                fromJsonArray(JSONArray(sources))
-            } catch (e: JSONException) {
-                Log.w(TAG, "Failed to parse event sources: $sources", e)
+        val CURRENT_TIME = OrderedEventSource(EventSource.CURRENT_TIME, 0)
+
+        fun fromJsonString(sources: String?): MutableList<OrderedEventSource> =
+            if (sources.isNullOrBlank()) {
                 mutableListOf()
+            } else {
+                try {
+                    fromJsonArray(JSONArray(sources))
+                } catch (e: JSONException) {
+                    Log.w(TAG, "Failed to parse event sources: $sources", e)
+                    mutableListOf()
+                }
             }
-        }
 
         fun fromJsonArray(jsonArray: JSONArray): MutableList<OrderedEventSource> {
             val list: MutableList<OrderedEventSource> = ArrayList()
             for (index in 0 until jsonArray.length()) {
                 val jsonObject = jsonArray.optJSONObject(index)
                 val source: EventSource =
-                    if (jsonObject == null) EventSource.fromStoredString(jsonArray.optString(index))
-                    else EventSource.fromJson(jsonObject)
-                        .toAvailable()
+                    if (jsonObject == null) {
+                        EventSource.fromStoredString(jsonArray.optString(index))
+                    } else {
+                        EventSource
+                            .fromJson(jsonObject)
+                            .toAvailable()
+                    }
                 if (source !== EventSource.EMPTY) {
                     add(list, source)
                 }
@@ -53,26 +61,28 @@ class OrderedEventSource(val source: EventSource, val order: Int) {
             return list
         }
 
-        fun fromSources(sources: List<EventSource>): MutableList<OrderedEventSource> {
-            return addAll(ArrayList(), sources)
-        }
+        fun fromSources(sources: List<EventSource>): MutableList<OrderedEventSource> = addAll(ArrayList(), sources)
 
-        fun addAll(list: MutableList<OrderedEventSource>, sources: List<EventSource>): MutableList<OrderedEventSource> {
+        fun addAll(
+            list: MutableList<OrderedEventSource>,
+            sources: List<EventSource>,
+        ): MutableList<OrderedEventSource> {
             for (source in sources) {
                 add(list, source)
             }
             return list
         }
 
-        private fun add(list: MutableList<OrderedEventSource>, source: EventSource) {
+        private fun add(
+            list: MutableList<OrderedEventSource>,
+            source: EventSource,
+        ) {
             if (source !== EventSource.EMPTY) {
                 list.add(OrderedEventSource(source, list.size + 1))
             }
         }
 
-        fun toJsonString(eventSources: List<OrderedEventSource>?): String {
-            return toJsonArray(eventSources).toString()
-        }
+        fun toJsonString(eventSources: List<OrderedEventSource>?): String = toJsonArray(eventSources).toString()
 
         fun toJsonArray(sources: List<OrderedEventSource>?): JSONArray {
             val jsonObjects: MutableList<JSONObject> = ArrayList()

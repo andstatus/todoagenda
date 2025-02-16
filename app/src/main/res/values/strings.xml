@@ -105,6 +105,8 @@
     <string name="maxlines_details_title">Maximum number of lines in details</string>
     <string name="multiline_details_title">Multiline details</string>
     <string name="multiline_details_desc">Spread event time and location over multiple lines</string>
+    <string name="show_current_time_line_title">Show Current time line</string>
+    <string name="show_current_time_line_desc">Show horizontal line representing the current time</string>
 
     <!-- Date format preference -->
     <string name="simple_options">Simple options</string>
@@ -165,6 +167,7 @@
     <string name="appearance_theme_dark">Light</string>
     <string name="appearance_theme_light">Dark</string>
     <string name="appearance_theme_white">Black</string>
+    <string name="current_time_line_color_title">Current time line color</string>
 
     <!-- Preference frame: Event details -->
     <string name="show_day_xy_title">(Day x/y)</string>

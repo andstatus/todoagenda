@@ -18,7 +18,8 @@ class TaskVisualizer(
     private val taskProvider: AbstractTaskProvider
         get() = super.eventProvider as AbstractTaskProvider
 
-    override fun newViewEntryIntent(entry: WidgetEntry): Intent? = entry.event?.let { taskProvider.newViewEventIntent(it) }
+    override fun newViewEntryIntent(entry: WidgetEntry): Intent =
+        entry.event?.let { taskProvider.newViewEventIntent(it) } ?: super.newViewEntryIntent(entry)
 
     override fun setIndicators(
         entry: WidgetEntry?,

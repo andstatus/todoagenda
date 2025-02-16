@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong
 abstract class WidgetEntry protected constructor(
     val settings: InstanceSettings,
     val entryPosition: WidgetEntryPosition,
-    entryDate: DateTime,
+    entryDateIn: DateTime,
     val allDay: Boolean,
     val endDate: DateTime?,
 ) : Comparable<WidgetEntry> {
@@ -24,8 +24,8 @@ abstract class WidgetEntry protected constructor(
     val timeSection: TimeSection
 
     init {
-        this.entryDate = fixEntryDate(entryPosition, entryDate)
-        entryDay = calcEntryDay(entryDate)
+        entryDate = fixEntryDate(entryPosition, entryDateIn)
+        entryDay = calcEntryDay(entryDateIn)
         timeSection = calcTimeSection(settings, entryPosition, entryDay, endDate)
     }
 

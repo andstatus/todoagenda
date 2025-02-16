@@ -18,7 +18,6 @@ import org.andstatus.todoagenda.task.dmfs.DmfsOpenTasksContract
 import org.andstatus.todoagenda.task.dmfs.DmfsOpenTasksProvider
 import org.andstatus.todoagenda.task.samsung.SamsungTasksProvider
 import org.andstatus.todoagenda.util.PermissionsUtil
-import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CopyOnWriteArraySet
@@ -29,54 +28,65 @@ enum class EventProviderType(
     val id: Int,
     val isCalendar: Boolean,
     val permission: String,
-    private val authority: String
+    private val authority: String,
 ) {
     EMPTY(0, true, "", ""),
     CALENDAR(1, true, Manifest.permission.READ_CALENDAR, "com.android.calendar") {
-        override fun getEventProvider(context: Context, widgetId: Int): EventProvider {
-            return CalendarEventProvider(this, context, widgetId)
-        }
+        override fun getEventProvider(
+            context: Context,
+            widgetId: Int,
+        ): EventProvider = CalendarEventProvider(this, context, widgetId)
     },
     DMFS_OPEN_TASKS(2, false, DmfsOpenTasksContract.PERMISSION, "org.dmfs.tasks") {
-        override fun getEventProvider(context: Context, widgetId: Int): EventProvider {
-            return DmfsOpenTasksProvider(this, context, widgetId)
-        }
+        override fun getEventProvider(
+            context: Context,
+            widgetId: Int,
+        ): EventProvider = DmfsOpenTasksProvider(this, context, widgetId)
     },
     SAMSUNG_TASKS(3, false, Manifest.permission.READ_CALENDAR, "com.android.calendar") {
-        override fun getEventProvider(context: Context, widgetId: Int): EventProvider {
-            return SamsungTasksProvider(this, context, widgetId)
-        }
+        override fun getEventProvider(
+            context: Context,
+            widgetId: Int,
+        ): EventProvider = SamsungTasksProvider(this, context, widgetId)
     },
     ASTRID_CLONE_TASKS(
         4,
         false,
         AstridCloneTasksProvider.PERMISSION,
-        AstridCloneTasksProvider.AUTHORITY
+        AstridCloneTasksProvider.AUTHORITY,
     ) {
-        override fun getEventProvider(context: Context, widgetId: Int): EventProvider {
-            return AstridCloneTasksProvider.newTasksProvider(this, context, widgetId)
-        }
+        override fun getEventProvider(
+            context: Context,
+            widgetId: Int,
+        ): EventProvider = AstridCloneTasksProvider.newTasksProvider(this, context, widgetId)
     },
     ASTRID_CLONE_GOOGLE_TASKS(
         5,
         false,
         AstridCloneTasksProvider.PERMISSION,
-        AstridCloneTasksProvider.AUTHORITY
+        AstridCloneTasksProvider.AUTHORITY,
     ) {
-        override fun getEventProvider(context: Context, widgetId: Int): EventProvider {
-            return AstridCloneTasksProvider.newGoogleTasksProvider(this, context, widgetId)
-        }
+        override fun getEventProvider(
+            context: Context,
+            widgetId: Int,
+        ): EventProvider = AstridCloneTasksProvider.newGoogleTasksProvider(this, context, widgetId)
     },
     DAY_HEADER(6, true, "", ""),
-    LAST_ENTRY(7, true, "", "");
+    LAST_ENTRY(7, true, "", ""),
+    CURRENT_TIME(8, true, "", ""),
+    ;
 
     val isPermissionNeeded: Boolean get() = neededPermissions.contains(permission)
 
-    open fun getEventProvider(context: Context, widgetId: Int): EventProvider {
-        return EventProvider(this, context, widgetId)
-    }
+    open fun getEventProvider(
+        context: Context,
+        widgetId: Int,
+    ): EventProvider = EventProvider(this, context, widgetId)
 
-    fun getVisualizer(context: Context, widgetId: Int): WidgetEntryVisualizer {
+    fun getVisualizer(
+        context: Context,
+        widgetId: Int,
+    ): WidgetEntryVisualizer {
         val eventProvider = getEventProvider(context, widgetId)
         return if (isCalendar) CalendarEventVisualizer(eventProvider) else TaskVisualizer(eventProvider)
     }
@@ -95,26 +105,32 @@ enum class EventProviderType(
 
         @Volatile
         private var initialized = false
-        fun initialize(context: Context, reInitialize: Boolean) {
+
+        fun initialize(
+            context: Context,
+            reInitialize: Boolean,
+        ) {
             if (initialized && !reInitialize) return
             forget()
             for (type in entries) {
                 val provider = type.getEventProvider(context, 0)
-                provider.fetchAvailableSources()
+                provider
+                    .fetchAvailableSources()
                     .onSuccess { ss: List<EventSource> ->
                         Log.i(TAG, "provider " + type + ", " + (if (ss.isEmpty()) "no" else ss.size) + " sources")
                         availableSources.addAll(OrderedEventSource.fromSources(ss))
-                    }
-                    .onFailure { e: Throwable ->
+                    }.onFailure { e: Throwable ->
                         if (PermissionsUtil.isPermissionGranted(context, type.permission)) {
                             Log.i(
-                                TAG, "provider '$type' has granted permission ${type.permission}" +
-                                    ", initialization error: ${e.message}"
+                                TAG,
+                                "provider '$type' has granted permission ${type.permission}" +
+                                    ", initialization error: ${e.message}",
                             )
                         } else {
                             Log.i(
-                                TAG, "provider '$type' needs permission ${type.permission}" +
-                                    ", initialization error: ${e.message}"
+                                TAG,
+                                "provider '$type' needs permission ${type.permission}" +
+                                    ", initialization error: ${e.message}",
                             )
                             neededPermissions.add(type.permission)
                         }
@@ -139,7 +155,10 @@ enum class EventProviderType(
             initialized = false
         }
 
-        fun registerProviderChangedReceivers(context: Context, receiver: EnvironmentChangedReceiver) {
+        fun registerProviderChangedReceivers(
+            context: Context,
+            receiver: EnvironmentChangedReceiver,
+        ) {
             val registeredAuthorities: MutableSet<String> = HashSet()
             for (type in entries) {
                 val authority = type.authority
@@ -152,8 +171,9 @@ enum class EventProviderType(
 
         @SuppressLint("UnspecifiedRegisterReceiverFlag")
         private fun registerProviderChangedReceiver(
-            context: Context, receiver: EnvironmentChangedReceiver,
-            authority: String
+            context: Context,
+            receiver: EnvironmentChangedReceiver,
+            authority: String,
         ) {
             val intentFilter = IntentFilter()
             intentFilter.addAction("android.intent.action.PROVIDER_CHANGED")

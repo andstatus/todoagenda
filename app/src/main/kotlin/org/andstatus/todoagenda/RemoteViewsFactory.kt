@@ -9,6 +9,7 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.layout.WidgetLayout
 import org.andstatus.todoagenda.prefs.AllSettings
@@ -22,12 +23,12 @@ import org.andstatus.todoagenda.util.InstanceId
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.util.StringUtil
+import org.andstatus.todoagenda.widget.CurrentTimeVisualizer
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.DayHeaderVisualizer
 import org.andstatus.todoagenda.widget.LastEntry
 import org.andstatus.todoagenda.widget.LastEntry.LastEntryType
 import org.andstatus.todoagenda.widget.LastEntryVisualizer
-import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.andstatus.todoagenda.widget.WidgetEntryVisualizer
@@ -118,15 +119,11 @@ class RemoteViewsFactory(
 
     private fun getVisualizers(): MutableList<WidgetEntryVisualizer> {
         val visualizers: MutableList<WidgetEntryVisualizer> = ArrayList()
-        val dayHeaderVisualizer =
-            DayHeaderVisualizer(
-                settings.context,
-                widgetId,
-            )
-        visualizers.add(dayHeaderVisualizer)
+        visualizers.add(DayHeaderVisualizer(settings.context, widgetId))
         for (type in settings.typesOfActiveEventProviders) {
             visualizers.add(type.getVisualizer(settings.context, widgetId))
         }
+        visualizers.add(CurrentTimeVisualizer(context, widgetId))
         visualizers.add(LastEntryVisualizer(context, widgetId))
         return visualizers
     }
@@ -345,6 +342,7 @@ class RemoteViewsFactory(
             rv: RemoteViews,
         ) {
             Log.d(TAG, settings.widgetId.toString() + " configureWidgetHeader, layout:" + settings.widgetHeaderLayout)
+            rv.removeAllViews(R.id.header_parent)
             if (settings.widgetHeaderLayout != WidgetHeaderLayout.HIDDEN) {
                 val headerView =
                     RemoteViews(

@@ -26,9 +26,42 @@ object RemoteViewsUtil {
     private const val METHOD_SET_MIN_WIDTH = "setMinWidth"
     private const val METHOD_SET_HEIGHT = "setHeight"
     private const val METHOD_SET_PAINT_FLAGS = "setPaintFlags"
+
+    fun setCompact(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+    ) {
+        if (settings.isCompactLayout) {
+            setPadding(
+                settings,
+                rv,
+                R.id.event_entry,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero,
+                R.dimen.zero,
+            )
+        } else {
+            setPadding(
+                settings,
+                rv,
+                R.id.event_entry,
+                R.dimen.calender_padding,
+                R.dimen.zero,
+                R.dimen.calender_padding,
+                R.dimen.entry_bottom_padding,
+            )
+        }
+    }
+
     fun setPadding(
-        settings: InstanceSettings, rv: RemoteViews, @IdRes viewId: Int,
-        @DimenRes leftDimenId: Int, @DimenRes topDimenId: Int, @DimenRes rightDimenId: Int, @DimenRes bottomDimenId: Int
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        @IdRes viewId: Int,
+        @DimenRes leftDimenId: Int,
+        @DimenRes topDimenId: Int,
+        @DimenRes rightDimenId: Int,
+        @DimenRes bottomDimenId: Int,
     ) {
         val leftPadding = getScaledValueInPixels(settings, leftDimenId)
         val topPadding = getScaledValueInPixels(settings, topDimenId)
@@ -37,15 +70,27 @@ object RemoteViewsUtil {
         rv.setViewPadding(viewId, leftPadding, topPadding, rightPadding, bottomPadding)
     }
 
-    fun setAlpha(rv: RemoteViews, viewId: Int, alpha: Int) {
+    fun setAlpha(
+        rv: RemoteViews,
+        viewId: Int,
+        alpha: Int,
+    ) {
         rv.setInt(viewId, METHOD_SET_ALPHA, alpha)
     }
 
-    fun setColorFilter(rv: RemoteViews, viewId: Int, color: Int) {
+    fun setColorFilter(
+        rv: RemoteViews,
+        viewId: Int,
+        color: Int,
+    ) {
         rv.setInt(viewId, METHOD_SET_COLOR_FILTER, color)
     }
 
-    fun setHeaderButtonSize(settings: InstanceSettings, rv: RemoteViews, viewId: Int) {
+    fun setHeaderButtonSize(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        viewId: Int,
+    ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val valuePixels = getDimension(settings.context, R.dimen.widget_header_button_size)
             val scaledValue = valuePixels * settings.widgetHeaderButtonsScale.scaleValue // / density
@@ -54,31 +99,58 @@ object RemoteViewsUtil {
         }
     }
 
-    fun setViewWidth(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
+    fun setViewWidth(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        viewId: Int,
+        dimenId: Int,
+    ) {
         rv.setInt(viewId, METHOD_SET_WIDTH, getScaledValueInPixels(settings, dimenId))
     }
 
-    fun setViewMinWidth(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
+    fun setViewMinWidth(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        viewId: Int,
+        dimenId: Int,
+    ) {
         rv.setInt(viewId, METHOD_SET_MIN_WIDTH, getScaledValueInPixels(settings, dimenId))
     }
 
-    fun setViewHeight(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
+    fun setViewHeight(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        viewId: Int,
+        dimenId: Int,
+    ) {
         rv.setInt(viewId, METHOD_SET_HEIGHT, getScaledValueInPixels(settings, dimenId))
     }
 
-    fun setTextSize(settings: InstanceSettings, rv: RemoteViews, viewId: Int, dimenId: Int) {
+    fun setTextSize(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        viewId: Int,
+        dimenId: Int,
+    ) {
         rv.setFloat(viewId, METHOD_SET_TEXT_SIZE, getScaledValueInScaledPixels(settings, dimenId))
     }
 
     fun setTextColor(
-        settings: InstanceSettings, textColorPref: TextColorPref?,
-        rv: RemoteViews, viewId: Int, colorAttrId: Int
+        settings: InstanceSettings,
+        textColorPref: TextColorPref?,
+        rv: RemoteViews,
+        viewId: Int,
+        colorAttrId: Int,
     ) {
         val color = settings.colors().getTextColor(textColorPref, colorAttrId)
         rv.setTextColor(viewId, color)
     }
 
-    fun setTextStrikethrough(rv: RemoteViews, viewID: Int, isStrikethrough: Boolean) {
+    fun setTextStrikethrough(
+        rv: RemoteViews,
+        viewID: Int,
+        isStrikethrough: Boolean,
+    ) {
         if (isStrikethrough) {
             rv.setInt(viewID, METHOD_SET_PAINT_FLAGS, Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG)
         } else {
@@ -86,70 +158,105 @@ object RemoteViewsUtil {
         }
     }
 
-    fun setBackgroundColorFromAttr(context: Context?, rv: RemoteViews, viewId: Int, colorAttrId: Int) {
+    fun setBackgroundColorFromAttr(
+        context: Context?,
+        rv: RemoteViews,
+        viewId: Int,
+        colorAttrId: Int,
+    ) {
         setBackgroundColor(rv, viewId, getColorValue(context, colorAttrId))
     }
 
-    fun setBackgroundColor(rv: RemoteViews, viewId: Int, color: Int) {
+    fun setBackgroundColor(
+        rv: RemoteViews,
+        viewId: Int,
+        color: Int,
+    ) {
         rv.setInt(viewId, METHOD_SET_BACKGROUND_COLOR, color)
     }
 
-    private fun getScaledValueInPixels(settings: InstanceSettings, dimenId: Int): Int {
+    private fun getScaledValueInPixels(
+        settings: InstanceSettings,
+        dimenId: Int,
+    ): Int {
         val resValue = getDimension(settings.context, dimenId)
         return Math.round(resValue * settings.textSizeScale.scaleValue)
     }
 
-    private fun getScaledValueInScaledPixels(settings: InstanceSettings, dimenId: Int): Float {
+    private fun getScaledValueInScaledPixels(
+        settings: InstanceSettings,
+        dimenId: Int,
+    ): Float {
         val resValue = getDimension(settings.context, dimenId)
         val density = settings.context.resources.displayMetrics.density
         return resValue * settings.textSizeScale.scaleValue / density
     }
 
-    fun getColorValue(context: Context?, @AttrRes attrId: Int): Int = try {
-        val theme = context!!.theme
-        val outValue = TypedValue()
-        if (theme.resolveAttribute(attrId, outValue, true)) {
-            val colorResourceId = outValue.resourceId
-            try {
-                context.resources.getColor(colorResourceId, theme)
-            } catch (e: Exception) {
-                Log.w(
-                    TAG,
-                    "context.getResources() failed to resolve color for resource Id:$colorResourceId" +
-                        " derived from attribute Id:$attrId", e
-                )
+    fun getColorValue(
+        context: Context?,
+        @AttrRes attrId: Int,
+    ): Int =
+        try {
+            val theme = context!!.theme
+            val outValue = TypedValue()
+            if (theme.resolveAttribute(attrId, outValue, true)) {
+                val colorResourceId = outValue.resourceId
+                try {
+                    context.resources.getColor(colorResourceId, theme)
+                } catch (e: Exception) {
+                    Log.w(
+                        TAG,
+                        "context.getResources() failed to resolve color for resource Id:$colorResourceId" +
+                            " derived from attribute Id:$attrId",
+                        e,
+                    )
+                    Color.GRAY
+                }
+            } else {
+                Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId")
                 Color.GRAY
             }
-        } else {
-            Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId")
+        } catch (e: Exception) {
+            Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId", e)
             Color.GRAY
         }
-    } catch (e: Exception) {
-        Log.w(TAG, "getColorValue failed to resolve color for attribute Id:$attrId", e)
-        Color.GRAY
-    }
 
-    private fun getDimension(context: Context?, dimensionResourceId: Int): Float {
-        return try {
+    private fun getDimension(
+        context: Context?,
+        dimensionResourceId: Int,
+    ): Float =
+        try {
             context!!.resources.getDimension(dimensionResourceId)
         } catch (e: NotFoundException) {
             Log.w(TAG, "getDimension failed for dimension resource Id:$dimensionResourceId")
             0f
         }
-    }
 
     /**
      * Note: Looks like "setEllipsize" is not supported for RemoteViews
      * */
-    fun setMaxLines(rv: RemoteViews, viewId: Int, maxLines: Int) {
+    fun setMaxLines(
+        rv: RemoteViews,
+        viewId: Int,
+        maxLines: Int,
+    ) {
         rv.setInt(viewId, "setMaxLines", maxLines)
     }
 
-    fun setMultiline(rv: RemoteViews, viewId: Int, multiLine: Boolean) {
+    fun setMultiline(
+        rv: RemoteViews,
+        viewId: Int,
+        multiLine: Boolean,
+    ) {
         rv.setBoolean(viewId, METHOD_SET_SINGLE_LINE, !multiLine)
     }
 
-    fun setImageFromAttr(context: Context?, rv: RemoteViews, viewId: Int, attrResId: Int) {
+    fun setImageFromAttr(
+        context: Context?,
+        rv: RemoteViews,
+        viewId: Int,
+        attrResId: Int,
+    ) {
         val outValue = TypedValue()
         if (context!!.theme.resolveAttribute(attrResId, outValue, true)) {
             setImage(rv, viewId, outValue.resourceId)
@@ -157,12 +264,16 @@ object RemoteViewsUtil {
             Log.w(
                 TAG,
                 "setImageFromAttr: not found; attrResId:" + attrResId + ", resourceId:" + outValue.resourceId +
-                    ", out:" + outValue + ", context:" + context
+                    ", out:" + outValue + ", context:" + context,
             )
         }
     }
 
-    fun setImage(rv: RemoteViews, viewId: Int, resId: Int) {
+    fun setImage(
+        rv: RemoteViews,
+        viewId: Int,
+        resId: Int,
+    ) {
         rv.setImageViewResource(viewId, resId)
     }
 }

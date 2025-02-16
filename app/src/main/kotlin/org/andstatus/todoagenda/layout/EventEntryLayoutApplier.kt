@@ -27,7 +27,7 @@ abstract class EventEntryLayoutApplier(
         setTime(entry, rv)
         setTextStrikethrough(entry, rv)
         visualizer.setIndicators(entry, rv)
-        setCompact(rv)
+        RemoteViewsUtil.setCompact(settings, rv)
         setBackground(rv, entry)
         return rv
     }
@@ -75,30 +75,6 @@ abstract class EventEntryLayoutApplier(
     ) {
         val viewId = R.id.event_entry_title
         RemoteViewsUtil.setTextStrikethrough(rv, viewId, entry.status == EventStatus.CANCELED)
-    }
-
-    open fun setCompact(rv: RemoteViews) {
-        if (settings.isCompactLayout) {
-            RemoteViewsUtil.setPadding(
-                settings,
-                rv,
-                R.id.event_entry,
-                R.dimen.zero,
-                R.dimen.zero,
-                R.dimen.zero,
-                R.dimen.zero,
-            )
-        } else {
-            RemoteViewsUtil.setPadding(
-                settings,
-                rv,
-                R.id.event_entry,
-                R.dimen.calender_padding,
-                R.dimen.zero,
-                R.dimen.calender_padding,
-                R.dimen.entry_bottom_padding,
-            )
-        }
     }
 
     open fun setBackground(

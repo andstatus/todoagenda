@@ -52,6 +52,7 @@ object ApplicationPreferences {
             setString(context, InstanceSettings.PREF_MAXLINES_TITLE, settings.maxLinesTitle.toString())
             setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
             setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
+            setBoolean(context, InstanceSettings.PREF_SHOW_CURRENT_TIME_LINE, settings.showCurrentTimeLine)
             //
             // ----------------------------------------------------------------------------------
             // Colors

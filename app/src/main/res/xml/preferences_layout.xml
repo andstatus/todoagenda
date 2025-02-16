@@ -119,6 +119,12 @@
             android:summary="5"
             android:title="@string/maxlines_details_title"
             android:dependency="multiline_details" />
+
+        <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
+            android:key="showCurrentTimeLine"
+            android:defaultValue="true"
+            android:summary="@string/show_current_time_line_desc"
+            android:title="@string/show_current_time_line_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>

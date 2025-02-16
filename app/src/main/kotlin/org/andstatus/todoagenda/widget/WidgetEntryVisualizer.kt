@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.provider.EventProvider
+import org.andstatus.todoagenda.util.CalendarIntentUtil
 
 abstract class WidgetEntryVisualizer(
     protected val eventProvider: EventProvider,
@@ -19,9 +20,9 @@ abstract class WidgetEntryVisualizer(
     val context: Context
         get() = eventProvider.context
 
-    abstract fun queryEventEntries(): List<WidgetEntry>
+    open fun queryEventEntries(): List<WidgetEntry> = emptyList()
 
     fun isFor(entry: WidgetEntry): Boolean = entry.source.source.providerType === eventProvider.type
 
-    open fun newViewEntryIntent(entry: WidgetEntry): Intent? = null
+    open fun newViewEntryIntent(entry: WidgetEntry): Intent = CalendarIntentUtil.newOpenCalendarAtDayIntent(entry.entryDate)
 }

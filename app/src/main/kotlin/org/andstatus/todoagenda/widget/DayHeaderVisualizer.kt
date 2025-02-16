@@ -1,7 +1,6 @@
 package org.andstatus.todoagenda.widget
 
 import android.content.Context
-import android.content.Intent
 import android.view.ContextThemeWrapper
 import android.view.View
 import android.widget.RemoteViews
@@ -11,7 +10,6 @@ import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.provider.EventProvider
 import org.andstatus.todoagenda.provider.EventProviderType
-import org.andstatus.todoagenda.util.CalendarIntentUtil
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 
@@ -45,35 +43,10 @@ class DayHeaderVisualizer(
         val textColorPref: TextColorPref = TextColorPref.forDayHeader(entry)
         val themeContext = settings.colors().getThemeContext(textColorPref)
         RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
-        if (settings.isCompactLayout) {
-            RemoteViewsUtil.setPadding(
-                settings,
-                rv,
-                R.id.event_entry,
-                R.dimen.zero,
-                R.dimen.zero,
-                R.dimen.zero,
-                R.dimen.zero,
-            )
-        } else {
-            RemoteViewsUtil.setPadding(
-                settings,
-                rv,
-                R.id.event_entry,
-                R.dimen.calender_padding,
-                R.dimen.zero,
-                R.dimen.calender_padding,
-                R.dimen.entry_bottom_padding,
-            )
-        }
+        RemoteViewsUtil.setCompact(settings, rv)
         setTitle(position, entry, rv, textColorPref)
         setDayHeaderSeparator(position, rv, themeContext)
         return rv
-    }
-
-    override fun newViewEntryIntent(eventEntry: WidgetEntry): Intent {
-        val entry = eventEntry as DayHeader
-        return CalendarIntentUtil.newOpenCalendarAtDayIntent(entry.entryDate)
     }
 
     private fun setTitle(
@@ -152,6 +125,4 @@ class DayHeaderVisualizer(
             }
         }
     }
-
-    override fun queryEventEntries(): List<DayHeader> = emptyList()
 }

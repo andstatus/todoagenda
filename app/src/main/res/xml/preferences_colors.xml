@@ -1,151 +1,163 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-        <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
-            android:key="differentColorsForDark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:defaultValue="false"
-            android:title="@string/different_colors_for_dark_title"
-            android:summaryOn="@string/different_colors_for_dark_on_desc"
-            android:summaryOff="@string/different_colors_for_dark_off_desc" />
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:defaultValue="false"
+        android:key="differentColorsForDark"
+        android:summaryOff="@string/different_colors_for_dark_off_desc"
+        android:summaryOn="@string/different_colors_for_dark_on_desc"
+        android:title="@string/different_colors_for_dark_title" />
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="auto"
+        android:entries="@array/pref_text_color_source_entries"
+        android:entryValues="@array/pref_text_color_source_values"
+        android:key="textColorSource"
+        android:summary="@string/text_color_source_auto_desc"
+        android:title="@string/text_color_source" />
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="no"
+        android:entries="@array/pref_text_shadow_entries"
+        android:entryValues="@array/pref_text_shadow_values"
+        android:key="textShadow"
+        android:title="@string/text_shadow_title" />
+
+    <PreferenceCategory app:title="@string/widget_header">
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="DARK"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="headerTheme"
+            android:title="@string/appearance_header_theme_title" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#9AFFFFFF"
+            android:key="widgetHeaderTextColor"
+            android:title="@string/widget_header_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#00000000"
+            android:key="widgetHeaderBackgroundColor"
+            android:summary="@string/widget_header_background_color_desc"
+            android:title="@string/widget_header_background_color_title"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="PastTime"
+        app:title="@string/past_events">
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="DARK"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="dayHeaderThemePast"
+            android:title="@string/day_header_theme_title" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#FFCCCCCC"
+            android:key="dayHeaderTextColorPast"
+            android:title="@string/day_header_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
 
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:key="textColorSource"
-            android:defaultValue="auto"
-            android:entries="@array/pref_text_color_source_entries"
-            android:entryValues="@array/pref_text_color_source_values"
-            android:summary="@string/text_color_source_auto_desc"
-            android:title="@string/text_color_source" />
+            android:defaultValue="BLACK"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="entryThemePast"
+            android:title="@string/appearance_entries_theme_title" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#FFFFFFFF"
+            android:key="eventTextColorPast"
+            android:title="@string/event_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#BF78782C"
+            android:key="pastEventsBackgroundColor"
+            android:title="@string/appearance_past_events_background_color_title"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="TodayTime"
+        app:title="@string/todays_events">
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="LIGHT"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="dayHeaderTheme"
+            android:title="@string/day_header_theme_title" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#FF777777"
+            android:key="dayHeaderTextColorToday"
+            android:title="@string/day_header_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
 
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:key="textShadow"
-            android:defaultValue="no"
-            android:entries="@array/pref_text_shadow_entries"
-            android:entryValues="@array/pref_text_shadow_values"
-            android:title="@string/text_shadow_title" />
+            android:defaultValue="WHITE"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="entryTheme"
+            android:title="@string/appearance_entries_theme_title" />
 
-        <PreferenceCategory app:title="@string/widget_header">
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="headerTheme"
-                    android:defaultValue="DARK"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/appearance_header_theme_title" />
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#FF000000"
+            android:key="eventTextColorToday"
+            android:title="@string/event_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="widgetHeaderTextColor"
-                    android:defaultValue="#9AFFFFFF"
-                    android:title="@string/widget_header_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#DAFFFFFF"
+            android:key="todaysEventsBackgroundColor"
+            android:title="@string/todays_events_background_color_title"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
+    </PreferenceCategory>
 
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="widgetHeaderBackgroundColor"
-                    android:defaultValue="#00000000"
-                    android:summary="@string/widget_header_background_color_desc"
-                    android:title="@string/widget_header_background_color_title"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-        </PreferenceCategory>
+    <PreferenceCategory
+        app:key="FutureTime"
+        app:title="@string/future_events">
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="DARK"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="dayHeaderThemeFuture"
+            android:title="@string/day_header_theme_title" />
 
-        <PreferenceCategory app:title="@string/past_events" app:key="PastTime">
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="dayHeaderThemePast"
-                    android:defaultValue="DARK"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/day_header_theme_title" />
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#FFCCCCCC"
+            android:key="dayHeaderTextColorFuture"
+            android:title="@string/day_header_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="dayHeaderTextColorPast"
-                    android:defaultValue="#FFCCCCCC"
-                    android:title="@string/day_header_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="BLACK"
+            android:entries="@array/pref_theme_entries"
+            android:entryValues="@array/pref_theme_values"
+            android:key="entryThemeFuture"
+            android:title="@string/appearance_entries_theme_title" />
 
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="entryThemePast"
-                    android:defaultValue="BLACK"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/appearance_entries_theme_title" />
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#FFFFFFFF"
+            android:key="eventTextColorFuture"
+            android:title="@string/event_text_color"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="eventTextColorPast"
-                    android:defaultValue="#FFFFFFFF"
-                    android:title="@string/event_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#80000000"
+            android:key="backgroundColor"
+            android:title="@string/appearance_background_color_title"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
+    </PreferenceCategory>
+    <com.rarepebble.colorpicker.ColorPreference
+        android:defaultValue="#F44336"
+        android:key="currentTimeLineColor"
+        android:title="@string/current_time_line_color_title"
+        app:colorpicker_selectNoneButtonText="@string/default_value" />
 
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="pastEventsBackgroundColor"
-                    android:defaultValue="#BF78782C"
-                    android:title="@string/appearance_past_events_background_color_title"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-        </PreferenceCategory>
-
-        <PreferenceCategory app:title="@string/todays_events"  app:key="TodayTime">
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="dayHeaderTheme"
-                    android:defaultValue="LIGHT"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/day_header_theme_title" />
-
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="dayHeaderTextColorToday"
-                    android:defaultValue="#FF777777"
-                    android:title="@string/day_header_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="entryTheme"
-                    android:defaultValue="WHITE"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/appearance_entries_theme_title" />
-
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="eventTextColorToday"
-                    android:defaultValue="#FF000000"
-                    android:title="@string/event_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="todaysEventsBackgroundColor"
-                    android:defaultValue="#DAFFFFFF"
-                    android:title="@string/todays_events_background_color_title"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-        </PreferenceCategory>
-
-        <PreferenceCategory app:title="@string/future_events" app:key="FutureTime">
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="dayHeaderThemeFuture"
-                    android:defaultValue="DARK"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/day_header_theme_title" />
-
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="dayHeaderTextColorFuture"
-                    android:defaultValue="#FFCCCCCC"
-                    android:title="@string/day_header_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-
-                <org.andstatus.todoagenda.prefs.MultilineListPreference
-                    android:key="entryThemeFuture"
-                    android:defaultValue="BLACK"
-                    android:entries="@array/pref_theme_entries"
-                    android:entryValues="@array/pref_theme_values"
-                    android:title="@string/appearance_entries_theme_title" />
-
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="eventTextColorFuture"
-                    android:defaultValue="#FFFFFFFF"
-                    android:title="@string/event_text_color"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-
-                <com.rarepebble.colorpicker.ColorPreference
-                    android:key="backgroundColor"
-                    android:defaultValue="#80000000"
-                    android:title="@string/appearance_background_color_title"
-                    app:colorpicker_selectNoneButtonText="@string/default_value" />
-        </PreferenceCategory>
 </PreferenceScreen>
