@@ -23,6 +23,7 @@ import org.andstatus.todoagenda.util.InstanceId
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.util.StringUtil
+import org.andstatus.todoagenda.widget.CurrentTimeEntry
 import org.andstatus.todoagenda.widget.CurrentTimeVisualizer
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.DayHeaderVisualizer
@@ -170,7 +171,13 @@ class RemoteViewsFactory(
             } else {
                 deduplicated
             }
-        val withDayHeaders = if (settings.showDayHeaders) addDayHeaders(limited) else limited
+        val withCurrentTime =
+            if (settings.showCurrentTimeLine && limited.isNotEmpty()) {
+                (limited + CurrentTimeEntry(settings)).sorted()
+            } else {
+                limited
+            }
+        val withDayHeaders = if (settings.showDayHeaders) addDayHeaders(withCurrentTime) else withCurrentTime
         val withLast =
             if (settings.maxNumberOfEvents > 0) {
                 withDayHeaders

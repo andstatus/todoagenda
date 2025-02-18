@@ -31,11 +31,4 @@ class CurrentTimeVisualizer(
         RemoteViewsUtil.setCompact(settings, rv)
         return rv
     }
-
-    override fun queryEventEntries(): List<WidgetEntry> =
-        if (settings.showCurrentTimeLine) {
-            listOf(CurrentTimeEntry(settings))
-        } else {
-            emptyList()
-        }
 }
