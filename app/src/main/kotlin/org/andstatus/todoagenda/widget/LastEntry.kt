@@ -16,27 +16,30 @@ class LastEntry(
         get() = OrderedEventSource.LAST_ENTRY
 
     companion object {
-        fun forEmptyList(settings: InstanceSettings): LastEntry {
-            val entryType =
-                if (PermissionsUtil.mustRequestPermissions(settings.context)) LastEntryType.NO_PERMISSIONS else LastEntryType.EMPTY
-            return LastEntry(settings, entryType, settings.clock.now())
-        }
-
-        fun addLast(
+        fun getLastEntry(
             settings: InstanceSettings,
             widgetEntries: List<WidgetEntry>,
-        ): List<WidgetEntry> {
-            val entry =
-                if (widgetEntries.isEmpty()) {
-                    forEmptyList(settings)
-                } else {
-                    LastEntry(
-                        settings,
-                        LastEntryType.LAST,
-                        widgetEntries[widgetEntries.size - 1].entryDate,
-                    )
+        ): LastEntry? {
+            if (widgetEntries.isEmpty()) {
+                return when {
+                    PermissionsUtil.mustRequestPermissions(settings.context) -> LastEntryType.NO_PERMISSIONS
+                    else -> LastEntryType.EMPTY
+                }.let { entryType ->
+                    if (settings.maxNumberOfEvents < 1) {
+                        return LastEntry(settings, entryType, settings.clock.now())
+                    } else {
+                        return null
+                    }
                 }
-            return widgetEntries + entry
+            } else if (settings.maxNumberOfEvents < 1) {
+                return LastEntry(
+                    settings,
+                    LastEntryType.LAST,
+                    widgetEntries[widgetEntries.size - 1].entryDate,
+                )
+            } else {
+                return null
+            }
         }
     }
 }

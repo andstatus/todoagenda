@@ -179,11 +179,9 @@ class RemoteViewsFactory(
             }
         val withDayHeaders = if (settings.showDayHeaders) addDayHeaders(withCurrentTime) else withCurrentTime
         val withLast =
-            if (settings.maxNumberOfEvents > 0) {
-                withDayHeaders
-            } else {
-                LastEntry.addLast(settings, withDayHeaders)
-            }
+            LastEntry.getLastEntry(settings, withDayHeaders)?.let {
+                withDayHeaders + it
+            } ?: withDayHeaders
         return withLast
     }
 
