@@ -5,10 +5,6 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:padding="@dimen/calender_padding"
-    android:text="@string/loading_with_dots"
-    android:textAppearance="?android:attr/textAppearanceMedium"
-    android:shadowColor="@color/text_shadow_dark"
-    android:shadowDx="1"
-    android:shadowDy="1"
-    android:shadowRadius="1">
+    android:text=" "
+    android:textAppearance="?android:attr/textAppearanceMedium">
 </TextView>

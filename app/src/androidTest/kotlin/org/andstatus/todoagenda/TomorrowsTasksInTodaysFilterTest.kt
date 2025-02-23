@@ -1,7 +1,7 @@
 package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.prefs.InstanceSettings
-import org.andstatus.todoagenda.widget.WidgetEntryPosition
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.junit.Test
 
 /**
@@ -14,18 +14,18 @@ class TomorrowsTasksInTodaysFilterTest : BaseWidgetTest() {
         val method = "testIssue102"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.tomorrows_tasks_one_week)
         playResults(method)
-        assertPosition(10, WidgetEntryPosition.LIST_FOOTER)
+        assertLastEntry(10, LastEntryType.END_OF_LIST)
         provider.settings =
             settings.copy(
                 eventRange = InstanceSettings.EVENT_RANGE_TODAY,
             )
         playResults(method)
-        assertPosition(0, WidgetEntryPosition.LIST_FOOTER)
+        assertLastEntry(0, LastEntryType.NO_EVENTS)
         provider.settings =
             settings.copy(
                 eventRange = InstanceSettings.EVENT_RANGE_TODAY_AND_TOMORROW,
             )
         playResults(method)
-        assertPosition(7, WidgetEntryPosition.LIST_FOOTER)
+        assertLastEntry(7, LastEntryType.END_OF_LIST)
     }
 }

@@ -1,5 +1,6 @@
 package org.andstatus.todoagenda
 
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.junit.Test
 
@@ -15,6 +16,6 @@ class WeirdDayHeaderTest : BaseWidgetTest() {
         assertPosition(0, WidgetEntryPosition.END_OF_LIST_HEADER)
         assertPosition(1, WidgetEntryPosition.END_OF_LIST)
         assertPosition(2, WidgetEntryPosition.END_OF_LIST)
-        assertPosition(3, WidgetEntryPosition.LIST_FOOTER)
+        assertLastEntry(3, LastEntryType.END_OF_LIST)
     }
 }

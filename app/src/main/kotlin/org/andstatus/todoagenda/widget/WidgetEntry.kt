@@ -189,7 +189,10 @@ abstract class WidgetEntry protected constructor(
             when (entryPosition) {
                 WidgetEntryPosition.PAST_AND_DUE_HEADER -> return TimeSection.PAST
                 WidgetEntryPosition.START_OF_TODAY -> return TimeSection.TODAY
-                WidgetEntryPosition.END_OF_TODAY, WidgetEntryPosition.END_OF_LIST_HEADER, WidgetEntryPosition.END_OF_LIST, WidgetEntryPosition.LIST_FOOTER -> return TimeSection.FUTURE
+                WidgetEntryPosition.END_OF_TODAY, WidgetEntryPosition.END_OF_LIST_HEADER,
+                WidgetEntryPosition.END_OF_LIST, WidgetEntryPosition.LIST_FOOTER,
+                -> return TimeSection.FUTURE
+
                 else -> {}
             }
             if (settings.clock.isDayToday(entryDay)) {

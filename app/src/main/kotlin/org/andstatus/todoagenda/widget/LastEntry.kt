@@ -11,10 +11,13 @@ import org.joda.time.DateTime
 class LastEntry(
     settings: InstanceSettings,
     val type: LastEntryType,
+    val appearance: LastEntryAppearance,
     date: DateTime,
-) : WidgetEntry(settings, WidgetEntryPosition.LIST_FOOTER, date, true, null) {
+) : WidgetEntry(settings, WidgetEntryPosition.ENTRY_DATE, date, true, null) {
     override val source: OrderedEventSource
         get() = OrderedEventSource.LAST_ENTRY
+
+    override fun toString(): String = (super.toString() + ", LastEntry [$type]")
 
     companion object {
         fun getLastEntry(
@@ -24,7 +27,8 @@ class LastEntry(
             if (widgetEntries.isEmpty()) {
                 when {
                     PermissionsUtil.mustRequestPermissions(settings.context) -> LastEntryType.NO_PERMISSIONS
-                    else -> LastEntryType.EMPTY
+                    settings.noPastEvents() -> LastEntryType.NO_UPCOMING
+                    else -> LastEntryType.NO_EVENTS
                 }.let { entryType ->
                     if (entryType == LastEntryType.NO_PERMISSIONS) {
                         LastEntryAppearance.WITH_MESSAGE
@@ -34,7 +38,7 @@ class LastEntry(
                         if (appearance == LastEntryAppearance.HIDDEN) {
                             null
                         } else {
-                            LastEntry(settings, entryType, settings.clock.now())
+                            LastEntry(settings, entryType, appearance, settings.clock.now())
                         }
                     }
                 }
@@ -43,7 +47,8 @@ class LastEntry(
             } else {
                 LastEntry(
                     settings,
-                    LastEntryType.LAST,
+                    LastEntryType.END_OF_LIST,
+                    settings.lastEntryAppearance,
                     widgetEntries[widgetEntries.size - 1].entryDate,
                 )
             }

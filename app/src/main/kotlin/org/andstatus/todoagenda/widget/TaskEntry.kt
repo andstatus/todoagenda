@@ -31,7 +31,7 @@ class TaskEntry private constructor(
             }
 
     override fun toString(): String =
-        super.toString() + " TaskEntry [title='" + event.title + "', startDate=" + event.startDate +
+        super.toString() + ", TaskEntry [title='" + event.title + "', startDate=" + event.startDate +
             ", dueDate=" + event.dueDate + "]"
 
     companion object {

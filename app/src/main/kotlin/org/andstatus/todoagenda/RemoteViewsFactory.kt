@@ -28,7 +28,6 @@ import org.andstatus.todoagenda.widget.CurrentTimeVisualizer
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.DayHeaderVisualizer
 import org.andstatus.todoagenda.widget.LastEntry
-import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.LastEntryVisualizer
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
@@ -52,7 +51,7 @@ class RemoteViewsFactory(
 
     init {
         visualizers.add(LastEntryVisualizer(context, widgetId))
-        widgetEntries = listOf(LastEntry(settings, LastEntryType.NOT_LOADED, settings.clock.now()))
+        widgetEntries = emptyList()
         logEvent("Init" + if (createdByLauncher) " by Launcher" else "")
     }
 

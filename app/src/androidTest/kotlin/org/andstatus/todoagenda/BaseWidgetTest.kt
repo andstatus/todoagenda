@@ -4,10 +4,13 @@ import android.util.Log
 import org.andstatus.todoagenda.prefs.FilterMode
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.provider.FakeCalendarContentProvider
+import org.andstatus.todoagenda.widget.LastEntry
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.joda.time.DateTime
 import org.junit.After
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import kotlin.math.abs
 
@@ -122,6 +125,21 @@ open class BaseWidgetTest {
             settings.copy(
                 filterModeIn = FilterMode.NO_FILTERING,
             )
+    }
+
+    protected fun assertLastEntry(
+        ind: Int,
+        lastEntryType: LastEntryType,
+    ) {
+        val widgetEntries = factory.widgetEntries
+        Assert.assertTrue(
+            "Expecting " + lastEntryType + " at " + (ind + 1) + "th entry, but found only " +
+                widgetEntries.size + " entries",
+            widgetEntries.size > ind,
+        )
+        val lastEntry = widgetEntries[ind] as? LastEntry
+        assertTrue("Expected LastEntry but was: ${widgetEntries[ind]}", lastEntry != null)
+        Assert.assertEquals(widgetEntries[ind].toString(), lastEntryType, lastEntry?.type)
     }
 
     protected fun assertPosition(

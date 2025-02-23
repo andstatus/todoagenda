@@ -29,22 +29,7 @@ enum class WidgetLayout(
         R.layout.event_entry_one_line_shadow_dark,
         R.layout.event_entry_one_line_shadow_light,
     ),
-    ITEM_EMPTY_LIST(
-        R.layout.item_empty_list,
-        R.layout.item_empty_list_shadow_dark,
-        R.layout.item_empty_list_shadow_light,
-    ),
-    ITEM_LAST(R.layout.item_last, R.layout.item_last_shadow_dark, R.layout.item_last_shadow_light),
-    ITEM_NO_PERMISSIONS(
-        R.layout.item_no_permissions,
-        R.layout.item_no_permissions_shadow_dark,
-        R.layout.item_no_permissions_shadow_light,
-    ),
-    ITEM_NOT_LOADED(
-        R.layout.item_not_loaded,
-        R.layout.item_not_loaded_shadow_dark,
-        R.layout.item_not_loaded_shadow_light,
-    ),
+    ENTRY_LAST(R.layout.entry_last, R.layout.entry_last_shadow_dark, R.layout.entry_last_shadow_light),
     WIDGET_SCROLLABLE(R.layout.widget_scrollable),
     WIDGET_HEADER_ONE_ROW(
         R.layout.widget_header_one_row,

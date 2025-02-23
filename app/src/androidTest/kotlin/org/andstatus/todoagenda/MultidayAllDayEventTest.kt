@@ -43,7 +43,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
                 }
                 dayOfHeaderPrev = dayOfEntry
             } else if (entry is LastEntry) {
-                assertEquals(LastEntryType.LAST, entry.type)
+                assertEquals(LastEntryType.END_OF_LIST, entry.type)
             } else if (entry is CalendarEntry) {
                 if (dayOfEventEntryPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {

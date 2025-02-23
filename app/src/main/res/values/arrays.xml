@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="one_space" tools:ignore="MissingTranslation"> </string>
     <string-array name="pref_widget_header_layout_entries">
         <item>@string/single_line_layout</item>
         <item>@string/two_rows_layout</item>

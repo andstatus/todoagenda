@@ -43,7 +43,7 @@
             android:key="maxNumberOfEvents"
             android:title="@string/max_number_of_events_title" />
         <org.andstatus.todoagenda.prefs.MultilineListPreference
-            android:defaultValue="with_message"
+            android:defaultValue="empty"
             android:entries="@array/pref_last_entry_entries"
             android:entryValues="@array/pref_last_entry_values"
             android:key="lastEntryAppearance"

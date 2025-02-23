@@ -102,7 +102,7 @@ class CalendarEntry private constructor(
     override fun toString(): String {
         val timeString = eventTimeString
         return (
-            super.toString() + " CalendarEntry [" +
+            super.toString() + ", CalendarEntry [" +
                 (if (allDay) "allDay" else "") +
                 (if (StringUtil.nonEmpty(timeString)) ", time=$timeString" else "") +
                 (if (locationShown.isNullOrBlank()) "" else ", location='$locationShown'") +

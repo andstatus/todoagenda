@@ -45,7 +45,7 @@ class PastDueHeaderWithTasksTest : BaseWidgetTest() {
         Assert.assertEquals(WidgetEntryPosition.END_OF_LIST, factory.widgetEntries[8].entryPosition)
         Assert.assertEquals(
             "Last Entry",
-            LastEntryType.LAST,
+            LastEntryType.END_OF_LIST,
             (factory.widgetEntries[factory.widgetEntries.size - 1] as LastEntry).type,
         )
         Assert.assertEquals("Number of entries", 10, factory.widgetEntries.size.toLong())
