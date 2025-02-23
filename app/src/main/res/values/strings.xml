@@ -226,6 +226,11 @@
     <string name="show_only_closest_instance_of_recurring_event">Show only the closest instance of a recurring event</string>
     <string name="hide_duplicates">Hide duplicates</string>
     <string name="max_number_of_events_title">Maximum number of events</string>
+    <string name="last_entry_title">The End of list entry after a list of events or the only entry for an empty list of events</string>
+    <string name="last_entry_with_message">An entry with a descriptive message is shown</string>
+    <string name="last_entry_empty">An empty entry (empty area) is shown</string>
+    <string name="last_entry_hidden">The entry is hidden</string>
+    <string name="end_of_list">(End of list)</string>
     <string name="all_day_events_placement_title">All day events placement</string>
     <string name="all_day_events_placement_top_of_the_days_events">At the top of the day\'s events</string>
     <string name="all_day_events_placement_bottom_of_the_days_events">At the bottom of the day\'s events</string>

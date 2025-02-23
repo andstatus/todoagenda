@@ -10,8 +10,13 @@ import androidx.preference.PreferenceFragmentCompat
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.ApplicationPreferences.limitToString
 
-class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+class EventFiltersPreferencesFragment :
+    PreferenceFragmentCompat(),
+    OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         addPreferencesFromResource(R.xml.preferences_event_filters)
     }
 
@@ -27,6 +32,7 @@ class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPref
         showHideBasedOnKeywords()
         showShowBasedOnKeywords()
         showMaximumNumberOfEvents()
+        showLastEntryAppearance()
         showAllDayEventsPlacement()
         showTaskScheduling()
         showTasksWithoutDates()
@@ -67,9 +73,13 @@ class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPref
 
     private fun showMaximumNumberOfEvents() =
         findPreference<Preference>(InstanceSettings.PREF_MAX_NUMBER_OF_EVENTS)?.setSummary(
-            ApplicationPreferences.getMaxNumberOfEvents(requireActivity()).limitToString()
+            ApplicationPreferences.getMaxNumberOfEvents(requireActivity()).limitToString(),
         )
 
+    private fun showLastEntryAppearance() =
+        findPreference<Preference>(InstanceSettings.PREF_LAST_ENTRY_APPEARANCE)?.setSummary(
+            ApplicationPreferences.getLastEntryAppearance(requireActivity()).valueResId,
+        )
 
     private fun showAllDayEventsPlacement() {
         val preference = findPreference<Preference>(InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT)
@@ -96,7 +106,10 @@ class EventFiltersPreferencesFragment : PreferenceFragmentCompat(), OnSharedPref
         super.onPause()
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    override fun onSharedPreferenceChanged(
+        sharedPreferences: SharedPreferences?,
+        key: String?,
+    ) {
         showStatus()
     }
 }

@@ -93,11 +93,8 @@ object ApplicationPreferences {
                     .showOnlyClosestInstanceOfRecurringEvent,
             )
             setHideDuplicates(context, settings.hideDuplicates)
-            setString(
-                context,
-                PREF_MAX_NUMBER_OF_EVENTS,
-                settings.maxNumberOfEvents.limitToString(),
-            )
+            setString(context, PREF_MAX_NUMBER_OF_EVENTS, settings.maxNumberOfEvents.limitToString())
+            setString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE, settings.lastEntryAppearance.value)
             setAllDayEventsPlacement(context, settings.allDayEventsPlacement)
             setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
             setString(context, InstanceSettings.PREF_TASK_WITHOUT_DATES, settings.taskWithoutDates.value)
@@ -479,11 +476,10 @@ object ApplicationPreferences {
     fun getHideDuplicates(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, false)
 
     fun getMaxNumberOfEvents(context: Context): Int =
-        getIntStoredAsString(
-            context,
-            PREF_MAX_NUMBER_OF_EVENTS,
-            InstanceSettings.EMPTY.maxNumberOfEvents,
-        )
+        getIntStoredAsString(context, PREF_MAX_NUMBER_OF_EVENTS, InstanceSettings.EMPTY.maxNumberOfEvents)
+
+    fun getLastEntryAppearance(context: Context): LastEntryAppearance =
+        LastEntryAppearance.fromValue(getString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE))
 
     fun setHideDuplicates(
         context: Context?,
@@ -501,18 +497,12 @@ object ApplicationPreferences {
 
     fun getAllDayEventsPlacement(context: Context): AllDayEventsPlacement =
         AllDayEventsPlacement.fromValue(
-            getString(
-                context,
-                InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT,
-            ),
+            getString(context, InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT),
         )
 
     fun getTaskScheduling(context: Context): TaskScheduling =
         TaskScheduling.fromValue(
-            getString(
-                context,
-                InstanceSettings.PREF_TASK_SCHEDULING,
-            ),
+            getString(context, InstanceSettings.PREF_TASK_SCHEDULING),
         )
 
     fun getTasksWithoutDates(context: Context): TasksWithoutDates =

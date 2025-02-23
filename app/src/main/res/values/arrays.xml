@@ -120,6 +120,16 @@
         <item>SIX_MONTHS</item>
         <item>ONE_YEAR</item>
     </string-array>
+    <string-array name="pref_last_entry_entries">
+        <item>@string/last_entry_with_message</item>
+        <item>@string/last_entry_empty</item>
+        <item>@string/last_entry_hidden</item>
+    </string-array>
+    <string-array name="pref_last_entry_values" tools:ignore="MissingTranslation">
+        <item>with_message</item>
+        <item>empty</item>
+        <item>hidden</item>
+    </string-array>
     <string-array name="pref_event_entry_layout_entries">
         <item>@string/default_multiline_layout</item>
         <item>@string/single_line_layout</item>

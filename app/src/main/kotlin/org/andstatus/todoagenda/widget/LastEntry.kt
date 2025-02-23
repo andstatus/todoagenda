@@ -1,6 +1,7 @@
 package org.andstatus.todoagenda.widget
 
 import org.andstatus.todoagenda.prefs.InstanceSettings
+import org.andstatus.todoagenda.prefs.LastEntryAppearance
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.util.PermissionsUtil
 import org.joda.time.DateTime
@@ -19,27 +20,32 @@ class LastEntry(
         fun getLastEntry(
             settings: InstanceSettings,
             widgetEntries: List<WidgetEntry>,
-        ): LastEntry? {
+        ): LastEntry? =
             if (widgetEntries.isEmpty()) {
-                return when {
+                when {
                     PermissionsUtil.mustRequestPermissions(settings.context) -> LastEntryType.NO_PERMISSIONS
                     else -> LastEntryType.EMPTY
                 }.let { entryType ->
-                    if (settings.maxNumberOfEvents < 1) {
-                        return LastEntry(settings, entryType, settings.clock.now())
+                    if (entryType == LastEntryType.NO_PERMISSIONS) {
+                        LastEntryAppearance.WITH_MESSAGE
                     } else {
-                        return null
+                        settings.lastEntryAppearance
+                    }.let { appearance ->
+                        if (appearance == LastEntryAppearance.HIDDEN) {
+                            null
+                        } else {
+                            LastEntry(settings, entryType, settings.clock.now())
+                        }
                     }
                 }
-            } else if (settings.maxNumberOfEvents < 1) {
-                return LastEntry(
+            } else if (settings.lastEntryAppearance == LastEntryAppearance.HIDDEN) {
+                null
+            } else {
+                LastEntry(
                     settings,
                     LastEntryType.LAST,
                     widgetEntries[widgetEntries.size - 1].entryDate,
                 )
-            } else {
-                return null
             }
-        }
     }
 }
