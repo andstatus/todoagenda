@@ -2,6 +2,7 @@ package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.util.MyClock
 import org.andstatus.todoagenda.widget.LastEntry
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.TaskEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.junit.Assert
@@ -44,7 +45,7 @@ class PastDueHeaderWithTasksTest : BaseWidgetTest() {
         Assert.assertEquals(WidgetEntryPosition.END_OF_LIST, factory.widgetEntries[8].entryPosition)
         Assert.assertEquals(
             "Last Entry",
-            LastEntry.LastEntryType.LAST,
+            LastEntryType.LAST,
             (factory.widgetEntries[factory.widgetEntries.size - 1] as LastEntry).type,
         )
         Assert.assertEquals("Number of entries", 10, factory.widgetEntries.size.toLong())

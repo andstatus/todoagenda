@@ -1,6 +1,5 @@
 package org.andstatus.todoagenda.widget
 
-import org.andstatus.todoagenda.layout.WidgetLayout
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.OrderedEventSource
 import org.andstatus.todoagenda.util.PermissionsUtil
@@ -15,15 +14,6 @@ class LastEntry(
 ) : WidgetEntry(settings, WidgetEntryPosition.LIST_FOOTER, date, true, null) {
     override val source: OrderedEventSource
         get() = OrderedEventSource.LAST_ENTRY
-
-    enum class LastEntryType(
-        val widgetLayout: WidgetLayout,
-    ) {
-        NOT_LOADED(WidgetLayout.ITEM_NOT_LOADED),
-        NO_PERMISSIONS(WidgetLayout.ITEM_NO_PERMISSIONS),
-        EMPTY(WidgetLayout.ITEM_EMPTY_LIST),
-        LAST(WidgetLayout.ITEM_LAST),
-    }
 
     companion object {
         fun forEmptyList(settings: InstanceSettings): LastEntry {

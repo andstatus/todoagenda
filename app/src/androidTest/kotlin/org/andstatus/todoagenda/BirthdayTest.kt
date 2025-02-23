@@ -7,6 +7,7 @@ import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.provider.QueryResultsStorage
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.LastEntry
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.joda.time.DateTime
 import org.junit.Assert
 import org.junit.Test
@@ -118,7 +119,7 @@ class BirthdayTest : BaseWidgetTest() {
         val lastEntry = factory.widgetEntries[factory.widgetEntries.size - 1] as LastEntry
         Assert.assertEquals(
             "Last entry: $lastEntry",
-            if (entriesWithoutLastExpected == 0) LastEntry.LastEntryType.EMPTY else LastEntry.LastEntryType.LAST,
+            if (entriesWithoutLastExpected == 0) LastEntryType.EMPTY else LastEntryType.LAST,
             lastEntry.type,
         )
     }

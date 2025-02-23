@@ -12,7 +12,6 @@ import org.andstatus.todoagenda.provider.EventProvider
 import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.util.CalendarIntentUtil
 import org.andstatus.todoagenda.util.RemoteViewsUtil
-import org.andstatus.todoagenda.widget.LastEntry.LastEntryType
 import org.joda.time.DateTime
 
 /** @author yvolk@yurivolkov.com

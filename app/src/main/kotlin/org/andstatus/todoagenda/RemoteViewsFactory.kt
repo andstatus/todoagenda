@@ -28,7 +28,7 @@ import org.andstatus.todoagenda.widget.CurrentTimeVisualizer
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.DayHeaderVisualizer
 import org.andstatus.todoagenda.widget.LastEntry
-import org.andstatus.todoagenda.widget.LastEntry.LastEntryType
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.LastEntryVisualizer
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.andstatus.todoagenda.widget.WidgetEntryPosition

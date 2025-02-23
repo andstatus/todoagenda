@@ -4,6 +4,7 @@ import org.andstatus.todoagenda.test.R
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.LastEntry
+import org.andstatus.todoagenda.widget.LastEntryType
 import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -42,7 +43,7 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
                 }
                 dayOfHeaderPrev = dayOfEntry
             } else if (entry is LastEntry) {
-                assertEquals(LastEntry.LastEntryType.LAST, entry.type)
+                assertEquals(LastEntryType.LAST, entry.type)
             } else if (entry is CalendarEntry) {
                 if (dayOfEventEntryPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {
