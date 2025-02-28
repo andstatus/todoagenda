@@ -117,6 +117,12 @@
             android:key="todaysEventsBackgroundColor"
             android:title="@string/todays_events_background_color_title"
             app:colorpicker_selectNoneButtonText="@string/default_value" />
+
+        <com.rarepebble.colorpicker.ColorPreference
+            android:defaultValue="#F44336"
+            android:key="currentTimeLineColor"
+            android:title="@string/current_time_line_color_title"
+            app:colorpicker_selectNoneButtonText="@string/default_value" />
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -154,10 +160,5 @@
             android:title="@string/appearance_background_color_title"
             app:colorpicker_selectNoneButtonText="@string/default_value" />
     </PreferenceCategory>
-    <com.rarepebble.colorpicker.ColorPreference
-        android:defaultValue="#F44336"
-        android:key="currentTimeLineColor"
-        android:title="@string/current_time_line_color_title"
-        app:colorpicker_selectNoneButtonText="@string/default_value" />
 
 </PreferenceScreen>

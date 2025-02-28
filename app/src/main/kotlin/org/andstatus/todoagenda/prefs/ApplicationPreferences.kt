@@ -53,6 +53,7 @@ object ApplicationPreferences {
             setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
             setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
             setBoolean(context, InstanceSettings.PREF_SHOW_CURRENT_TIME_LINE, settings.showCurrentTimeLine)
+            setString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE, settings.lastEntryAppearance.value)
             //
             // ----------------------------------------------------------------------------------
             // Colors
@@ -94,7 +95,6 @@ object ApplicationPreferences {
             )
             setHideDuplicates(context, settings.hideDuplicates)
             setString(context, PREF_MAX_NUMBER_OF_EVENTS, settings.maxNumberOfEvents.limitToString())
-            setString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE, settings.lastEntryAppearance.value)
             setAllDayEventsPlacement(context, settings.allDayEventsPlacement)
             setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
             setString(context, InstanceSettings.PREF_TASK_WITHOUT_DATES, settings.taskWithoutDates.value)
@@ -463,6 +463,9 @@ object ApplicationPreferences {
             InstanceSettings.PREF_MAXLINES_DETAILS_DEFAULT,
         )
 
+    fun getLastEntryAppearance(context: Context): LastEntryAppearance =
+        LastEntryAppearance.fromValue(getString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE))
+
     fun getShowOnlyClosestInstanceOfRecurringEvent(context: Context?): Boolean =
         getBoolean(context, InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, false)
 
@@ -477,9 +480,6 @@ object ApplicationPreferences {
 
     fun getMaxNumberOfEvents(context: Context): Int =
         getIntStoredAsString(context, PREF_MAX_NUMBER_OF_EVENTS, InstanceSettings.EMPTY.maxNumberOfEvents)
-
-    fun getLastEntryAppearance(context: Context): LastEntryAppearance =
-        LastEntryAppearance.fromValue(getString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE))
 
     fun setHideDuplicates(
         context: Context?,

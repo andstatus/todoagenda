@@ -1,5 +1,17 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+<a id="v4.13"/>
+
+### 2025-03-XX v4.13.0 
+* "Show Current time line" checkbox added to Layout section.
+  It shows horizontal line representing the current time. 
+  "Current time line color" setting added to Colors section.
+  [#143](https://github.com/andstatus/todoagenda/issues/143)
+* "The End of list entry after a list of events" setting added to Layout section
+  with the following options: "An entry with a descriptive message is shown",
+  "An empty entry (empty area) is shown" (default) and "The entry is hidden".
+  [#163](https://github.com/andstatus/todoagenda/issues/163)
+
 <a id="v4.12"/>
 
 ### 2025-02-15 v4.12.2 Widget header buttons size

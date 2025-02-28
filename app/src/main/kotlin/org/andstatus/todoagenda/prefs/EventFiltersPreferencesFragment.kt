@@ -32,7 +32,6 @@ class EventFiltersPreferencesFragment :
         showHideBasedOnKeywords()
         showShowBasedOnKeywords()
         showMaximumNumberOfEvents()
-        showLastEntryAppearance()
         showAllDayEventsPlacement()
         showTaskScheduling()
         showTasksWithoutDates()
@@ -74,11 +73,6 @@ class EventFiltersPreferencesFragment :
     private fun showMaximumNumberOfEvents() =
         findPreference<Preference>(InstanceSettings.PREF_MAX_NUMBER_OF_EVENTS)?.setSummary(
             ApplicationPreferences.getMaxNumberOfEvents(requireActivity()).limitToString(),
-        )
-
-    private fun showLastEntryAppearance() =
-        findPreference<Preference>(InstanceSettings.PREF_LAST_ENTRY_APPEARANCE)?.setSummary(
-            ApplicationPreferences.getLastEntryAppearance(requireActivity()).valueResId,
         )
 
     private fun showAllDayEventsPlacement() {

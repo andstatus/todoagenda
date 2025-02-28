@@ -11,8 +11,13 @@ import org.andstatus.todoagenda.WidgetConfigurationActivity
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatDialog
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatPreference
 
-class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreferenceChangeListener {
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+class LayoutPreferencesFragment :
+    PreferenceFragmentCompat(),
+    OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         addPreferencesFromResource(R.xml.preferences_layout)
     }
 
@@ -22,6 +27,7 @@ class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreference
         showWidgetHeaderLayout()
         showMaxLinesTitle()
         showMaxLinesDetails()
+        showLastEntryAppearance()
         preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
     }
 
@@ -45,6 +51,11 @@ class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreference
             summary = ApplicationPreferences.getMaxLinesDetails(requireActivity()).toString()
         }
 
+    private fun showLastEntryAppearance() =
+        findPreference<Preference>(InstanceSettings.PREF_LAST_ENTRY_APPEARANCE)?.setSummary(
+            ApplicationPreferences.getLastEntryAppearance(requireActivity()).valueResId,
+        )
+
     override fun onDisplayPreferenceDialog(preference: Preference) {
         var dialogFragment: DialogFragment? = null
         if (preference is DateFormatPreference) {
@@ -63,7 +74,10 @@ class LayoutPreferencesFragment : PreferenceFragmentCompat(), OnSharedPreference
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    override fun onSharedPreferenceChanged(
+        sharedPreferences: SharedPreferences?,
+        key: String?,
+    ) {
         when (key) {
             InstanceSettings.PREF_EVENT_ENTRY_LAYOUT -> showEventEntryLayout()
             InstanceSettings.PREF_WIDGET_HEADER_LAYOUT -> showWidgetHeaderLayout()

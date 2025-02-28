@@ -91,6 +91,12 @@
     <string name="multiline_details_desc">Длинный текст с информацией о времени и местоположении продолжается на несколько строк</string>
     <string name="show_current_time_line_title">Показать Линию текущего времени</string>
     <string name="show_current_time_line_desc">Показать горизонтальную линию, представляющую текущее время</string>
+    <string name="last_entry_title">Элемент \"Конец списка\" после списка событий</string>
+    <string name="last_entry_with_message">Показать вместе с пояснительным текстом</string>
+    <string name="last_entry_empty">Показать пустой элемент (пустую область)</string>
+    <string name="last_entry_hidden">Скрыть элемент</string>
+    <string name="end_of_list">(конец списка)</string>
+    <string name="other_widget_parts">Другие части виджета</string>
     <!-- Date format preference -->
     <string name="simple_options">Простые варианты</string>
     <string name="date_format_default_weekday">По умолчанию, с днём недели</string>

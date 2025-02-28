@@ -119,12 +119,22 @@
             android:summary="5"
             android:title="@string/maxlines_details_title"
             android:dependency="multiline_details" />
+    </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/other_widget_parts">
         <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
             android:key="showCurrentTimeLine"
             android:defaultValue="true"
             android:summary="@string/show_current_time_line_desc"
             android:title="@string/show_current_time_line_title" />
+
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="empty"
+            android:entries="@array/pref_last_entry_entries"
+            android:entryValues="@array/pref_last_entry_values"
+            android:key="lastEntryAppearance"
+            android:summary="@string/last_entry_with_message"
+            android:title="@string/last_entry_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>
