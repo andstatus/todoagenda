@@ -20,32 +20,54 @@ object DateUtil {
     private const val AUTO = "auto"
     const val EMPTY_STRING = ""
 
-    fun formatTime(settingsSupplier: Supplier<InstanceSettings>, time: DateTime?): String {
+    fun formatTime(
+        settingsSupplier: Supplier<InstanceSettings>,
+        time: DateTime?,
+    ): String {
         if (time == null || !MyClock.isDateDefined(time)) return EMPTY_STRING
         val settings = settingsSupplier.get()
         val timeFormat = settings.timeFormat
         return if (!DateFormat.is24HourFormat(settings.context) && timeFormat == AUTO || timeFormat == TWELVE) {
             formatDateTime(
-                settings, time,
-                DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_12HOUR
+                settings,
+                time,
+                DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_12HOUR,
             )
-        } else formatDateTime(
-            settings, time,
-            DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_24HOUR
+        } else {
+            formatDateTime(
+                settings,
+                time,
+                DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_24HOUR,
+            )
+        }
+    }
+
+    fun formatTimeUntil(
+        settings: InstanceSettings,
+        time: DateTime?,
+    ): String {
+        if (time == null || !MyClock.isDateDefined(time)) return EMPTY_STRING
+        return formatDateTime(
+            settings,
+            time,
+            DateUtils.FORMAT_SHOW_TIME or DateUtils.FORMAT_24HOUR,
         )
     }
 
-    private fun formatDateTime(settings: InstanceSettings, dateTime: DateTime, flags: Int): String {
-        return DateUtils.formatDateRange(
-            settings.context,
-            Formatter(StringBuilder(50), MyLocale.locale),
-            dateTime.millis,
-            dateTime.millis,
-            flags,
-            settings.timeZone.id
-        )
-            .toString()
-    }
+    private fun formatDateTime(
+        settings: InstanceSettings,
+        dateTime: DateTime,
+        flags: Int,
+    ): String =
+        DateUtils
+            .formatDateRange(
+                settings.context,
+                Formatter(StringBuilder(50), MyLocale.locale),
+                dateTime.millis,
+                dateTime.millis,
+                flags,
+                settings.timeZone.id,
+            ).toString()
 
     /**
      * Returns an empty string in a case supplied ID is not a valid Time Zone ID
@@ -76,22 +98,34 @@ object DateUtil {
         return java.lang.Long.toString(time) // Fallback if above doesn't work
     }
 
-    fun isSameDate(date: DateTime?, other: DateTime?): Boolean {
+    fun isSameDate(
+        date: DateTime?,
+        other: DateTime?,
+    ): Boolean {
         if (date == null && other == null) return true
         return if (date == null || other == null) false else date == other
     }
 
-    fun isSameDay(date: DateTime?, other: DateTime?): Boolean {
+    fun isSameDay(
+        date: DateTime?,
+        other: DateTime?,
+    ): Boolean {
         if (date == null && other == null) return true
         return if (date == null || other == null) false else date.year() == other.year() && date.dayOfYear() == other.dayOfYear()
     }
 
-    fun exactMinutesPlusMinutes(nowIn: DateTime, periodMinutes: Int): DateTime {
+    fun exactMinutesPlusMinutes(
+        nowIn: DateTime,
+        periodMinutes: Int,
+    ): DateTime {
         val now = nowIn.plusMinutes(1)
         return DateTime(
-            now.year, now.monthOfYear,
-            now.dayOfMonth, now.hourOfDay, now.minuteOfHour, now.zone
-        )
-            .plusMinutes(periodMinutes)
+            now.year,
+            now.monthOfYear,
+            now.dayOfMonth,
+            now.hourOfDay,
+            now.minuteOfHour,
+            now.zone,
+        ).plusMinutes(periodMinutes)
     }
 }

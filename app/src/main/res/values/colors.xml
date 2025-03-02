@@ -50,4 +50,7 @@
     <color name="text_shadow_dark">#FF000000</color>
     <color name="text_shadow_light">#FFFFFFFF</color>
 
+    <!-- Other -->
+    <color name="yellow500">#ffeb3b</color>
+
 </resources>

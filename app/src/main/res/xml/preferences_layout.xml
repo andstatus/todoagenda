@@ -124,9 +124,15 @@
     <PreferenceCategory app:title="@string/other_widget_parts">
         <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
             android:key="showCurrentTimeLine"
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:summary="@string/show_current_time_line_desc"
             android:title="@string/show_current_time_line_title" />
+
+        <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
+            android:key="showTimeUntilTag"
+            android:defaultValue="false"
+            android:summary="@string/show_time_until_desc"
+            android:title="@string/show_time_until_title" />
 
         <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:defaultValue="empty"

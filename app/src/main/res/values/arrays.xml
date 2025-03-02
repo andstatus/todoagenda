@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="one_space" tools:ignore="MissingTranslation"> </string>
+    <!-- Layout -->
     <string-array name="pref_widget_header_layout_entries">
         <item>@string/single_line_layout</item>
         <item>@string/two_rows_layout</item>
@@ -11,25 +11,6 @@
         <item>TWO_ROWS</item>
         <item>HIDDEN</item>
     </string-array>
-    <string-array name="pref_text_size_entries">
-        <item>@string/appearance_text_size_very_large</item>
-        <item>@string/appearance_text_size_large</item>
-        <item>@string/appearance_text_size_medium</item>
-        <item>@string/appearance_text_size_small</item>
-        <item>@string/appearance_text_size_very_small</item>
-    </string-array>
-    <string-array name="pref_text_size_values" tools:ignore="MissingTranslation">
-        <item>1.75</item>
-        <item>1.25</item>
-        <item>1.0</item>
-        <item>0.8</item>
-        <item>0.6</item>
-    </string-array>
-    <string-array name="pref_date_format_entries">
-        <item>@string/appearance_date_format_auto</item>
-        <item>@string/appearance_date_format_24</item>
-        <item>@string/appearance_date_format_12</item>
-    </string-array>
     <string-array name="pref_day_header_alignment_entries">
         <item>@string/appearance_day_header_alignment_left</item>
         <item>@string/appearance_day_header_alignment_center</item>
@@ -39,6 +20,37 @@
         <item>LEFT</item>
         <item>CENTER</item>
         <item>RIGHT</item>
+    </string-array>
+    <string-array name="pref_event_entry_layout_entries">
+        <item>@string/default_multiline_layout</item>
+        <item>@string/single_line_layout</item>
+    </string-array>
+    <string-array name="pref_event_entry_layout_values" tools:ignore="MissingTranslation">
+        <item>DEFAULT</item>
+        <item>ONE_LINE</item>
+    </string-array>
+
+    <string-array name="pref_last_entry_entries">
+        <item>@string/last_entry_with_message</item>
+        <item>@string/last_entry_empty</item>
+        <item>@string/last_entry_hidden</item>
+    </string-array>
+    <string-array name="pref_last_entry_values" tools:ignore="MissingTranslation">
+        <item>with_message</item>
+        <item>empty</item>
+        <item>hidden</item>
+    </string-array>
+
+    <!-- Colors -->
+    <string-array name="pref_text_shadow_entries">
+        <item>@string/text_shadow_no_shadow</item>
+        <item>@string/text_shadow_dark</item>
+        <item>@string/text_shadow_light</item>
+    </string-array>
+    <string-array name="pref_text_shadow_values" tools:ignore="MissingTranslation">
+        <item>no</item>
+        <item>dark</item>
+        <item>light</item>
     </string-array>
     <string-array name="pref_theme_entries">
         <item>@string/appearance_theme_black</item>
@@ -62,11 +74,22 @@
         <item>shading</item>
         <item>colors</item>
     </string-array>
-    <string-array name="pref_date_format_values" tools:ignore="MissingTranslation">
-        <item>auto</item>
-        <item>24</item>
-        <item>12</item>
-    </string-array>
+    <integer-array name="task_list_colors">
+        <item>@color/task_list_0</item>
+        <item>@color/task_list_1</item>
+        <item>@color/task_list_2</item>
+        <item>@color/task_list_3</item>
+        <item>@color/task_list_4</item>
+        <item>@color/task_list_5</item>
+        <item>@color/task_list_6</item>
+        <item>@color/task_list_7</item>
+        <item>@color/task_list_8</item>
+        <item>@color/task_list_9</item>
+    </integer-array>
+
+    <!-- Event details -->
+
+    <!-- Event filters -->
     <string-array name="pref_event_range_entries">
         <item>@string/event_range_today</item>
         <item>@string/event_range_today_and_tomorrow</item>
@@ -121,36 +144,85 @@
         <item>SIX_MONTHS</item>
         <item>ONE_YEAR</item>
     </string-array>
-    <string-array name="pref_last_entry_entries">
-        <item>@string/last_entry_with_message</item>
-        <item>@string/last_entry_empty</item>
-        <item>@string/last_entry_hidden</item>
+    <string-array name="pref_all_day_events_placement_entries">
+        <item>@string/all_day_events_placement_top_of_the_days_events</item>
+        <item>@string/all_day_events_placement_bottom_of_the_days_events</item>
     </string-array>
-    <string-array name="pref_last_entry_values" tools:ignore="MissingTranslation">
-        <item>with_message</item>
-        <item>empty</item>
-        <item>hidden</item>
+    <string-array name="pref_all_day_events_placement_values" tools:ignore="MissingTranslation">
+        <item>top_day</item>
+        <item>bottom_day</item>
     </string-array>
-    <string-array name="pref_event_entry_layout_entries">
-        <item>@string/default_multiline_layout</item>
-        <item>@string/single_line_layout</item>
+    <string-array name="pref_task_scheduling_entries">
+        <item>@string/task_scheduling_date_due</item>
+        <item>@string/task_scheduling_date_started</item>
     </string-array>
-    <string-array name="pref_event_entry_layout_values" tools:ignore="MissingTranslation">
-        <item>DEFAULT</item>
-        <item>ONE_LINE</item>
+    <string-array name="pref_task_scheduling_values" tools:ignore="MissingTranslation">
+        <item>date_due</item>
+        <item>date_started</item>
     </string-array>
-    <integer-array name="task_list_colors">
-        <item>@color/task_list_0</item>
-        <item>@color/task_list_1</item>
-        <item>@color/task_list_2</item>
-        <item>@color/task_list_3</item>
-        <item>@color/task_list_4</item>
-        <item>@color/task_list_5</item>
-        <item>@color/task_list_6</item>
-        <item>@color/task_list_7</item>
-        <item>@color/task_list_8</item>
-        <item>@color/task_list_9</item>
-    </integer-array>
+    <string-array name="pref_tasks_wo_dates_entries">
+        <item>@string/tasks_wo_dates_end_of_list</item>
+        <item>@string/tasks_wo_dates_end_of_today</item>
+        <item>@string/tasks_wo_dates_hide</item>
+    </string-array>
+    <string-array name="pref_tasks_wo_dates_values" tools:ignore="MissingTranslation">
+        <item>end_of_list</item>
+        <item>end_of_today</item>
+        <item>hide</item>
+    </string-array>
+    <string-array name="pref_filter_mode_entries">
+        <item>@string/filter_mode_normal</item>
+        <item>@string/filter_mode_debug</item>
+        <item>@string/filter_mode_no_filtering</item>
+    </string-array>
+    <string-array name="pref_filter_mode_values" tools:ignore="MissingTranslation">
+        <item>normal</item>
+        <item>debug</item>
+        <item>no_filtering</item>
+    </string-array>
+
+    <!-- Calendars and task lists -->
+
+    <!-- Other settings -->
+    <string-array name="pref_text_size_entries">
+        <item>@string/appearance_text_size_very_large</item>
+        <item>@string/appearance_text_size_large</item>
+        <item>@string/appearance_text_size_medium</item>
+        <item>@string/appearance_text_size_small</item>
+        <item>@string/appearance_text_size_very_small</item>
+    </string-array>
+    <string-array name="pref_text_size_values" tools:ignore="MissingTranslation">
+        <item>1.75</item>
+        <item>1.25</item>
+        <item>1.0</item>
+        <item>0.8</item>
+        <item>0.6</item>
+    </string-array>
+    <string-array name="pref_date_format_entries">
+        <item>@string/appearance_date_format_auto</item>
+        <item>@string/appearance_date_format_24</item>
+        <item>@string/appearance_date_format_12</item>
+    </string-array>
+    <string-array name="pref_date_format_values" tools:ignore="MissingTranslation">
+        <item>auto</item>
+        <item>24</item>
+        <item>12</item>
+    </string-array>
+    <string-array name="pref_snapshot_mode_entries">
+        <item>@string/snapshot_mode_live_data</item>
+        <item>@string/snapshot_mode_time</item>
+        <item>@string/snapshot_mode_now</item>
+    </string-array>
+    <string-array name="pref_snapshot_mode_values" tools:ignore="MissingTranslation">
+        <item>live_data</item>
+        <item>snapshot_time</item>
+        <item>snapshot_now</item>
+    </string-array>
+
+    <!-- Feedback and backup -->
+
+    <!-- Unsorted -->
+    <string name="one_space" tools:ignore="MissingTranslation"> </string>
     <string-array name="custom_locale_entries">
         <item>@string/device_default</item>
         <item>English</item>
@@ -238,61 +310,5 @@
         <item>tr</item>
         <item>uk</item>
         <item>vi</item>
-    </string-array>
-    <string-array name="pref_task_scheduling_entries">
-        <item>@string/task_scheduling_date_due</item>
-        <item>@string/task_scheduling_date_started</item>
-    </string-array>
-    <string-array name="pref_task_scheduling_values" tools:ignore="MissingTranslation">
-        <item>date_due</item>
-        <item>date_started</item>
-    </string-array>
-    <string-array name="pref_tasks_wo_dates_entries">
-        <item>@string/tasks_wo_dates_end_of_list</item>
-        <item>@string/tasks_wo_dates_end_of_today</item>
-        <item>@string/tasks_wo_dates_hide</item>
-    </string-array>
-    <string-array name="pref_tasks_wo_dates_values" tools:ignore="MissingTranslation">
-        <item>end_of_list</item>
-        <item>end_of_today</item>
-        <item>hide</item>
-    </string-array>
-    <string-array name="pref_filter_mode_entries">
-        <item>@string/filter_mode_normal</item>
-        <item>@string/filter_mode_debug</item>
-        <item>@string/filter_mode_no_filtering</item>
-    </string-array>
-    <string-array name="pref_filter_mode_values" tools:ignore="MissingTranslation">
-        <item>normal</item>
-        <item>debug</item>
-        <item>no_filtering</item>
-    </string-array>
-    <string-array name="pref_snapshot_mode_entries">
-        <item>@string/snapshot_mode_live_data</item>
-        <item>@string/snapshot_mode_time</item>
-        <item>@string/snapshot_mode_now</item>
-    </string-array>
-    <string-array name="pref_snapshot_mode_values" tools:ignore="MissingTranslation">
-        <item>live_data</item>
-        <item>snapshot_time</item>
-        <item>snapshot_now</item>
-    </string-array>
-    <string-array name="pref_all_day_events_placement_entries">
-        <item>@string/all_day_events_placement_top_of_the_days_events</item>
-        <item>@string/all_day_events_placement_bottom_of_the_days_events</item>
-    </string-array>
-    <string-array name="pref_all_day_events_placement_values" tools:ignore="MissingTranslation">
-        <item>top_day</item>
-        <item>bottom_day</item>
-    </string-array>
-    <string-array name="pref_text_shadow_entries">
-        <item>@string/text_shadow_no_shadow</item>
-        <item>@string/text_shadow_dark</item>
-        <item>@string/text_shadow_light</item>
-    </string-array>
-    <string-array name="pref_text_shadow_values" tools:ignore="MissingTranslation">
-        <item>no</item>
-        <item>dark</item>
-        <item>light</item>
     </string-array>
 </resources>

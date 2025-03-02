@@ -53,6 +53,7 @@ object ApplicationPreferences {
             setBoolean(context, InstanceSettings.PREF_MULTILINE_DETAILS, settings.isMultilineDetails)
             setString(context, InstanceSettings.PREF_MAXLINES_DETAILS, settings.maxLinesDetails.toString())
             setBoolean(context, InstanceSettings.PREF_SHOW_CURRENT_TIME_LINE, settings.showCurrentTimeLine)
+            setBoolean(context, InstanceSettings.PREF_SHOW_TIME_UNTIL_TAG, settings.showTimeUntilTag)
             setString(context, InstanceSettings.PREF_LAST_ENTRY_APPEARANCE, settings.lastEntryAppearance.value)
             //
             // ----------------------------------------------------------------------------------
@@ -258,7 +259,7 @@ object ApplicationPreferences {
             getString(
                 context,
                 ThemeColors.PREF_TEXT_COLOR_SOURCE,
-                TextColorSource.defaultValue.value,
+                TextColorSource.defaultEntry.value,
             ),
         )
 

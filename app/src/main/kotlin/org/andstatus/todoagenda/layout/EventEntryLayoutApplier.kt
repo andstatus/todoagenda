@@ -1,9 +1,11 @@
 package org.andstatus.todoagenda.layout
 
+import android.view.View
 import android.widget.RemoteViews
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
+import org.andstatus.todoagenda.util.DateUtil.formatTimeUntil
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.EventEntryVisualizer
@@ -21,6 +23,7 @@ abstract class EventEntryLayoutApplier(
         rv: RemoteViews,
     ): RemoteViews {
         visualizer.setIcon(entry, rv)
+        setTimeUntil(entry, rv)
         setTitle(entry, rv)
         setDetails(entry, rv)
         setDate(entry, rv)
@@ -30,6 +33,31 @@ abstract class EventEntryLayoutApplier(
         RemoteViewsUtil.setCompact(settings, rv)
         setBackground(rv, entry)
         return rv
+    }
+
+    open fun setTimeUntil(
+        entry: WidgetEntry,
+        rv: RemoteViews,
+    ) {
+        val viewId = R.id.time_until
+        if (entry.showTimeUntil && settings.showTimeUntilTag) {
+            val time = settings.clock.thisDay().plusMinutes(settings.clock.getNumberOfMinutesTo(entry.entryDate))
+            val strTime = formatTimeUntil(settings, time)
+            rv.setTextViewText(viewId, "in $strTime")
+            RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
+            val textColorPref = TextColorPref.forTitle(entry)
+            RemoteViewsUtil.setTextColor(settings, textColorPref, rv, viewId, R.attr.eventEntryTitle)
+            settings
+                .colors()
+                .getShading(textColorPref)
+                .timeUntilBackgroundSource.drawableResId
+                ?.let { resId ->
+                    RemoteViewsUtil.setBackgroundResource(rv, viewId, resId)
+                }
+            rv.setViewVisibility(viewId, View.VISIBLE)
+        } else {
+            rv.setViewVisibility(viewId, View.GONE)
+        }
     }
 
     open fun setTitle(

@@ -53,7 +53,7 @@ class DayHeaderVisualizer(
         position: Int,
         entry: DayHeader,
         rv: RemoteViews,
-        textColorPref: TextColorPref?,
+        textColorPref: TextColorPref,
     ) {
         val dateString = getTitleString(entry).toString().uppercase(MyLocale.locale)
         rv.setTextViewText(R.id.day_header_title, dateString)

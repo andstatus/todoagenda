@@ -170,6 +170,13 @@ class RemoteViewsFactory(
             } else {
                 deduplicated
             }
+        val now = settings.clock.now()
+        for (it in limited) {
+            if (it.entryDate >= now) {
+                it.showTimeUntil = true
+                break
+            }
+        }
         val withCurrentTime =
             if (settings.showCurrentTimeLine && limited.isNotEmpty()) {
                 (limited + CurrentTimeEntry(settings)).sorted()

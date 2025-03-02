@@ -59,6 +59,7 @@ data class InstanceSettings(
     val isMultilineDetails: Boolean = PREF_MULTILINE_DETAILS_DEFAULT,
     val maxLinesDetails: Int = PREF_MAXLINES_DETAILS_DEFAULT,
     val showCurrentTimeLine: Boolean = false,
+    val showTimeUntilTag: Boolean = false,
     val lastEntryAppearance: LastEntryAppearance = LastEntryAppearance.defaultValue,
     //
     // ----------------------------------------------------------------------------------
@@ -222,6 +223,7 @@ data class InstanceSettings(
             put(PREF_MULTILINE_DETAILS, isMultilineDetails)
             put(PREF_MAXLINES_DETAILS, maxLinesDetails)
             put(PREF_SHOW_CURRENT_TIME_LINE, showCurrentTimeLine)
+            put(PREF_SHOW_TIME_UNTIL_TAG, showTimeUntilTag)
             put(PREF_LAST_ENTRY_APPEARANCE, lastEntryAppearance.value)
             //
             // ----------------------------------------------------------------------------------
@@ -431,6 +433,7 @@ data class InstanceSettings(
         const val PREF_MAXLINES_DETAILS = "maxLinesDetails"
         const val PREF_MAXLINES_DETAILS_DEFAULT = 5
         const val PREF_SHOW_CURRENT_TIME_LINE = "showCurrentTimeLine"
+        const val PREF_SHOW_TIME_UNTIL_TAG = "showTimeUntilTag"
         const val PREF_LAST_ENTRY_APPEARANCE = "lastEntryAppearance"
 
         //
@@ -671,6 +674,12 @@ data class InstanceSettings(
                             json.getBoolean(PREF_SHOW_CURRENT_TIME_LINE)
                         } else {
                             EMPTY.showCurrentTimeLine
+                        },
+                    showTimeUntilTag =
+                        if (json.has(PREF_SHOW_TIME_UNTIL_TAG)) {
+                            json.getBoolean(PREF_SHOW_TIME_UNTIL_TAG)
+                        } else {
+                            EMPTY.showTimeUntilTag
                         },
                     lastEntryAppearance =
                         if (json.has(PREF_LAST_ENTRY_APPEARANCE)) {
@@ -985,7 +994,18 @@ data class InstanceSettings(
                     maxLinesTitle = ApplicationPreferences.getMaxLinesTitle(context),
                     isMultilineDetails = ApplicationPreferences.isMultilineDetails(context),
                     maxLinesDetails = ApplicationPreferences.getMaxLinesDetails(context),
-                    showCurrentTimeLine = ApplicationPreferences.getBoolean(context, PREF_SHOW_CURRENT_TIME_LINE, true),
+                    showCurrentTimeLine =
+                        ApplicationPreferences.getBoolean(
+                            context,
+                            PREF_SHOW_CURRENT_TIME_LINE,
+                            EMPTY.showCurrentTimeLine,
+                        ),
+                    showTimeUntilTag =
+                        ApplicationPreferences.getBoolean(
+                            context,
+                            PREF_SHOW_TIME_UNTIL_TAG,
+                            EMPTY.showTimeUntilTag,
+                        ),
                     lastEntryAppearance = ApplicationPreferences.getLastEntryAppearance(context),
                     //
                     // ----------------------------------------------------------------------------------

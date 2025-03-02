@@ -24,6 +24,13 @@
         <item name="android:background">@color/day_header_separator_black</item>
     </style>
 
+    <style name="TimeUntil" parent="android:Widget.Holo.TextView">
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/event_entry_title_black</item>
+        <item name="android:textSize">@dimen/event_entry_title</item>
+    </style>
+
     <style name="EventEntryTitle" parent="android:Widget.Holo.TextView">
         <item name="android:ellipsize">marquee</item>
         <item name="android:singleLine">true</item>

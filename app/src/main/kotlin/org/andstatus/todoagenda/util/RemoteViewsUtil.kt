@@ -10,6 +10,7 @@ import android.util.TypedValue
 import android.widget.RemoteViews
 import androidx.annotation.AttrRes
 import androidx.annotation.DimenRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
@@ -19,6 +20,7 @@ object RemoteViewsUtil {
     private val TAG = RemoteViewsUtil::class.java.simpleName
     private const val METHOD_SET_TEXT_SIZE = "setTextSize"
     private const val METHOD_SET_BACKGROUND_COLOR = "setBackgroundColor"
+    private const val METHOD_SET_BACKGROUND_RESOURCE = "setBackgroundResource"
     private const val METHOD_SET_SINGLE_LINE = "setSingleLine"
     private const val METHOD_SET_ALPHA = "setAlpha"
     private const val METHOD_SET_COLOR_FILTER = "setColorFilter"
@@ -137,7 +139,7 @@ object RemoteViewsUtil {
 
     fun setTextColor(
         settings: InstanceSettings,
-        textColorPref: TextColorPref?,
+        textColorPref: TextColorPref,
         rv: RemoteViews,
         viewId: Int,
         colorAttrId: Int,
@@ -173,6 +175,14 @@ object RemoteViewsUtil {
         color: Int,
     ) {
         rv.setInt(viewId, METHOD_SET_BACKGROUND_COLOR, color)
+    }
+
+    fun setBackgroundResource(
+        rv: RemoteViews,
+        viewId: Int,
+        @DrawableRes drawable: Int,
+    ) {
+        rv.setInt(viewId, METHOD_SET_BACKGROUND_RESOURCE, drawable)
     }
 
     private fun getScaledValueInPixels(

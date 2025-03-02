@@ -19,6 +19,8 @@
     <dimen name="day_header_padding_top">2dp</dimen>
     <dimen name="day_header_padding_right">10dp</dimen>
     <dimen name="day_header_padding_bottom">12dp</dimen>
+    <dimen name="time_until_horizontal_padding">4dp</dimen>
+    <dimen name="time_until_background_radius">8dp</dimen>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>

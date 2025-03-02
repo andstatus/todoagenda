@@ -19,12 +19,12 @@ abstract class WidgetEntry protected constructor(
     val endDate: DateTime?,
 ) : Comparable<WidgetEntry> {
     val entryId = idGenerator.incrementAndGet()
-    val entryDate: DateTime
+    val entryDate: DateTime = fixEntryDate(entryPosition, entryDateIn)
     val entryDay: DateTime
     val timeSection: TimeSection
+    var showTimeUntil: Boolean = false
 
     init {
-        entryDate = fixEntryDate(entryPosition, entryDateIn)
         entryDay = calcEntryDay(entryDateIn)
         timeSection = calcTimeSection(settings, entryPosition, entryDay, endDate)
     }

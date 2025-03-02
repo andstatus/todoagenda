@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/event_entry"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:paddingLeft="@dimen/calender_padding"
-              android:paddingRight="@dimen/calender_padding"
-              android:paddingBottom="@dimen/entry_bottom_padding">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/event_entry"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/calender_padding"
+    android:paddingRight="@dimen/calender_padding"
+    android:paddingBottom="@dimen/entry_bottom_padding">
 
     <TextView
         android:id="@+id/event_entry_color"
@@ -38,6 +39,17 @@
             android:layout_alignParentTop="true"
             android:layout_toStartOf="@+id/event_entry_indicator_layout_ref"
             android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/time_until"
+                style="@style/TimeUntil"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/time_until_black"
+                android:paddingStart="@dimen/time_until_horizontal_padding"
+                android:paddingEnd="@dimen/time_until_horizontal_padding"
+                tools:ignore="SelectableText"
+                tools:text="in 00:45" />
 
             <TextView
                 android:id="@+id/event_entry_days"
@@ -87,8 +99,8 @@
             layout="@layout/event_entry_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@id/text_container" />
+            android:layout_alignTop="@id/text_container"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </LinearLayout>
