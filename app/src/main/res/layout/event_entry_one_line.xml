@@ -45,10 +45,10 @@
                 style="@style/TimeUntil"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/time_until_black"
+                android:layout_marginEnd="@dimen/time_until_horizontal_margin"
                 android:paddingStart="@dimen/time_until_horizontal_padding"
                 android:paddingEnd="@dimen/time_until_horizontal_padding"
-                tools:ignore="SelectableText"
+                tools:background="@drawable/time_until_black"
                 tools:text="in 00:45" />
 
             <TextView

@@ -7,7 +7,9 @@ import org.andstatus.todoagenda.layout.EventEntryLayout
 import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType
+import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.prefs.colors.ThemeColors
+import org.andstatus.todoagenda.prefs.colors.TimeUntilBackgroundSource
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatter
@@ -72,6 +74,7 @@ data class InstanceSettings(
         },
     private val darkColors: ThemeColors = ThemeColors.EMPTY,
     val textShadow: TextShadow = TextShadow.NO_SHADOW,
+    val timeUntilBackgroundSource: TimeUntilBackgroundSource = TimeUntilBackgroundSource.defaultEntry,
     //
     // ----------------------------------------------------------------------------------
     // Event details
@@ -233,6 +236,7 @@ data class InstanceSettings(
                 put(PREF_DARK_THEME, darkColors.toJson(JSONObject()))
             }
             put(PREF_TEXT_SHADOW, textShadow.value)
+            put(PREF_TIME_UNTIL_BACKGROUND_SOURCE, timeUntilBackgroundSource.value)
             //
             // ----------------------------------------------------------------------------------
             // Event details
@@ -306,6 +310,12 @@ data class InstanceSettings(
             ).minusMillis(1)
     val startOfTimeRange: DateTime?
         get() = eventsEnded.endedAt(clock)
+
+    fun timeUntilBackgroundSource(pref: TextColorPref): TimeUntilBackgroundSource =
+        when (timeUntilBackgroundSource) {
+            TimeUntilBackgroundSource.AUTO -> colors().getShading(pref).timeUntilBackgroundSource
+            else -> timeUntilBackgroundSource
+        }
 
     fun colors(): ThemeColors = if (!darkColors.isEmpty && isDarkThemeOn(context)) darkColors else defaultColors
 
@@ -442,6 +452,7 @@ data class InstanceSettings(
         const val PREF_DARK_THEME = "darkTheme"
         const val PREF_TEXT_SHADOW = "textShadow"
         val PREF_TEXT_SHADOW_DEFAULT = TextShadow.NO_SHADOW.name
+        const val PREF_TIME_UNTIL_BACKGROUND_SOURCE = "timeUntilBackgroundSource"
 
         //
         // ----------------------------------------------------------------------------------
@@ -713,6 +724,12 @@ data class InstanceSettings(
                             TextShadow.fromValue(json.getString(PREF_TEXT_SHADOW))
                         } else {
                             EMPTY.textShadow
+                        },
+                    timeUntilBackgroundSource =
+                        if (json.has(PREF_TIME_UNTIL_BACKGROUND_SOURCE)) {
+                            TimeUntilBackgroundSource.fromValue(json.getString(PREF_TIME_UNTIL_BACKGROUND_SOURCE))
+                        } else {
+                            EMPTY.timeUntilBackgroundSource
                         },
                     //
                     // ----------------------------------------------------------------------------------
@@ -1013,6 +1030,7 @@ data class InstanceSettings(
                     darkColors = darkColors,
                     defaultColors = defaultColors,
                     textShadow = ApplicationPreferences.getTextShadow(context),
+                    timeUntilBackgroundSource = ApplicationPreferences.getTimeUntilBackgroundSource(context),
                     //
                     // ----------------------------------------------------------------------------------
                     // Event details

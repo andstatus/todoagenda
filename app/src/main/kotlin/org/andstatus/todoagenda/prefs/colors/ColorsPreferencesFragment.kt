@@ -19,6 +19,7 @@ import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
 import org.andstatus.todoagenda.prefs.MyPreferenceFragment
 import org.andstatus.todoagenda.layout.TimeSection
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
 import java.util.Arrays
 import java.util.stream.Collectors
 
@@ -49,6 +50,7 @@ class ColorsPreferencesFragment :
         preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
         showTextSources()
         showTextShadow()
+        showTimeUntilBackgroundSource()
     }
 
     private fun showTextSources() {
@@ -155,6 +157,14 @@ class ColorsPreferencesFragment :
         }
     }
 
+    private fun showTimeUntilBackgroundSource() {
+        findPreference<ListPreference>(PREF_TIME_UNTIL_BACKGROUND_SOURCE)?.let { preference ->
+            TimeUntilBackgroundSource.fromValue(preference.value).let { source ->
+                preference.summary = requireActivity().getString(source.titleResId)
+            }
+        }
+    }
+
     private fun showShadings() {
         for (shadingPref in TextColorPref.entries) {
             findPreference<ListPreference>(shadingPref.shadingPreferenceName)?.let { preference ->
@@ -207,6 +217,7 @@ class ColorsPreferencesFragment :
                 saveSettings()
                 showTextSources()
                 showTextShadow()
+                showTimeUntilBackgroundSource()
             }
         }
     }

@@ -128,6 +128,7 @@
     <PreferenceCategory
         app:key="FutureTime"
         app:title="@string/future_events">
+
         <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:defaultValue="DARK"
             android:entries="@array/pref_theme_entries"
@@ -140,6 +141,13 @@
             android:key="dayHeaderTextColorFuture"
             android:title="@string/day_header_text_color"
             app:colorpicker_selectNoneButtonText="@string/default_value" />
+
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:defaultValue="auto"
+            android:entries="@array/pref_time_until_background_source_entries"
+            android:entryValues="@array/pref_time_until_background_source_values"
+            android:key="timeUntilBackgroundSource"
+            android:title="@string/time_until_background" />
 
         <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:defaultValue="BLACK"

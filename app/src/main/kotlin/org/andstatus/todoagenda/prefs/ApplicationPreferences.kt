@@ -9,11 +9,13 @@ import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_MAX_NUMBER_OF_EVENTS
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW_DEFAULT
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.prefs.colors.TextColorSource
 import org.andstatus.todoagenda.prefs.colors.ThemeColors
+import org.andstatus.todoagenda.prefs.colors.TimeUntilBackgroundSource
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.util.StringUtil
 
@@ -70,6 +72,7 @@ object ApplicationPreferences {
                 setInt(context, pref.colorPreferenceName, colors.getTextColorStored(pref).color)
             }
             setString(context, PREF_TEXT_SHADOW, settings.textShadow.value)
+            setString(context, PREF_TIME_UNTIL_BACKGROUND_SOURCE, settings.timeUntilBackgroundSource.value)
             //
             // ----------------------------------------------------------------------------------
             // Event details
@@ -269,6 +272,15 @@ object ApplicationPreferences {
                 context,
                 PREF_TEXT_SHADOW,
                 PREF_TEXT_SHADOW_DEFAULT,
+            ),
+        )
+
+    fun getTimeUntilBackgroundSource(context: Context): TimeUntilBackgroundSource =
+        TimeUntilBackgroundSource.fromValue(
+            getString(
+                context,
+                PREF_TIME_UNTIL_BACKGROUND_SOURCE,
+                TimeUntilBackgroundSource.defaultEntry.value,
             ),
         )
 

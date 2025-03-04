@@ -74,6 +74,18 @@
         <item>shading</item>
         <item>colors</item>
     </string-array>
+    <string-array name="pref_time_until_background_source_entries">
+        <item>@string/auto_color</item>
+        <item>@string/appearance_theme_white</item>
+        <item>@string/appearance_theme_black</item>
+        <item>@string/color_yellow</item>
+    </string-array>
+    <string-array name="pref_time_until_background_source_values" tools:ignore="MissingTranslation">
+        <item>auto</item>
+        <item>black</item>
+        <item>white</item>
+        <item>yellow</item>
+    </string-array>
     <integer-array name="task_list_colors">
         <item>@color/task_list_0</item>
         <item>@color/task_list_1</item>
