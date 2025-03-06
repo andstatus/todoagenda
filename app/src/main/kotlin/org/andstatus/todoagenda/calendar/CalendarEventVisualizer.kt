@@ -117,8 +117,8 @@ class CalendarEventVisualizer(
                         oneEventEntries
                             .drop(1)
                             .fold(oneEventEntries.first()) { acc, entry ->
-                                if (abs(settings.clock.getNumberOfMinutesTo(entry.entryClosestTime)) <
-                                    abs(settings.clock.getNumberOfMinutesTo(acc.entryClosestTime))
+                                if (abs(settings.clock.minutesTo(entry.entryClosestTime)) <
+                                    abs(settings.clock.minutesTo(acc.entryClosestTime))
                                 ) {
                                     entry
                                 } else {

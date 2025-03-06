@@ -63,10 +63,9 @@ class MyClock(
                 date.withTimeAtStartOfDay(),
             ).days
 
-    fun getNumberOfMinutesTo(date: DateTime?): Int =
-        Minutes
-            .minutesBetween(now(date!!.zone), date)
-            .minutes
+    fun minutesTo(date: DateTime): Int = Minutes.minutesBetween(now(date.zone), date).minutes + 1
+
+    fun daysTo(date: DateTime): Int = Days.daysBetween(now(date.zone), date).days + 1
 
     fun startOfTomorrow(timeZone: DateTimeZone? = this.timeZone): DateTime = startOfToday(timeZone).plusDays(1)
 

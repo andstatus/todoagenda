@@ -29,9 +29,9 @@ import java.util.Formatter
 class DateFormatter(
     private val context: Context?,
     private val dateFormatValue: DateFormatValue?,
-    private val now: DateTime?,
+    private val now: DateTime,
 ) {
-    fun formatDate(date: DateTime?): CharSequence {
+    fun formatDate(date: DateTime): CharSequence {
         return try {
             if (dateFormatValue!!.hasPattern()) {
                 return formatDateCustom(date, dateFormatValue.pattern)
@@ -77,14 +77,14 @@ class DateFormatter(
         }
     }
 
-    private fun formatDefaultWithNumberOfDaysToEvent(date: DateTime?): CharSequence {
+    private fun formatDefaultWithNumberOfDaysToEvent(date: DateTime): CharSequence {
         val dateStub = "dateStub"
         return formatDateCustom(date, "BBB, '$dateStub', BBBB")
             .replace(dateStub, formatDateTime(date, DateUtils.FORMAT_SHOW_DATE))
     }
 
     private fun formatDateTime(
-        date: DateTime?,
+        date: DateTime,
         flags: Int,
     ): String {
         val millis = toJavaDate(date).time
@@ -95,19 +95,19 @@ class DateFormatter(
                 millis,
                 millis,
                 flags,
-                date!!.zone.id,
+                date.zone.id,
             ).toString()
     }
 
-    private fun getNumberOfDaysToEvent(date: DateTime?): Int =
+    private fun getNumberOfDaysToEvent(date: DateTime): Int =
         Days
             .daysBetween(
-                now!!.withZone(date!!.zone).withTimeAtStartOfDay(),
+                now.withZone(date.zone).withTimeAtStartOfDay(),
                 date.withTimeAtStartOfDay(),
             ).days
 
     private fun formatDateCustom(
-        date: DateTime?,
+        date: DateTime,
         pattern: String?,
     ): String =
         if (StringUtil.isEmpty(pattern)) {
@@ -123,7 +123,7 @@ class DateFormatter(
         }
 
     private fun preProcessNumberOfDaysToEvent(
-        date: DateTime?,
+        date: DateTime,
         pattern: String?,
         startIndex: Int = 0,
         alreadyShown: Boolean = false,
@@ -191,7 +191,7 @@ class DateFormatter(
         private const val NUMBER_OF_DAYS_LOWER_LETTER = 'b'
         private const val NUMBER_OF_DAYS_UPPER_LETTER = 'B'
 
-        fun toJavaDate(date: DateTime?): Date = Date(date!!.yearOfEra - 1900, date.monthOfYear - 1, date.dayOfMonth)
+        fun toJavaDate(date: DateTime): Date = Date(date.yearOfEra - 1900, date.monthOfYear - 1, date.dayOfMonth)
 
         fun formatNumberOfDaysToEvent(
             context: Context?,

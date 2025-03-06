@@ -41,9 +41,8 @@ abstract class EventEntryLayoutApplier(
     ) {
         val viewId = R.id.time_until
         if (entry.showTimeUntil && settings.showTimeUntilTag) {
-            val time = settings.clock.thisDay().plusMinutes(settings.clock.getNumberOfMinutesTo(entry.entryDate))
-            val strTime = formatTimeUntil(settings, time)
-            rv.setTextViewText(viewId, "in $strTime")
+            val strTime = formatTimeUntil(settings, entry.entryDate)
+            rv.setTextViewText(viewId, strTime)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
             val textColorPref = TextColorPref.forTitle(entry)
             settings.timeUntilBackgroundSource.textColor?.let { color ->

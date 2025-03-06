@@ -133,6 +133,7 @@
     <string name="result_formatted_date">Result, formatted date</string>
     <string name="N_days_ago">%d days ago</string>
     <string name="in_N_days">in %d days</string>
+    <string name="in_HH_mm">in %02d:%02d</string>
 
     <!-- Preference frame: Colors -->
     <string name="different_colors_for_dark_title">Different colors for Android system Dark theme</string>

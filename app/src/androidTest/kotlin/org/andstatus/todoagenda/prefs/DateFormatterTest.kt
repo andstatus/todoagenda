@@ -33,36 +33,52 @@ class DateFormatterTest : BaseWidgetTest() {
         provider!!.setExecutedAt(now)
         provider!!.updateAppSettings("DateFormatterTest pattern:'$pattern'")
         assertPattern(
-            now, "MM-dd b", String.format(
-                "%02d-%02d", now.monthOfYear().get(),
-                now.dayOfMonth().get()
-            ) + " 0"
+            now,
+            "MM-dd b",
+            String.format(
+                "%02d-%02d",
+                now.monthOfYear().get(),
+                now.dayOfMonth().get(),
+            ) + " 0",
         )
         val yesterday = now.minusDays(1)
         assertPattern(
-            yesterday, "MM-dd b", String.format(
-                "%02d-%02d", yesterday.monthOfYear().get(),
-                yesterday.dayOfMonth().get()
-            ) + " -1"
+            yesterday,
+            "MM-dd b",
+            String.format(
+                "%02d-%02d",
+                yesterday.monthOfYear().get(),
+                yesterday.dayOfMonth().get(),
+            ) + " -1",
         )
         assertPattern(
-            yesterday, "b MM.dd", "-1 " + String.format(
-                "%02d.%02d", yesterday.monthOfYear().get(),
-                yesterday.dayOfMonth().get()
-            )
+            yesterday,
+            "b MM.dd",
+            "-1 " +
+                String.format(
+                    "%02d.%02d",
+                    yesterday.monthOfYear().get(),
+                    yesterday.dayOfMonth().get(),
+                ),
         )
         assertPattern(
-            yesterday, "MM.b.dd", String.format(
-                "%02d.-1.%02d", yesterday.monthOfYear().get(),
-                yesterday.dayOfMonth().get()
-            )
+            yesterday,
+            "MM.b.dd",
+            String.format(
+                "%02d.-1.%02d",
+                yesterday.monthOfYear().get(),
+                yesterday.dayOfMonth().get(),
+            ),
         )
         val tomorrow = now.plusDays(1)
         assertPattern(
-            tomorrow, "MM-dd b", String.format(
-                "%02d-%02d", tomorrow.monthOfYear().get(),
-                tomorrow.dayOfMonth().get()
-            ) + " 1"
+            tomorrow,
+            "MM-dd b",
+            String.format(
+                "%02d-%02d",
+                tomorrow.monthOfYear().get(),
+                tomorrow.dayOfMonth().get(),
+            ) + " 1",
         )
     }
 
@@ -70,59 +86,80 @@ class DateFormatterTest : BaseWidgetTest() {
     fun customPatterns() {
         ensureNonEmptyResults()
         val settings = settings
-        val now = settings!!.clock.now().withTimeAtStartOfDay().plusHours(1)
+        val now =
+            settings!!
+                .clock
+                .now()
+                .withTimeAtStartOfDay()
+                .plusHours(1)
         provider!!.setExecutedAt(now)
         val todayText = provider.context.getText(R.string.today)
         val tomorrowText = provider.context.getText(R.string.tomorrow).toString()
         val inTwoDaysText = String.format(provider.context.getText(R.string.in_N_days).toString(), 2)
         val javaPattern = "yyyy-MM-dd"
-        val javaFormatted = String.format(
-            "%04d-%02d-%02d", now.yearOfEra().get(),
-            now.monthOfYear().get(), now.dayOfMonth().get()
-        )
+        val javaFormatted =
+            String.format(
+                "%04d-%02d-%02d",
+                now.yearOfEra().get(),
+                now.monthOfYear().get(),
+                now.dayOfMonth().get(),
+            )
         Assert.assertEquals(javaFormatted, javaFormatted(javaPattern, now))
         assertPattern(now, javaPattern, javaFormatted)
         assertPattern(now, "$javaPattern b", "$javaFormatted 0")
         assertPattern(now, "BBB $javaPattern b", "$todayText $javaFormatted")
         assertPattern(
-            now.plusDays(1), "BBB $javaPattern b", tomorrowText + " " +
-                javaFormatted(javaPattern, now.plusDays(1))
+            now.plusDays(1),
+            "BBB $javaPattern b",
+            tomorrowText + " " +
+                javaFormatted(javaPattern, now.plusDays(1)),
         )
         assertPattern(
-            now.plusDays(1), "BBB, $javaPattern b", tomorrowText + ", " +
-                javaFormatted(javaPattern, now.plusDays(1))
+            now.plusDays(1),
+            "BBB, $javaPattern b",
+            tomorrowText + ", " +
+                javaFormatted(javaPattern, now.plusDays(1)),
         )
         assertPattern(
-            now.plusDays(2), "BBB $javaPattern b",
-            javaFormatted(javaPattern, now.plusDays(2)) + " 2"
+            now.plusDays(2),
+            "BBB $javaPattern b",
+            javaFormatted(javaPattern, now.plusDays(2)) + " 2",
         )
         assertPattern(
-            now.plusDays(2), "BBB, $javaPattern b",
-            javaFormatted(javaPattern, now.plusDays(2)) + " 2"
+            now.plusDays(2),
+            "BBB, $javaPattern b",
+            javaFormatted(javaPattern, now.plusDays(2)) + " 2",
         )
         assertPattern(now, "BBB $javaPattern BBBB", "$todayText $javaFormatted")
         assertPattern(now, "BBB $javaPattern, BBBB", "$todayText $javaFormatted")
         assertPattern(
-            now.plusDays(1), "BBB $javaPattern BBBB", tomorrowText + " " +
-                javaFormatted(javaPattern, now.plusDays(1))
+            now.plusDays(1),
+            "BBB $javaPattern BBBB",
+            tomorrowText + " " +
+                javaFormatted(javaPattern, now.plusDays(1)),
         )
         assertPattern(
-            now.plusDays(1), "BBB $javaPattern, BBBB", tomorrowText + " " +
-                javaFormatted(javaPattern, now.plusDays(1))
+            now.plusDays(1),
+            "BBB $javaPattern, BBBB",
+            tomorrowText + " " +
+                javaFormatted(javaPattern, now.plusDays(1)),
         )
         assertPattern(
-            now.plusDays(2), "BBB $javaPattern BBBB",
-            javaFormatted(javaPattern, now.plusDays(2)) + " " + inTwoDaysText
+            now.plusDays(2),
+            "BBB $javaPattern BBBB",
+            javaFormatted(javaPattern, now.plusDays(2)) + " " + inTwoDaysText,
         )
         assertPattern(now, "b", "0")
         assertPattern(
             now,
             "MM-dd bb",
-            String.format("%02d-%02d", now.monthOfYear().get(), now.dayOfMonth().get()) + " 00"
+            String.format("%02d-%02d", now.monthOfYear().get(), now.dayOfMonth().get()) + " 00",
         )
         assertPattern(
-            now.plusDays(1), "", "(not implemented: " +
-                DateFormatValue.of(DateFormatType.CUSTOM, "").getSummary(provider.context) + ")"
+            now.plusDays(1),
+            "",
+            "(not implemented: " +
+                DateFormatValue.of(DateFormatType.CUSTOM, "").getSummary(provider.context) + ")",
         )
         assertPattern(now.plusDays(1), "b", "1")
         assertPattern(now.plusDays(1), "bbb", "001")
@@ -133,7 +170,7 @@ class DateFormatterTest : BaseWidgetTest() {
         assertPattern(
             now.plusDays(-2),
             "BBBB",
-            String.format(provider.context.getText(R.string.N_days_ago).toString(), 2)
+            String.format(provider.context.getText(R.string.N_days_ago).toString(), 2),
         )
         assertPattern(now.plusDays(2), "BBB", "")
         assertPattern(now.plusDays(2), "BBBB", inTwoDaysText)
@@ -145,7 +182,11 @@ class DateFormatterTest : BaseWidgetTest() {
         assertPattern(now.minusDays(5), "bbbb", "-5")
     }
 
-    private fun assertPattern(date: DateTime, pattern: String, expected: String) {
+    private fun assertPattern(
+        date: DateTime,
+        pattern: String,
+        expected: String,
+    ) {
         val format = DateFormatValue.of(DateFormatType.CUSTOM, pattern)
         val now = settings.clock.now()
         val formatter = DateFormatter(settings.context, format, now)
@@ -153,7 +194,10 @@ class DateFormatterTest : BaseWidgetTest() {
     }
 
     companion object {
-        private fun javaFormatted(javaPattern: String, date: DateTime): String {
+        private fun javaFormatted(
+            javaPattern: String,
+            date: DateTime,
+        ): String {
             val locale = MyLocale.locale
             return SimpleDateFormat(javaPattern, locale).format(DateFormatter.toJavaDate(date))
         }

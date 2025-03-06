@@ -83,8 +83,8 @@ class CalendarEventProvider(
                 eventIds[event.eventId] = event
                 return@forEach
             }
-            if (abs(settings.clock.getNumberOfMinutesTo(event.closestTime)) <
-                abs(settings.clock.getNumberOfMinutesTo(otherEvent.closestTime))
+            if (abs(settings.clock.minutesTo(event.closestTime)) <
+                abs(settings.clock.minutesTo(otherEvent.closestTime))
             ) {
                 toRemove.add(otherEvent)
                 eventIds[event.eventId] = event
