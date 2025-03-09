@@ -112,8 +112,8 @@
     <string name="custom_pattern">Пользовательский шаблон</string>
     <string name="sample_date">Пример даты (в формате yyyy-MM-dd)</string>
     <string name="result_formatted_date">Результат, отформатированная дата</string>
-    <string name="N_days_ago">%d дней назад</string>
-    <string name="in_N_days">через %d дней</string>
+    <string name="N_days_ago">%d дн. назад</string>
+    <string name="in_N_days">через %d дн.</string>
     <string name="in_HH_mm">через %02d:%02d</string>
     <!-- Preference frame: Colors -->
     <string name="colors_prefs_desc">Цвет и прозрачность текста и фона</string>

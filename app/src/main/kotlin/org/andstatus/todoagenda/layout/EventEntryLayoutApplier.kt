@@ -40,7 +40,7 @@ abstract class EventEntryLayoutApplier(
     ) {
         val viewId = R.id.time_until
         if (entry.showTimeUntil && settings.showTimeUntilTag) {
-            val strTime = settings.clock.timeUntil(entry.entryDate).format(settings)
+            val strTime = settings.clock.timeUntil(entry).format(settings)
             rv.setTextViewText(viewId, strTime)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
             val textColorPref = TextColorPref.forTitle(entry)

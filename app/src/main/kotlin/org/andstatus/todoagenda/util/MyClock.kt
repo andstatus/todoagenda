@@ -1,6 +1,7 @@
 package org.andstatus.todoagenda.util
 
 import org.andstatus.todoagenda.prefs.SnapshotMode
+import org.andstatus.todoagenda.widget.WidgetEntry
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Days
@@ -63,7 +64,12 @@ class MyClock(
                 date.withTimeAtStartOfDay(),
             ).days
 
-    fun timeUntil(date: DateTime): TimeUntil =
+    fun timeUntil(entry: WidgetEntry): TimeUntil = timeUntil(entry.entryDate, entry.entryDay)
+
+    fun timeUntil(
+        date: DateTime,
+        day: DateTime? = null,
+    ): TimeUntil =
         minutesTo(date).let { minutes ->
             if (minutes < 1) {
                 TimeUntil(hours = 0, minutes = 0)
@@ -72,13 +78,13 @@ class MyClock(
                 val min: Int = minutes - hours * 60
                 TimeUntil(hours = hours, minutes = min)
             } else {
-                TimeUntil(daysTo(date))
+                TimeUntil(daysTo(day ?: dayOf(date)))
             }
         }
 
     fun minutesTo(date: DateTime): Int = Minutes.minutesBetween(now(date.zone), date).minutes
 
-    fun daysTo(date: DateTime): Int = Days.daysBetween(thisDay(date.zone), dayOf(date)).days
+    fun daysTo(day: DateTime): Int = Days.daysBetween(thisDay(day.zone), day).days
 
     fun startOfTomorrow(timeZone: DateTimeZone? = this.timeZone): DateTime = startOfToday(timeZone).plusDays(1)
 
