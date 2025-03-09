@@ -14,9 +14,9 @@ buildscript {
         annotationVersion = '1.0.1'
         appCompatVersion = '1.7.0'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
         espressoCoreVersion = '3.6.1'  // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
-        jodaTimeVersion = '2.13.0'     // https://github.com/JodaOrg/joda-time/releases
+        jodaTimeVersion = '2.13.1'     // https://github.com/JodaOrg/joda-time/releases
         junitVersion = '4.13.2'
-        junitJupiterVersion = '5.11.3'
+        junitJupiterVersion = '5.12.0'
         preferenceVersion = '1.2.1'
         testCoreVersion = '1.6.1'
         testRulesVersion = '1.6.1'
@@ -26,7 +26,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.8.2'
+        classpath 'com.android.tools.build:gradle:8.9.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 
