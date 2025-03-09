@@ -1,8 +1,5 @@
 package org.andstatus.todoagenda
 
-import android.content.ContextWrapper
-import androidx.test.platform.app.InstrumentationRegistry
-import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.prefs.TestLocale
 import org.andstatus.todoagenda.widget.DayHeader
 import org.junit.Assert
@@ -27,24 +24,13 @@ class DayHeadersShiftTest : BaseWidgetTest() {
                 .toLong(),
         )
 
-        val context1 = InstrumentationRegistry.getInstrumentation().targetContext
-        val context = context1.applicationContext as ContextWrapper
-        val locale = MyLocale.locale.toLanguageTag()
-        val enUsLocale = "en_US"
-        try {
-            if (locale != enUsLocale) {
-                TestLocale.setLocale(context, enUsLocale)
-            }
+        TestLocale.withEnUsLocale {
             val dayHeaderTitle = settings.dayHeaderDateFormatter().formatDate(dayHeader0.entryDate)
             Assert.assertEquals(
                 "First day header should show Jan 8 ${factory.widgetEntries}",
                 "Wednesday, January 8, 2020",
                 dayHeaderTitle,
             )
-        } finally {
-            if (locale != enUsLocale) {
-                TestLocale.setLocale(context, locale)
-            }
         }
     }
 }

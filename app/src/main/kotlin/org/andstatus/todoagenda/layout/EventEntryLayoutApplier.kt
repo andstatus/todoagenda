@@ -5,7 +5,6 @@ import android.widget.RemoteViews
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
-import org.andstatus.todoagenda.util.DateUtil.formatTimeUntil
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.EventEntryVisualizer
@@ -41,7 +40,7 @@ abstract class EventEntryLayoutApplier(
     ) {
         val viewId = R.id.time_until
         if (entry.showTimeUntil && settings.showTimeUntilTag) {
-            val strTime = formatTimeUntil(settings, entry.entryDate)
+            val strTime = settings.clock.timeUntil(entry.entryDate).format(settings)
             rv.setTextViewText(viewId, strTime)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
             val textColorPref = TextColorPref.forTitle(entry)

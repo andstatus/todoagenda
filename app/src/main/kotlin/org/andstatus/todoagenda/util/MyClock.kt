@@ -63,9 +63,22 @@ class MyClock(
                 date.withTimeAtStartOfDay(),
             ).days
 
-    fun minutesTo(date: DateTime): Int = Minutes.minutesBetween(now(date.zone), date).minutes + 1
+    fun timeUntil(date: DateTime): TimeUntil =
+        minutesTo(date).let { minutes ->
+            if (minutes < 1) {
+                TimeUntil(hours = 0, minutes = 0)
+            } else if (minutes < MINUTES_IN_DAY) {
+                val hours: Int = minutes / 60
+                val min: Int = minutes - hours * 60
+                TimeUntil(hours = hours, minutes = min)
+            } else {
+                TimeUntil(daysTo(date))
+            }
+        }
 
-    fun daysTo(date: DateTime): Int = Days.daysBetween(now(date.zone), date).days + 1
+    fun minutesTo(date: DateTime): Int = Minutes.minutesBetween(now(date.zone), date).minutes
+
+    fun daysTo(date: DateTime): Int = Days.daysBetween(thisDay(date.zone), dayOf(date)).days
 
     fun startOfTomorrow(timeZone: DateTimeZone? = this.timeZone): DateTime = startOfToday(timeZone).plusDays(1)
 
@@ -113,6 +126,7 @@ class MyClock(
     private fun DateTime.withTimeAtStartHourOfDayInner(): DateTime = withTimeAtStartOfDay().plusHours(startHourOfDay)
 
     companion object {
+        const val MINUTES_IN_DAY = 60 * 24
         val DATETIME_MIN = DateTime(0, DateTimeZone.UTC).withTimeAtStartOfDay()
         val DATETIME_MAX = DateTime(5000, 1, 1, 0, 0, DateTimeZone.UTC).withTimeAtStartOfDay()
 

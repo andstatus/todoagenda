@@ -4,7 +4,6 @@ import android.text.TextUtils
 import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.util.Log
-import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.MyLocale
 import org.andstatus.todoagenda.prefs.MyLocale.APP_DEFAULT_LOCALE
@@ -20,7 +19,6 @@ object DateUtil {
     private const val TWELVE = "12"
     private const val AUTO = "auto"
     const val EMPTY_STRING = ""
-    const val MINUTES_IN_DAY = 60 * 24
 
     fun formatTime(
         settingsSupplier: Supplier<InstanceSettings>,
@@ -43,23 +41,6 @@ object DateUtil {
             )
         }
     }
-
-    fun formatTimeUntil(
-        settings: InstanceSettings,
-        date: DateTime,
-    ): String =
-        settings.clock.minutesTo(date).let { minutes ->
-            if (minutes < 1) {
-                EMPTY_STRING
-            } else if (minutes < MINUTES_IN_DAY) {
-                val hours = minutes / 60
-                val min = minutes - hours * 60
-                String.format(settings.context.getText(R.string.in_HH_mm).toString(), hours, min)
-            } else {
-                val days = settings.clock.daysTo(date)
-                String.format(settings.context.getText(R.string.in_N_days).toString(), days)
-            }
-        }
 
     private fun formatDateTime(
         settings: InstanceSettings,
