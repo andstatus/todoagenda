@@ -100,7 +100,7 @@
             app:colorpicker_selectNoneButtonText="@string/default_value" />
 
         <com.rarepebble.colorpicker.ColorPreference
-            android:defaultValue="#DAFFFFFF"
+            android:defaultValue="#D8FFFFFF"
             android:key="ongoingEventsBackgroundColor"
             android:title="@string/appearance_background_color_title"
             app:colorpicker_selectNoneButtonText="@string/default_value" />
@@ -142,7 +142,7 @@
             app:colorpicker_selectNoneButtonText="@string/default_value" />
 
         <com.rarepebble.colorpicker.ColorPreference
-            android:defaultValue="#DAFFFFFF"
+            android:defaultValue="#DCE7E7E7"
             android:key="todaysEventsBackgroundColor"
             android:title="@string/appearance_background_color_title"
             app:colorpicker_selectNoneButtonText="@string/default_value" />
