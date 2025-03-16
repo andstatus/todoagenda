@@ -21,12 +21,14 @@ class CurrentTimeVisualizer(
         position: Int,
     ): RemoteViews {
         val entry = eventEntry as CurrentTimeEntry
-        val rv = RemoteViews(context.packageName, WidgetLayout.CURRENT_TIME_NARROW.shadowed(settings.textShadow))
-        RemoteViewsUtil.setBackgroundColor(
-            rv,
-            R.id.current_time_line,
-            settings.colors().getBackgroundColor(BackgroundColorPref.CURRENT_TIME),
-        )
+        val rv = RemoteViews(context.packageName, WidgetLayout.CURRENT_TIME_LINE.shadowed(settings.textShadow))
+        listOf(R.id.current_time_line, R.id.current_time_line_dot).forEach { id ->
+            RemoteViewsUtil.setBackgroundColor(
+                rv,
+                id,
+                settings.colors().getBackgroundColor(BackgroundColorPref.CURRENT_TIME),
+            )
+        }
         RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
         RemoteViewsUtil.setCompact(settings, rv)
         return rv

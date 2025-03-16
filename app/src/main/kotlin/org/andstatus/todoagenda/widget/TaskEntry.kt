@@ -14,7 +14,7 @@ class TaskEntry private constructor(
     private val mainDate: DateTime?,
     entryDate: DateTime,
     override val event: TaskEvent,
-) : WidgetEntry(settings, entryPosition, entryDate, event.isAllDay, event.dueDate) {
+) : WidgetEntry(settings, entryPosition, entryDate, event.isAllDay, false, event.dueDate) {
     override val source: OrderedEventSource
         get() = event.eventSource
     override val title: String

@@ -13,7 +13,7 @@ class LastEntry(
     val type: LastEntryType,
     val appearance: LastEntryAppearance,
     date: DateTime,
-) : WidgetEntry(settings, WidgetEntryPosition.ENTRY_DATE, date, true, null) {
+) : WidgetEntry(settings, WidgetEntryPosition.ENTRY_DATE, date, true, false, null) {
     override val source: OrderedEventSource
         get() = OrderedEventSource.LAST_ENTRY
 

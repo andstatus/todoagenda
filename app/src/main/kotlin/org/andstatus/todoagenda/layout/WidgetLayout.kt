@@ -8,7 +8,7 @@ enum class WidgetLayout(
     @field:LayoutRes @param:LayoutRes val darkShadowLayoutId: Int = noShadowLayoutId,
     @field:LayoutRes @param:LayoutRes val lightShadowLayoutId: Int = noShadowLayoutId,
 ) {
-    CURRENT_TIME_NARROW(R.layout.current_time_narrow),
+    CURRENT_TIME_LINE(R.layout.current_time_line),
     DAY_HEADER_SEPARATOR_ABOVE(
         R.layout.day_header_separator_above,
         R.layout.day_header_separator_above_shadow_dark,

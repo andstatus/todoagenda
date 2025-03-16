@@ -31,6 +31,7 @@
     <string name="day_header">Заголовок дня</string>
     <string name="event_entry">Элемент списка событий</string>
     <string name="todays_events">Сегодняшние события</string>
+    <string name="ongoing_events">Текущие события</string>
     <string name="future_events">Будущие события</string>
     <string name="not_found">Не найдено</string>
     <string name="day">День</string>
@@ -120,9 +121,9 @@
     <string name="appearance_group_color_title">Цвета</string>
     <string name="appearance_background_color_title">Цвет фона</string>
     <string name="appearance_background_color_desc">Изменить цвет и прозрачность фона</string>
-    <string name="appearance_past_events_background_color_title">Цвет фона для прошедших событий</string>
+    <string name="appearance_past_events_background_color_title">Цвет фона прошедших событий</string>
     <string name="appearance_past_events_background_color_desc">Настройка цвета фона для событий, произошедших в прошлом</string>
-    <string name="todays_events_background_color_title">Цвет фона для сегодняшних событий</string>
+    <string name="todays_events_background_color_title">Цвет фона сегодняшних событий</string>
     <string name="todays_events_background_color_desc">Настройка цвета фона для сегодняшних событий</string>
     <string name="appearance_header_theme_title">Цвет текста заголовка виджета</string>
     <string name="appearance_header_theme_desc">Светлый или тёмный цвет текста заголовка</string>
@@ -141,6 +142,7 @@
     <string name="text_shadow_dark">Тёмная тень</string>
     <string name="text_shadow_light">Светлая тень</string>
     <string name="current_time_line_color_title">Цвет Линии текущего времени</string>
+    <string name="background_color_title">Цвет фона</string>
     <!-- Preference frame: Event details -->
     <string name="show_day_xy_title">(День x/y)</string>
     <string name="show_day_xy_desc">Показать номер текущего дня / общее количество дней многодневных событий</string>

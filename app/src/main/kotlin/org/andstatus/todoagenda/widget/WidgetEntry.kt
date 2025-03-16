@@ -16,6 +16,7 @@ abstract class WidgetEntry protected constructor(
     val entryPosition: WidgetEntryPosition,
     entryDateIn: DateTime,
     val allDay: Boolean,
+    isOngoing: Boolean,
     val endDate: DateTime?,
 ) : Comparable<WidgetEntry> {
     val entryId = idGenerator.incrementAndGet()
@@ -26,7 +27,7 @@ abstract class WidgetEntry protected constructor(
 
     init {
         entryDay = calcEntryDay(entryDateIn)
-        timeSection = calcTimeSection(settings, entryPosition, entryDay, endDate)
+        timeSection = calcTimeSection(settings, entryPosition, entryDay, isOngoing, endDate)
     }
 
     val isLastEntryOfEvent: Boolean
@@ -184,6 +185,7 @@ abstract class WidgetEntry protected constructor(
             settings: InstanceSettings,
             entryPosition: WidgetEntryPosition?,
             entryDay: DateTime,
+            isOngoing: Boolean,
             endDate: DateTime?,
         ): TimeSection {
             when (entryPosition) {
@@ -197,7 +199,9 @@ abstract class WidgetEntry protected constructor(
             }
             if (settings.clock.isDayToday(entryDay)) {
                 if (entryPosition == WidgetEntryPosition.DAY_HEADER) return TimeSection.TODAY
-                return if (settings.clock.isToday(endDate)) {
+                return if (isOngoing) {
+                    TimeSection.ONGOING
+                } else if (settings.clock.isToday(endDate)) {
                     if (settings.clock.isBeforeNow(endDate)) TimeSection.PAST else TimeSection.TODAY
                 } else {
                     TimeSection.TODAY

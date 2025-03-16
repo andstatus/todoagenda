@@ -41,7 +41,7 @@ class OngoingEventTest : BaseWidgetTest() {
             }
         }
         Assert.assertNotNull(entry)
-        Assert.assertTrue("Is active event", entry!!.event.isActive)
+        Assert.assertTrue("Is active event", entry!!.event.isOngoing)
         Assert.assertFalse("Is not part of Multi Day Event", entry.isPartOfMultiDayEvent)
         Assert.assertEquals("Start Time didn't change for today's event", event.startDate, entry.entryDate)
         Assert.assertEquals("End Time didn't change for today's event", event.endDate, entry.endDate)
@@ -74,7 +74,7 @@ class OngoingEventTest : BaseWidgetTest() {
             }
         }
         Assert.assertNotNull(entry)
-        Assert.assertTrue("Is active event", entry!!.event.isActive)
+        Assert.assertTrue("Is active event", entry!!.event.isOngoing)
         Assert.assertTrue("Is Part of Multi Day Event", entry.isPartOfMultiDayEvent)
         Assert.assertFalse("Is not start of Multi Day Event", entry.isStartOfMultiDayEvent)
         Assert.assertTrue("Is end of Multi Day Event", entry.isEndOfMultiDayEvent)
@@ -107,7 +107,7 @@ class OngoingEventTest : BaseWidgetTest() {
             }
         }
         Assert.assertNotNull(entry)
-        Assert.assertTrue("Is active event", entry!!.event.isActive)
+        Assert.assertTrue("Is active event", entry!!.event.isOngoing)
         Assert.assertTrue("Is Part of Multi Day Event", entry.isPartOfMultiDayEvent)
         Assert.assertTrue("Is start of Multi Day Event", entry.isStartOfMultiDayEvent)
         Assert.assertFalse("Is not an end of Multi Day Event", entry.isEndOfMultiDayEvent)

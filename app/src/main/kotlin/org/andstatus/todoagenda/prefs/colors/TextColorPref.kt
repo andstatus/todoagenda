@@ -67,6 +67,18 @@ enum class TextColorPref(
         true,
         TimeSection.TODAY,
     ),
+    EVENT_ONGOING(
+        "entryThemeOngoing",
+        Shading.BLACK,
+        R.string.appearance_entries_theme_title,
+        "eventTextColorOngoing",
+        -0x1000000,
+        R.string.event_text_color,
+        R.attr.eventEntryTitle,
+        BackgroundColorPref.ONGOING_EVENTS,
+        false,
+        TimeSection.ONGOING,
+    ),
     EVENT_TODAY(
         "entryTheme",
         Shading.BLACK,
@@ -132,10 +144,10 @@ enum class TextColorPref(
     }
 
     companion object {
-        fun forDayHeader(entry: WidgetEntry): TextColorPref = entry.timeSection.select(DAY_HEADER_PAST, DAY_HEADER_TODAY, DAY_HEADER_FUTURE)
+        fun forDayHeader(entry: WidgetEntry): TextColorPref = entry.timeSection.select(DAY_HEADER_PAST, DAY_HEADER_TODAY, DAY_HEADER_TODAY, DAY_HEADER_FUTURE)
 
-        fun forDetails(entry: WidgetEntry): TextColorPref = entry.timeSection.select(DAY_HEADER_PAST, DAY_HEADER_TODAY, DAY_HEADER_FUTURE)
+        fun forDetails(entry: WidgetEntry): TextColorPref = entry.timeSection.select(DAY_HEADER_PAST, EVENT_ONGOING, DAY_HEADER_TODAY, DAY_HEADER_FUTURE)
 
-        fun forTitle(entry: WidgetEntry): TextColorPref = entry.timeSection.select(EVENT_PAST, EVENT_TODAY, EVENT_FUTURE)
+        fun forTitle(entry: WidgetEntry): TextColorPref = entry.timeSection.select(EVENT_PAST, EVENT_ONGOING, EVENT_TODAY, EVENT_FUTURE)
     }
 }

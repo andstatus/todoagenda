@@ -1,16 +1,25 @@
 package org.andstatus.todoagenda.layout
 
-enum class TimeSection(val preferenceCategoryKey: String) {
+enum class TimeSection(
+    val preferenceCategoryKey: String,
+) {
     PAST("PastTime"),
+    ONGOING("OngoingTime"),
     TODAY("TodayTime"),
     FUTURE("FutureTime"),
-    ALL("AllTime");
+    ALL("AllTime"),
+    ;
 
-    fun <T> select(past: T, today: T, future: T): T {
-        return when (this) {
+    fun <T> select(
+        past: T,
+        ongoing: T,
+        today: T,
+        future: T,
+    ): T =
+        when (this) {
             PAST -> past
+            ONGOING -> ongoing
             TODAY -> today
-            else -> future
+            FUTURE, ALL -> future
         }
-    }
 }

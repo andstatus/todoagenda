@@ -20,6 +20,7 @@ class CalendarEntry private constructor(
         getEntryPosition(settings, event.isAllDay, entryDate, event.endDate),
         entryDate,
         event.isAllDay,
+        event.isOngoing,
         event.endDate,
     ) {
     override val title: String

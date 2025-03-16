@@ -35,23 +35,23 @@ object RemoteViewsUtil {
     ) {
         if (settings.isCompactLayout) {
             setPadding(
-                settings,
-                rv,
-                R.id.event_entry,
-                R.dimen.zero,
-                R.dimen.zero,
-                R.dimen.zero,
-                R.dimen.zero,
+                settings = settings,
+                rv = rv,
+                viewId = R.id.event_entry,
+                leftDimenId = R.dimen.zero,
+                topDimenId = R.dimen.zero,
+                rightDimenId = R.dimen.zero,
+                bottomDimenId = R.dimen.zero,
             )
         } else {
             setPadding(
-                settings,
-                rv,
-                R.id.event_entry,
-                R.dimen.calender_padding,
-                R.dimen.zero,
-                R.dimen.calender_padding,
-                R.dimen.entry_bottom_padding,
+                settings = settings,
+                rv = rv,
+                viewId = R.id.event_entry,
+                leftDimenId = R.dimen.calender_padding,
+                topDimenId = R.dimen.entry_top_bottom_padding,
+                rightDimenId = R.dimen.calender_padding,
+                bottomDimenId = R.dimen.entry_bottom_padding,
             )
         }
     }

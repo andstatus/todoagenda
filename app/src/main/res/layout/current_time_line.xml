@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/event_entry"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/zero"
+    android:paddingEnd="@dimen/calender_padding">
+
+    <LinearLayout
+        android:id="@+id/current_time_line_dot"
+        android:layout_width="@dimen/current_time_line_dot_size"
+        android:layout_height="@dimen/current_time_line_dot_size"
+        android:layout_marginStart="@dimen/entry_top_bottom_padding"
+        android:layout_marginTop="@dimen/zero"
+        android:layout_marginBottom="@dimen/zero"
+        android:orientation="horizontal">
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/current_time_line"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/current_time_line_height"
+        android:layout_marginTop="@dimen/current_time_line_top_bottom_padding"
+        android:layout_marginBottom="@dimen/current_time_line_top_bottom_padding"
+        android:orientation="horizontal">
+
+    </LinearLayout>
+
+</LinearLayout>

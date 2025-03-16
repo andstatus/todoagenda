@@ -1,10 +1,11 @@
 package org.andstatus.todoagenda.prefs.colors
 
-import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
+import androidx.core.graphics.toColorInt
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.layout.TimeSection
+import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref.entries
 
 enum class BackgroundColorPref(
     val colorPreferenceName: String,
@@ -15,30 +16,36 @@ enum class BackgroundColorPref(
     WIDGET_HEADER(
         "widgetHeaderBackgroundColor",
         ThemeColors.Companion.TRANSPARENT_BLACK,
-        R.string.widget_header_background_color_title,
+        R.string.appearance_background_color_title,
         TimeSection.ALL,
     ),
     PAST_EVENTS(
         "pastEventsBackgroundColor",
-        -0x408787d4,
-        R.string.appearance_past_events_background_color_title,
+        "#BF78782C".toColorInt(),
+        R.string.appearance_background_color_title,
         TimeSection.PAST,
     ),
-    TODAYS_EVENTS(
-        "todaysEventsBackgroundColor",
-        -0x25000001,
-        R.string.todays_events_background_color_title,
-        TimeSection.TODAY,
+    ONGOING_EVENTS(
+        "ongoingEventsBackgroundColor",
+        "#D8FFFFFF".toColorInt(),
+        R.string.appearance_background_color_title,
+        TimeSection.ONGOING,
     ),
     CURRENT_TIME(
         "currentTimeLineColor",
-        Color.parseColor("#FFF44336"),
+        "#FFF44336".toColorInt(),
         R.string.current_time_line_color_title,
         TimeSection.ALL,
     ),
+    TODAYS_EVENTS(
+        "todaysEventsBackgroundColor",
+        "#DCE7E7E7".toColorInt(),
+        R.string.appearance_background_color_title,
+        TimeSection.TODAY,
+    ),
     FUTURE_EVENTS(
         "backgroundColor",
-        -0x80000000,
+        "#80000000".toColorInt(),
         R.string.appearance_background_color_title,
         TimeSection.FUTURE,
     ),

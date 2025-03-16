@@ -12,7 +12,6 @@ import org.joda.time.DateTimeZone
 import org.joda.time.Days
 import org.joda.time.IllegalInstantException
 import org.joda.time.LocalDateTime
-import kotlin.concurrent.Volatile
 
 data class CalendarEvent(
     val settings: InstanceSettings,
@@ -151,7 +150,7 @@ data class CalendarEvent(
         return result
     }
 
-    val isActive: Boolean =
+    val isOngoing: Boolean =
         settings.clock.now().let { now ->
             !startDate.isAfter(now) && endDate.isAfter(now)
         }

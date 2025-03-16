@@ -35,6 +35,7 @@
     <string name="day_header">Day header</string>
     <string name="event_entry">Event entry</string>
     <string name="todays_events">Today\'s events</string>
+    <string name="ongoing_events">Ongoing events</string>
     <string name="future_events">Future events</string>
     <string name="not_found">Not found</string>
     <string name="day">Day</string>
@@ -180,6 +181,7 @@
     <string name="time_until_background">Time until tag background</string>
     <string name="auto_color">Auto color</string>
     <string name="color_yellow">Yellow</string>
+    <string name="background_color_title">Background color</string>
 
     <!-- Preference frame: Event details -->
     <string name="show_day_xy_title">(Day x/y)</string>

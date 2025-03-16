@@ -145,7 +145,7 @@ class CalendarEventVisualizer(
     private fun getFirstDayEntry(event: CalendarEvent): CalendarEntry {
         var firstDate = event.startDate
         val today = settings.clock.startOfToday()
-        if (event.isActive && firstDate.isBefore(today)) {
+        if (event.isOngoing && firstDate.isBefore(today)) {
             firstDate = today
         } else {
             val timeRangeStartDay = settings.clock.dayOf(calendarEventProvider.startOfTimeRange)
