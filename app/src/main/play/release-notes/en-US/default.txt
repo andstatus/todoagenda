@@ -1,1 +1,1 @@
-v4.12.2. "(Day x/y)" option added to "Event details" showing current day number / total number of days for multi-day events.
+v4.13.0. Ongoing events color, Current time line and Time until tag.

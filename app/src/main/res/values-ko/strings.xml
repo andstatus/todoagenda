@@ -34,7 +34,6 @@
     <string name="appearance_text_size_large">크게</string>
     <string name="appearance_text_size_very_large">매우 크게</string>
     <string name="appearance_date_format_desc">Am/Pm 또는 24시간 형식으로 표시</string>
-    <string name="appearance_date_format_title">시간 형식</string>
     <string name="appearance_date_format_auto">자동</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">오후 5시</string>

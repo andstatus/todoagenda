@@ -44,7 +44,6 @@
     <string name="appearance_text_size_large">Великий</string>
     <string name="appearance_text_size_very_large">Дуже великий</string>
     <string name="appearance_date_format_desc">Відображати час у 12 чи 24-годинному форматі</string>
-    <string name="appearance_date_format_title">Формат дати</string>
     <string name="appearance_date_format_auto">Автоматично</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">5:00 pm</string>

@@ -40,7 +40,6 @@
     <string name="appearance_text_size_large">Hraw</string>
     <string name="appearance_text_size_very_large">Hraw aṭas</string>
     <string name="appearance_date_format_desc">Sken akud s umasal n fw/md neɣ 24 n isragen</string>
-    <string name="appearance_date_format_title">Amasal n wazemz</string>
     <string name="appearance_date_format_auto">Awurman</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">5:00 md</string>

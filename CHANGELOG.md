@@ -2,16 +2,19 @@
 
 <a id="v4.13"/>
 
-### 2025-03-XX v4.13.0 Current time line and Time until tag
-* "Show Current time line" checkbox added to Layout section.
+### 2025-03-16 v4.13.0 Ongoing events color, Current time line and Time until tag
+* "Ongoing events" section was added to Colors settings.
+  This means that ongoing events can have their own color settings, different from "Today's events".
+  [#166](https://github.com/andstatus/todoagenda/issues/166)
+* "Show Current time line" checkbox added to Layout settings.
   It shows horizontal line representing the current time. 
-  "Current time line color" setting added to Colors section.
+  "Current time line color" setting added to Colors settings.
   [#143](https://github.com/andstatus/todoagenda/issues/143)
-* "Show time until" checkbox added to Layout section.
+* "Show time until" checkbox added to Layout settings.
   It shows "Time until tag" for the next upcoming event.
-  "Time until tag background" setting added to Colors section.
+  "Time until tag background" setting added to Colors settings.
   [#143](https://github.com/andstatus/todoagenda/issues/143)
-* "The End of list entry after a list of events" setting added to Layout section
+* "The End of list entry after a list of events" setting added to Layout settings
   with the following options: "An entry with a descriptive message is shown",
   "An empty entry (empty area) is shown" (default) and "The entry is hidden".
   [#163](https://github.com/andstatus/todoagenda/issues/163)

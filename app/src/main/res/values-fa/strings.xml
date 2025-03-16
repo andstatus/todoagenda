@@ -33,7 +33,6 @@
     <string name="appearance_text_size_large">بزرگ</string>
     <string name="appearance_text_size_very_large">بسیار بزرگ</string>
     <string name="appearance_date_format_desc">نمایش زمان به صورت am/pm و یا 24 ساعت</string>
-    <string name="appearance_date_format_title">فرمت تاریخ</string>
     <string name="appearance_date_format_auto">خودکار</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">5:00 pm</string>

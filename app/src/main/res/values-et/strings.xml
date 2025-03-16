@@ -31,7 +31,6 @@
     <string name="appearance_text_size_large">Suur</string>
     <string name="appearance_text_size_very_large">Väga suur</string>
     <string name="appearance_date_format_desc">Näita kellaaeg 12h või 24h vormingus</string>
-    <string name="appearance_date_format_title">Aja esitusviis</string>
     <string name="appearance_date_format_auto">Automaatne</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">5:00 pm</string>

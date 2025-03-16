@@ -31,7 +31,6 @@
     <string name="appearance_text_size_large">Veľká</string>
     <string name="appearance_text_size_very_large">Veľmi veľká</string>
     <string name="appearance_date_format_desc">Zobrazovanie času v tvare AM/PM alebo 24 hodín</string>
-    <string name="appearance_date_format_title">Formát času</string>
     <string name="appearance_date_format_auto">Automatický</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">5:00 pm</string>

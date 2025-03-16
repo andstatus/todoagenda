@@ -55,7 +55,6 @@
     <string name="appearance_text_size_large">كبير</string>
     <string name="appearance_text_size_very_large">كبير جدا</string>
     <string name="appearance_date_format_desc">اظهار الوقت بصيغة صباحا/مساءا او بصيغة 24 ساعة</string>
-    <string name="appearance_date_format_title">صيغة التاريخ</string>
     <string name="appearance_date_format_auto">تلقائي</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">05:00 م</string>
@@ -64,7 +63,6 @@
     <string name="widget_header_layout">مخطط عنوان عنصر واجهة المستخدم</string>
     <string name="pref_event_entry_layout_title">مخطط شكل الحدث</string>
     <string name="default_multiline_layout">الوقت تحت عنوان</string>
-    <string name="show_date_on_widget_header">إظهار التاريخ في عنوان عنصر واجهة المستخدم</string>
     <string name="default_value">الإفتراضي</string>
     <string name="single_line_layout">جميعا في صف واحد</string>
     <string name="two_rows_layout">تخطيط ذو سطرين</string>

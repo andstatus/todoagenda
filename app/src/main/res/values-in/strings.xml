@@ -49,7 +49,6 @@
     <string name="appearance_text_size_large">Besar</string>
     <string name="appearance_text_size_very_large">Sangat besar</string>
     <string name="appearance_date_format_desc">Tampilan waktu dalam format am/pm atau 24 jam</string>
-    <string name="appearance_date_format_title">Format tanggal</string>
     <string name="appearance_date_format_auto">Otomatis</string>
     <string name="appearance_date_format_24">17:00</string>
     <string name="appearance_date_format_12">5:00 pm</string>
