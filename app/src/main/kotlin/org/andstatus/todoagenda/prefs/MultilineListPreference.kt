@@ -13,7 +13,7 @@ class MultilineListPreference : ListPreference {
 
     override fun onBindViewHolder(viewHolder: PreferenceViewHolder) {
         super.onBindViewHolder(viewHolder)
-        val textView = viewHolder.findViewById(android.R.id.title) as TextView?
+        val textView = viewHolder.findViewById(android.R.id.title) as? TextView?
         if (textView != null) {
             textView.isSingleLine = false
         }
