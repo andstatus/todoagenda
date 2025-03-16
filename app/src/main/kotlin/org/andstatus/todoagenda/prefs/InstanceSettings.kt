@@ -29,7 +29,6 @@ import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.stream.Collectors
-import kotlin.Int
 import kotlin.math.abs
 
 /**
@@ -88,7 +87,7 @@ data class InstanceSettings(
     //
     // ----------------------------------------------------------------------------------
     // Event filters
-    val eventsEnded: EndedSomeTimeAgo = EndedSomeTimeAgo.NONE,
+    val eventsEnded: EndedSomeTimeAgo = EndedSomeTimeAgo.defaultValue,
     val showPastEventsWithDefaultColor: Boolean = false,
     val eventRange: Int = PREF_EVENT_RANGE_DEFAULT.toInt(),
     val hideBasedOnKeywords: String? = "",
@@ -350,7 +349,7 @@ data class InstanceSettings(
     fun noPastEvents(): Boolean =
         filterMode != FilterMode.NO_FILTERING &&
             !showPastEventsWithDefaultColor &&
-            eventsEnded === EndedSomeTimeAgo.NONE &&
+            eventsEnded == EndedSomeTimeAgo.NONE &&
             noTaskSources()
 
     fun noTaskSources(): Boolean {
