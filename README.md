@@ -1,7 +1,5 @@
 # [Todo Agenda](https://github.com/andstatus/todoagenda#readme) - Calendar and Task widgets for Android
 
-[![Build Status](https://travis-ci.com/andstatus/todoagenda.svg?branch=master)](https://travis-ci.com/github/andstatus/todoagenda)
-
 Todo Agenda is home screen widgets for your Android device. 
 Each widget has its own settings and displays configured list of calendar events and tasks
 so that you can easily have a glimpse at your due, current and upcoming appointments.
@@ -34,8 +32,8 @@ selected calendars and task lists.
 * Backup and restore settings, cloning widgets on the same or different devices.
 * Android 7+ supported. Supports Android tablets.
 
-Note on Tasks support: As there is no unified way to access tasks created in different applications, 
-each application needs its own implementation. Currently supported:
+Note on Tasks support: There is no unified way to access tasks created in different applications, 
+so each application needs its own implementation. Currently supported:
 * [Tasks: Astrid To-Do List Clone v.10+](https://github.com/tasks/tasks#readme), Google Tasks can be used via it.
 * [OpenTasks (by dmfs GmbH)](https://github.com/dmfs/opentasks#readme).
 * Partially supported: Tasks of Samsung Calendar ([looks like a deprecating feature...](

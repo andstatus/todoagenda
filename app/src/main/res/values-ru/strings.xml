@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Todo Agenda</string>
+    <string name="app_name">Расписания - Todo Agenda</string>
     <string name="widget_name">Todo Agenda</string>
     <string name="widget_instance_name">Имя экземпляра виджета</string>
     <string name="yesterday">Вчера</string>
