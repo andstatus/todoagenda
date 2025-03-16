@@ -17,7 +17,6 @@
     <dimen name="current_time_line_height">2dp</dimen>
     <dimen name="current_time_line_top_bottom_padding">2dp</dimen>
     <dimen name="entry_top_bottom_padding">1dp</dimen>
-    <dimen name="entry_bottom_padding">1dp</dimen>
     <dimen name="day_header_padding_left">12dp</dimen>
     <dimen name="day_header_padding_top_first">6dp</dimen>
     <dimen name="day_header_padding_top">2dp</dimen>

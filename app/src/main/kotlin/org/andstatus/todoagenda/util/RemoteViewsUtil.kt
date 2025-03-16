@@ -51,7 +51,7 @@ object RemoteViewsUtil {
                 leftDimenId = R.dimen.calender_padding,
                 topDimenId = R.dimen.entry_top_bottom_padding,
                 rightDimenId = R.dimen.calender_padding,
-                bottomDimenId = R.dimen.entry_bottom_padding,
+                bottomDimenId = R.dimen.entry_top_bottom_padding,
             )
         }
     }

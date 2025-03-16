@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/event_entry"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:paddingLeft="@dimen/calender_padding"
-              android:paddingRight="@dimen/calender_padding"
-              android:paddingBottom="@dimen/entry_bottom_padding">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/event_entry"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/calender_padding"
+    android:paddingRight="@dimen/calender_padding">
 
     <TextView
         android:id="@+id/event_entry_color"
@@ -25,11 +24,11 @@
         android:layout_width="12dp"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
-        android:text="@string/task_icon"
         android:shadowColor="@color/text_shadow_dark"
         android:shadowDx="1"
         android:shadowDy="1"
         android:shadowRadius="1"
+        android:text="@string/task_icon"
         tools:ignore="SelectableText" />
 
     <RelativeLayout
@@ -80,11 +79,11 @@
                 android:layout_gravity="top"
                 android:layout_marginRight="8dp"
                 android:gravity="end"
-                android:textAlignment="gravity"
                 android:shadowColor="@color/text_shadow_dark"
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="1"
+                android:textAlignment="gravity"
                 tools:ignore="SelectableText"
                 tools:text="-325" />
 
@@ -122,8 +121,8 @@
             layout="@layout/event_entry_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignTop="@id/text_container" />
+            android:layout_alignTop="@id/text_container"
+            android:layout_alignParentEnd="true" />
     </RelativeLayout>
 
 </LinearLayout>

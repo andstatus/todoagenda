@@ -112,7 +112,7 @@
     <string name="last_entry_with_message">An entry with a descriptive message is shown</string>
     <string name="last_entry_empty">An empty entry (empty area) is shown</string>
     <string name="last_entry_hidden">The entry is hidden</string>
-    <string name="end_of_list">(End of list)</string>
+    <string name="end_of_list">(end of list)</string>
     <string name="other_widget_parts">Other widget parts</string>
     <string name="show_time_until_title">Show Time until</string>
     <string name="show_time_until_desc">Time until tag for the next upcoming event</string>

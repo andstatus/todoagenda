@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:id="@+id/event_entry"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:gravity="bottom"
-              android:orientation="vertical"
-              android:paddingLeft="@dimen/calender_padding"
-              android:paddingRight="@dimen/calender_padding"
-              android:paddingBottom="@dimen/entry_bottom_padding">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/event_entry"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="bottom"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/calender_padding"
+    android:paddingRight="@dimen/calender_padding">
 
     <LinearLayout
         android:id="@+id/day_header_title_wrapper"
@@ -25,8 +24,8 @@
             android:shadowDx="1"
             android:shadowDy="1"
             android:shadowRadius="1"
-            tools:text="SATURDAY, SEPTEMBER 28"
-            tools:ignore="SelectableText" />
+            tools:ignore="SelectableText"
+            tools:text="SATURDAY, SEPTEMBER 28" />
     </LinearLayout>
 
     <TextView
