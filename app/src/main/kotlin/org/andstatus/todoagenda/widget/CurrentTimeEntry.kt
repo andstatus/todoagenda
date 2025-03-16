@@ -12,7 +12,7 @@ class CurrentTimeEntry(
         entryPosition = WidgetEntryPosition.ENTRY_DATE,
         entryDateIn = date,
         allDay = false,
-        false,
+        isOngoing = true,
         endDate = date.plusSeconds(1),
     ) {
     override val source: OrderedEventSource

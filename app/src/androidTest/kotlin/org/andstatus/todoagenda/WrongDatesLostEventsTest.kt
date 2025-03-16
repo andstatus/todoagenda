@@ -15,6 +15,7 @@ class WrongDatesLostEventsTest : BaseWidgetTest() {
     fun testIssue205() {
         val method = "testIssue205"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events)
+        provider.settings = settings.copy(showCurrentTimeLine = false)
         playResults(method)
         Assert.assertEquals("Number of entries", 11, factory.widgetEntries.size.toLong())
         Assert.assertEquals("On Saturday", "Maker Fair", (factory.widgetEntries[4] as CalendarEntry).event.title)

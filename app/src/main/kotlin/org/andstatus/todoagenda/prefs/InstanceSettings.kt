@@ -60,8 +60,8 @@ data class InstanceSettings(
     val maxLinesTitle: Int = PREF_MAXLINES_TITLE_DEFAULT,
     val isMultilineDetails: Boolean = PREF_MULTILINE_DETAILS_DEFAULT,
     val maxLinesDetails: Int = PREF_MAXLINES_DETAILS_DEFAULT,
-    val showCurrentTimeLine: Boolean = false,
-    val showTimeUntilTag: Boolean = false,
+    val showCurrentTimeLine: Boolean = true,
+    val showTimeUntilTag: Boolean = true,
     val lastEntryAppearance: LastEntryAppearance = LastEntryAppearance.defaultValue,
     //
     // ----------------------------------------------------------------------------------

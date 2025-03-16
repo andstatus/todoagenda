@@ -12,8 +12,16 @@ class LastEntry(
     settings: InstanceSettings,
     val type: LastEntryType,
     val appearance: LastEntryAppearance,
+    isOngoing: Boolean,
     date: DateTime,
-) : WidgetEntry(settings, WidgetEntryPosition.ENTRY_DATE, date, true, false, null) {
+) : WidgetEntry(
+        settings = settings,
+        entryPosition = WidgetEntryPosition.ENTRY_DATE,
+        entryDateIn = date,
+        allDay = true,
+        isOngoing = isOngoing,
+        endDate = null,
+    ) {
     override val source: OrderedEventSource
         get() = OrderedEventSource.LAST_ENTRY
 
@@ -38,7 +46,13 @@ class LastEntry(
                         if (appearance == LastEntryAppearance.HIDDEN) {
                             null
                         } else {
-                            LastEntry(settings, entryType, appearance, settings.clock.now())
+                            LastEntry(
+                                settings = settings,
+                                type = entryType,
+                                appearance = appearance,
+                                isOngoing = true,
+                                date = settings.clock.now(),
+                            )
                         }
                     }
                 }
@@ -46,10 +60,11 @@ class LastEntry(
                 null
             } else {
                 LastEntry(
-                    settings,
-                    LastEntryType.END_OF_LIST,
-                    settings.lastEntryAppearance,
-                    widgetEntries[widgetEntries.size - 1].entryDate,
+                    settings = settings,
+                    type = LastEntryType.END_OF_LIST,
+                    appearance = settings.lastEntryAppearance,
+                    isOngoing = false,
+                    date = widgetEntries[widgetEntries.size - 1].entryDate,
                 )
             }
     }

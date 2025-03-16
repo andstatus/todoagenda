@@ -13,7 +13,7 @@ enum class LastEntryAppearance(
     ;
 
     companion object {
-        val defaultValue = EMPTY_ENTRY
+        val defaultValue = WITH_MESSAGE
 
         fun fromValue(value: String?): LastEntryAppearance {
             for (item in LastEntryAppearance.entries) {

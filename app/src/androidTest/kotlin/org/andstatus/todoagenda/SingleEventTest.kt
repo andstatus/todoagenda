@@ -16,6 +16,7 @@ class SingleEventTest : BaseWidgetTest() {
 
     @Test
     fun testEventAttributes() {
+        provider.settings = settings.copy(showCurrentTimeLine = false)
         val today = settings.clock.now().withTimeAtStartOfDay()
         val event =
             CalendarEvent(
@@ -45,6 +46,7 @@ class SingleEventTest : BaseWidgetTest() {
 
     @Test
     fun testAlldayEventAttributes() {
+        provider.settings = settings.copy(showCurrentTimeLine = false)
         val today = settings.clock.now().withTimeAtStartOfDay()
         val event =
             CalendarEvent(

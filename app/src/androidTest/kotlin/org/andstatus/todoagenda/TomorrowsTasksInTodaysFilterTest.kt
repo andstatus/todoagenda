@@ -14,7 +14,7 @@ class TomorrowsTasksInTodaysFilterTest : BaseWidgetTest() {
         val method = "testIssue102"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.tomorrows_tasks_one_week)
         playResults(method)
-        assertLastEntry(10, LastEntryType.END_OF_LIST)
+        assertLastEntry(12, LastEntryType.END_OF_LIST)
         provider.settings =
             settings.copy(
                 eventRange = InstanceSettings.EVENT_RANGE_TODAY,
@@ -26,6 +26,6 @@ class TomorrowsTasksInTodaysFilterTest : BaseWidgetTest() {
                 eventRange = InstanceSettings.EVENT_RANGE_TODAY_AND_TOMORROW,
             )
         playResults(method)
-        assertLastEntry(7, LastEntryType.END_OF_LIST)
+        assertLastEntry(9, LastEntryType.END_OF_LIST)
     }
 }

@@ -15,6 +15,6 @@ class TodaysColorsEventsTest : BaseWidgetTest() {
         val method = "testIssue327"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.todays_colors)
         playResults(method)
-        Assert.assertEquals("Number of entries", 43, factory.widgetEntries.size.toLong())
+        Assert.assertEquals("Number of entries", 44, factory.widgetEntries.size.toLong())
     }
 }

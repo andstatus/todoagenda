@@ -19,6 +19,7 @@ class PastDueHeaderWithTasksTest : BaseWidgetTest() {
     fun testPastDueHeaderWithTasks() {
         val method = "testPastDueHeaderWithTasks"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.past_due_header_with_tasks)
+        provider.settings = settings.copy(showCurrentTimeLine = false)
         playResults(method)
         Assert.assertEquals("Past and Due header", MyClock.DATETIME_MIN, factory.widgetEntries[0].entryDate)
         Assert.assertEquals(WidgetEntryPosition.PAST_AND_DUE_HEADER, factory.widgetEntries[0].entryPosition)

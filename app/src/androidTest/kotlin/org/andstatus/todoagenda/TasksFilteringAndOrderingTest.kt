@@ -372,7 +372,10 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
         setter: UnaryOperator<InstanceSettings>,
         names: List<String>,
     ) {
-        provider.settings = setter.apply(settings)
+        provider.settings =
+            setter
+                .apply(settings)
+                .copy(showCurrentTimeLine = false)
         playResults(method)
         val widgetEntries = factory.widgetEntries
         for (ind in names.indices) {

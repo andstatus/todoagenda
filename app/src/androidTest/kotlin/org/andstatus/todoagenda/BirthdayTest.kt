@@ -27,6 +27,7 @@ class BirthdayTest : BaseWidgetTest() {
                 eventsEnded = EndedSomeTimeAgo.NONE,
                 showPastEventsWithDefaultColor = false,
                 eventRange = 30,
+                showCurrentTimeLine = false,
             )
         playAtOneTime(inputs, dateTime(2015, 8, 1, 17, 0), 0, LastEntryType.NO_UPCOMING)
         playAtOneTime(inputs, dateTime(2015, 8, 9, 23, 59), 0, LastEntryType.NO_UPCOMING)

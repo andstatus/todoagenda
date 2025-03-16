@@ -57,7 +57,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
             ),
         )
         playResults(TAG)
-        Assert.assertEquals(3, factory.widgetEntries.size.toLong())
+        Assert.assertEquals(5, factory.widgetEntries.size.toLong())
     }
 
     private fun oneTimeDst(iso8601time: String) {

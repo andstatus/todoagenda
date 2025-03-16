@@ -12,6 +12,7 @@ class WeirdDayHeaderTest : BaseWidgetTest() {
     fun testWeirdDayHeader() {
         val method = "testWeirdDayHeader"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.weird_day_header)
+        provider.settings = settings.copy(showCurrentTimeLine = false)
         playResults(method)
         assertPosition(0, WidgetEntryPosition.END_OF_LIST_HEADER)
         assertPosition(1, WidgetEntryPosition.END_OF_LIST)
