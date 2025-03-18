@@ -6,6 +6,7 @@ import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.util.RemoteViewsUtil
+import org.andstatus.todoagenda.util.TimeUntil
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.EventEntryVisualizer
 import org.andstatus.todoagenda.widget.EventStatus
@@ -39,8 +40,13 @@ abstract class EventEntryLayoutApplier(
         rv: RemoteViews,
     ) {
         val viewId = R.id.time_until
-        if (entry.showTimeUntil && settings.showTimeUntilTag) {
-            val strTime = settings.clock.timeUntil(entry).format(settings)
+        val timeUntil: TimeUntil? =
+            (entry.showTimeUntil && settings.showTimeUntilTag)
+                .takeIf { it == true }
+                ?.let { settings.clock.timeUntil(entry) }
+                ?.takeIf { it.days == null || it.days < 1000 }
+        if (timeUntil != null) {
+            val strTime = timeUntil.format(settings)
             rv.setTextViewText(viewId, strTime)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
             val textColorPref = TextColorPref.forTitle(entry)

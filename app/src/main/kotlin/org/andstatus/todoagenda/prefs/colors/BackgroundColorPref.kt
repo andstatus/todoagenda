@@ -27,7 +27,7 @@ enum class BackgroundColorPref(
     ),
     ONGOING_EVENTS(
         "ongoingEventsBackgroundColor",
-        "#D8FFFFFF".toColorInt(),
+        "#F0FFFFFF".toColorInt(),
         R.string.appearance_background_color_title,
         TimeSection.ONGOING,
     ),
@@ -39,7 +39,7 @@ enum class BackgroundColorPref(
     ),
     TODAYS_EVENTS(
         "todaysEventsBackgroundColor",
-        "#DCE7E7E7".toColorInt(),
+        "#DAFFFFFF".toColorInt(),
         R.string.appearance_background_color_title,
         TimeSection.TODAY,
     ),

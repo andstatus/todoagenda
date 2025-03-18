@@ -1,0 +1,579 @@
+{
+  "deviceInfo": {
+    "versionCode": 35,
+    "versionRelease": "15",
+    "versionCodename": "REL",
+    "buildManufacturer": "Google",
+    "buildBrand": "google",
+    "buildModel": "sdk_gphone64_x86_64"
+  },
+  "applicationInfo": {
+    "versionName": "4.13.2",
+    "versionCode": 716
+  },
+  "settings": {
+    "widgetId": 17,
+    "compactLayout": false,
+    "widgetHeaderLayout": "ONE_ROW",
+    "widgetHeaderDateFormat": "defaultWeekday:",
+    "showDayHeaders": true,
+    "dayHeaderDateFormat": "defaultWeekday:",
+    "showPastEventsUnderOneHeader": false,
+    "dayHeaderAlignment": "RIGHT",
+    "horizontalLineBelowDayHeader": false,
+    "showDaysWithoutEvents": false,
+    "eventEntryLayout": "DEFAULT",
+    "showEventIcon": true,
+    "entryDateFormat": "hidden:",
+    "multiline_title": true,
+    "maxLinesTitle": 5,
+    "multiline_details": false,
+    "maxLinesDetails": 5,
+    "showCurrentTimeLine": true,
+    "showTimeUntilTag": true,
+    "lastEntryAppearance": "with_message",
+    "showDayXY": true,
+    "showEndTime": true,
+    "showLocation": true,
+    "showDescription": true,
+    "fillAllDay": true,
+    "indicateAlerts": true,
+    "indicateRecurring": true,
+    "eventsEnded": "YESTERDAY",
+    "showPastEventsWithDefaultColor": false,
+    "eventRange": 7,
+    "hideBasedOnKeywords": "",
+    "showBasedOnKeywords": "",
+    "showOnlyClosestInstanceOfRecurringEvent": false,
+    "hideDuplicates": false,
+    "maxNumberOfEvents": -1,
+    "allDayEventsPlacement": "top_day",
+    "taskScheduling": "date_due",
+    "taskWithoutDates": "end_of_list",
+    "filterMode": "normal",
+    "activeSources": [
+      {
+        "providerType": 1,
+        "id": 3,
+        "title": "ToDo Agenda Shared",
+        "summary": "calendar.widget.android@gmail.com",
+        "color": -6644481,
+        "isAvailable": true
+      }
+    ],
+    "widgetInstanceName": "Todo Agenda 17",
+    "widgetHeaderButtonsScale": "1.0",
+    "textSizeScale": "1.0",
+    "dateFormat": "auto",
+    "lockedTimeZoneId": "",
+    "startHourOfDay": 0,
+    "snapshotMode": "live_data",
+    "refreshPeriodMinutes": 10
+  },
+  "resultsVersion": 3,
+  "results": [
+    {
+      "providerType": 1,
+      "executedAt": 1742322916751,
+      "timeZoneId": "UTC",
+      "millisOffsetUtcToLocal": 0,
+      "standardMillisOffsetUtcToLocal": 0,
+      "uri": "content:\/\/com.android.calendar\/instances\/when\/1741996800000\/1742927716750",
+      "projection": [
+        "calendar_id",
+        "event_id",
+        "eventStatus",
+        "title",
+        "begin",
+        "end",
+        "allDay",
+        "eventLocation",
+        "description",
+        "hasAlarm",
+        "rrule",
+        "displayColor",
+        "calendar_color"
+      ],
+      "selection": "selfAttendeeStatus!=2 AND (calendar_id = 3)",
+      "selectionArgs": [],
+      "sortOrder": "startDay ASC, allDay DESC, begin ASC ",
+      "rows": [
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "All day weekly event1"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=WEEKLY;WKST=TU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 14
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742083200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1741996800000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "All day today's event"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "event_id": {
+            "type": 1,
+            "value": 86
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742169600000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742083200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": "Санкт-Петербург, Россия"
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Three days meeting with D"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "event_id": {
+            "type": 1,
+            "value": 88
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742428800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -18312
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742169600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Yesterday's event"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 89
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742239800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742236200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": "Secret cafe, Rhodyho, 4220 Bardejov, Slovakia"
+          },
+          "description": {
+            "type": 3,
+            "value": "Description of the event"
+          },
+          "title": {
+            "type": 3,
+            "value": "Test event 2 that is a recurring all day event and has a reminder"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=MONTHLY;WKST=SU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 18
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742342400000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742256000000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Recently ended event"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 85
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742317200000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742313600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Ongoing event"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 83
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742332800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742318400000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "Later today event"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 1
+          },
+          "allDay": {
+            "type": 1,
+            "value": 0
+          },
+          "event_id": {
+            "type": 1,
+            "value": 84
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742338800000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -6644481
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742335200000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        },
+        {
+          "calendar_id": {
+            "type": 1,
+            "value": 3
+          },
+          "eventLocation": {
+            "type": 3,
+            "value": ""
+          },
+          "description": {
+            "type": 3,
+            "value": ""
+          },
+          "title": {
+            "type": 3,
+            "value": "All day weekly event1"
+          },
+          "hasAlarm": {
+            "type": 1,
+            "value": 0
+          },
+          "allDay": {
+            "type": 1,
+            "value": 1
+          },
+          "rrule": {
+            "type": 3,
+            "value": "FREQ=WEEKLY;WKST=TU"
+          },
+          "event_id": {
+            "type": 1,
+            "value": 14
+          },
+          "eventStatus": {
+            "type": 1,
+            "value": 1
+          },
+          "end": {
+            "type": 1,
+            "value": 1742688000000
+          },
+          "displayColor": {
+            "type": 1,
+            "value": -8722497
+          },
+          "begin": {
+            "type": 1,
+            "value": 1742601600000
+          },
+          "calendar_color": {
+            "type": 1,
+            "value": -6644481
+          }
+        }
+      ]
+    },
+    {
+      "providerType": 4,
+      "executedAt": 1742322916797,
+      "timeZoneId": "UTC",
+      "millisOffsetUtcToLocal": 0,
+      "standardMillisOffsetUtcToLocal": 0,
+      "uri": "content:\/\/org.tasks\/todoagenda",
+      "projection": [],
+      "selection": "completed = 0 AND hideUntil <= 1742927716796 AND cdl_id IN ( 1 )",
+      "selectionArgs": [],
+      "sortOrder": "",
+      "rows": []
+    }
+  ]
+}

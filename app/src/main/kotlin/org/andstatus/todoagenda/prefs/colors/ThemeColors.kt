@@ -11,7 +11,6 @@ import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.json.JSONException
 import org.json.JSONObject
-import java.lang.IllegalStateException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
@@ -41,7 +40,17 @@ class ThemeColors(
         try {
             for (pref in BackgroundColorPref.entries) {
                 val color =
-                    if (json.has(pref.colorPreferenceName)) json.getInt(pref.colorPreferenceName) else pref.defaultColor
+                    if (json.has(pref.colorPreferenceName)) {
+                        json.getInt(pref.colorPreferenceName)
+                    } else {
+                        if (pref == BackgroundColorPref.ONGOING_EVENTS &&
+                            json.has(BackgroundColorPref.TODAYS_EVENTS.colorPreferenceName)
+                        ) {
+                            json.getInt(BackgroundColorPref.TODAYS_EVENTS.colorPreferenceName)
+                        } else {
+                            pref.defaultColor
+                        }
+                    }
                 backgroundColors[pref] = ShadingAndColor(color)
             }
             textColorSource =
