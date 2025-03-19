@@ -43,13 +43,7 @@ class ThemeColors(
                     if (json.has(pref.colorPreferenceName)) {
                         json.getInt(pref.colorPreferenceName)
                     } else {
-                        if (pref == BackgroundColorPref.ONGOING_EVENTS &&
-                            json.has(BackgroundColorPref.TODAYS_EVENTS.colorPreferenceName)
-                        ) {
-                            json.getInt(BackgroundColorPref.TODAYS_EVENTS.colorPreferenceName)
-                        } else {
-                            pref.defaultColor
-                        }
+                        pref.defaultColor
                     }
                 backgroundColors[pref] = ShadingAndColor(color)
             }
