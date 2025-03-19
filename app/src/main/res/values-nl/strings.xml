@@ -19,6 +19,7 @@
     <string name="grant_permissions">Toestemming geven</string>
     <string name="grant_permissions_verbose">De widget heeft toestemming nodig om agenda\'s te mogen lezen.\n
         Tik hier om toestemming te verlenen.</string>
+    <string name="dont_ask_for_permissions">Niet meer om toestemmingen vragen</string>
     <string name="past_header">Verleden en vervallen</string>
     <string name="end_of_list_header">Andere gebeurtenissen</string>
     <string name="permissions_justification">Welkom bij de Todo Agenda, de makkelijkste manier om toegang te krijgen tot uw agenda\'s en taken.\n\n
@@ -32,8 +33,10 @@
     <string name="day_header">Dag koptekst</string>
     <string name="event_entry">Gebeurtenis invoer</string>
     <string name="todays_events">Gebeurtenissen van vandaag</string>
+    <string name="ongoing_events">Lopende gebeurtenissen</string>
     <string name="future_events">Toekomstige gebeurtenissen</string>
     <string name="not_found">Niet gevonden </string>
+    <string name="day">dag</string>
     <!-- Descriptions for app markets -->
     <string name="app_description_80_chars_max">Startscherm widget die gebeurtenissen weergeven uit gesel. agenda\'s/takenlijsten</string>
     <string name="app_description_4000_chars_max_part01">Todo Agenda is een startscherm-widget voor je Android-apparaat.
@@ -48,11 +51,11 @@
         die je in de widget wilt weergeven.</string>
     <string name="app_description_4000_chars_max_part06">Maak indien nodig meerdere widgets aan. Elke widget heeft zijn eigen instellingen,
         inclusief lay-outs, kleuren, filters, geselecteerde agenda\'s en takenlijsten.</string>
-    <string name="app_description_4000_chars_max_part07">Achtergrondkleuren en transparantie aanpassen
-        van verschillende widgetonderdelen, zwarte en witte kleur voor teksten.</string>
+    <string name="app_description_4000_chars_max_part07">Van verschillende widgetonderdelen de kleuren en transparantie
+        van teksten en achtergronden aanpassen.</string>
     <string name="app_description_4000_chars_max_part08">Scroll door de lijst met gebeurtenissen.
         Gebruik de knop \"Ga naar vandaag\" om direct terug te keren naar vandaag.</string>
-    <string name="app_description_4000_chars_max_part09">Verander de tekstgrootte van de widget.</string>
+    <string name="app_description_4000_chars_max_part09">De grootte van de tekst en knoppen van de widget aanpassen.</string>
     <string name="app_description_4000_chars_max_part10">Volledig aanpasbare widget met alternatieve lay-outs.</string>
     <string name="app_description_4000_chars_max_part11">Indicatoren voor herinneringen en herhaalde gebeurtenissen.</string>
     <string name="app_description_4000_chars_max_part12">Vergrendel de tijdzone als u naar verschillende tijdzones reist.</string>
@@ -94,8 +97,20 @@
     <string name="show_event_icon_title">Pictogram gebeurtenis weergeven</string>
     <string name="show_event_icon_desc">Kleurenbalk agenda / Pictogram taak voor gebeurtenis weergeven</string>
     <string name="entry_date_format">Invoer datum opmaak</string>
+    <string name="maxlines_title_title">Maximaal aantal regels in een titel</string>
+    <string name="maxlines_details_title">Maximum aantal regels in details</string>
     <string name="multiline_details_title">Details op meerdere regels</string>
     <string name="multiline_details_desc">De tijd en locatie van de gebeurtenis over meerdere regels verdelen</string>
+    <string name="show_current_time_line_title">Huidige tijdlijn weergeven</string>
+    <string name="show_current_time_line_desc">Horizontale lijn representatief voor de huidige tijd weergeven</string>
+    <string name="last_entry_title">De Einde van de lijst vermelding na een lijst van gebeurtenissen</string>
+    <string name="last_entry_with_message">Een item met een beschrijvend bericht wordt weergegeven</string>
+    <string name="last_entry_empty">Een leeg veld (leeg gebied) wordt weergegeven</string>
+    <string name="last_entry_hidden">De invoer is verborgen</string>
+    <string name="end_of_list">(einde van de lijst)</string>
+    <string name="other_widget_parts">Andere widgetonderdelen</string>
+    <string name="show_time_until_title">Tijd tot weergeven</string>
+    <string name="show_time_until_desc">Tijd tot tag voor de volgende aankomende gebeurtenis</string>
     <!-- Date format preference -->
     <string name="simple_options">Eenvoudige opties</string>
     <string name="date_format_default_weekday">Standaard met weekdag</string>
@@ -113,6 +128,7 @@
     <string name="result_formatted_date">Resultaat, opgemaakte datum</string>
     <string name="N_days_ago">%d dag(en) geleden</string>
     <string name="in_N_days">in %d dagen</string>
+    <string name="in_HH_mm">in %02d:%02d</string>
     <!-- Preference frame: Colors -->
     <string name="different_colors_for_dark_title">Verschillende kleuren voor donker Android-systeem thema</string>
     <string name="different_colors_for_dark_off_desc">Kleuren zijn hetzelfde</string>
@@ -122,6 +138,17 @@
     <string name="appearance_group_color_title">Kleuren</string>
     <string name="colors_light">Kleuren voor lichte thema</string>
     <string name="colors_dark">Kleuren voor donkere thema</string>
+    <string name="text_color_source">Hoe tekstkleur is gedefinieerd</string>
+    <string name="text_color_source_auto">Automatische tekstschaduw</string>
+    <string name="text_color_source_auto_desc">Tekstschaduw (wit, licht, donker of zwart) wordt automatisch ingesteld op basis van achtergrondkleur</string>
+    <string name="text_color_source_shading">Handmatige tekstschaduw</string>
+    <string name="text_color_source_shading_desc">Tekstschaduw moet worden ingesteld voor elk deel van de widget</string>
+    <string name="text_color_source_color">Aangepaste tekstkleuren</string>
+    <string name="text_color_source_color_desc">Tekstkleur moet worden ingesteld voor elk deel van de widget</string>
+    <string name="text_shadow_title">Tekst schaduw</string>
+    <string name="text_shadow_no_shadow">Geen schaduw</string>
+    <string name="text_shadow_dark">Donkere schaduw</string>
+    <string name="text_shadow_light">Lichte schaduw</string>
     <string name="appearance_background_color_title">Achtergrondkleur</string>
     <string name="appearance_background_color_desc">De kleur van de achtergrond aanpassen</string>
     <string name="appearance_past_events_background_color_title">Achtergrondkleur van gebeurtenissen uit het verleden</string>
@@ -129,24 +156,36 @@
     <string name="todays_events_background_color_title">Achtergrondkleur van de gebeurtenissen van vandaag</string>
     <string name="todays_events_background_color_desc">Achtergrondkleur van de gebeurtenissen van vandaag aanpassen</string>
     <string name="appearance_header_theme_title">Widget koptekst kleur arcering</string>
+    <string name="widget_header_text_color">Tekstkleur koptekst widget</string>
     <string name="appearance_header_theme_desc">De kop van de widget in donkere of lichte tint weergeven</string>
     <string name="widget_header_background_color_desc">Kleur van de koptekst van de widget aanpassen. Standaard transparant</string>
     <string name="widget_header_background_color_title">Widget koptekst achtergrond kleur</string>
     <string name="day_header_theme_title">Dag koptekst kleur</string>
     <string name="day_header_theme_desc">Dag koptekst in donkere of lichte schaduw weergeven</string>
+    <string name="day_header_text_color">Tekstkleur koptekst dag</string>
     <string name="appearance_entries_theme_title">Gebeurtenis tekst arcering</string>
+    <string name="event_text_color">Tekstkleur gebeurtenis</string>
     <string name="appearance_entries_theme_desc">Gebeurtenis tekst in donkere of lichte tint weergeven</string>
     <string name="appearance_theme_black">Wit</string>
     <string name="appearance_theme_dark">Licht</string>
     <string name="appearance_theme_light">Donker</string>
     <string name="appearance_theme_white">Zwart</string>
+    <string name="current_time_line_color_title">Kleur huidige tijdlijn</string>
+    <string name="time_until_background">Tijd tot tag achtergrond</string>
+    <string name="auto_color">Automatische kleur</string>
+    <string name="color_yellow">Geel</string>
+    <string name="background_color_title">Achtergrondkleur</string>
     <!-- Preference frame: Event details -->
+    <string name="show_day_xy_title">(dag x/y)</string>
+    <string name="show_day_xy_desc">Huidige dagnummer / totaal aantal dagen voor meerdaagse afspraken weergeven</string>
     <string name="event_details_prefs">Details gebeurtenissen</string>
     <string name="event_details_prefs_desc">Instellen welke details weergegeven moeten worden voor een gebeurtenis</string>
     <string name="event_details_show_end_time_title">Eindtijd</string>
     <string name="event_details_show_end_time_desc">Toon de eindtijd van de gebeurtenis</string>
-    <string name="event_details_show_location_title">Toon locatie</string>
+    <string name="event_details_show_location_title">Locatie</string>
     <string name="event_details_show_location_desc">De locatie weergeven of verbergen van de gebeurtenis</string>
+    <string name="show_description_title">Beschrijving</string>
+    <string name="show_description_desc">De beschrijving weergeven of verbergen van de gebeurtenis</string>
     <string name="event_details_fill_all_day_events_title">Opvullen hele-dag gebeurtenis</string>
     <string name="event_details_fill_all_day_events_desc">Toon een vermelding voor elke dag van de hele-dag gebeurtenis</string>
     <string name="event_details_indicators">Indicatoren</string>
@@ -163,7 +202,8 @@
     <string name="event_details_event_range_title">Datumbereik</string>
     <string name="event_details_event_range_desc">Configureren van het aantal weer te geven gebeurtenissen</string>
     <string name="event_range_today">Vandaag</string>
-    <string name="event_range_one_day">Een dag</string>
+    <string name="event_range_today_and_tomorrow">Vandaag en morgen</string>
+    <string name="event_range_one_day">24 uur</string>
     <string name="event_range_one_week">Een week</string>
     <string name="event_range_two_weeks">Twee weken</string>
     <string name="event_range_one_month">Een maand</string>
@@ -187,8 +227,10 @@
     <string name="ended_six_months_ago">Eindigde zes maanden geleden</string>
     <string name="ended_one_year_ago">Eindigde een jaar geleden</string>
     <string name="pref_hide_based_on_keywords_title">Verbergen op basis van zoekwoorden in een titel</string>
+    <string name="pref_show_based_on_keywords_title">Weergeven op basis van zoekwoorden in een titel</string>
     <string name="show_only_closest_instance_of_recurring_event">Alleen de eerstvolgende van een terugkerende afspraak weergeven</string>
     <string name="hide_duplicates">Duplicaten verbergen</string>
+    <string name="max_number_of_events_title">Maximum aantal gebeurtenissen</string>
     <string name="all_day_events_placement_title">Plaatsing van hele dag gebeurtenissen</string>
     <string name="all_day_events_placement_top_of_the_days_events">Bovenaan de gebeurtenissen van de dag</string>
     <string name="all_day_events_placement_bottom_of_the_days_events">Onderaan de gebeurtenissen van de dag</string>
@@ -214,6 +256,8 @@
     <string name="other_prefs_title">Overige instellingen</string>
     <string name="appearance_prefs">Uiterlijk</string>
     <string name="appearance_prefs_desc">Het uiterlijk van de widget aanpassen</string>
+    <string name="buttons_size_title">Knoppen grootte</string>
+    <string name="buttons_size_desc">Grootte van de knoppen aanpassen</string>
     <string name="appearance_text_size_title">Tekstgrootte</string>
     <string name="appearance_text_size_desc">De tekstgrootte wijzigen</string>
     <string name="appearance_text_size_very_small">Zeer klein</string>
@@ -229,6 +273,7 @@
     <string name="lock_time_zone_off_desc">Ontgrendeld, huidige tijdzone: %s</string>
     <string name="lock_time_zone_on_desc">Vergrendeld op %s</string>
     <string name="lock_time_zone_title">Tijdzone vergrendelen</string>
+    <string name="start_hour_of_day">Beginuur van een dag</string>
     <string name="snapshot_mode">Vergrendelingslijst van gebeurtenissen (Snapshot modus)</string>
     <string name="snapshot_mode_live_data">Live data uit echte bronnen</string>
     <string name="snapshot_mode_time">Snapshot zoals gezien op het moment dat het werd genomen: %s</string>

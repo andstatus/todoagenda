@@ -18,6 +18,7 @@
     <string name="no_title">(Sans titre)</string>
     <string name="grant_permissions">Accorder l’autorisation</string>
     <string name="grant_permissions_verbose">Widget demande l’autorisation de lire les calendriers. \nAppuyer ici pour accorder l’autorisation.</string>
+    <string name="dont_ask_for_permissions">Ne plus demander d\'autorisations </string>
     <string name="past_header">Passés et à venir</string>
     <string name="end_of_list_header">Autres événements</string>
     <string name="permissions_justification">Bienvenue à Todo Agenda Widget, un moyen facile d\'accéder à votre calendrier.\n\nPour l\'utiliser, vous devez lui accorder l\'accès à votre calendrier.</string>
@@ -30,8 +31,10 @@
     <string name="day_header">En-tête du jour</string>
     <string name="event_entry">Événement</string>
     <string name="todays_events">Événements d\'aujourd\'hui</string>
+    <string name="ongoing_events">Évènements en cours</string>
     <string name="future_events">Événements à venir</string>
     <string name="not_found">Non trouvé</string>
+    <string name="day">Jour</string>
     <!-- Descriptions for app markets -->
     <string name="app_description_80_chars_max">Widgets affichant sur l\'écran d\'accueil les événements des calendriers et des listes de tâches sélectionnés</string>
     <string name="app_description_4000_chars_max_part01">Todo Agenda est un widget d\'écran d\'accueil pour votre appareil Android.
@@ -46,11 +49,11 @@
         que vous souhaitez voir apparaître dans le widget.</string>
     <string name="app_description_4000_chars_max_part06">Si vous le souhaitez, vous pouvez créer plusieurs widgets. Chaque widget a ses propres paramètres,
         incluant un choix de mise en page, couleurs, filtres, sélection de calendriers et listes de tâches.</string>
-    <string name="app_description_4000_chars_max_part07">Personnalisez les couleurs de fond et la transparence
-        des différentes parties de widget, l\'ombrage noir et blanc pour les textes.</string>
+    <string name="app_description_4000_chars_max_part07">Personnalise les couleurs et la transparence des différentes parties du widget,
+        de leurs textes et arrière-plans.</string>
     <string name="app_description_4000_chars_max_part08">Parcourez la liste des événements.
         Utilisez le bouton \"Aller à aujourd\'hui\" pour revenir à aujourd\'hui instantanément.</string>
-    <string name="app_description_4000_chars_max_part09">Personnaliser la taille du texte du widget.</string>
+    <string name="app_description_4000_chars_max_part09">Personnalisez la taille du texte et des boutons du widget.</string>
     <string name="app_description_4000_chars_max_part10">Widget entièrement redimensionnable avec différentes mises en page possibles.</string>
     <string name="app_description_4000_chars_max_part11">Indicateurs pour les alertes et les événements récurrents.</string>
     <string name="app_description_4000_chars_max_part12">Verrouillage fuseau horaire lorsque vous voyagez dans différents fuseaux horaires.</string>
@@ -92,8 +95,20 @@
     <string name="show_event_icon_title">Afficher l\'icône de l\'événement</string>
     <string name="show_event_icon_desc">Afficher la barre de couleur du calendrier / l\'icône de tâche pour l\'événement</string>
     <string name="entry_date_format">Format de date de l\'événement</string>
+    <string name="maxlines_title_title">Nombre maximum de lignes dans le titre</string>
+    <string name="maxlines_details_title">Nombre maximum de lignes dans le détail </string>
     <string name="multiline_details_title">Présentation multi-ligne des détails des événements</string>
     <string name="multiline_details_desc">Étendre l\'horaire et le lieu de l\'événement sur plusieurs lignes</string>
+    <string name="show_current_time_line_title">Afficher la ligne de temps actuelle.</string>
+    <string name="show_current_time_line_desc">Afficher la ligne horizontale représentant l\'heure actuelle.</string>
+    <string name="last_entry_title">Dernière entrée de la liste après une série d\'événements</string>
+    <string name="last_entry_with_message">Une entrée avec un message descriptif est affichée.</string>
+    <string name="last_entry_empty">Une entrée vide (zone vide) est affichée.</string>
+    <string name="last_entry_hidden">L\'entrée est cachée.</string>
+    <string name="end_of_list">(fin de la liste)</string>
+    <string name="other_widget_parts">Autres parties du widget</string>
+    <string name="show_time_until_title">Afficher l\'heure jusqu\'à</string>
+    <string name="show_time_until_desc">Temps restant avant le prochain événement à venir</string>
     <!-- Date format preference -->
     <string name="simple_options">Options de base</string>
     <string name="date_format_default_weekday">Format par défaut comprenant le jour de la semaine</string>
@@ -111,9 +126,27 @@
     <string name="result_formatted_date">Résultat, date formatée</string>
     <string name="N_days_ago">il y a %d jours</string>
     <string name="in_N_days">dans %d jours</string>
+    <string name="in_HH_mm">Dans %02d:%02d</string>
     <!-- Preference frame: Colors -->
+    <string name="different_colors_for_dark_title">Différentes couleurs pour le thème sombre du système Android</string>
+    <string name="different_colors_for_dark_off_desc">Les couleurs sont les mêmes</string>
+    <string name="different_colors_for_dark_on_desc">Active/désactive le thème Sombre du système Android pour régler les couleurs
+        du  thème Sombre/Clair en conséquence.</string>
     <string name="colors_prefs_desc">Couleur et opacité du texte et de l\'arrière plan</string>
     <string name="appearance_group_color_title">Couleurs</string>
+    <string name="colors_light">Couleurs pour thème clair</string>
+    <string name="colors_dark">Couleurs pour le thème sombre</string>
+    <string name="text_color_source">Comment la couleur du texte est définie</string>
+    <string name="text_color_source_auto">Ombrage de texte automatique</string>
+    <string name="text_color_source_auto_desc">L\'ombrage du texte (blanc, lumière, ou noir) est automatiquement défini en fonction de la couleur de fond</string>
+    <string name="text_color_source_shading">Ombrage du texte manuel</string>
+    <string name="text_color_source_shading_desc">L\'ombrage du texte doit être défini pour chaque partie du widget</string>
+    <string name="text_color_source_color">Couleurs de texte personnalisées</string>
+    <string name="text_color_source_color_desc">La couleur du texte doit être définie pour chaque partie du widget</string>
+    <string name="text_shadow_title">Ombrage du texte</string>
+    <string name="text_shadow_no_shadow">Aucun ombrage</string>
+    <string name="text_shadow_dark">Ombrage sombre</string>
+    <string name="text_shadow_light">Ombrage clair</string>
     <string name="appearance_background_color_title">Couleur d\'arrière plan</string>
     <string name="appearance_background_color_desc">Ajuster la transparence du fond</string>
     <string name="appearance_past_events_background_color_title">Couleur d\'arrière-plan des événements passés</string>
@@ -121,24 +154,36 @@
     <string name="todays_events_background_color_title">Couleur d\'arrière-plan des événements du jour</string>
     <string name="todays_events_background_color_desc">Ajuster la couleur d\'arrière-plan des événements du jour</string>
     <string name="appearance_header_theme_title">Ombre de l\'en-tête du gadget</string>
+    <string name="widget_header_text_color">Couleur du texte de l\'en-tête du widget</string>
     <string name="appearance_header_theme_desc">Afficher l\'en-tête du gadget avec une ombre claire ou foncée</string>
     <string name="widget_header_background_color_desc">Ajuster la couleur de l\'en-tête du widget. Transparent par défaut</string>
     <string name="widget_header_background_color_title">Couleur d\'arrière-plan de l\'en-tête du widget</string>
     <string name="day_header_theme_title">Niveau de contraste du texte de l\'en-tête du jour</string>
     <string name="day_header_theme_desc">Afficher le texte de l\'en-tête du jour en mode clair ou foncé</string>
+    <string name="day_header_text_color">Couleur du texte de l\'en-tête du jour</string>
     <string name="appearance_entries_theme_title">Ombrage des événements</string>
+    <string name="event_text_color">Couleur du texte de l\'événement</string>
     <string name="appearance_entries_theme_desc">Afficher un événement avec une ombre claire ou foncée</string>
     <string name="appearance_theme_black">Blanc</string>
     <string name="appearance_theme_dark">Clair</string>
     <string name="appearance_theme_light">Sombre</string>
     <string name="appearance_theme_white">Noir</string>
+    <string name="current_time_line_color_title">Couleur de la ligne du temps actuelle</string>
+    <string name="time_until_background">Couleur du fond du tag \"Dans xx:xx\"</string>
+    <string name="auto_color">Couleur automatique</string>
+    <string name="color_yellow">Jaune</string>
+    <string name="background_color_title">Couleur de fond</string>
     <!-- Preference frame: Event details -->
+    <string name="show_day_xy_title">(Jour x/y)</string>
+    <string name="show_day_xy_desc">Afficher le numéro du jour actuel / le nombre total de jours pour les événements sur plusieurs jours</string>
     <string name="event_details_prefs">Détails de l\'événement</string>
     <string name="event_details_prefs_desc">Configurez quelles informations voir pour un événement</string>
     <string name="event_details_show_end_time_title">Heure de fin</string>
     <string name="event_details_show_end_time_desc">Afficher l\'heure de fin de l\'événement</string>
-    <string name="event_details_show_location_title">Montrer le lieu</string>
+    <string name="event_details_show_location_title">Lieu</string>
     <string name="event_details_show_location_desc">Cacher ou montrer le lieu de l\'événement</string>
+    <string name="show_description_title">Description</string>
+    <string name="show_description_desc">Afficher/Masquer la description de l\'événement</string>
     <string name="event_details_fill_all_day_events_title">Gestion des événements Journée Entière</string>
     <string name="event_details_fill_all_day_events_desc">Afficher une entrée pour chaque jour d\'un événement Journée entière</string>
     <string name="event_details_indicators">Indicateurs</string>
@@ -155,7 +200,8 @@
     <string name="event_details_event_range_title">Intervalle de date</string>
     <string name="event_details_event_range_desc">Configurer le nombre d\'événements à afficher</string>
     <string name="event_range_today">Aujourd\'hui</string>
-    <string name="event_range_one_day">Un jour</string>
+    <string name="event_range_today_and_tomorrow">aujourd\'hui et demain</string>
+    <string name="event_range_one_day">24 heures</string>
     <string name="event_range_one_week">Une semaine</string>
     <string name="event_range_two_weeks">Deux semaines</string>
     <string name="event_range_one_month">Un mois</string>
@@ -179,8 +225,13 @@
     <string name="ended_six_months_ago">Terminé il y a six mois</string>
     <string name="ended_one_year_ago">Terminé il y a un an</string>
     <string name="pref_hide_based_on_keywords_title">Cacher en fonction de mots-clés dans un titre</string>
+    <string name="pref_show_based_on_keywords_title">Afficher en fonction de mots-clés dans le titre</string>
     <string name="show_only_closest_instance_of_recurring_event">N\'afficher que l\'instance la plus proche d\'un événement récurrent</string>
     <string name="hide_duplicates">Masquer les doublons</string>
+    <string name="max_number_of_events_title">Nombre maximum d\'événements</string>
+    <string name="all_day_events_placement_title">Placement des événements durant une journée complète</string>
+    <string name="all_day_events_placement_top_of_the_days_events">En haut des événements de la journée</string>
+    <string name="all_day_events_placement_bottom_of_the_days_events">En bas des événements de la journée</string>
     <string name="task_scheduling_title">Planification de tâches</string>
     <string name="task_scheduling_date_due">Afficher les tâches en dessous de la date d\'échéance</string>
     <string name="task_scheduling_date_started">Afficher les tâches en dessous de la date de début</string>
@@ -203,6 +254,8 @@
     <string name="other_prefs_title">Autres paramètres</string>
     <string name="appearance_prefs">Apparence</string>
     <string name="appearance_prefs_desc">Ajuster l\'apparence du widget</string>
+    <string name="buttons_size_title">Taille des boutons</string>
+    <string name="buttons_size_desc">Ajuster la taille des boutons</string>
     <string name="appearance_text_size_title">Taille de police</string>
     <string name="appearance_text_size_desc">Ajuster la taille de police</string>
     <string name="appearance_text_size_very_small">Très petit</string>
@@ -218,6 +271,7 @@
     <string name="lock_time_zone_off_desc">Déverrouillé, fuseau actuel : %s</string>
     <string name="lock_time_zone_on_desc">Verrouillé sur %s</string>
     <string name="lock_time_zone_title">Verrouiller le fuseau horaire</string>
+    <string name="start_hour_of_day">Heure de début d\'une journée</string>
     <string name="snapshot_mode">Verrouiller la liste des événements (mode capture d\'écran)</string>
     <string name="snapshot_mode_live_data">Données en direct à partir de sources réelles</string>
     <string name="snapshot_mode_time">Instantané affiché tel qu\'à l\'heure où il a été pris : %s</string>
