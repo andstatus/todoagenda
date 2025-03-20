@@ -2,24 +2,26 @@
 <resources>
     <string name="app_name">To-Do Liste</string>
     <string name="widget_name">To-do Liste</string>
-    <string name="widget_instance_name">Widget Name</string>
+    <string name="widget_instance_name">Widget-Name</string>
     <string name="yesterday">Gestern</string>
     <string name="today">Heute</string>
     <string name="tomorrow">Morgen</string>
     <string name="not_initialized_yet">Noch nicht initialisiert...</string>
-    <string name="no_events_to_show">Keine Ereignisse vorhanden</string>
+    <string name="no_events_to_show">Keine Termine vorhanden</string>
     <string name="no_upcoming_events">Keine anstehenden Termine</string>
     <string name="open_prefs_desc">Öffne die Einstellungen des Kalender-Widget</string>
     <string name="go_to_today">Zu heute wechseln</string>
     <string name="add_event_desc">Neuen Kalendereintrag erstellen</string>
+    <string name="add_task_desc">Neue Aufgabe hinzufügen</string>
     <string name="indicator_alarm">Hinweis ob an dem Ereignis ein Erinnerungen gesetzt wurde</string>
     <string name="indicator_recurring">Hinweis ob das Ereignis wiederkehrend ist</string>
     <string name="no_title">(Kein Titel)</string>
     <string name="grant_permissions">Berechtigung erteilen</string>
     <string name="grant_permissions_verbose">Das Widget erfordert die Berechtigung deinen Kalender zu lesen.\n
         Klicke hier, um die Berechtigung zu erteilen.</string>
+    <string name="dont_ask_for_permissions">Nicht mehr nach Berechtigung fragen</string>
     <string name="past_header">Fällig</string>
-    <string name="end_of_list_header">Andere Veranstaltungen</string>
+    <string name="end_of_list_header">Andere Termine</string>
     <string name="permissions_justification">Willkommen bei Todo Agenda, dem einfachen Zugriff auf deine Kalender und Aufgaben.\n\n
         Um das Widget bestmöglich zu nutzen, musst du Zugriff auf deine Kalender und Aufgaben gewähren.</string>
     <string name="no_widgets_found">Füge zuerst das \"Todo Agenda\"-Widget dem Startbildschirm des Gerätes hinzu.</string>
@@ -29,10 +31,12 @@
     <string name="loading_with_dots">Lädt...</string>
     <string name="widget_header">Widget-Kopfzeile</string>
     <string name="day_header">Tagesüberschrift</string>
-    <string name="event_entry">Ereigniseintrag</string>
+    <string name="event_entry">Termineintrag</string>
     <string name="todays_events">Heutige Termine</string>
+    <string name="ongoing_events">Laufende Termine</string>
     <string name="future_events">Alle zukünftigen Termine</string>
     <string name="not_found">Nicht gefunden</string>
+    <string name="day">Tag</string>
     <!-- Descriptions for app markets -->
     <string name="app_description_80_chars_max">Startbildschirm-Widgets, die Termine aus ausgewählten Kalendern und Aufgabenlisten anzeigen</string>
     <string name="app_description_4000_chars_max_part01">Todo Agenda sind Startbildschirm-Widgets für dein Android-Gerät.
@@ -47,13 +51,13 @@
         aus, die du im Widget sehen möchtest.</string>
     <string name="app_description_4000_chars_max_part06">Erstelle mehrere Widgets, wenn du möchtest. Jedes Widget hat eigene Einstellungen,
         inklusive Layouts, Farben, Filtern, ausgewählten Kalendern und Aufgabenlisten.</string>
-    <string name="app_description_4000_chars_max_part07">Passe Hintergrundfarben und Transparenz
-        von verschiedenen Widgetteilen sowie die Schwarz- und Weißschattierung von Texten an.</string>
+    <string name="app_description_4000_chars_max_part07">Farben und Transparenz verschiedener Widget-Teile anpassen,
+        ihrer Texte und Hintergründe.</string>
     <string name="app_description_4000_chars_max_part08">Scrolle durch die Liste der Termine.
         Verwende \"Zu heute wechseln\", um sofort wieder zum heutigen Tag zu kommen.</string>
-    <string name="app_description_4000_chars_max_part09">Passen Sie die Textgröße des Widgets an.</string>
+    <string name="app_description_4000_chars_max_part09">Passe die Größe des Textes und der Buttons des Widgets an.</string>
     <string name="app_description_4000_chars_max_part10">Voll anpassbares Widget mit verschiedenen Layouts.</string>
-    <string name="app_description_4000_chars_max_part11">Indikatoren für Alarme und wiederkehrende Ereignisse.</string>
+    <string name="app_description_4000_chars_max_part11">Indikatoren für Alarme und wiederkehrende Termine.</string>
     <string name="app_description_4000_chars_max_part12">Fixieren sie die Zeitzone wenn sie in andere reisen.</string>
     <string name="app_description_4000_chars_max_part13">Deaktiviere Widget-Kopfzeile, Tages-Kopfzeile, Termin-Symbole, Tage von heute,
         etc. und sieh nur das, was du brauchst.</string>
@@ -62,12 +66,15 @@
         um Widgets auf dem gleichen oder verschiedenen Geräten zu klonen.</string>
     <string name="app_description_4000_chars_max_part14">Android 4+ unterstützt. Unterstützt Android Tablets.</string>
     <!-- Preference frame: Layout -->
+    <string name="compact_layout_title">Kompaktes Layout</string>
+    <string name="compact_layout_off_desc">Normaler Abstand zwischen Widget-Teilen</string>
+    <string name="compact_layout_on_desc">Minimaler Abstand zwischen Widget-Teilen, dünne Ränder</string>
     <string name="layout_prefs_desc">Widget-Elemente platzieren, anzeigen und verbergen</string>
     <string name="layout_prefs_title">Ansicht</string>
-    <string name="widget_header_layout">Widgetüberschriftansicht</string>
+    <string name="widget_header_layout">Widget-Kopfzeilenansicht</string>
     <string name="pref_event_entry_layout_title">Ereignis Anordnung</string>
     <string name="default_multiline_layout">Zeit unterhalb von Title</string>
-    <string name="widget_header_date_format">Widget-Header-Datumsformat</string>
+    <string name="widget_header_date_format">Datumsformat der Widget-Kopfzeile</string>
     <string name="default_value">Standard</string>
     <string name="single_line_layout">Alles in einer Zeile</string>
     <string name="two_rows_layout">Zweizeiliges Layout</string>
@@ -85,18 +92,30 @@
     <string name="appearance_show_day_headers_title">Zeige Tagesüberschriften</string>
     <string name="appearance_show_day_headers_desc">Zeige Tagesüberschriften in Widget an</string>
     <string name="day_header_date_format">Datumsformat der Tagesüberschrift</string>
-    <string name="show_past_events_under_one_header_title">Header für vergangene/fällige Ereignisse</string>
-    <string name="show_past_events_under_one_header_desc">Alle vergangenen/fälligen Ereignisse unter einem \"Einfügen und Fälligkeit\"-Überschrift anzeigen</string>
-    <string name="show_event_icon_title">Ereignissymbol anzeigen</string>
-    <string name="show_event_icon_desc">Kalenderfarben Leiste / Aufgabensymbol für Ereignis anzeigen</string>
+    <string name="show_past_events_under_one_header_title">Kopfzeile für vergangene/fällige Termine</string>
+    <string name="show_past_events_under_one_header_desc">Alle vergangenen/fälligen Termine unter einem \"Einfügen und Fälligkeit\"-Überschrift anzeigen</string>
+    <string name="show_event_icon_title">Terminsymbol anzeigen</string>
+    <string name="show_event_icon_desc">Kalenderfarben Leiste / Aufgabensymbol für Termin anzeigen</string>
     <string name="entry_date_format">Eingabe-Datumsformat</string>
+    <string name="maxlines_title_title">Maximale Anzahl von Zeilen in einem Titel</string>
+    <string name="maxlines_details_title">Maximale Anzahl von Zeilen in Details</string>
     <string name="multiline_details_title">Mehrzeilige Details</string>
     <string name="multiline_details_desc">Terminzeit und -Ort über mehrere Zeilen verteilen</string>
+    <string name="show_current_time_line_title">Zeige Linie für aktuelle Zeit</string>
+    <string name="show_current_time_line_desc">Zeige horizontale Linie, die die aktuelle Zeit repräsentiert</string>
+    <string name="last_entry_title">Das Ende des Listeneintrags nach einer Liste von Terminen</string>
+    <string name="last_entry_with_message">Ein Eintrag mit einer erklärenden Nachricht wird angezeigt</string>
+    <string name="last_entry_empty">Ein leerer Eintrag (leerer Bereich) wird angezeigt</string>
+    <string name="last_entry_hidden">Der Eintrag wird ausgeblendet</string>
+    <string name="end_of_list">(Ende der Liste)</string>
+    <string name="other_widget_parts">Andere Widget-Teile</string>
+    <string name="show_time_until_title">Zeige Zeit bis</string>
+    <string name="show_time_until_desc">Zeit bis Hintergrund für den nächsten Termin</string>
     <!-- Date format preference -->
     <string name="simple_options">Einfache Optionen</string>
     <string name="date_format_default_weekday">Voreinstellung mit Wochentag</string>
     <string name="date_format_default_ytt">Standard mit Gestern, Heute und morgen</string>
-    <string name="date_format_default_days">Anzahl der Tage bis zum Ereignis anzeigen</string>
+    <string name="date_format_default_days">Anzahl der Tage bis zum Termin anzeigen</string>
     <string name="appearance_abbreviate_dates_title">Datum mit Wochentag abkürzen</string>
     <string name="appearance_abbreviate_dates_desc">Verwende das Drei-Buchstaben-Format für Datums</string>
     <string name="date_format_number_of_days_to_event">Anzahl der Tage bis zur Veranstaltung</string>
@@ -109,34 +128,64 @@
     <string name="result_formatted_date">Ergebnis, formatiertes Datum</string>
     <string name="N_days_ago">vor %d Tagen</string>
     <string name="in_N_days">In %d Tagen</string>
+    <string name="in_HH_mm">in %02d:%02d</string>
     <!-- Preference frame: Colors -->
+    <string name="different_colors_for_dark_title">Verschiedene Farben für Android System Dark Theme</string>
+    <string name="different_colors_for_dark_off_desc">Farben sind die gleichen</string>
+    <string name="different_colors_for_dark_on_desc">Schalten Sie das Android System Dark Theme ein oder aus, um die Farben
+        für das Dunkel/Hell-Theme entsprechend einzustellen.</string>
     <string name="colors_prefs_desc">Farbe und Deckkraft von Texten und Hintergründen</string>
     <string name="appearance_group_color_title">Farben</string>
+    <string name="colors_light">Farben für helles Theme</string>
+    <string name="colors_dark">Farben für dunkles Theme</string>
+    <string name="text_color_source">Wie Textfarbe definiert ist</string>
+    <string name="text_color_source_auto">Automatischer Textschattierung</string>
+    <string name="text_color_source_auto_desc">Textschattierung (weiß, hell, dunkel oder schwarz) wird automatisch basierend auf der Hintergrundfarbe eingestellt</string>
+    <string name="text_color_source_shading">Manuelle Textschattierung</string>
+    <string name="text_color_source_shading_desc">Textschattierung sollte für jeden Teil des Widgets gesetzt werden</string>
+    <string name="text_color_source_color">Eigene Textfarben</string>
+    <string name="text_color_source_color_desc">Textfarbe sollte für jeden Teil des Widgets festgelegt werden</string>
+    <string name="text_shadow_title">Textschatten</string>
+    <string name="text_shadow_no_shadow">Kein Schatten</string>
+    <string name="text_shadow_dark">Dunkler Schatten</string>
+    <string name="text_shadow_light">Heller Schatten</string>
     <string name="appearance_background_color_title">Hintergrundfarbe</string>
     <string name="appearance_background_color_desc">Passe die Farbe des Hintergrundes an</string>
     <string name="appearance_past_events_background_color_title">Hintergrundfarbe für vergangene Ereignisse</string>
     <string name="appearance_past_events_background_color_desc">Hintergrundfarbe von vergangenen Einträgen ändern</string>
-    <string name="todays_events_background_color_title">Hintergrundfarbe vom heutigen Ereignis</string>
-    <string name="todays_events_background_color_desc">Hintergrundfarbe vom heutigen Ereignis ändern</string>
-    <string name="appearance_header_theme_title">Schattierung der Kopfzeile</string>
+    <string name="todays_events_background_color_title">Hintergrundfarbe von heutigen Terminen</string>
+    <string name="todays_events_background_color_desc">Hintergrundfarbe von heutigen Terminen ändern</string>
+    <string name="appearance_header_theme_title">Schattierung der Widget-Kopfzeile</string>
+    <string name="widget_header_text_color">Textfarbe Widget-Kopfzeile</string>
     <string name="appearance_header_theme_desc">Zeige die Kopfzeile des Widgets in heller oder dunkler Schattierung an</string>
-    <string name="widget_header_background_color_desc">Farbe des Widget-Headers anpassen. Standardmäßig transparent</string>
-    <string name="widget_header_background_color_title">Widgetüberschrift-Hintergrundfarbe</string>
+    <string name="widget_header_background_color_desc">Farbe der Widget-Kopfzeile anpassen. Standardmäßig transparent</string>
+    <string name="widget_header_background_color_title">Widget-Kopfzeilen-Hintergrundfarbe</string>
     <string name="day_header_theme_title">Tagesüberschrift Textschattierung</string>
     <string name="day_header_theme_desc">Zeige Ereignisse in heller oder dunkler Schattierung an</string>
-    <string name="appearance_entries_theme_title">Schattierung der Ereignisse</string>
+    <string name="day_header_text_color">Textfarbe des Tageskopfes</string>
+    <string name="appearance_entries_theme_title">Schattierung der Termine</string>
+    <string name="event_text_color">Termin-Textfarbe</string>
     <string name="appearance_entries_theme_desc">Zeige Ereignisse in heller oder dunkler Schattierung an</string>
     <string name="appearance_theme_black">Weiß</string>
     <string name="appearance_theme_dark">Hell</string>
     <string name="appearance_theme_light">Dunkel</string>
     <string name="appearance_theme_white">Schwarz</string>
+    <string name="current_time_line_color_title">Aktuelle Farbe der Zeitlinie</string>
+    <string name="time_until_background">Zeit bis Hintergrund</string>
+    <string name="auto_color">Automatische Farbe</string>
+    <string name="color_yellow">Gelb</string>
+    <string name="background_color_title">Hintergrundfarbe</string>
     <!-- Preference frame: Event details -->
+    <string name="show_day_xy_title">(Tag x/y)</string>
+    <string name="show_day_xy_desc">Zeige aktuelle Tageszahl / Gesamtanzahl der Tage für mehrtägige Termine</string>
     <string name="event_details_prefs">Termindetails</string>
     <string name="event_details_prefs_desc">Details die zu einem Termin angezeigt werden</string>
     <string name="event_details_show_end_time_title">Endzeitpunkt</string>
     <string name="event_details_show_end_time_desc">Zeige Uhrzeit an der ein Termin endet</string>
     <string name="event_details_show_location_title">Ort</string>
     <string name="event_details_show_location_desc">Zeige den Ort des Termins</string>
+    <string name="show_description_title">Beschreibung</string>
+    <string name="show_description_desc">Zeige die Beschreibung des Termins</string>
     <string name="event_details_fill_all_day_events_title">Mehrtägige Termine auffüllen</string>
     <string name="event_details_fill_all_day_events_desc">Für jeden Tag eines mehrtägigen Termins einen Eintrag anzeigen</string>
     <string name="event_details_indicators">Hinweise</string>
@@ -153,7 +202,8 @@
     <string name="event_details_event_range_title">Zeitraum</string>
     <string name="event_details_event_range_desc">Wieviele Termine werden angezeigt</string>
     <string name="event_range_today">Heute</string>
-    <string name="event_range_one_day">Ein Tag</string>
+    <string name="event_range_today_and_tomorrow">Heute und morgen</string>
+    <string name="event_range_one_day">24 Stunden</string>
     <string name="event_range_one_week">Eine Woche</string>
     <string name="event_range_two_weeks">Zwei Wochen</string>
     <string name="event_range_one_month">Ein Monat</string>
@@ -177,8 +227,13 @@
     <string name="ended_six_months_ago">Endete vor sechs Monaten</string>
     <string name="ended_one_year_ago">Endete vor einem Jahr</string>
     <string name="pref_hide_based_on_keywords_title">Ausblenden basierend auf Schlüsselwörtern in Titel</string>
+    <string name="pref_show_based_on_keywords_title">Zeigen basierend auf Schlüsselwörtern in Titel</string>
     <string name="show_only_closest_instance_of_recurring_event">Zeigen nur den nächsten Eintrag eines wiederholenden Ereignisses</string>
     <string name="hide_duplicates">Duplikate ausblenden</string>
+    <string name="max_number_of_events_title">Maximale Anzahl von Terminen</string>
+    <string name="all_day_events_placement_title">Platzierung ganztägiger Termine</string>
+    <string name="all_day_events_placement_top_of_the_days_events">Oberhalb der Termine des Tages</string>
+    <string name="all_day_events_placement_bottom_of_the_days_events">Unterhalb der Termine des Tages</string>
     <string name="task_scheduling_title">Aufgabenplanung</string>
     <string name="task_scheduling_date_due">Zeige Aufgaben unter Fälligkeitsdatum</string>
     <string name="task_scheduling_date_started">Aufgaben unter gestartetem Datum anzeigen</string>
@@ -201,6 +256,8 @@
     <string name="other_prefs_title">Weitere Einstellungen</string>
     <string name="appearance_prefs">Aussehen</string>
     <string name="appearance_prefs_desc">Passen Sie das Aussehen des Widgets an</string>
+    <string name="buttons_size_title">Buttongröße</string>
+    <string name="buttons_size_desc">Größe der Buttons anpassen</string>
     <string name="appearance_text_size_title">Textgröße</string>
     <string name="appearance_text_size_desc">Textgröße anpassen</string>
     <string name="appearance_text_size_very_small">Sehr klein</string>
@@ -216,11 +273,12 @@
     <string name="lock_time_zone_off_desc">Nicht fixiert, aktuelle Zeitzone: %s</string>
     <string name="lock_time_zone_on_desc">Fixiert auf %s</string>
     <string name="lock_time_zone_title">Zeitzone fixieren</string>
-    <string name="snapshot_mode">Liste der Ereignisse sperren (Snapshot-Modus)</string>
+    <string name="start_hour_of_day">Anfangsstunde eines Tages</string>
+    <string name="snapshot_mode">Liste der Termine sperren (Snapshot-Modus)</string>
     <string name="snapshot_mode_live_data">Live-Daten aus echten Quellen</string>
     <string name="snapshot_mode_time">Snapshot als zu der Zeit gesehen wurde, als er aufgenommen wurde: %s</string>
     <string name="snapshot_mode_now">Gespeicherter Schnappschuss, der zur aktuellen Zeit angezeigt wird (aufgenommen um %s)</string>
-    <string name="refresh_period_minutes">Zeitspanne automatisch aktualisieren, Minuten</string>
+    <string name="refresh_period_minutes">Zeitspanne automatisch aktualisieren</string>
     <string name="refresh_period_minutes_desc">Automatisch das Widget alle %d Minute(n) aktualisieren</string>
     <!-- Preference frame: Feedback and Backup -->
     <string name="feedback_prefs">Feedback und Sicherung</string>
