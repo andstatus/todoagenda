@@ -59,7 +59,7 @@ class DmfsOpenTasksProvider(type: EventProviderType, context: Context, widgetId:
                     .append(NOT_EQUALS)
                     .append(DmfsOpenTasksContract.Tasks.STATUS_COMPLETED)
                 whereBuilder.append(
-                    AND_BRACKET +
+                    AND + OPEN_BRACKET +
                         DmfsOpenTasksContract.Tasks.COLUMN_START_DATE + LTE + mEndOfTimeRange.millis +
                         OR + DmfsOpenTasksContract.Tasks.COLUMN_START_DATE + IS_NULL +
                         CLOSING_BRACKET

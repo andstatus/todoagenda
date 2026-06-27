@@ -1,5 +1,12 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+<a id="v4.14"/>
+
+### 2026-06-27 v4.14.0  
+* Subscribed calendar events appear in the widget.
+  [#193](https://github.com/andstatus/todoagenda/issues/193)
+* Updated for Android 17.
+
 <a id="v4.13"/>
 
 ### 2025-03-16 v4.13.0 Ongoing events color, Current time line and Time until tag

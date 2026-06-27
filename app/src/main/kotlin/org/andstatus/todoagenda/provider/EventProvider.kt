@@ -47,7 +47,6 @@ open class EventProvider(val type: EventProviderType, val context: Context, val 
         get() = MainActivity.intentToConfigure(context, widgetId)
 
     companion object {
-        const val AND_BRACKET = " AND ("
         const val OPEN_BRACKET = "( "
         const val CLOSING_BRACKET = " )"
         const val AND = " AND "

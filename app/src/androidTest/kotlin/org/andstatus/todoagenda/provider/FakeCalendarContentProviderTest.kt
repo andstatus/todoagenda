@@ -20,6 +20,7 @@ class FakeCalendarContentProviderTest : BaseWidgetTest() {
     private val projection = CalendarEventProvider.projection
     private val sortOrder = CalendarEventProvider.EVENT_SORT_ORDER
     private var eventId: Long = 0
+
     @Throws(Exception::class)
     override fun setUp() {
         super.setUp()

@@ -125,7 +125,7 @@ class CalendarEventProvider(
                         ", end: " + endDateForQuery +
                         ", got " + eventList.size + " events",
                 )
-                val factory: RemoteViewsFactory? = RemoteViewsFactory.factories.get(widgetId)
+                val factory: RemoteViewsFactory? = RemoteViewsFactory.factories[widgetId]
                 if (factory != null && settings.logEvents) {
                     factory.logWidgetEntries(tag)
                 }
@@ -133,29 +133,33 @@ class CalendarEventProvider(
             when (filterMode) {
                 FilterMode.NO_FILTERING -> {}
                 else -> // Filters in a query are not exactly correct for AllDay events:
-                    // for them we are selecting events some days/time before what is defined in settings.
+                    // for them, we are selecting events some days/time before what is defined in settings.
                     // This is why we need to do additional filtering after querying a Content Provider:
-                    {
-                        val it = eventList.iterator()
-                        while (it.hasNext()) {
-                            val event = it.next()
-                            if (!event.endDate.isAfter(mStartOfTimeRange) ||
-                                !mEndOfTimeRange.isAfter(event.startDate)
-                            ) {
-                                // We remove using Iterator to avoid ConcurrentModificationException
-                                it.remove()
-                            }
+                {
+                    val it = eventList.iterator()
+                    while (it.hasNext()) {
+                        val event = it.next()
+                        if (!event.endDate.isAfter(mStartOfTimeRange) ||
+                            !mEndOfTimeRange.isAfter(event.startDate)
+                        ) {
+                            // We remove using Iterator to avoid ConcurrentModificationException
+                            it.remove()
                         }
                     }
+                }
             }
             return eventList
         }
     private val calendarSelection: String
         get() {
             val activeSources = settings.getActiveEventSources(type)
-            val stringBuilder = StringBuilder(EVENT_SELECTION)
+            val stringBuilder = StringBuilder()
+            stringBuilder.append(OPEN_BRACKET)
+            stringBuilder.append(EVENT_SELECTION)
+            stringBuilder.append(CLOSING_BRACKET)
             if (!activeSources.isEmpty()) {
-                stringBuilder.append(AND_BRACKET)
+                stringBuilder.append(AND)
+                stringBuilder.append(OPEN_BRACKET)
                 val iterator: Iterator<OrderedEventSource> = activeSources.iterator()
                 while (iterator.hasNext()) {
                     val source = iterator.next().source
@@ -175,26 +179,25 @@ class CalendarEventProvider(
         uri: Uri,
         selection: String,
     ): MutableList<CalendarEvent> =
-        myContentResolver.foldEvents<ArrayList<CalendarEvent>>(
+        myContentResolver.foldEvents(
             uri,
             projection,
             selection,
             null,
             EVENT_SORT_ORDER,
             ArrayList(),
-            { eventList: ArrayList<CalendarEvent> ->
-                Function { cursor: Cursor ->
-                    val event = newCalendarEvent(cursor)
-                    if (!eventList.contains(event) &&
-                        !hideBasedOnKeywordsFilter!!.matched(event.title) &&
-                        showBasedOnKeywordsFilter!!.matched(event.title)
-                    ) {
-                        eventList.add(event)
-                    }
-                    eventList
+        ) { eventList: ArrayList<CalendarEvent> ->
+            Function { cursor: Cursor ->
+                val event = newCalendarEvent(cursor)
+                if (!eventList.contains(event) &&
+                    !hideBasedOnKeywordsFilter!!.matched(event.title) &&
+                    showBasedOnKeywordsFilter!!.matched(event.title)
+                ) {
+                    eventList.add(event)
                 }
-            },
-        )
+                eventList
+            }
+        }
 
     private val pastEventsWithColorList: List<CalendarEvent>
         get() {
@@ -206,8 +209,8 @@ class CalendarEventProvider(
         }
     private val pastEventsWithColorSelection: String
         get() =
-            calendarSelection +
-                AND_BRACKET +
+            calendarSelection + AND +
+                OPEN_BRACKET +
                 DISPLAY_COLOR + EQUALS + CALENDAR_COLOR +
                 CLOSING_BRACKET
 
@@ -219,7 +222,7 @@ class CalendarEventProvider(
         val allDay = cursor.getInt(cursor.getColumnIndex(ALL_DAY)) > 0
         var calendarColor: Int? = null
         getColumnIndex(cursor, CALENDAR_COLOR)
-            .map<Int> { ind: Int -> getAsOpaque(cursor.getInt(ind)) }
+            .map { ind: Int -> getAsOpaque(cursor.getInt(ind)) }
             .ifPresent { color: Int -> calendarColor = color }
         val event =
             CalendarEvent(
@@ -243,36 +246,35 @@ class CalendarEventProvider(
     }
 
     override fun fetchAvailableSources(): Try<MutableList<EventSource>> =
-        myContentResolver.foldAvailableSources<MutableList<EventSource>>(
+        myContentResolver.foldAvailableSources(
             CalendarContract.Calendars.CONTENT_URI
                 .buildUpon()
                 .build(),
             EVENT_SOURCES_PROJECTION,
-            ArrayList<EventSource>(),
-            { eventSources: MutableList<EventSource> ->
-                { cursor: Cursor ->
-                    val indId = cursor.getColumnIndex(CalendarContract.Calendars._ID)
-                    val indTitle = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
-                    val indSummary = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)
-                    val indColor = cursor.getColumnIndex(CALENDAR_COLOR)
-                    val source =
-                        EventSource(
-                            type,
-                            cursor.getInt(indId),
-                            cursor.getStringOrNull(indTitle),
-                            cursor.getStringOrNull(indSummary),
-                            cursor.getInt(indColor),
-                            true,
-                        )
-                    eventSources.add(source)
-                    eventSources
-                }
-            },
-        )
+            ArrayList(),
+        ) { eventSources: MutableList<EventSource> ->
+            { cursor: Cursor ->
+                val indId = cursor.getColumnIndex(CalendarContract.Calendars._ID)
+                val indTitle = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
+                val indSummary = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)
+                val indColor = cursor.getColumnIndex(CALENDAR_COLOR)
+                val source =
+                    EventSource(
+                        type,
+                        cursor.getInt(indId),
+                        cursor.getStringOrNull(indTitle),
+                        cursor.getStringOrNull(indSummary),
+                        cursor.getInt(indColor),
+                        true,
+                    )
+                eventSources.add(source)
+                eventSources
+            }
+        }
 
     fun newViewEventIntent(event: CalendarEvent): Intent {
         val intent = IntentUtil.newViewIntent()
-        intent.setData(ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.eventId))
+        intent.data = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, event.eventId)
         intent.putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, event.startMillis)
         intent.putExtra(CalendarContract.EXTRA_EVENT_END_TIME, event.endMillis)
         return intent
@@ -282,19 +284,17 @@ class CalendarEventProvider(
         get() = CalendarIntentUtil.newAddCalendarEventIntent(settings.timeZone)
 
     companion object {
-        private val TAG = CalendarEventProvider::class.java.simpleName
         private val EVENT_SOURCES_PROJECTION =
-            arrayOf<String>(
+            arrayOf(
                 CalendarContract.Calendars._ID,
                 CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
                 CALENDAR_COLOR,
                 CalendarContract.Calendars.ACCOUNT_NAME,
             )
-        const val EVENT_SORT_ORDER = "${START_DAY} ASC, ${ALL_DAY} DESC, $BEGIN ASC "
-        private const val EVENT_SELECTION = (
-            CalendarContract.Instances.SELF_ATTENDEE_STATUS + "!=" +
-                Attendees.ATTENDEE_STATUS_DECLINED
-        )
+        const val EVENT_SORT_ORDER = "$START_DAY ASC, $ALL_DAY DESC, $BEGIN ASC "
+        const val EVENT_SELECTION =
+            CalendarContract.Instances.SELF_ATTENDEE_STATUS + "!=" + Attendees.ATTENDEE_STATUS_DECLINED +
+                " OR " + CalendarContract.Instances.SELF_ATTENDEE_STATUS + " IS NULL"
 
         fun correctStartOfTimeRangeForQuery(startDateIn: DateTime): DateTime =
             if (startDateIn.isAfter(MyClock.DATETIME_MIN)) {
