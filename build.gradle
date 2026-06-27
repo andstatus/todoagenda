@@ -5,28 +5,28 @@ buildscript {
     }
 
     ext {
-        compileSdkVersion = 35 as int
-        buildToolsVersion = '35.0.0'
+        compileSdkVersion = 37 as int
+        buildToolsVersion = '37.0.0'
         minSdkVersion = 24 as int
-        targetSdkVersion = 35 as int
+        targetSdkVersion = 37 as int
 
         // Lookup the latest here: https://mvnrepository.com/
         annotationVersion = '1.0.1'
-        appCompatVersion = '1.7.0'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
-        espressoCoreVersion = '3.6.1'  // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
-        jodaTimeVersion = '2.13.1'     // https://github.com/JodaOrg/joda-time/releases
+        appCompatVersion = '1.7.1'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
+        espressoCoreVersion = '3.7.0'  // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
+        jodaTimeVersion = '2.14.2'     // https://github.com/JodaOrg/joda-time/releases
         junitVersion = '4.13.2'
-        junitJupiterVersion = '5.12.0'
+        junitJupiterVersion = '6.1.0'
         preferenceVersion = '1.2.1'
-        testCoreVersion = '1.6.1'
-        testRulesVersion = '1.6.1'
-        testRunnerVersion = '1.6.2'
-        kotlinVersion = '2.0.21'  // https://kotlinlang.org/docs/releases.html#release-details
-        ktxVersion = '1.15.0'  // https://androidx.tech/artifacts/core/core-ktx/
+        testCoreVersion = '1.7.0'
+        testRulesVersion = '1.7.0'
+        testRunnerVersion = '1.7.0'
+        kotlinVersion = '2.2.10'  // https://kotlinlang.org/docs/releases.html#release-details
+        ktxVersion = '1.19.0'  // https://androidx.tech/artifacts/core/core-ktx/
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.13.2'
+        classpath 'com.android.tools.build:gradle:9.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 
@@ -44,9 +44,6 @@ buildscript {
 }
 plugins {
     id 'org.jetbrains.kotlin.jvm' version "$kotlinVersion"
-}
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
 allprojects {
     repositories {
