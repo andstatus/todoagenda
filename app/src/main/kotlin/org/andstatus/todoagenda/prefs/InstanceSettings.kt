@@ -44,6 +44,7 @@ data class InstanceSettings(
     // ----------------------------------------------------------------------------------
     // Layout
     val isCompactLayout: Boolean = false,
+    val isScrollable: Boolean = true,
     val widgetHeaderLayout: WidgetHeaderLayout = WidgetHeaderLayout.defaultValue,
     val widgetHeaderDateFormat: DateFormatValue = PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT,
     val showDayHeaders: Boolean = true,
