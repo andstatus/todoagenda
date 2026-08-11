@@ -339,7 +339,12 @@ class RemoteViewsFactory(
                     return
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
-                val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_SCROLLABLE.shadowed(settings.textShadow))
+                val layout = if (settings.isScrollable) {
+                    WidgetLayout.WIDGET_SCROLLABLE
+                } else {
+                    WidgetLayout.WIDGET_NON_SCROLLABLE
+                }
+                val rv = RemoteViews(context.packageName, layout.shadowed(settings.textShadow))
                 configureWidgetHeader(settings, rv)
                 configureWidgetEntriesList(settings, rv)
                 appWidgetManager.updateAppWidget(widgetId, rv)
