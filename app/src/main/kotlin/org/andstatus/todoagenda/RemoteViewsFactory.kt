@@ -477,6 +477,7 @@ class RemoteViewsFactory(
             settings: InstanceSettings,
             rv: RemoteViews,
         ) {
+            rv.setViewVisibility(R.id.go_to_today, if (settings.isScrollable) View.VISIBLE else View.GONE)
             rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.go_to_today)
         }
