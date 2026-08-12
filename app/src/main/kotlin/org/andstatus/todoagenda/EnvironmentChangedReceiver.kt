@@ -100,6 +100,12 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         context: Context,
         widgetId: Int,
     ) {
+        val settings = AllSettings.instanceFromId(context, widgetId)
+        if (!settings.isScrollable) {
+            RemoteViewsFactory.updateWidget(context, widgetId)
+            return
+        }
+
         val factory: RemoteViewsFactory? = RemoteViewsFactory.factories[widgetId]
         val position1 = factory?.tomorrowsPosition ?: 0
         val position2 = factory?.todaysPosition ?: 0
