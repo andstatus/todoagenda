@@ -355,7 +355,11 @@ class RemoteViewsFactory(
                 }
                 val rv = RemoteViews(context.packageName, layout.shadowed(settings.textShadow))
                 configureWidgetHeader(settings, rv)
-                configureWidgetEntriesList(settings, rv)
+                if (settings.isScrollable) {
+                    configureWidgetEntriesList(settings, rv)
+                } else {
+                    configureWidgetEntriesNonScrollable(settings, rv)
+                }
                 appWidgetManager.updateAppWidget(widgetId, rv)
             } catch (e: Exception) {
                 Log.w(TAG, "$widgetId Exception in updateWidget, context:$context", e)
@@ -482,6 +486,27 @@ class RemoteViewsFactory(
             rv.setPendingIntentTemplate(R.id.event_list, getActionPendingIntent(settings, ACTION_VIEW_ENTRY))
         }
 
+        private fun configureWidgetEntriesNonScrollable(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
+            val factory = factories.computeIfAbsent(settings.widgetId) { id ->
+                RemoteViewsFactory(settings.context, id, false)
+            }
+            factory.onDataSetChanged()
+            rv.removeAllViews(R.id.event_list)
+            factory.widgetEntries.forEachIndexed { position, entry ->
+                factory.getRemoteViewsAt(position)?.let { views ->
+                    views.setOnClickPendingIntent(
+                        R.id.event_entry,
+                        getEntryPendingIntent(settings, entry.entryId),
+                    )
+                    rv.addView(R.id.event_list, views)
+                }
+            }
+            InstanceState.listRedrawn(settings.widgetId)
+        }
+
         private fun configureGotoToday(
             settings: InstanceSettings,
             rv: RemoteViews,
@@ -489,6 +514,42 @@ class RemoteViewsFactory(
             rv.setViewVisibility(R.id.go_to_today, if (settings.isScrollable) View.VISIBLE else View.GONE)
             rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.go_to_today)
+        }
+
+        private fun getEntryPendingIntent(
+            settings: InstanceSettings,
+            entryId: Long,
+        ): PendingIntent {
+            val requestCode = ACTION_VIEW_ENTRY.hashCode() + settings.widgetId
+            val intent =
+                Intent(
+                    settings.context.applicationContext,
+                    EnvironmentChangedReceiver::class.java,
+                )
+                    .setAction(ACTION_VIEW_ENTRY)
+                    .setData(
+                        Uri.parse(
+                            "intent:" +
+                                ACTION_VIEW_ENTRY.lowercase(MyLocale.locale) +
+                                settings.widgetId +
+                                ":" +
+                                entryId,
+                        )
+                    )
+                    .putExtra(
+                        AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        settings.widgetId,
+                    )
+                    .putExtra(
+                        WidgetEntry.EXTRA_WIDGET_ENTRY_ID,
+                        entryId,
+                    )
+            return PendingIntent.getBroadcast(
+                settings.context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
         }
 
         fun getActionPendingIntent(
