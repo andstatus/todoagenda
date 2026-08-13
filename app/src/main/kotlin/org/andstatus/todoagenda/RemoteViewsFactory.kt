@@ -77,15 +77,24 @@ class RemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews? {
         if (position < widgetEntries.size) {
+            val views = getRemoteViewsAt(position) ?: return null
+            val entry = widgetEntries[position]
+            views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent())
+            if (position == widgetEntries.size - 1) {
+                InstanceState.listRedrawn(widgetId)
+            }
+            return views
+        }
+        logEvent("no view at:" + position + ", size:" + widgetEntries.size)
+        return null
+    }
+
+    internal fun getRemoteViewsAt(position: Int): RemoteViews? {
+        if (position < widgetEntries.size) {
             val entry = widgetEntries[position]
             val visualizer = visualizerFor(entry)
             return if (visualizer != null) {
-                val views = visualizer.getRemoteViews(entry, position)
-                views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent())
-                if (position == widgetEntries.size - 1) {
-                    InstanceState.listRedrawn(widgetId)
-                }
-                views
+                visualizer.getRemoteViews(entry, position)
             } else {
                 logEvent("no visualizer at:$position for $entry")
                 null
