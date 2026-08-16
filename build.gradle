@@ -12,7 +12,7 @@ buildscript {
 
         // Lookup the latest here: https://mvnrepository.com/
         annotationVersion = '1.0.1'
-        appCompatVersion = '1.7.1'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
+        appCompatVersion = '1.8.0'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
         espressoCoreVersion = '3.7.0'  // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
         jodaTimeVersion = '2.14.2'     // https://github.com/JodaOrg/joda-time/releases
         junitVersion = '4.13.2'
