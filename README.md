@@ -4,11 +4,13 @@ Todo Agenda is home screen widgets for your Android device.
 Each widget has its own settings and displays configured list of calendar events and tasks
 so that you can easily have a glimpse at your due, current and upcoming appointments.
 
-[<img src="doc/images/get-it-on-rustore.png" alt="Get ToDo Agenda on RuStore" height="60" />](https://apps.rustore.ru/app/org.andstatus.todoagenda)
+[<img src="doc/images/get-it-on-github.png" alt="Get it on GitHub" height="50">](https://github.com/andstatus/todoagenda/releases)
+[<img src="doc/images/5x5.png" width="5">](#)
+[<img src="doc/images/get-it-on-rustore.png" alt="Get ToDo Agenda on RuStore" height="50" />](https://apps.rustore.ru/app/org.andstatus.todoagenda)
 [<img src="doc/images/5x5.png" width="10">](#)
-[<img src="doc/images/get-it-on-google-play.png" alt="Get ToDo Agenda on Google Play" height="60" />](https://play.google.com/store/apps/details?id=org.andstatus.todoagenda)
+[<img src="doc/images/get-it-on-google-play.png" alt="Get ToDo Agenda on Google Play" height="50" />](https://play.google.com/store/apps/details?id=org.andstatus.todoagenda)
 [<img src="doc/images/5x5.png" width="10">](#)
-[<img src="doc/images/get-it-on-fdroid.png" alt="Get ToDo Agenda on F-Droid" height="60">](https://f-droid.org/packages/org.andstatus.todoagenda)
+[<img src="doc/images/get-it-on-fdroid.png" alt="Get ToDo Agenda on F-Droid" height="50">](https://f-droid.org/packages/org.andstatus.todoagenda)
 
 ![Calendar Widget Screenshots](app/src/main/play/listings/en-US/graphics/large-tablet-screenshots/widget-collage.png)
 
