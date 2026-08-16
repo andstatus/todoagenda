@@ -58,6 +58,9 @@
     <string name="compact_layout_title">Компактный макет</string>
     <string name="compact_layout_off_desc">Обычные промежутки между частями виджета</string>
     <string name="compact_layout_on_desc">Минимальные промежутки между частями виджета, тонкие границы</string>
+    <string name="scrollable_layout_title">Макет с прокруткой</string>
+    <string name="scrollable_layout_off_desc">Список событий не прокручивается</string>
+    <string name="scrollable_layout_on_desc">Разрешить прокрутку списка событий</string>
     <string name="layout_prefs_desc">Разместить, показать и скрыть элементы виджета</string>
     <string name="layout_prefs_title">Макет / раскладка</string>
     <string name="widget_header_layout">Макет Заголовка виджета</string>

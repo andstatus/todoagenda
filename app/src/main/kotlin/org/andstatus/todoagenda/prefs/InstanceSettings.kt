@@ -44,7 +44,7 @@ data class InstanceSettings(
     // ----------------------------------------------------------------------------------
     // Layout
     val isCompactLayout: Boolean = false,
-    val isScrollable: Boolean = true,
+    val isScrollableLayout: Boolean = true,
     val widgetHeaderLayout: WidgetHeaderLayout = WidgetHeaderLayout.defaultValue,
     val widgetHeaderDateFormat: DateFormatValue = PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT,
     val showDayHeaders: Boolean = true,
@@ -210,7 +210,7 @@ data class InstanceSettings(
             // ----------------------------------------------------------------------------------
             // Layout
             put(PREF_COMPACT_LAYOUT, isCompactLayout)
-            put(PREF_IS_SCROLLABLE, isScrollable)
+            put(PREF_SCROLLABLE_LAYOUT, isScrollableLayout)
             put(PREF_WIDGET_HEADER_LAYOUT, widgetHeaderLayout.value)
             put(PREF_WIDGET_HEADER_DATE_FORMAT, widgetHeaderDateFormat.save())
             put(PREF_SHOW_DAY_HEADERS, showDayHeaders)
@@ -418,7 +418,7 @@ data class InstanceSettings(
         // ----------------------------------------------------------------------------------
         // Layout
         const val PREF_COMPACT_LAYOUT = "compactLayout"
-        const val PREF_IS_SCROLLABLE = "isScrollable"
+        const val PREF_SCROLLABLE_LAYOUT = "scrollableLayout"
         const val PREF_WIDGET_HEADER_LAYOUT = "widgetHeaderLayout"
         private const val PREF_SHOW_DATE_ON_WIDGET_HEADER = "showDateOnWidgetHeader" // till v 4.0
         const val PREF_WIDGET_HEADER_DATE_FORMAT = "widgetHeaderDateFormat"
@@ -576,11 +576,11 @@ data class InstanceSettings(
                         } else {
                             EMPTY.isCompactLayout
                         },
-                    isScrollable =
-                        if (json.has(PREF_IS_SCROLLABLE)) {
-                            json.getBoolean(PREF_IS_SCROLLABLE)
+                    isScrollableLayout =
+                        if (json.has(PREF_SCROLLABLE_LAYOUT)) {
+                            json.getBoolean(PREF_SCROLLABLE_LAYOUT)
                         } else {
-                            EMPTY.isScrollable
+                            EMPTY.isScrollableLayout
                         },
                     widgetHeaderLayout =
                         if (json.has(
@@ -999,7 +999,7 @@ data class InstanceSettings(
                     // ----------------------------------------------------------------------------------
                     // Layout
                     isCompactLayout = ApplicationPreferences.isCompactLayout(context),
-                    isScrollable = ApplicationPreferences.isScrollable(context),
+                    isScrollableLayout = ApplicationPreferences.isScrollableLayout(context),
                     widgetHeaderLayout = ApplicationPreferences.getWidgetHeaderLayout(context),
                     widgetHeaderDateFormat = ApplicationPreferences.getWidgetHeaderDateFormat(context),
                     showDayHeaders = ApplicationPreferences.getShowDayHeaders(context),

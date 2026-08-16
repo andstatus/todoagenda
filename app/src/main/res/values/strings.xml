@@ -74,8 +74,9 @@
     <string name="compact_layout_title">Compact layout</string>
     <string name="compact_layout_off_desc">Normal space between widget parts</string>
     <string name="compact_layout_on_desc">Minimum space between widget parts, thin borders</string>
-    <string name="is_scrollable_title">Allow scrolling</string>
-    <string name="is_scrollable_desc">Allow scrolling through the list of events</string>
+    <string name="scrollable_layout_title">Scrollable layout</string>
+    <string name="scrollable_layout_off_desc">The list of events is non-scrollable</string>
+    <string name="scrollable_layout_on_desc">Allow scrolling through the list of events</string>
     <string name="layout_prefs_desc">Place, show and hide widget parts</string>
     <string name="layout_prefs_title">Layout</string>
     <string name="widget_header_layout">Widget header layout</string>

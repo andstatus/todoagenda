@@ -2,7 +2,10 @@
 
 <a id="v4.14"/>
 
-### 2026-06-27 v4.14.0  
+### 2026-08-16 v4.14.1 Non-scrollable widget option
+* "Scrollable layout" checkbox added to Layout settings. Turning it off
+  makes the widget non-scrollable.
+  [#148](https://github.com/andstatus/todoagenda/issues/148)
 * Subscribed calendar events appear in the widget.
   [#193](https://github.com/andstatus/todoagenda/issues/193)
 * Updated for Android 17.

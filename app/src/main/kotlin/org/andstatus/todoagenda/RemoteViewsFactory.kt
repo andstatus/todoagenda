@@ -348,14 +348,14 @@ class RemoteViewsFactory(
                     return
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
-                val layout = if (settings.isScrollable) {
+                val layout = if (settings.isScrollableLayout) {
                     WidgetLayout.WIDGET_SCROLLABLE
                 } else {
                     WidgetLayout.WIDGET_NON_SCROLLABLE
                 }
                 val rv = RemoteViews(context.packageName, layout.shadowed(settings.textShadow))
                 configureWidgetHeader(settings, rv)
-                if (settings.isScrollable) {
+                if (settings.isScrollableLayout) {
                     configureWidgetEntriesList(settings, rv)
                 } else {
                     configureWidgetEntriesNonScrollable(settings, rv)
@@ -511,7 +511,7 @@ class RemoteViewsFactory(
             settings: InstanceSettings,
             rv: RemoteViews,
         ) {
-            rv.setViewVisibility(R.id.go_to_today, if (settings.isScrollable) View.VISIBLE else View.GONE)
+            rv.setViewVisibility(R.id.go_to_today, if (settings.isScrollableLayout) View.VISIBLE else View.GONE)
             rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.go_to_today)
         }

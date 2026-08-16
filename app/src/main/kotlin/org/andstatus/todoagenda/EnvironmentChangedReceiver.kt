@@ -101,18 +101,16 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         widgetId: Int,
     ) {
         val settings = AllSettings.instanceFromId(context, widgetId)
-        if (!settings.isScrollable) {
-            return
-        } else {
-            val factory: RemoteViewsFactory? = RemoteViewsFactory.factories[widgetId]
-            val position1 = factory?.tomorrowsPosition ?: 0
-            val position2 = factory?.todaysPosition ?: 0
-            gotoPosition(context, widgetId, position1)
-            if (position1 >= 0 && position2 >= 0 && position1 != position2) {
-                sleep(1000)
-            }
-            gotoPosition(context, widgetId, position2)
+        if (!settings.isScrollableLayout) return
+
+        val factory: RemoteViewsFactory? = RemoteViewsFactory.factories[widgetId]
+        val position1 = factory?.tomorrowsPosition ?: 0
+        val position2 = factory?.todaysPosition ?: 0
+        gotoPosition(context, widgetId, position1)
+        if (position1 >= 0 && position2 >= 0 && position1 != position2) {
+            sleep(1000)
         }
+        gotoPosition(context, widgetId, position2)
     }
 
     private fun onReceive(

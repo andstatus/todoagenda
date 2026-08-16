@@ -72,7 +72,7 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
         for (widgetId in appWidgetIds) {
             RemoteViewsFactory.updateWidget(context, widgetId)
             InstanceState.updated(widgetId)
-            if (AllSettings.instanceFromId(context, widgetId).isScrollable) {
+            if (AllSettings.instanceFromId(context, widgetId).isScrollableLayout) {
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                     intArrayOf(widgetId),
                     R.id.event_list,

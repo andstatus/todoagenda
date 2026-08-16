@@ -35,7 +35,7 @@ object ApplicationPreferences {
             // ----------------------------------------------------------------------------------
             // Layout
             setBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, settings.isCompactLayout)
-            setBoolean(context, InstanceSettings.PREF_IS_SCROLLABLE, settings.isScrollable)
+            setBoolean(context, InstanceSettings.PREF_SCROLLABLE_LAYOUT, settings.isScrollableLayout)
             setString(context, InstanceSettings.PREF_WIDGET_HEADER_LAYOUT, settings.widgetHeaderLayout.value)
             setDateFormat(
                 context,
@@ -611,7 +611,7 @@ object ApplicationPreferences {
 
     fun isCompactLayout(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, false)
 
-    fun isScrollable(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_IS_SCROLLABLE, true)
+    fun isScrollableLayout(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_SCROLLABLE_LAYOUT, true)
 
     fun getWidgetHeaderLayout(context: Context): WidgetHeaderLayout =
         WidgetHeaderLayout.fromValue(
