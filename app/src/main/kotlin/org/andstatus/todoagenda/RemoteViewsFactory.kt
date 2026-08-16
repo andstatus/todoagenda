@@ -77,15 +77,24 @@ class RemoteViewsFactory(
 
     override fun getViewAt(position: Int): RemoteViews? {
         if (position < widgetEntries.size) {
+            val views = getRemoteViewsAt(position) ?: return null
+            val entry = widgetEntries[position]
+            views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent())
+            if (position == widgetEntries.size - 1) {
+                InstanceState.listRedrawn(widgetId)
+            }
+            return views
+        }
+        logEvent("no view at:" + position + ", size:" + widgetEntries.size)
+        return null
+    }
+
+    internal fun getRemoteViewsAt(position: Int): RemoteViews? {
+        if (position < widgetEntries.size) {
             val entry = widgetEntries[position]
             val visualizer = visualizerFor(entry)
             return if (visualizer != null) {
-                val views = visualizer.getRemoteViews(entry, position)
-                views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent())
-                if (position == widgetEntries.size - 1) {
-                    InstanceState.listRedrawn(widgetId)
-                }
-                views
+                visualizer.getRemoteViews(entry, position)
             } else {
                 logEvent("no visualizer at:$position for $entry")
                 null
@@ -339,9 +348,18 @@ class RemoteViewsFactory(
                     return
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
-                val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_SCROLLABLE.shadowed(settings.textShadow))
+                val layout = if (settings.isScrollable) {
+                    WidgetLayout.WIDGET_SCROLLABLE
+                } else {
+                    WidgetLayout.WIDGET_NON_SCROLLABLE
+                }
+                val rv = RemoteViews(context.packageName, layout.shadowed(settings.textShadow))
                 configureWidgetHeader(settings, rv)
-                configureWidgetEntriesList(settings, rv)
+                if (settings.isScrollable) {
+                    configureWidgetEntriesList(settings, rv)
+                } else {
+                    configureWidgetEntriesNonScrollable(settings, rv)
+                }
                 appWidgetManager.updateAppWidget(widgetId, rv)
             } catch (e: Exception) {
                 Log.w(TAG, "$widgetId Exception in updateWidget, context:$context", e)
@@ -468,12 +486,70 @@ class RemoteViewsFactory(
             rv.setPendingIntentTemplate(R.id.event_list, getActionPendingIntent(settings, ACTION_VIEW_ENTRY))
         }
 
+        private fun configureWidgetEntriesNonScrollable(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
+            val factory = factories.computeIfAbsent(settings.widgetId) { id ->
+                RemoteViewsFactory(settings.context, id, false)
+            }
+            factory.onDataSetChanged()
+            rv.removeAllViews(R.id.event_list)
+            factory.widgetEntries.forEachIndexed { position, entry ->
+                factory.getRemoteViewsAt(position)?.let { views ->
+                    views.setOnClickPendingIntent(
+                        R.id.event_entry,
+                        getEntryPendingIntent(settings, entry.entryId),
+                    )
+                    rv.addView(R.id.event_list, views)
+                }
+            }
+            InstanceState.listRedrawn(settings.widgetId)
+        }
+
         private fun configureGotoToday(
             settings: InstanceSettings,
             rv: RemoteViews,
         ) {
+            rv.setViewVisibility(R.id.go_to_today, if (settings.isScrollable) View.VISIBLE else View.GONE)
             rv.setOnClickPendingIntent(R.id.go_to_today, getActionPendingIntent(settings, ACTION_GOTO_TODAY))
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.go_to_today)
+        }
+
+        private fun getEntryPendingIntent(
+            settings: InstanceSettings,
+            entryId: Long,
+        ): PendingIntent {
+            val requestCode = ACTION_VIEW_ENTRY.hashCode() + settings.widgetId
+            val intent =
+                Intent(
+                    settings.context.applicationContext,
+                    EnvironmentChangedReceiver::class.java,
+                )
+                    .setAction(ACTION_VIEW_ENTRY)
+                    .setData(
+                        Uri.parse(
+                            "intent:" +
+                                ACTION_VIEW_ENTRY.lowercase(MyLocale.locale) +
+                                settings.widgetId +
+                                ":" +
+                                entryId,
+                        )
+                    )
+                    .putExtra(
+                        AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        settings.widgetId,
+                    )
+                    .putExtra(
+                        WidgetEntry.EXTRA_WIDGET_ENTRY_ID,
+                        entryId,
+                    )
+            return PendingIntent.getBroadcast(
+                settings.context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
         }
 
         fun getActionPendingIntent(

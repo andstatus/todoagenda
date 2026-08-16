@@ -65,6 +65,8 @@
     <string name="layout_prefs_desc">Colocar, mostrar y ocultar elementos de widget</string>
     <string name="layout_prefs_title">Disposición</string>
     <string name="widget_header_layout">Diseño del encabezado del widget</string>
+    <string name="is_scrollable_title">Permitir desplazamiento</string>
+    <string name="is_scrollable_desc">Permitir desplazarse por la lista de eventos</string>
     <string name="pref_event_entry_layout_title">Diseño del evento</string>
     <string name="default_multiline_layout">Hora debajo del título</string>
     <string name="widget_header_date_format">Formato de fecha del encabezado del widget</string>

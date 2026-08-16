@@ -44,6 +44,7 @@ data class InstanceSettings(
     // ----------------------------------------------------------------------------------
     // Layout
     val isCompactLayout: Boolean = false,
+    val isScrollable: Boolean = true,
     val widgetHeaderLayout: WidgetHeaderLayout = WidgetHeaderLayout.defaultValue,
     val widgetHeaderDateFormat: DateFormatValue = PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT,
     val showDayHeaders: Boolean = true,
@@ -209,6 +210,7 @@ data class InstanceSettings(
             // ----------------------------------------------------------------------------------
             // Layout
             put(PREF_COMPACT_LAYOUT, isCompactLayout)
+            put(PREF_IS_SCROLLABLE, isScrollable)
             put(PREF_WIDGET_HEADER_LAYOUT, widgetHeaderLayout.value)
             put(PREF_WIDGET_HEADER_DATE_FORMAT, widgetHeaderDateFormat.save())
             put(PREF_SHOW_DAY_HEADERS, showDayHeaders)
@@ -416,6 +418,7 @@ data class InstanceSettings(
         // ----------------------------------------------------------------------------------
         // Layout
         const val PREF_COMPACT_LAYOUT = "compactLayout"
+        const val PREF_IS_SCROLLABLE = "isScrollable"
         const val PREF_WIDGET_HEADER_LAYOUT = "widgetHeaderLayout"
         private const val PREF_SHOW_DATE_ON_WIDGET_HEADER = "showDateOnWidgetHeader" // till v 4.0
         const val PREF_WIDGET_HEADER_DATE_FORMAT = "widgetHeaderDateFormat"
@@ -572,6 +575,12 @@ data class InstanceSettings(
                             json.getBoolean(PREF_COMPACT_LAYOUT)
                         } else {
                             EMPTY.isCompactLayout
+                        },
+                    isScrollable =
+                        if (json.has(PREF_IS_SCROLLABLE)) {
+                            json.getBoolean(PREF_IS_SCROLLABLE)
+                        } else {
+                            EMPTY.isScrollable
                         },
                     widgetHeaderLayout =
                         if (json.has(
@@ -990,6 +999,7 @@ data class InstanceSettings(
                     // ----------------------------------------------------------------------------------
                     // Layout
                     isCompactLayout = ApplicationPreferences.isCompactLayout(context),
+                    isScrollable = ApplicationPreferences.isScrollable(context),
                     widgetHeaderLayout = ApplicationPreferences.getWidgetHeaderLayout(context),
                     widgetHeaderDateFormat = ApplicationPreferences.getWidgetHeaderDateFormat(context),
                     showDayHeaders = ApplicationPreferences.getShowDayHeaders(context),

@@ -10,6 +10,14 @@
         android:summaryOff="@string/compact_layout_off_desc"
         android:title="@string/compact_layout_title" />
 
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
+        android:key="isScrollable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:defaultValue="true"
+        android:title="@string/is_scrollable_title"
+        android:summary="@string/is_scrollable_desc" />
+
     <PreferenceCategory app:title="@string/widget_header">
         <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:key="widgetHeaderLayout"

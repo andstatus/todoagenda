@@ -31,6 +31,7 @@ enum class WidgetLayout(
     ),
     ENTRY_LAST(R.layout.entry_last, R.layout.entry_last_shadow_dark, R.layout.entry_last_shadow_light),
     WIDGET_SCROLLABLE(R.layout.widget_scrollable),
+    WIDGET_NON_SCROLLABLE(R.layout.widget_non_scrollable),
     WIDGET_HEADER_ONE_ROW(
         R.layout.widget_header_one_row,
         R.layout.widget_header_one_row_shadow_dark,
