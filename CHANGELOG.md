@@ -1,5 +1,12 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+* "Use Material You dynamic colors" checkbox added to Colors settings, for Android 12+.
+  The widget takes its colors from the system palette derived from your wallpaper,
+  instead of from the colors set by hand, using the same tones as the Google Calendar widget
+  so that it sits alongside other Material You widgets.
+  Colors set by hand are kept, and are used again as soon as the checkbox is cleared.
+  [#175](https://github.com/andstatus/todoagenda/issues/175)
+
 <a id="v4.14"/>
 
 ### 2026-08-16 v4.14.1 Non-scrollable widget option

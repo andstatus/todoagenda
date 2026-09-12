@@ -354,6 +354,7 @@ class RemoteViewsFactory(
                     WidgetLayout.WIDGET_NON_SCROLLABLE
                 }
                 val rv = RemoteViews(context.packageName, layout.shadowed(settings.textShadow))
+                RemoteViewsUtil.setBackgroundColor(rv, R.id.widget_parent, settings.colors().widgetBackgroundColor)
                 configureWidgetHeader(settings, rv)
                 if (settings.isScrollableLayout) {
                     configureWidgetEntriesList(settings, rv)

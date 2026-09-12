@@ -10,6 +10,15 @@
         android:summaryOn="@string/different_colors_for_dark_on_desc"
         android:title="@string/different_colors_for_dark_title" />
 
+    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:defaultValue="false"
+        android:key="useDynamicColors"
+        android:summaryOff="@string/use_dynamic_colors_off_desc"
+        android:summaryOn="@string/use_dynamic_colors_on_desc"
+        android:title="@string/use_dynamic_colors_title" />
+
     <org.andstatus.todoagenda.prefs.MultilineListPreference
         android:defaultValue="auto"
         android:entries="@array/pref_text_color_source_entries"
@@ -25,7 +34,11 @@
         android:key="textShadow"
         android:title="@string/text_shadow_title" />
 
-    <PreferenceCategory app:title="@string/widget_header">
+    <!-- Keys of the categories below are TimeSection.preferenceCategoryKey values,
+         so that the code can find them by TimeSection -->
+    <PreferenceCategory
+        app:key="AllTime"
+        app:title="@string/widget_header">
         <org.andstatus.todoagenda.prefs.MultilineListPreference
             android:defaultValue="DARK"
             android:entries="@array/pref_theme_entries"
