@@ -14,19 +14,19 @@ buildscript {
         annotationVersion = '1.0.1'
         appCompatVersion = '1.8.0'        // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
         espressoCoreVersion = '3.7.0'  // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
-        jodaTimeVersion = '2.14.2'     // https://github.com/JodaOrg/joda-time/releases
+        jodaTimeVersion = '2.15.0'     // https://github.com/JodaOrg/joda-time/releases
         junitVersion = '4.13.2'
-        junitJupiterVersion = '6.1.0'
+        junitJupiterVersion = '6.1.3'
         preferenceVersion = '1.2.1'
         testCoreVersion = '1.7.0'
         testRulesVersion = '1.7.0'
         testRunnerVersion = '1.7.0'
         kotlinVersion = '2.2.10'  // https://kotlinlang.org/docs/releases.html#release-details
-        ktxVersion = '1.19.0'  // https://androidx.tech/artifacts/core/core-ktx/
+        ktxVersion = '1.19.1'  // https://androidx.tech/artifacts/core/core-ktx/
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:9.3.1'
+        classpath 'com.android.tools.build:gradle:9.4.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 
