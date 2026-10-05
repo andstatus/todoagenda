@@ -991,6 +991,13 @@ data class InstanceSettings(
                             }
                     }
                 }
+                // Material You derives both the Light and the Dark palette itself, so the choice
+                // applies to the widget as a whole. Only the theme being edited is read from
+                // preferences above, so the other one would otherwise keep a stale value.
+                val useDynamicColors =
+                    ApplicationPreferences.getBoolean(context, ThemeColors.PREF_USE_DYNAMIC_COLORS, false)
+                if (!defaultColors.isEmpty) defaultColors.useDynamicColors = useDynamicColors
+                if (!darkColors.isEmpty) darkColors.useDynamicColors = useDynamicColors
 
                 InstanceSettings(
                     contextIn = context,

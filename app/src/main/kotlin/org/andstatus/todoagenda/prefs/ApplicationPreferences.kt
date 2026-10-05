@@ -67,6 +67,7 @@ object ApplicationPreferences {
             for (pref in BackgroundColorPref.entries) {
                 setInt(context, pref.colorPreferenceName, colors.getBackground(pref).color)
             }
+            setBoolean(context, ThemeColors.PREF_USE_DYNAMIC_COLORS, colors.useDynamicColors)
             setString(context, ThemeColors.PREF_TEXT_COLOR_SOURCE, colors.textColorSource!!.value)
             for (pref in TextColorPref.entries) {
                 setString(context, pref.shadingPreferenceName, colors.getTextShadingStored(pref).shading.themeName)

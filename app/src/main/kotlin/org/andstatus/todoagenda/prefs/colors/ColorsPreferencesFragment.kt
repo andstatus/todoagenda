@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
+import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.preference.ListPreference
@@ -37,6 +38,9 @@ class ColorsPreferencesFragment :
         setTitle()
         addPreferencesFromResource(R.xml.preferences_colors)
         removeUnavailablePreferences()
+        // Before the first layout pass, otherwise the preferences hidden by Material You
+        // are visible for a frame
+        updateDynamicColorsVisibility()
     }
 
     private fun setTitle() {
@@ -51,6 +55,7 @@ class ColorsPreferencesFragment :
         showTextSources()
         showTextShadow()
         showTimeUntilBackgroundSource()
+        updateDynamicColorsVisibility()
     }
 
     private fun showTextSources() {
@@ -96,6 +101,9 @@ class ColorsPreferencesFragment :
 
     private fun removeUnavailablePreferences() {
         val context = activity ?: return
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            removePreferenceImproved(ThemeColors.PREF_USE_DYNAMIC_COLORS)
+        }
         val colorThemeType = ApplicationPreferences.getColorThemeType(context)
         if (!ColorThemeType.canHaveDifferentColorsForDark() ||
             colorThemeType == ColorThemeType.LIGHT ||
@@ -174,6 +182,17 @@ class ColorsPreferencesFragment :
         }
     }
 
+    /** Material You supplies all of these itself, so hide them rather than let them look effective */
+    private fun updateDynamicColorsVisibility() {
+        val context = activity ?: return
+        val visible = !ApplicationPreferences.getBoolean(context, ThemeColors.PREF_USE_DYNAMIC_COLORS, false)
+        findPreference<Preference>(ThemeColors.PREF_TEXT_COLOR_SOURCE)?.isVisible = visible
+        findPreference<Preference>(PREF_TEXT_SHADOW)?.isVisible = visible
+        for (section in TimeSection.entries) {
+            findPreference<Preference>(section.preferenceCategoryKey)?.isVisible = visible
+        }
+    }
+
     override fun onPause() {
         super.onPause()
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
@@ -199,6 +218,11 @@ class ColorsPreferencesFragment :
                     }
                     setTitle()
                 }
+
+            ThemeColors.PREF_USE_DYNAMIC_COLORS -> {
+                saveSettings()
+                updateDynamicColorsVisibility()
+            }
 
             ThemeColors.PREF_TEXT_COLOR_SOURCE ->
                 if (activity != null) {

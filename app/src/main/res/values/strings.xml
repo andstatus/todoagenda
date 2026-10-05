@@ -144,6 +144,9 @@
     <string name="different_colors_for_dark_off_desc">Colors are the same</string>
     <string name="different_colors_for_dark_on_desc">Switch Android system Dark theme on/off to set colors
         for Dark/Light theme correspondingly.</string>
+    <string name="use_dynamic_colors_title">Use Material You dynamic colors</string>
+    <string name="use_dynamic_colors_off_desc">Widget uses your manually selected colors</string>
+    <string name="use_dynamic_colors_on_desc">Widget colors derived from your wallpaper. Your manual selections are preserved.</string>
     <string name="colors_prefs_desc">Colors and opacity of texts and backgrounds</string>
     <string name="appearance_group_color_title">Colors</string>
     <string name="colors_light">Colors for Light theme</string>
