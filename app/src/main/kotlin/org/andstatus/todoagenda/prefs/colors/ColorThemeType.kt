@@ -12,20 +12,16 @@ import org.andstatus.todoagenda.prefs.InstanceSettings
  * @author yvolk@yurivolkov.com
  */
 enum class ColorThemeType(val value: String, @field:StringRes val titleResId: Int) {
+    UNSPECIFIED("none", R.string.no_title),
     SINGLE("single", R.string.appearance_group_color_title),
     DARK("dark", R.string.colors_dark),
-    LIGHT("light", R.string.colors_light),
-    NONE("none", R.string.no_title);
+    LIGHT("light", R.string.colors_light);
 
-    val isValid: Boolean
-        get() = this != NONE
+    val isValid: Boolean get() = this != UNSPECIFIED
 
-    fun fromEditor(context: Context?, differentColorsForDark: Boolean): ColorThemeType {
-        return if (differentColorsForDark && canHaveDifferentColorsForDark()) {
-            if (this == DARK || this == SINGLE && InstanceSettings.Companion.isDarkThemeOn(
-                    context
-                )
-            ) {
+    fun fromEditor(context: Context, differentColorsForDark: Boolean): ColorThemeType {
+        return if (differentColorsForDark && canHaveDifferentColorsForDark) {
+            if (this == DARK || this == SINGLE && InstanceSettings.isDarkThemeOn(context)) {
                 DARK
             } else {
                 LIGHT
@@ -34,7 +30,7 @@ enum class ColorThemeType(val value: String, @field:StringRes val titleResId: In
             if (this == LIGHT || this == SINGLE) {
                 SINGLE
             } else {
-                NONE
+                UNSPECIFIED
             }
         }
     }
@@ -56,8 +52,6 @@ enum class ColorThemeType(val value: String, @field:StringRes val titleResId: In
         }
 
         /** See https://developer.android.com/guide/topics/ui/look-and-feel/darktheme  */
-        fun canHaveDifferentColorsForDark(): Boolean {
-            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-        }
+        val canHaveDifferentColorsForDark: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     }
 }

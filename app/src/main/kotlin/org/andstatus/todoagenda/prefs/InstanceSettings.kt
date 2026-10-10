@@ -543,7 +543,7 @@ data class InstanceSettings(
                         }
                     }
                 val differentColorsForDark: Boolean =
-                    ColorThemeType.canHaveDifferentColorsForDark() && json.has(PREF_DARK_THEME)
+                    ColorThemeType.canHaveDifferentColorsForDark && json.has(PREF_DARK_THEME)
                 val eventEntryLayout =
                     if (json.has(PREF_EVENT_ENTRY_LAYOUT)) {
                         EventEntryLayout.fromValue(json.getString(PREF_EVENT_ENTRY_LAYOUT))
@@ -953,34 +953,36 @@ data class InstanceSettings(
                 when (ApplicationPreferences.getEditingColorThemeType(context)) {
                     ColorThemeType.DARK -> {
                         darkColors =
-                            ThemeColors(ColorThemeType.DARK).setFromApplicationPreferences(context)
+                            ThemeColors.setFromApplicationPreferences(ColorThemeType.DARK, context)
                         defaultColors =
-                            settingsStored?.defaultColors?.copy(ColorThemeType.LIGHT) ?: darkColors
+                            settingsStored?.defaultColors?.jsonCopy(ColorThemeType.LIGHT) ?: darkColors
                     }
 
                     ColorThemeType.LIGHT -> {
                         defaultColors =
-                            ThemeColors(ColorThemeType.LIGHT).setFromApplicationPreferences(context)
+                            ThemeColors.setFromApplicationPreferences(ColorThemeType.LIGHT, context)
                         darkColors =
                             if (settingsStored == null) {
                                 defaultColors
                             } else if (settingsStored.darkColors.isEmpty) {
-                                settingsStored.defaultColors.copy(ColorThemeType.DARK)
+                                settingsStored.defaultColors.jsonCopy(ColorThemeType.DARK)
                             } else {
-                                settingsStored.darkColors.copy(ColorThemeType.DARK)
+                                settingsStored.darkColors.jsonCopy(ColorThemeType.DARK)
                             }
                     }
 
                     ColorThemeType.SINGLE -> {
                         darkColors = ThemeColors.EMPTY
-                        defaultColors =
-                            ThemeColors(ColorThemeType.SINGLE).setFromApplicationPreferences(context)
+                        defaultColors = ThemeColors.setFromApplicationPreferences(
+                            ColorThemeType.SINGLE,
+                            context
+                        )
                     }
 
                     else -> {
                         darkColors = ThemeColors.EMPTY
                         defaultColors =
-                            settingsStored?.defaultColors?.copy(ColorThemeType.SINGLE) ?: darkColors
+                            settingsStored?.defaultColors?.jsonCopy(ColorThemeType.SINGLE) ?: darkColors
                     }
                 }
 
@@ -1123,8 +1125,8 @@ data class InstanceSettings(
 
         private fun getStorageKey(widgetId: Int): String = "instanceSettings$widgetId"
 
-        fun isDarkThemeOn(context: Context?): Boolean {
-            val configuration = context!!.applicationContext.resources.configuration
+        fun isDarkThemeOn(context: Context): Boolean {
+            val configuration = context.applicationContext.resources.configuration
             val currentNightMode = configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             return currentNightMode == Configuration.UI_MODE_NIGHT_YES
         }

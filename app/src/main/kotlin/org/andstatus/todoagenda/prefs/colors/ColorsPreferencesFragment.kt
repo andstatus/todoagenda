@@ -110,7 +110,7 @@ class ColorsPreferencesFragment :
     private fun removeUnavailablePreferences() {
         val context = activity ?: return
         val colorThemeType = ApplicationPreferences.getColorThemeType(context)
-        if (!ColorThemeType.canHaveDifferentColorsForDark() ||
+        if (!ColorThemeType.canHaveDifferentColorsForDark ||
             colorThemeType == ColorThemeType.LIGHT ||
             colorThemeType == ColorThemeType.SINGLE &&
             !InstanceSettings.isDarkThemeOn(
@@ -202,7 +202,7 @@ class ColorsPreferencesFragment :
         when (key) {
             ApplicationPreferences.PREF_DIFFERENT_COLORS_FOR_DARK ->
                 if (activity != null) {
-                    if (ApplicationPreferences.getEditingColorThemeType(activity) == ColorThemeType.NONE) {
+                    if (ApplicationPreferences.getEditingColorThemeType(activity) == ColorThemeType.UNSPECIFIED) {
                         activity.startActivity(
                             MainActivity.intentToConfigure(
                                 activity,

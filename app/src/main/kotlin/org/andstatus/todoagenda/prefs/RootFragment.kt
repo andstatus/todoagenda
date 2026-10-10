@@ -25,7 +25,7 @@ class RootFragment : PreferenceFragmentCompat() {
         val preference = findPreference<Preference>("ColorsPreferencesFragment")
         if (context != null && preference != null) {
             val themeType = ApplicationPreferences.getEditingColorThemeType(context)
-            preference.setTitle(themeType!!.titleResId)
+            preference.setTitle(themeType.titleResId)
             preference.isVisible = themeType.isValid
         }
     }
