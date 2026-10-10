@@ -14,12 +14,12 @@ import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.WidgetConfigurationActivity
 import org.andstatus.todoagenda.layout.TextShadow
+import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
-import org.andstatus.todoagenda.prefs.MyPreferenceFragment
-import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
+import org.andstatus.todoagenda.prefs.MyPreferenceFragment
 import java.util.Arrays
 import java.util.stream.Collectors
 
@@ -75,7 +75,8 @@ class ColorsPreferencesFragment :
     private fun previewTextOnBackground() {
         val colors = settings.colors()
         for (backgroundColorPref in BackgroundColorPref.entries) {
-            val colorPreference = findPreference<ColorPreference>(backgroundColorPref.colorPreferenceName)
+            val colorPreference =
+                findPreference<ColorPreference>(backgroundColorPref.colorPreferenceName)
             if (colorPreference != null) {
                 val toPreview =
                     Arrays
@@ -84,11 +85,23 @@ class ColorsPreferencesFragment :
                         .collect(Collectors.toList())
                 if (toPreview.size > 0) {
                     val pref = toPreview[0]
-                    colorPreference.setSampleTextColor1(colors.getTextColor(pref, pref.colorAttrId))
+                    colorPreference.setSampleTextColor1(
+                        colors.getTextColor(
+                            settings.context,
+                            pref,
+                            pref.colorAttrId
+                        )
+                    )
                 }
                 if (toPreview.size > 1) {
                     val pref = toPreview[1]
-                    colorPreference.setSampleTextColor2(colors.getTextColor(pref, pref.colorAttrId))
+                    colorPreference.setSampleTextColor2(
+                        colors.getTextColor(
+                            settings.context,
+                            pref,
+                            pref.colorAttrId
+                        )
+                    )
                 }
             }
         }
@@ -105,7 +118,8 @@ class ColorsPreferencesFragment :
             )
         ) {
             val screen = preferenceScreen
-            val preference = findPreference<Preference>(ApplicationPreferences.PREF_DIFFERENT_COLORS_FOR_DARK)
+            val preference =
+                findPreference<Preference>(ApplicationPreferences.PREF_DIFFERENT_COLORS_FOR_DARK)
             if (screen != null && preference != null) {
                 screen.removePreference(preference)
             }
@@ -168,7 +182,8 @@ class ColorsPreferencesFragment :
     private fun showShadings() {
         for (shadingPref in TextColorPref.entries) {
             findPreference<ListPreference>(shadingPref.shadingPreferenceName)?.let { preference ->
-                val shading: Shading = Shading.fromThemeName(preference.value, shadingPref.defaultShading)
+                val shading: Shading =
+                    Shading.fromThemeName(preference.value, shadingPref.defaultShading)
                 preference.summary = requireActivity().getString(shading.titleResId)
             }
         }
@@ -203,7 +218,10 @@ class ColorsPreferencesFragment :
             ThemeColors.PREF_TEXT_COLOR_SOURCE ->
                 if (activity != null) {
                     val intent: Intent =
-                        MainActivity.intentToConfigure(activity, ApplicationPreferences.getWidgetId(activity))
+                        MainActivity.intentToConfigure(
+                            activity,
+                            ApplicationPreferences.getWidgetId(activity)
+                        )
                     intent.putExtra(
                         WidgetConfigurationActivity.EXTRA_GOTO_PREFERENCES_SECTION,
                         WidgetConfigurationActivity.EXTRA_GOTO_SECTION_COLORS,

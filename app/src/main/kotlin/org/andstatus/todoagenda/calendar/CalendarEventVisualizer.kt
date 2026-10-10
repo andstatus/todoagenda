@@ -78,7 +78,9 @@ class CalendarEventVisualizer(
         if (showIndication) {
             rv.setViewVisibility(viewId, View.VISIBLE)
             val pref: TextColorPref = TextColorPref.forTitle(entry)
-            RemoteViewsUtil.setImageFromAttr(settings.colors().getThemeContext(pref), rv, viewId, imageAttrId)
+            RemoteViewsUtil.setImageFromAttr(
+                settings.colors().getThemeContext(settings.context, pref), rv, viewId, imageAttrId
+            )
             val shading = settings.colors().getShading(pref)
             var alpha = 255
             if (shading == Shading.DARK || shading == Shading.LIGHT) {
@@ -96,7 +98,11 @@ class CalendarEventVisualizer(
     ) {
         if (settings.showEventIcon) {
             rv.setViewVisibility(R.id.event_entry_color, View.VISIBLE)
-            RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry_color, (entry as CalendarEntry).color)
+            RemoteViewsUtil.setBackgroundColor(
+                rv,
+                R.id.event_entry_color,
+                (entry as CalendarEntry).color
+            )
         } else {
             rv.setViewVisibility(R.id.event_entry_color, View.GONE)
         }
@@ -130,7 +136,10 @@ class CalendarEventVisualizer(
             } else {
                 entryList.add(firstDayEntry)
                 if (settings.logEvents) {
-                    Log.i("toCalendarEntryList", "Only one entry for event: $event\nentry: $firstDayEntry")
+                    Log.i(
+                        "toCalendarEntryList",
+                        "Only one entry for event: $event\nentry: $firstDayEntry"
+                    )
                 }
             }
         }
@@ -158,7 +167,7 @@ class CalendarEventVisualizer(
 
     private fun allEventEntries(firstDayEntry: CalendarEntry): List<CalendarEntry> {
         val entries = mutableListOf(firstDayEntry)
-        var endDay =
+        val endDay =
             if (firstDayEntry.event.endDate.isAfter(calendarEventProvider.endOfTimeRange)) {
                 calendarEventProvider.endOfTimeRange
             } else {
@@ -169,7 +178,10 @@ class CalendarEventVisualizer(
         var nextDay = firstDayEntry.entryDay.plusDays(1)
         var i = 1
         if (settings.logEvents) {
-            Log.i("addEntriesToFillAllEventDays", "$i. endDay: $endDay, thisDay: $nextDay, $firstDayEntry")
+            Log.i(
+                "addEntriesToFillAllEventDays",
+                "$i. endDay: $endDay, thisDay: $nextDay, $firstDayEntry"
+            )
         }
         while (!nextDay.isAfter(endDay)) {
             val nextEntry: CalendarEntry =

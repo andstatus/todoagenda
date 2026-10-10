@@ -8,7 +8,7 @@ import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.InstanceSettings
 
 /**
- * See https://github.com/andstatus/todoagenda/issues/48
+ * See https://github.com/andstatus/todoagenda/issues/28
  * @author yvolk@yurivolkov.com
  */
 enum class ColorThemeType(val value: String, @field:StringRes val titleResId: Int) {

@@ -70,7 +70,7 @@ data class InstanceSettings(
         if (contextIn == null) {
             ThemeColors.EMPTY
         } else {
-            ThemeColors(contextIn, ColorThemeType.SINGLE)
+            ThemeColors(ColorThemeType.SINGLE)
         },
     private val darkColors: ThemeColors = ThemeColors.EMPTY,
     val textShadow: TextShadow = TextShadow.NO_SHADOW,
@@ -113,7 +113,7 @@ data class InstanceSettings(
     val timeFormat: String = PREF_TIME_FORMAT_DEFAULT,
     private val lockedTimeZoneIdIn: String = "",
     private val startHourOfDayIn: Int = 0,
-    private val snapshotModeIn: SnapshotMode = SnapshotMode.Companion.defaultValue,
+    private val snapshotModeIn: SnapshotMode = SnapshotMode.defaultValue,
     val resultsStorage: QueryResultsStorage? = null,
     private val refreshPeriodMinutesIn: Int = PREF_REFRESH_PERIOD_MINUTES_DEFAULT,
 ) {
@@ -138,7 +138,8 @@ data class InstanceSettings(
         } else {
             snapshotModeIn
         }
-    val snapshotDate: DateTime? = if (snapshotMode.isSnapshotMode) resultsStorage?.executedAt?.get() else null
+    val snapshotDate: DateTime? =
+        if (snapshotMode.isSnapshotMode) resultsStorage?.executedAt?.get() else null
     val timeZone: DateTimeZone =
         snapshotDate?.let<DateTime, DateTimeZone?> {
             if (snapshotMode == SnapshotMode.SNAPSHOT_TIME) it.zone else null
@@ -159,12 +160,8 @@ data class InstanceSettings(
 
     val snapshotActiveEventSources: MutableList<OrderedEventSource> = CopyOnWriteArrayList()
     val activeEventSources: List<OrderedEventSource>
-        get() =
-            (
-                activeEventSourcesIn
-                    .takeIf { it.isNotEmpty() }
-                    ?: EventProviderType.availableSources
-            ) + snapshotActiveEventSources
+        get() = (activeEventSourcesIn.takeIf { it.isNotEmpty() }
+            ?: EventProviderType.availableSources) + snapshotActiveEventSources
 
     val refreshPeriodMinutes: Int = refreshPeriodMinutesIn.takeIf { it > 0 } ?: 10
 
@@ -256,7 +253,10 @@ data class InstanceSettings(
             put(PREF_EVENT_RANGE, eventRange)
             put(PREF_HIDE_BASED_ON_KEYWORDS, hideBasedOnKeywords)
             put(PREF_SHOW_BASED_ON_KEYWORDS, showBasedOnKeywords)
-            put(PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT, showOnlyClosestInstanceOfRecurringEvent)
+            put(
+                PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT,
+                showOnlyClosestInstanceOfRecurringEvent
+            )
             put(PREF_HIDE_DUPLICATES, hideDuplicates)
             put(PREF_MAX_NUMBER_OF_EVENTS, maxNumberOfEvents)
             put(PREF_ALL_DAY_EVENTS_PLACEMENT, allDayEventsPlacement.value)
@@ -299,16 +299,10 @@ data class InstanceSettings(
     }
 
     val endOfTimeRange: DateTime
-        get() =
-            (
-                if (eventRange > 0) {
-                    clock.now().plusDays(eventRange)
-                } else {
-                    clock
-                        .startOfToday()
-                        .plusDays(1 - eventRange)
-                }
-            ).minusMillis(1)
+        get() = (if (eventRange > 0) clock.now().plusDays(eventRange) else {
+            clock.startOfToday().plusDays(1 - eventRange)
+        }).minusMillis(1)
+
     val startOfTimeRange: DateTime?
         get() = eventsEnded.endedAt(clock)
 
@@ -318,11 +312,14 @@ data class InstanceSettings(
             else -> timeUntilBackgroundSource
         }
 
-    fun colors(): ThemeColors = if (!darkColors.isEmpty && isDarkThemeOn(context)) darkColors else defaultColors
+    fun colors(): ThemeColors =
+        if (!darkColors.isEmpty && isDarkThemeOn(context)) darkColors else defaultColors
 
-    fun widgetHeaderDateFormatter(): DateFormatter = DateFormatter(context, widgetHeaderDateFormat, clock.now())
+    fun widgetHeaderDateFormatter(): DateFormatter =
+        DateFormatter(context, widgetHeaderDateFormat, clock.now())
 
-    fun dayHeaderDateFormatter(): DateFormatter = DateFormatter(context, dayHeaderDateFormat, clock.now())
+    fun dayHeaderDateFormatter(): DateFormatter =
+        DateFormatter(context, dayHeaderDateFormat, clock.now())
 
     fun entryDateFormatter(): DateFormatter = DateFormatter(context, entryDateFormat, clock.now())
 
@@ -350,9 +347,9 @@ data class InstanceSettings(
 
     fun noPastEvents(): Boolean =
         filterMode != FilterMode.NO_FILTERING &&
-            !showPastEventsWithDefaultColor &&
-            eventsEnded == EndedSomeTimeAgo.NONE &&
-            noTaskSources()
+                !showPastEventsWithDefaultColor &&
+                eventsEnded == EndedSomeTimeAgo.NONE &&
+                noTaskSources()
 
     fun noTaskSources(): Boolean {
         for (orderedSource in activeEventSources) {
@@ -482,7 +479,8 @@ data class InstanceSettings(
         const val EVENT_RANGE_TODAY_AND_TOMORROW = -1
         const val PREF_HIDE_BASED_ON_KEYWORDS = "hideBasedOnKeywords"
         const val PREF_SHOW_BASED_ON_KEYWORDS = "showBasedOnKeywords"
-        const val PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT = "showOnlyClosestInstanceOfRecurringEvent"
+        const val PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT =
+            "showOnlyClosestInstanceOfRecurringEvent"
         const val PREF_MAX_NUMBER_OF_EVENTS = "maxNumberOfEvents"
         const val PREF_HIDE_DUPLICATES = "hideDuplicates"
         const val PREF_ALL_DAY_EVENTS_PLACEMENT = "allDayEventsPlacement"
@@ -545,10 +543,7 @@ data class InstanceSettings(
                         }
                     }
                 val differentColorsForDark: Boolean =
-                    ColorThemeType.canHaveDifferentColorsForDark() &&
-                        json.has(
-                            PREF_DARK_THEME,
-                        )
+                    ColorThemeType.canHaveDifferentColorsForDark() && json.has(PREF_DARK_THEME)
                 val eventEntryLayout =
                     if (json.has(PREF_EVENT_ENTRY_LAYOUT)) {
                         EventEntryLayout.fromValue(json.getString(PREF_EVENT_ENTRY_LAYOUT))
@@ -558,7 +553,10 @@ data class InstanceSettings(
 
                 val resultsStorage =
                     if (json.has(PREF_RESULTS_STORAGE)) {
-                        QueryResultsStorage.fromJson(widgetId, json.getJSONObject(PREF_RESULTS_STORAGE))
+                        QueryResultsStorage.fromJson(
+                            widgetId,
+                            json.getJSONObject(PREF_RESULTS_STORAGE)
+                        )
                     } else {
                         EMPTY.resultsStorage
                     }
@@ -711,14 +709,12 @@ data class InstanceSettings(
                     // Colors
                     defaultColors =
                         ThemeColors.fromJson(
-                            context,
                             if (differentColorsForDark) ColorThemeType.LIGHT else ColorThemeType.SINGLE,
                             json,
                         ),
                     darkColors =
                         if (differentColorsForDark) {
                             ThemeColors.fromJson(
-                                context,
                                 ColorThemeType.DARK,
                                 json.getJSONObject(
                                     PREF_DARK_THEME,
@@ -735,7 +731,11 @@ data class InstanceSettings(
                         },
                     timeUntilBackgroundSource =
                         if (json.has(PREF_TIME_UNTIL_BACKGROUND_SOURCE)) {
-                            TimeUntilBackgroundSource.fromValue(json.getString(PREF_TIME_UNTIL_BACKGROUND_SOURCE))
+                            TimeUntilBackgroundSource.fromValue(
+                                json.getString(
+                                    PREF_TIME_UNTIL_BACKGROUND_SOURCE
+                                )
+                            )
                         } else {
                             EMPTY.timeUntilBackgroundSource
                         },
@@ -842,7 +842,11 @@ data class InstanceSettings(
                         },
                     allDayEventsPlacement =
                         if (json.has(PREF_ALL_DAY_EVENTS_PLACEMENT)) {
-                            AllDayEventsPlacement.fromValue(json.getString(PREF_ALL_DAY_EVENTS_PLACEMENT))
+                            AllDayEventsPlacement.fromValue(
+                                json.getString(
+                                    PREF_ALL_DAY_EVENTS_PLACEMENT
+                                )
+                            )
                         } else {
                             EMPTY.allDayEventsPlacement
                         },
@@ -882,7 +886,11 @@ data class InstanceSettings(
                                 PREF_WIDGET_HEADER_BUTTONS_SCALE,
                             )
                         ) {
-                            TextSizeScale.fromPreferenceValue(json.getString(PREF_WIDGET_HEADER_BUTTONS_SCALE))
+                            TextSizeScale.fromPreferenceValue(
+                                json.getString(
+                                    PREF_WIDGET_HEADER_BUTTONS_SCALE
+                                )
+                            )
                         } else {
                             EMPTY.widgetHeaderButtonsScale
                         },
@@ -944,51 +952,35 @@ data class InstanceSettings(
                 var defaultColors: ThemeColors
                 when (ApplicationPreferences.getEditingColorThemeType(context)) {
                     ColorThemeType.DARK -> {
-                        darkColors = ThemeColors(context, ColorThemeType.DARK).setFromApplicationPreferences()
+                        darkColors =
+                            ThemeColors(ColorThemeType.DARK).setFromApplicationPreferences(context)
                         defaultColors =
-                            if (settingsStored == null) {
-                                darkColors
-                            } else {
-                                settingsStored.defaultColors.copy(
-                                    context,
-                                    ColorThemeType.LIGHT,
-                                )
-                            }
+                            settingsStored?.defaultColors?.copy(ColorThemeType.LIGHT) ?: darkColors
                     }
 
                     ColorThemeType.LIGHT -> {
-                        defaultColors = ThemeColors(context, ColorThemeType.LIGHT).setFromApplicationPreferences()
+                        defaultColors =
+                            ThemeColors(ColorThemeType.LIGHT).setFromApplicationPreferences(context)
                         darkColors =
-                            if (settingsStored ==
-                                null
-                            ) {
+                            if (settingsStored == null) {
                                 defaultColors
                             } else if (settingsStored.darkColors.isEmpty) {
-                                settingsStored.defaultColors.copy(
-                                    context,
-                                    ColorThemeType.DARK,
-                                )
+                                settingsStored.defaultColors.copy(ColorThemeType.DARK)
                             } else {
-                                settingsStored.darkColors.copy(context, ColorThemeType.DARK)
+                                settingsStored.darkColors.copy(ColorThemeType.DARK)
                             }
                     }
 
                     ColorThemeType.SINGLE -> {
                         darkColors = ThemeColors.EMPTY
-                        defaultColors = ThemeColors(context, ColorThemeType.SINGLE).setFromApplicationPreferences()
+                        defaultColors =
+                            ThemeColors(ColorThemeType.SINGLE).setFromApplicationPreferences(context)
                     }
 
                     else -> {
                         darkColors = ThemeColors.EMPTY
                         defaultColors =
-                            if (settingsStored == null) {
-                                darkColors
-                            } else {
-                                settingsStored.defaultColors.copy(
-                                    context,
-                                    ColorThemeType.SINGLE,
-                                )
-                            }
+                            settingsStored?.defaultColors?.copy(ColorThemeType.SINGLE) ?: darkColors
                     }
                 }
 
@@ -1001,17 +993,23 @@ data class InstanceSettings(
                     isCompactLayout = ApplicationPreferences.isCompactLayout(context),
                     isScrollableLayout = ApplicationPreferences.isScrollableLayout(context),
                     widgetHeaderLayout = ApplicationPreferences.getWidgetHeaderLayout(context),
-                    widgetHeaderDateFormat = ApplicationPreferences.getWidgetHeaderDateFormat(context),
+                    widgetHeaderDateFormat = ApplicationPreferences.getWidgetHeaderDateFormat(
+                        context
+                    ),
                     showDayHeaders = ApplicationPreferences.getShowDayHeaders(context),
                     dayHeaderDateFormat = ApplicationPreferences.getDayHeaderDateFormat(context),
-                    showPastEventsUnderOneHeader = ApplicationPreferences.getShowPastEventsUnderOneHeader(context),
+                    showPastEventsUnderOneHeader = ApplicationPreferences.getShowPastEventsUnderOneHeader(
+                        context
+                    ),
                     dayHeaderAlignment =
                         ApplicationPreferences.getString(
                             context,
                             PREF_DAY_HEADER_ALIGNMENT,
                             PREF_DAY_HEADER_ALIGNMENT_DEFAULT,
                         ),
-                    horizontalLineBelowDayHeader = ApplicationPreferences.getHorizontalLineBelowDayHeader(context),
+                    horizontalLineBelowDayHeader = ApplicationPreferences.getHorizontalLineBelowDayHeader(
+                        context
+                    ),
                     showDaysWithoutEvents = ApplicationPreferences.getShowDaysWithoutEvents(context),
                     eventEntryLayout = ApplicationPreferences.getEventEntryLayout(context),
                     showEventIcon = ApplicationPreferences.getShowEventIcon(context),
@@ -1039,7 +1037,9 @@ data class InstanceSettings(
                     darkColors = darkColors,
                     defaultColors = defaultColors,
                     textShadow = ApplicationPreferences.getTextShadow(context),
-                    timeUntilBackgroundSource = ApplicationPreferences.getTimeUntilBackgroundSource(context),
+                    timeUntilBackgroundSource = ApplicationPreferences.getTimeUntilBackgroundSource(
+                        context
+                    ),
                     //
                     // ----------------------------------------------------------------------------------
                     // Event details
@@ -1048,13 +1048,23 @@ data class InstanceSettings(
                     showLocation = ApplicationPreferences.getShowLocation(context),
                     showDescription = ApplicationPreferences.getShowDescription(context),
                     fillAllDayEvents = ApplicationPreferences.getFillAllDayEvents(context),
-                    indicateAlerts = ApplicationPreferences.getBoolean(context, PREF_INDICATE_ALERTS, true),
-                    indicateRecurring = ApplicationPreferences.getBoolean(context, PREF_INDICATE_RECURRING, false),
+                    indicateAlerts = ApplicationPreferences.getBoolean(
+                        context,
+                        PREF_INDICATE_ALERTS,
+                        true
+                    ),
+                    indicateRecurring = ApplicationPreferences.getBoolean(
+                        context,
+                        PREF_INDICATE_RECURRING,
+                        false
+                    ),
                     //
                     // ----------------------------------------------------------------------------------
                     // Event filters
                     eventsEnded = ApplicationPreferences.getEventsEnded(context),
-                    showPastEventsWithDefaultColor = ApplicationPreferences.getShowPastEventsWithDefaultColor(context),
+                    showPastEventsWithDefaultColor = ApplicationPreferences.getShowPastEventsWithDefaultColor(
+                        context
+                    ),
                     eventRange = ApplicationPreferences.getEventRange(context),
                     hideBasedOnKeywords = ApplicationPreferences.getHideBasedOnKeywords(context),
                     showBasedOnKeywords = ApplicationPreferences.getShowBasedOnKeywords(context),
@@ -1079,11 +1089,19 @@ data class InstanceSettings(
                         ApplicationPreferences.getString(
                             context,
                             PREF_WIDGET_INSTANCE_NAME,
-                            ApplicationPreferences.getString(context, PREF_WIDGET_INSTANCE_NAME, ""),
+                            ApplicationPreferences.getString(
+                                context,
+                                PREF_WIDGET_INSTANCE_NAME,
+                                ""
+                            ),
                         ),
                     widgetHeaderButtonsScale =
                         TextSizeScale.fromPreferenceValue(
-                            ApplicationPreferences.getString(context, PREF_WIDGET_HEADER_BUTTONS_SCALE, ""),
+                            ApplicationPreferences.getString(
+                                context,
+                                PREF_WIDGET_HEADER_BUTTONS_SCALE,
+                                ""
+                            ),
                         ),
                     textSizeScale =
                         TextSizeScale.fromPreferenceValue(
@@ -1091,7 +1109,11 @@ data class InstanceSettings(
                         ),
                     timeFormat = ApplicationPreferences.getTimeFormat(context),
                     lockedTimeZoneIdIn = ApplicationPreferences.getLockedTimeZoneId(context),
-                    startHourOfDayIn = ApplicationPreferences.getIntStoredAsString(context, PREF_START_HOUR_OF_DAY, 0),
+                    startHourOfDayIn = ApplicationPreferences.getIntStoredAsString(
+                        context,
+                        PREF_START_HOUR_OF_DAY,
+                        0
+                    ),
                     snapshotModeIn = ApplicationPreferences.getSnapshotMode(context),
                     resultsStorage = resultsStorage,
                     refreshPeriodMinutesIn = ApplicationPreferences.getRefreshPeriodMinutes(context),

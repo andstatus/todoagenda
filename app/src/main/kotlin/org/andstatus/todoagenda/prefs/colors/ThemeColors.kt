@@ -19,20 +19,18 @@ import java.util.concurrent.ConcurrentMap
  * @author yvolk@yurivolkov.com
  */
 class ThemeColors(
-    val contextIn: Context?,
     val colorThemeType: ColorThemeType,
+    val isEmpty: Boolean = false,
 ) {
-    val context: Context get() = contextIn ?: throw IllegalStateException("Context is null")
     val backgroundColors: ConcurrentMap<BackgroundColorPref?, ShadingAndColor> = ConcurrentHashMap()
     var textColorSource: TextColorSource = TextColorSource.defaultEntry
     val textShadings: ConcurrentMap<TextColorPref?, ShadingAndColor> = ConcurrentHashMap()
     val textColors: ConcurrentMap<TextColorPref?, ShadingAndColor> = ConcurrentHashMap()
 
     fun copy(
-        context: Context,
         colorThemeType: ColorThemeType,
     ): ThemeColors {
-        val themeColors = ThemeColors(context, colorThemeType)
+        val themeColors = ThemeColors(colorThemeType)
         return if (isEmpty) themeColors else themeColors.setFromJson(toJson(JSONObject()))
     }
 
@@ -69,27 +67,29 @@ class ThemeColors(
                     if (json.has(pref.colorPreferenceName)) json.getInt(pref.colorPreferenceName) else pref.defaultColor
                 textColors[pref] = ShadingAndColor(color)
             }
-        } catch (e: JSONException) {
+        } catch (_: JSONException) {
             Log.w(TAG, "setFromJson failed\n$json")
             return this
         }
         return this
     }
 
-    fun setFromApplicationPreferences(): ThemeColors {
+    fun setFromApplicationPreferences(context: Context): ThemeColors {
         for (pref in BackgroundColorPref.entries) {
             setBackgroundColor(pref, ApplicationPreferences.getBackgroundColor(pref, context))
         }
         textColorSource = ApplicationPreferences.getTextColorSource(context)
         for (pref in TextColorPref.entries) {
             val oldValue = getTextShadingStored(pref)
-            val themeName = ApplicationPreferences.getString(context, pref.shadingPreferenceName, "")
+            val themeName =
+                ApplicationPreferences.getString(context, pref.shadingPreferenceName, "")
             val shading: Shading = Shading.fromThemeName(themeName, oldValue.shading)
             textShadings[pref] = ShadingAndColor(shading)
         }
         for (pref in TextColorPref.entries) {
             val oldValue = getTextColorStored(pref)
-            val color = ApplicationPreferences.getInt(context, pref.colorPreferenceName, oldValue.color)
+            val color =
+                ApplicationPreferences.getInt(context, pref.colorPreferenceName, oldValue.color)
             textColors[pref] = ShadingAndColor(color)
         }
         return this
@@ -128,9 +128,6 @@ class ThemeColors(
             )
         }
 
-    val isEmpty: Boolean
-        get() = contextIn == null
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
@@ -141,6 +138,7 @@ class ThemeColors(
     override fun hashCode(): Int = toJson(JSONObject()).toString().hashCode()
 
     fun getTextColor(
+        context: Context,
         textColorPref: TextColorPref,
         @AttrRes colorAttrId: Int,
     ): Int {
@@ -161,7 +159,7 @@ class ThemeColors(
                 }
             }
         }
-        return RemoteViewsUtil.getColorValue(getThemeContext(textColorPref), colorAttrId)
+        return RemoteViewsUtil.getColorValue(getThemeContext(context, textColorPref), colorAttrId)
     }
 
     fun getTextShadingStored(colorPref: TextColorPref?): ShadingAndColor =
@@ -185,21 +183,22 @@ class ThemeColors(
             TextColorSource.AUTO -> pref.getShadingForBackground(getBackground(pref.backgroundColorPref).shading)
         }
 
-    fun getEntryBackgroundColor(entry: WidgetEntry): Int = getBackgroundColor(BackgroundColorPref.forTimeSection(entry.timeSection))
+    fun getEntryBackgroundColor(entry: WidgetEntry): Int =
+        getBackgroundColor(BackgroundColorPref.forTimeSection(entry.timeSection))
 
-    fun getThemeContext(pref: TextColorPref): ContextThemeWrapper = ContextThemeWrapper(context, getShading(pref).themeResId)
+    fun getThemeContext(context: Context, pref: TextColorPref): ContextThemeWrapper =
+        ContextThemeWrapper(context, getShading(pref).themeResId)
 
     companion object {
         private val TAG = ThemeColors::class.java.simpleName
         const val TRANSPARENT_BLACK = Color.TRANSPARENT
         const val TRANSPARENT_WHITE = 0x00FFFFFF
-        val EMPTY = ThemeColors(null, ColorThemeType.SINGLE)
+        val EMPTY = ThemeColors(ColorThemeType.SINGLE, isEmpty = true)
         const val PREF_TEXT_COLOR_SOURCE = "textColorSource"
 
         fun fromJson(
-            context: Context?,
             colorThemeType: ColorThemeType,
             json: JSONObject,
-        ): ThemeColors = ThemeColors(context, colorThemeType).setFromJson(json)
+        ): ThemeColors = ThemeColors(colorThemeType).setFromJson(json)
     }
 }
