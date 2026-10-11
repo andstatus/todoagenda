@@ -44,18 +44,18 @@ fun dynamicThemeColors(
                     when (darkLightTheme) {
                         DarkLightTheme.AUTO -> {
                             if (InstanceSettings.isDarkThemeOn(context)) {
-                                TONAL_DARK
+                                ColorThemeType.SEMANTIC_DARK
                             } else {
-                                TONAL_LIGHT
+                                ColorThemeType.SEMANTIC_LIGHT
                             }
                         }
 
                         DarkLightTheme.DARK -> {
-                            TONAL_DARK
+                            ColorThemeType.SEMANTIC_DARK
                         }
 
                         DarkLightTheme.LIGHT -> {
-                            TONAL_LIGHT
+                            ColorThemeType.SEMANTIC_LIGHT
                         }
                     }
                 }
