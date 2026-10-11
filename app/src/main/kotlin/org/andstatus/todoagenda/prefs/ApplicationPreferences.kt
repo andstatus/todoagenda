@@ -3,15 +3,20 @@ package org.andstatus.todoagenda.prefs
 import android.content.Context
 import android.text.TextUtils
 import androidx.preference.PreferenceManager
+import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.layout.EventEntryLayout
 import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.layout.WidgetHeaderLayout
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_COLOR_SETTINGS_SOURCE
+import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_DARK_LIGHT_THEME
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_MAX_NUMBER_OF_EVENTS
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW_DEFAULT
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
+import org.andstatus.todoagenda.prefs.colors.ColorSettingsSource
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType
+import org.andstatus.todoagenda.prefs.colors.DarkLightTheme
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.prefs.colors.TextColorSource
 import org.andstatus.todoagenda.prefs.colors.ThemeColors
@@ -40,12 +45,12 @@ object ApplicationPreferences {
             setBoolean(
                 context,
                 InstanceSettings.PREF_SCROLLABLE_LAYOUT,
-                settings.isScrollableLayout
+                settings.isScrollableLayout,
             )
             setString(
                 context,
                 InstanceSettings.PREF_WIDGET_HEADER_LAYOUT,
-                settings.widgetHeaderLayout.value
+                settings.widgetHeaderLayout.value,
             )
             setDateFormat(
                 context,
@@ -56,68 +61,65 @@ object ApplicationPreferences {
             setDateFormat(
                 context,
                 InstanceSettings.PREF_DAY_HEADER_DATE_FORMAT,
-                settings.dayHeaderDateFormat
+                settings.dayHeaderDateFormat,
             )
             setShowPastEventsUnderOneHeader(context, settings.showPastEventsUnderOneHeader)
             setString(
                 context,
                 InstanceSettings.PREF_DAY_HEADER_ALIGNMENT,
-                settings.dayHeaderAlignment
+                settings.dayHeaderAlignment,
             )
             setHorizontalLineBelowDayHeader(context, settings.horizontalLineBelowDayHeader)
             setShowDaysWithoutEvents(context, settings.showDaysWithoutEvents)
             setString(
                 context,
                 InstanceSettings.PREF_EVENT_ENTRY_LAYOUT,
-                settings.eventEntryLayout.value
+                settings.eventEntryLayout.value,
             )
             setShowEventIcon(context, settings.showEventIcon)
             setDateFormat(
                 context,
                 InstanceSettings.PREF_ENTRY_DATE_FORMAT,
-                settings.entryDateFormat
+                settings.entryDateFormat,
             )
             setBoolean(context, InstanceSettings.PREF_MULTILINE_TITLE, settings.isMultilineTitle)
             setString(
                 context,
                 InstanceSettings.PREF_MAXLINES_TITLE,
-                settings.maxLinesTitle.toString()
+                settings.maxLinesTitle.toString(),
             )
             setBoolean(
                 context,
                 InstanceSettings.PREF_MULTILINE_DETAILS,
-                settings.isMultilineDetails
+                settings.isMultilineDetails,
             )
             setString(
                 context,
                 InstanceSettings.PREF_MAXLINES_DETAILS,
-                settings.maxLinesDetails.toString()
+                settings.maxLinesDetails.toString(),
             )
             setBoolean(
                 context,
                 InstanceSettings.PREF_SHOW_CURRENT_TIME_LINE,
-                settings.showCurrentTimeLine
+                settings.showCurrentTimeLine,
             )
             setBoolean(
                 context,
                 InstanceSettings.PREF_SHOW_TIME_UNTIL_TAG,
-                settings.showTimeUntilTag
+                settings.showTimeUntilTag,
             )
             setString(
                 context,
                 InstanceSettings.PREF_LAST_ENTRY_APPEARANCE,
-                settings.lastEntryAppearance.value
+                settings.lastEntryAppearance.value,
             )
             //
             // ----------------------------------------------------------------------------------
             // Colors
+            setString(context, PREF_COLOR_SETTINGS_SOURCE, settings.colorSettingsSource.value)
+            setString(context, PREF_DARK_LIGHT_THEME, settings.darkLightTheme.value)
             val colors = settings.colors()
             setString(context, PREF_COLOR_THEME_TYPE, colors.colorThemeType.value)
-            setBoolean(
-                context,
-                PREF_DIFFERENT_COLORS_FOR_DARK,
-                colors.colorThemeType != ColorThemeType.SINGLE
-            )
             for (pref in BackgroundColorPref.entries) {
                 setInt(context, pref.colorPreferenceName, colors.getBackground(pref).color)
             }
@@ -126,19 +128,21 @@ object ApplicationPreferences {
                 setString(
                     context,
                     pref.shadingPreferenceName,
-                    colors.textShadings.textShadingStored(pref).shading.themeName
+                    colors.textShadings
+                        .textShadingStored(pref)
+                        .shading.themeName,
                 )
                 setInt(
                     context,
                     pref.colorPreferenceName,
-                    colors.textColors.textColorStored(pref).color
+                    colors.textColors.textColorStored(pref).color,
                 )
             }
             setString(context, PREF_TEXT_SHADOW, settings.textShadow.value)
             setString(
                 context,
                 PREF_TIME_UNTIL_BACKGROUND_SOURCE,
-                settings.timeUntilBackgroundSource.value
+                settings.timeUntilBackgroundSource.value,
             )
             //
             // ----------------------------------------------------------------------------------
@@ -152,7 +156,7 @@ object ApplicationPreferences {
             setBoolean(
                 context,
                 InstanceSettings.PREF_INDICATE_RECURRING,
-                settings.indicateRecurring
+                settings.indicateRecurring,
             )
             //
             // ----------------------------------------------------------------------------------
@@ -172,14 +176,14 @@ object ApplicationPreferences {
             setString(
                 context,
                 PREF_MAX_NUMBER_OF_EVENTS,
-                settings.maxNumberOfEvents.limitToString()
+                settings.maxNumberOfEvents.limitToString(),
             )
             setAllDayEventsPlacement(context, settings.allDayEventsPlacement)
             setString(context, InstanceSettings.PREF_TASK_SCHEDULING, settings.taskScheduling.value)
             setString(
                 context,
                 InstanceSettings.PREF_TASK_WITHOUT_DATES,
-                settings.taskWithoutDates.value
+                settings.taskWithoutDates.value,
             )
             setString(context, InstanceSettings.PREF_FILTER_MODE, settings.filterMode.value)
             //
@@ -192,7 +196,7 @@ object ApplicationPreferences {
             setString(
                 context,
                 InstanceSettings.PREF_WIDGET_INSTANCE_NAME,
-                settings.widgetInstanceName
+                settings.widgetInstanceName,
             )
             setString(
                 context,
@@ -202,14 +206,14 @@ object ApplicationPreferences {
             setString(
                 context,
                 InstanceSettings.PREF_TEXT_SIZE_SCALE,
-                settings.textSizeScale.preferenceValue
+                settings.textSizeScale.preferenceValue,
             )
             setString(context, InstanceSettings.PREF_TIME_FORMAT, settings.timeFormat)
             setLockedTimeZoneId(context, settings.lockedTimeZoneId)
             setString(
                 context,
                 InstanceSettings.PREF_START_HOUR_OF_DAY,
-                settings.startHourOfDay.toString()
+                settings.startHourOfDay.toString(),
             )
             setString(context, InstanceSettings.PREF_SNAPSHOT_MODE, settings.snapshotMode.value)
             setRefreshPeriodMinutes(context, settings.refreshPeriodMinutes)
@@ -225,8 +229,7 @@ object ApplicationPreferences {
         }
     }
 
-    fun isAskForPermissions(context: Context): Boolean =
-        getBoolean(context, PREF_ASK_FOR_PERMISSIONS, true)
+    fun isAskForPermissions(context: Context): Boolean = getBoolean(context, PREF_ASK_FOR_PERMISSIONS, true)
 
     fun setAskForPermissions(
         context: Context,
@@ -235,8 +238,7 @@ object ApplicationPreferences {
         setBoolean(context, PREF_ASK_FOR_PERMISSIONS, value)
     }
 
-    fun getWidgetId(context: Context?): Int =
-        if (context == null) 0 else getInt(context, InstanceSettings.PREF_WIDGET_ID, 0)
+    fun getWidgetId(context: Context?): Int = if (context == null) 0 else getInt(context, InstanceSettings.PREF_WIDGET_ID, 0)
 
     fun setWidgetId(
         context: Context?,
@@ -320,8 +322,7 @@ object ApplicationPreferences {
         setBoolean(context, InstanceSettings.PREF_FILL_ALL_DAY, value)
     }
 
-    fun getHideBasedOnKeywords(context: Context): String =
-        getString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS)
+    fun getHideBasedOnKeywords(context: Context): String = getString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS)
 
     private fun setHideBasedOnKeywords(
         context: Context?,
@@ -330,8 +331,7 @@ object ApplicationPreferences {
         setString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS, value)
     }
 
-    fun getShowBasedOnKeywords(context: Context): String =
-        getString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, "")
+    fun getShowBasedOnKeywords(context: Context): String = getString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, "")
 
     private fun setShowBasedOnKeywords(
         context: Context?,
@@ -340,14 +340,125 @@ object ApplicationPreferences {
         setString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, value)
     }
 
-    fun areDifferentColorsForDark(context: Context?): Boolean =
-        getBoolean(context, PREF_DIFFERENT_COLORS_FOR_DARK, false)
+    fun getSupportedColorSettingsSource(context: Context): ColorSettingsSource =
+        ColorSettingsSource
+            .fromValue(getString(context, PREF_COLOR_SETTINGS_SOURCE))
+            .toSupportedByDevice()
 
-    fun getEditingColorThemeType(context: Context): ColorThemeType =
-        getColorThemeType(context).fromEditor(context, areDifferentColorsForDark(context))
+    fun getDarkLightTheme(context: Context): DarkLightTheme = DarkLightTheme.fromValue(getString(context, PREF_DARK_LIGHT_THEME))
 
-    fun getColorThemeType(context: Context): ColorThemeType =
-        ColorThemeType.fromValue(getString(context, PREF_COLOR_THEME_TYPE))
+    fun colorsPreferencesTitleResId(context: Context): Int {
+        val colorSettingsSource = getSupportedColorSettingsSource(context)
+        val darkLightTheme = getDarkLightTheme(context)
+        return when (colorSettingsSource) {
+            ColorSettingsSource.SINGLE_MANUAL -> {
+                R.string.appearance_group_color_title
+            }
+
+            ColorSettingsSource.TWO_MANUAL -> {
+                if (InstanceSettings.isDarkThemeOn(context)) {
+                    R.string.colors_dark
+                } else {
+                    R.string.colors_light
+                }
+            }
+
+            ColorSettingsSource.MATERIAL_YOU_TONAL,
+            ColorSettingsSource.MATERIAL_YOU_SEMANTIC,
+            -> {
+                if (darkLightTheme == DarkLightTheme.AUTO) {
+                    if (InstanceSettings.isDarkThemeOn(context)) {
+                        R.string.colors_dark
+                    } else {
+                        R.string.colors_light
+                    }
+                } else {
+                    R.string.appearance_group_color_title
+                }
+            }
+        }
+    }
+
+    /** Which, if any, [ColorThemeType] is being edited now.
+     * Its settings are now stored in the [ApplicationPreferences] */
+    fun getBeingEditedColorThemeType(context: Context): ColorThemeType {
+        val colorThemeTypeIn = getColorThemeType(context)
+        val colorSettingsSource = getSupportedColorSettingsSource(context)
+        val darkLightTheme = getDarkLightTheme(context)
+        val colorThemeTypeOut =
+            if (colorThemeTypeIn.manuallyDefinedColors != colorSettingsSource.manuallyDefinedColors) {
+                ColorThemeType.UNSPECIFIED
+            } else {
+                when (colorSettingsSource) {
+                    ColorSettingsSource.SINGLE_MANUAL -> {
+                        if (colorThemeTypeIn == ColorThemeType.LIGHT || colorThemeTypeIn == ColorThemeType.SINGLE) {
+                            ColorThemeType.SINGLE
+                        } else {
+                            ColorThemeType.UNSPECIFIED
+                        }
+                    }
+
+                    ColorSettingsSource.TWO_MANUAL -> {
+                        if ((colorThemeTypeIn == ColorThemeType.DARK) || (
+                                (colorThemeTypeIn == ColorThemeType.SINGLE) &&
+                                    InstanceSettings.isDarkThemeOn(
+                                        context,
+                                    )
+                            )
+                        ) {
+                            ColorThemeType.DARK
+                        } else if (colorThemeTypeIn == ColorThemeType.LIGHT || colorThemeTypeIn == ColorThemeType.SINGLE) {
+                            ColorThemeType.LIGHT
+                        } else {
+                            ColorThemeType.UNSPECIFIED
+                        }
+                    }
+
+                    ColorSettingsSource.MATERIAL_YOU_TONAL -> {
+                        when (darkLightTheme) {
+                            DarkLightTheme.AUTO -> {
+                                if (InstanceSettings.isDarkThemeOn(context)) {
+                                    ColorThemeType.TONAL_DARK
+                                } else {
+                                    ColorThemeType.TONAL_LIGHT
+                                }
+                            }
+
+                            DarkLightTheme.DARK -> {
+                                ColorThemeType.TONAL_DARK
+                            }
+
+                            DarkLightTheme.LIGHT -> {
+                                ColorThemeType.TONAL_LIGHT
+                            }
+                        }
+                    }
+
+                    ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
+                        when (darkLightTheme) {
+                            DarkLightTheme.AUTO -> {
+                                if (InstanceSettings.isDarkThemeOn(context)) {
+                                    ColorThemeType.TONAL_DARK
+                                } else {
+                                    ColorThemeType.TONAL_LIGHT
+                                }
+                            }
+
+                            DarkLightTheme.DARK -> {
+                                ColorThemeType.TONAL_DARK
+                            }
+
+                            DarkLightTheme.LIGHT -> {
+                                ColorThemeType.TONAL_LIGHT
+                            }
+                        }
+                    }
+                }
+            }
+        return colorThemeTypeOut
+    }
+
+    fun getColorThemeType(context: Context): ColorThemeType = ColorThemeType.fromValue(getString(context, PREF_COLOR_THEME_TYPE))
 
     fun getBackgroundColor(
         pref: BackgroundColorPref,
@@ -391,8 +502,7 @@ object ApplicationPreferences {
         setBoolean(context, InstanceSettings.PREF_HORIZONTAL_LINE_BELOW_DAY_HEADER, value)
     }
 
-    fun getShowDaysWithoutEvents(context: Context?): Boolean =
-        getBoolean(context, InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS, false)
+    fun getShowDaysWithoutEvents(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS, false)
 
     private fun setShowDaysWithoutEvents(
         context: Context?,
@@ -401,8 +511,7 @@ object ApplicationPreferences {
         setBoolean(context, InstanceSettings.PREF_SHOW_DAYS_WITHOUT_EVENTS, value)
     }
 
-    fun getShowDayHeaders(context: Context?): Boolean =
-        getBoolean(context, InstanceSettings.PREF_SHOW_DAY_HEADERS, true)
+    fun getShowDayHeaders(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_SHOW_DAY_HEADERS, true)
 
     private fun setShowDayHeaders(
         context: Context?,
@@ -421,8 +530,7 @@ object ApplicationPreferences {
         setBoolean(context, InstanceSettings.PREF_SHOW_PAST_EVENTS_UNDER_ONE_HEADER, value)
     }
 
-    fun getShowEventIcon(context: Context?): Boolean =
-        getBoolean(context, InstanceSettings.PREF_SHOW_EVENT_ICON, false)
+    fun getShowEventIcon(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_SHOW_EVENT_ICON, false)
 
     fun setShowEventIcon(
         context: Context?,
@@ -504,8 +612,7 @@ object ApplicationPreferences {
             InstanceSettings.PREF_TIME_FORMAT_DEFAULT,
         )
 
-    fun getLockedTimeZoneId(context: Context): String =
-        getString(context, InstanceSettings.PREF_LOCKED_TIME_ZONE_ID, "")
+    fun getLockedTimeZoneId(context: Context): String = getString(context, InstanceSettings.PREF_LOCKED_TIME_ZONE_ID, "")
 
     fun setLockedTimeZoneId(
         context: Context?,
@@ -538,8 +645,7 @@ object ApplicationPreferences {
         return if (stored > 0) stored else InstanceSettings.PREF_REFRESH_PERIOD_MINUTES_DEFAULT
     }
 
-    fun isTimeZoneLocked(context: Context): Boolean =
-        !TextUtils.isEmpty(getLockedTimeZoneId(context))
+    fun isTimeZoneLocked(context: Context): Boolean = !TextUtils.isEmpty(getLockedTimeZoneId(context))
 
     fun getEventEntryLayout(context: Context): EventEntryLayout =
         EventEntryLayout.fromValue(
@@ -582,15 +688,15 @@ object ApplicationPreferences {
         LastEntryAppearance.fromValue(
             getString(
                 context,
-                InstanceSettings.PREF_LAST_ENTRY_APPEARANCE
-            )
+                InstanceSettings.PREF_LAST_ENTRY_APPEARANCE,
+            ),
         )
 
     fun getShowOnlyClosestInstanceOfRecurringEvent(context: Context?): Boolean =
         getBoolean(
             context,
             InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT,
-            false
+            false,
         )
 
     fun setShowOnlyClosestInstanceOfRecurringEvent(
@@ -600,18 +706,17 @@ object ApplicationPreferences {
         setBoolean(
             context,
             InstanceSettings.PREF_SHOW_ONLY_CLOSEST_INSTANCE_OF_RECURRING_EVENT,
-            value
+            value,
         )
     }
 
-    fun getHideDuplicates(context: Context?): Boolean =
-        getBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, false)
+    fun getHideDuplicates(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_HIDE_DUPLICATES, false)
 
     fun getMaxNumberOfEvents(context: Context): Int =
         getIntStoredAsString(
             context,
             PREF_MAX_NUMBER_OF_EVENTS,
-            InstanceSettings.EMPTY.maxNumberOfEvents
+            InstanceSettings.EMPTY.maxNumberOfEvents,
         )
 
     fun setHideDuplicates(
@@ -646,8 +751,7 @@ object ApplicationPreferences {
             ),
         )
 
-    fun getFilterMode(context: Context): FilterMode =
-        FilterMode.fromValue(getString(context, InstanceSettings.PREF_FILTER_MODE))
+    fun getFilterMode(context: Context): FilterMode = FilterMode.fromValue(getString(context, InstanceSettings.PREF_FILTER_MODE))
 
     private fun setString(
         context: Context?,
@@ -679,12 +783,12 @@ object ApplicationPreferences {
     ): String {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         return (
-                if (prefs == null) {
-                    defaultValue
-                } else {
-                    prefs.getString(key, defaultValue)
-                }
-                ) ?: ""
+            if (prefs == null) {
+                defaultValue
+            } else {
+                prefs.getString(key, defaultValue)
+            }
+        ) ?: ""
     }
 
     private fun setBoolean(
@@ -727,14 +831,11 @@ object ApplicationPreferences {
         return prefs?.getInt(key, defaultValue) ?: defaultValue
     }
 
-    fun getWidgetInstanceName(context: Context): String =
-        getString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, "")
+    fun getWidgetInstanceName(context: Context): String = getString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, "")
 
-    fun isCompactLayout(context: Context?): Boolean =
-        getBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, false)
+    fun isCompactLayout(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, false)
 
-    fun isScrollableLayout(context: Context?): Boolean =
-        getBoolean(context, InstanceSettings.PREF_SCROLLABLE_LAYOUT, true)
+    fun isScrollableLayout(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_SCROLLABLE_LAYOUT, true)
 
     fun getWidgetHeaderLayout(context: Context): WidgetHeaderLayout =
         WidgetHeaderLayout.fromValue(
@@ -743,9 +844,9 @@ object ApplicationPreferences {
 
     fun noPastEvents(context: Context?): Boolean =
         context != null &&
-                !getShowPastEventsWithDefaultColor(context) &&
-                getEventsEnded(context) === EndedSomeTimeAgo.NONE &&
-                noTaskSources(context)
+            !getShowPastEventsWithDefaultColor(context) &&
+            getEventsEnded(context) === EndedSomeTimeAgo.NONE &&
+            noTaskSources(context)
 
     fun parseIntSafe(value: String?): Int =
         if (StringUtil.isEmpty(value)) {

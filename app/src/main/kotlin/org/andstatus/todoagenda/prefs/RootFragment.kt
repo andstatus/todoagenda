@@ -5,28 +5,47 @@ import androidx.fragment.app.FragmentActivity
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.andstatus.todoagenda.R
-import java.util.Optional
+import org.andstatus.todoagenda.prefs.ApplicationPreferences.getSupportedColorSettingsSource
+import org.andstatus.todoagenda.prefs.colors.DynamicColorsPreferencesFragment
+import org.andstatus.todoagenda.prefs.colors.ManualColorsPreferencesFragment
 
 class RootFragment : PreferenceFragmentCompat() {
     override fun onResume() {
         super.onResume()
-        Optional.ofNullable(activity)
-            .ifPresent { a: FragmentActivity -> a.title = ApplicationPreferences.getWidgetInstanceName(a) }
-        setTitles()
+        activity?.let { a: FragmentActivity ->
+            a.title = ApplicationPreferences.getWidgetInstanceName(a)
+        }
+        setTitlesAndVisibility()
     }
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         addPreferencesFromResource(R.xml.preferences_root)
-        setTitles()
+        setTitlesAndVisibility()
     }
 
-    private fun setTitles() {
-        val context = context
-        val preference = findPreference<Preference>("ColorsPreferencesFragment")
-        if (context != null && preference != null) {
-            val themeType = ApplicationPreferences.getEditingColorThemeType(context)
-            preference.setTitle(themeType.titleResId)
-            preference.isVisible = themeType.isValid
+    private fun setTitlesAndVisibility() {
+        val context = context ?: return
+        val colorSettingsSource = getSupportedColorSettingsSource(context)
+        val titleResId = ApplicationPreferences.colorsPreferencesTitleResId(context)
+        if (colorSettingsSource.manuallyDefinedColors) {
+            findPreference<Preference>(ManualColorsPreferencesFragment::class.simpleName!!)?.let { preference ->
+                preference.setTitle(titleResId)
+                preference.isVisible = true
+            }
+            findPreference<Preference>(DynamicColorsPreferencesFragment::class.simpleName!!)?.let { preference ->
+                preference.isVisible = false
+            }
+        } else {
+            findPreference<Preference>(ManualColorsPreferencesFragment::class.simpleName!!)?.let { preference ->
+                preference.isVisible = false
+            }
+            findPreference<Preference>(DynamicColorsPreferencesFragment::class.simpleName!!)?.let { preference ->
+                preference.setTitle(titleResId)
+                preference.isVisible = true
+            }
         }
     }
 }

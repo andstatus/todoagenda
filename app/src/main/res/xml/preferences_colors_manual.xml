@@ -1,14 +1,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:defaultValue="false"
-        android:key="differentColorsForDark"
-        android:summaryOff="@string/different_colors_for_dark_off_desc"
-        android:summaryOn="@string/different_colors_for_dark_on_desc"
-        android:title="@string/different_colors_for_dark_title" />
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="single"
+        android:entries="@array/pref_color_settings_source_entries"
+        android:entryValues="@array/pref_color_settings_source_values"
+        android:key="colorSettingsSource"
+        android:title="@string/color_settings_source" />
 
     <org.andstatus.todoagenda.prefs.MultilineListPreference
         android:defaultValue="auto"

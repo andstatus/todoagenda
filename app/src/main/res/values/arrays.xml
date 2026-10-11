@@ -64,6 +64,28 @@
         <item>LIGHT</item>
         <item>WHITE</item>
     </string-array>
+    <string-array name="pref_color_settings_source_entries">
+        <item>@string/color_settings_source_single_manual</item>
+        <item>@string/color_settings_source_two_manual</item>
+        <item>@string/color_settings_source_tonal</item>
+        <item>@string/color_settings_source_semantic</item>
+    </string-array>
+    <string-array name="pref_color_settings_source_values" tools:ignore="MissingTranslation">
+        <item>single</item>
+        <item>two</item>
+        <item>tonal</item>
+        <item>semantic</item>
+    </string-array>
+    <string-array name="pref_dark_light_theme_entries">
+        <item>@string/color_theme_auto</item>
+        <item>@string/appearance_theme_dark</item>
+        <item>@string/appearance_theme_light</item>
+    </string-array>
+    <string-array name="pref_pref_dark_light_theme_values" tools:ignore="MissingTranslation">
+        <item>auto</item>
+        <item>light</item>
+        <item>dark</item>
+    </string-array>
     <string-array name="pref_text_color_source_entries">
         <item>@string/text_color_source_auto</item>
         <item>@string/text_color_source_shading</item>

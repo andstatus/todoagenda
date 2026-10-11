@@ -4,9 +4,15 @@
         android:summary="@string/layout_prefs_desc"
         android:title="@string/layout_prefs_title" />
     <Preference
-        android:key="ColorsPreferencesFragment"
+        android:fragment="org.andstatus.todoagenda.prefs.colors.ManualColorsPreferencesFragment"
+        android:key="ManualColorsPreferencesFragment"
         android:persistent="false"
-        android:fragment="org.andstatus.todoagenda.prefs.colors.ColorsPreferencesFragment"
+        android:summary="@string/colors_prefs_desc"
+        android:title="@string/appearance_group_color_title" />
+    <Preference
+        android:fragment="org.andstatus.todoagenda.prefs.colors.DynamicColorsPreferencesFragment"
+        android:key="DynamicColorsPreferencesFragment"
+        android:persistent="false"
         android:summary="@string/colors_prefs_desc"
         android:title="@string/appearance_group_color_title" />
     <Preference

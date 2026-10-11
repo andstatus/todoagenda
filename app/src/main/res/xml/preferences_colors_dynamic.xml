@@ -1,0 +1,16 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="single"
+        android:entries="@array/pref_color_settings_source_entries"
+        android:entryValues="@array/pref_color_settings_source_values"
+        android:key="colorSettingsSource"
+        android:title="@string/color_settings_source" />
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="auto"
+        android:entries="@array/pref_dark_light_theme_entries"
+        android:entryValues="@array/pref_pref_dark_light_theme_values"
+        android:key="darkLightTheme"
+        android:title="@string/color_theme" />
+</PreferenceScreen>

@@ -13,8 +13,10 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.prefs.ApplicationPreferences.getSupportedColorSettingsSource
 import org.andstatus.todoagenda.prefs.RootFragment
-import org.andstatus.todoagenda.prefs.colors.ColorsPreferencesFragment
+import org.andstatus.todoagenda.prefs.colors.DynamicColorsPreferencesFragment
+import org.andstatus.todoagenda.prefs.colors.ManualColorsPreferencesFragment
 import org.andstatus.todoagenda.provider.WidgetData
 import org.andstatus.todoagenda.util.PermissionsUtil
 import org.json.JSONException
@@ -26,9 +28,12 @@ import java.io.InputStreamReader
 import java.io.Reader
 import java.nio.charset.StandardCharsets
 
-class WidgetConfigurationActivity : MyActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
+class WidgetConfigurationActivity :
+    MyActivity(),
+    PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     private var widgetId = 0
     private var saveOnPause = true
+
     override fun onPause() {
         super.onPause()
         if (saveOnPause) {
@@ -59,15 +64,24 @@ class WidgetConfigurationActivity : MyActivity(), PreferenceFragmentCompat.OnPre
             ft.commit()
             val gotoSection = intent.getStringExtra(EXTRA_GOTO_PREFERENCES_SECTION)
             if (EXTRA_GOTO_SECTION_COLORS == gotoSection) {
+                val colorsFragment =
+                    if (getSupportedColorSettingsSource(this).manuallyDefinedColors) {
+                        ManualColorsPreferencesFragment()
+                    } else {
+                        DynamicColorsPreferencesFragment()
+                    }
                 ft = supportFragmentManager.beginTransaction()
-                ft.replace(R.id.settings_container, ColorsPreferencesFragment(), FRAGMENT_TAG)
+                ft.replace(R.id.settings_container, colorsFragment, FRAGMENT_TAG)
                 ft.commit()
                 ft.addToBackStack(null)
             }
         }
     }
 
-    override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
+    override fun onPreferenceStartFragment(
+        caller: PreferenceFragmentCompat,
+        pref: Preference,
+    ): Boolean {
         title = pref.title.toString() + " - " + ApplicationPreferences.getWidgetInstanceName(this)
         return false
     }
@@ -105,17 +119,27 @@ class WidgetConfigurationActivity : MyActivity(), PreferenceFragmentCompat.OnPre
     }
 
     @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+    ) {
         when (requestCode) {
-            REQUEST_ID_BACKUP_SETTINGS -> if (resultCode == RESULT_OK && data != null) {
-                backupSettings(data.data)
+            REQUEST_ID_BACKUP_SETTINGS -> {
+                if (resultCode == RESULT_OK && data != null) {
+                    backupSettings(data.data)
+                }
             }
 
-            REQUEST_ID_RESTORE_SETTINGS -> if (resultCode == RESULT_OK && data != null) {
-                restoreSettings(data.data)
+            REQUEST_ID_RESTORE_SETTINGS -> {
+                if (resultCode == RESULT_OK && data != null) {
+                    restoreSettings(data.data)
+                }
             }
 
-            else -> super.onActivityResult(requestCode, resultCode, data)
+            else -> {
+                super.onActivityResult(requestCode, resultCode, data)
+            }
         }
     }
 
@@ -161,7 +185,12 @@ ${e.message}"""
             saveOnPause = false
             val duration = 3000
             val context = this@WidgetConfigurationActivity
-            Toast.makeText(context, context.getText(R.string.restore_settings_title), Toast.LENGTH_LONG).show()
+            Toast
+                .makeText(
+                    context,
+                    context.getText(R.string.restore_settings_title),
+                    Toast.LENGTH_LONG,
+                ).show()
             Handler().postDelayed({
                 startActivity(intentToStartMe(context, widgetId))
                 context.finish()
@@ -220,11 +249,14 @@ ${e.message}"""
         const val FRAGMENT_TAG = "settings_fragment"
         const val REQUEST_ID_RESTORE_SETTINGS = 1
         const val REQUEST_ID_BACKUP_SETTINGS = 2
-        fun intentToStartMe(context: Context?, widgetId: Int): Intent {
-            return Intent(context, WidgetConfigurationActivity::class.java)
+
+        fun intentToStartMe(
+            context: Context?,
+            widgetId: Int,
+        ): Intent =
+            Intent(context, WidgetConfigurationActivity::class.java)
                 .setData(Uri.parse("intent:configure$widgetId"))
                 .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP + Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                 .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-        }
     }
 }
