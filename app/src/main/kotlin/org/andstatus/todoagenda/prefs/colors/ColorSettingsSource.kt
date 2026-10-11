@@ -34,7 +34,7 @@ enum class ColorSettingsSource(
         value = "semantic",
         titleResId = R.string.color_settings_source_semantic,
         manuallyDefinedColors = false,
-        supportedByDevice = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+        supportedByDevice = Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE,
     ),
     ;
 

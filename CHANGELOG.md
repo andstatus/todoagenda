@@ -1,5 +1,9 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+* Material You dynamic colors: "Color settings source" options for the tonal palette (Android 12+)
+  and the semantic palette (Android 14+). Manually defined colors are kept for when you switch back.
+  [#175](https://github.com/andstatus/todoagenda/issues/175)
+
 <a id="v4.14"/>
 
 ### 2026-08-16 v4.14.1 Non-scrollable widget option

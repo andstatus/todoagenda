@@ -34,6 +34,7 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
         val context: FragmentActivity = requireActivity()
         setTitle(context)
         addPreferencesFromResource(R.xml.preferences_colors_manual)
+        showSupportedColorSettingsSources()
         removeUnavailablePreferences()
     }
 

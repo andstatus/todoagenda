@@ -153,7 +153,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         if (widgetId == 0 || position < 0) return
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val settings = AllSettings.instanceFromId(context, widgetId)
-        val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_SCROLLABLE.shadowed(settings.textShadow))
+        val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_SCROLLABLE.shadowed(settings.appliedTextShadow))
         Log.d(TAG, "gotoPosition, Scrolling widget $widgetId to position $position")
         rv.setScrollPosition(R.id.event_list, position)
         appWidgetManager.updateAppWidget(widgetId, rv)

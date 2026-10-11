@@ -30,9 +30,9 @@ class DayHeaderVisualizer(
         val rv = RemoteViews(
             context.packageName,
             if (horizontalLineBelowDayHeader) {
-                WidgetLayout.DAY_HEADER_SEPARATOR_BELOW.shadowed(settings.textShadow)
+                WidgetLayout.DAY_HEADER_SEPARATOR_BELOW.shadowed(settings.appliedTextShadow)
             } else {
-                WidgetLayout.DAY_HEADER_SEPARATOR_ABOVE.shadowed(settings.textShadow)
+                WidgetLayout.DAY_HEADER_SEPARATOR_ABOVE.shadowed(settings.appliedTextShadow)
             },
         )
         rv.setInt(R.id.day_header_title_wrapper, "setGravity", alignment.gravity)

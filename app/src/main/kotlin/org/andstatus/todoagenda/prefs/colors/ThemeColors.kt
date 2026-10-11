@@ -20,6 +20,8 @@ class ThemeColors(
     val textColorSource: TextColorSource = TextColorSource.defaultEntry,
     val textShadings: Map<TextColorPref, ShadingAndColor> = emptyMap(),
     val textColors: Map<TextColorPref, ShadingAndColor> = emptyMap(),
+    /** Behind the whole widget, under the header and entry backgrounds. Not stored: only dynamic sources set it */
+    val widgetBackgroundColor: Int = Color.TRANSPARENT,
     val isEmpty: Boolean = false,
 ) {
     fun jsonCopy(colorThemeType: ColorThemeType): ThemeColors = fromJson(colorThemeType, toJson(JSONObject()))

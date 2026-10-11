@@ -3,6 +3,7 @@ package org.andstatus.todoagenda.prefs.colors
 import android.content.Context
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.fragment.app.FragmentActivity
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
@@ -33,6 +34,18 @@ abstract class ColorsPreferencesFragment :
         if (preference != null) {
             preference.summary = context.getString(colorSettingsSource.titleResId)
         }
+    }
+
+    /** Lists only the sources supported by the device, hiding the choice if there is nothing to choose from */
+    fun showSupportedColorSettingsSources() {
+        val preference = findPreference<ListPreference>(PREF_COLOR_SETTINGS_SOURCE) ?: return
+        val supported = ColorSettingsSource.entries.filter { it.supportedByDevice }
+        if (supported.size < 2) {
+            removePreferenceImproved(PREF_COLOR_SETTINGS_SOURCE)
+            return
+        }
+        preference.entries = supported.map { getString(it.titleResId) }.toTypedArray()
+        preference.entryValues = supported.map { it.value }.toTypedArray()
     }
 
     fun setTitle(context: FragmentActivity) {
