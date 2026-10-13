@@ -369,7 +369,7 @@ class RemoteViewsFactory(
                 } else {
                     WidgetLayout.WIDGET_NON_SCROLLABLE
                 }
-                val rv = RemoteViews(context.packageName, layout.shadowed(settings.appliedTextShadow))
+                val rv = RemoteViews(context.packageName, layout.shadowed(settings.textShadow))
                 RemoteViewsUtil.setBackgroundColor(rv, R.id.widget_parent, settings.colors().widgetBackgroundColor)
                 configureWidgetHeader(settings, rv)
                 if (settings.isScrollableLayout) {
@@ -396,7 +396,7 @@ class RemoteViewsFactory(
                 val headerView =
                     RemoteViews(
                         settings.context.packageName,
-                        settings.widgetHeaderLayout.widgetLayout?.shadowed(settings.appliedTextShadow)
+                        settings.widgetHeaderLayout.widgetLayout?.shadowed(settings.textShadow)
                             ?: 0,
                     )
                 rv.addView(R.id.header_parent, headerView)

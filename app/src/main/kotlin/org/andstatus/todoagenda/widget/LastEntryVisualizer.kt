@@ -22,7 +22,7 @@ class LastEntryVisualizer(
     ): RemoteViews {
         val entry = eventEntry as LastEntry
         Log.d(TAG, "lastEntry: ${entry.type}, position: $position")
-        val rv = RemoteViews(context.packageName, entry.type.widgetLayout.shadowed(settings.appliedTextShadow))
+        val rv = RemoteViews(context.packageName, entry.type.widgetLayout.shadowed(settings.textShadow))
         val viewId = R.id.event_entry
         if (entry.appearance == LastEntryAppearance.WITH_MESSAGE) {
             rv.setTextViewText(viewId, context.getText(entry.type.valueResId))

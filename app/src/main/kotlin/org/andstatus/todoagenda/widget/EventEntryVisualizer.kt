@@ -13,7 +13,7 @@ abstract class EventEntryVisualizer(
         entry: WidgetEntry,
         position: Int,
     ): RemoteViews =
-        RemoteViews(context.packageName, settings.eventEntryLayout.widgetLayout.shadowed(settings.appliedTextShadow)).also {
+        RemoteViews(context.packageName, settings.eventEntryLayout.widgetLayout.shadowed(settings.textShadow)).also {
             layout.apply(entry, it)
         }
 

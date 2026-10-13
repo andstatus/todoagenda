@@ -17,7 +17,6 @@ class DynamicColorsPreferencesFragment : ColorsPreferencesFragment() {
         val context: FragmentActivity = requireActivity()
         setTitle(context)
         addPreferencesFromResource(R.xml.preferences_colors_dynamic)
-        showSupportedColorSettingsSources()
     }
 
     override fun onResume() {

@@ -21,7 +21,7 @@ class CurrentTimeVisualizer(
         position: Int,
     ): RemoteViews {
         val entry = eventEntry as CurrentTimeEntry
-        val rv = RemoteViews(context.packageName, WidgetLayout.CURRENT_TIME_LINE.shadowed(settings.appliedTextShadow))
+        val rv = RemoteViews(context.packageName, WidgetLayout.CURRENT_TIME_LINE.shadowed(settings.textShadow))
         listOf(R.id.current_time_line, R.id.current_time_line_dot).forEach { id ->
             RemoteViewsUtil.setBackgroundColor(
                 rv,

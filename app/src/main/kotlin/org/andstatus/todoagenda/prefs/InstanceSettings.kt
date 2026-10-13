@@ -321,18 +321,10 @@ data class InstanceSettings(
     val startOfTimeRange: DateTime?
         get() = eventsEnded.endedAt(clock)
 
-    /** Text shadow is set together with manually defined colors: dynamic palettes are drawn without it */
-    val appliedTextShadow: TextShadow
-        get() = if (colorSettingsSource.manuallyDefinedColors) textShadow else TextShadow.NO_SHADOW
-
-    /** Like [appliedTextShadow], dynamic palettes ignore the manually set "Time until" background */
-    val appliedTimeUntilBackgroundSource: TimeUntilBackgroundSource
-        get() = if (colorSettingsSource.manuallyDefinedColors) timeUntilBackgroundSource else TimeUntilBackgroundSource.AUTO
-
     fun timeUntilBackgroundSource(pref: TextColorPref): TimeUntilBackgroundSource =
-        when (appliedTimeUntilBackgroundSource) {
+        when (timeUntilBackgroundSource) {
             TimeUntilBackgroundSource.AUTO -> colors().getShading(pref).timeUntilBackgroundSource
-            else -> appliedTimeUntilBackgroundSource
+            else -> timeUntilBackgroundSource
         }
 
     fun colors(): ThemeColors =
