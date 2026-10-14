@@ -1,9 +1,8 @@
 package org.andstatus.todoagenda.prefs.colors
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Build
 import androidx.annotation.ColorRes
-import androidx.annotation.RequiresApi
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.SEMANTIC_DARK
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.SEMANTIC_LIGHT
@@ -15,6 +14,9 @@ fun dynamicThemeColors(
     colorSettingsSource: ColorSettingsSource,
     darkLightTheme: DarkLightTheme,
 ): ThemeColors {
+    if (!colorSettingsSource.supportedByDevice) {
+        error("$colorSettingsSource is not supported by the device")
+    }
     val dark =
         when (darkLightTheme) {
             DarkLightTheme.AUTO -> InstanceSettings.isDarkThemeOn(context)
@@ -29,19 +31,11 @@ fun dynamicThemeColors(
         }
 
         ColorSettingsSource.MATERIAL_YOU_TONAL -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                tonalPalette(dark).toThemeColors(context, if (dark) TONAL_DARK else TONAL_LIGHT)
-            } else {
-                error("$colorSettingsSource is not supported by the device")
-            }
+            tonalPalette(dark).toThemeColors(context, if (dark) TONAL_DARK else TONAL_LIGHT)
         }
 
         ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                semanticPalette(dark).toThemeColors(context, if (dark) SEMANTIC_DARK else SEMANTIC_LIGHT)
-            } else {
-                error("$colorSettingsSource is not supported by the device")
-            }
+            semanticPalette(dark).toThemeColors(context, if (dark) SEMANTIC_DARK else SEMANTIC_LIGHT)
         }
     }
 }
@@ -108,8 +102,9 @@ private class DynamicPalette(
  * The surface is tone 95 / 20 of the secondary accent: measured to be exactly what the
  * Google Calendar, Google Maps, Google Search and Breezy Weather widgets use, so that this widget
  * sits alongside them. Note that this is not one of the Material 3 surface roles, which are far less tinted.
+ * Callers check [ColorSettingsSource.supportedByDevice] first.
  */
-@RequiresApi(Build.VERSION_CODES.S)
+@SuppressLint("InlinedApi")
 private fun tonalPalette(dark: Boolean): DynamicPalette =
     if (dark) {
         DynamicPalette(
@@ -129,8 +124,8 @@ private fun tonalPalette(dark: Boolean): DynamicPalette =
         )
     }
 
-/** Material 3 color roles, available from Android 14 on */
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+/** Material 3 color roles, available from Android 14 on. Callers check [ColorSettingsSource.supportedByDevice] first. */
+@SuppressLint("InlinedApi")
 private fun semanticPalette(dark: Boolean): DynamicPalette =
     if (dark) {
         DynamicPalette(
