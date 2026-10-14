@@ -3,7 +3,7 @@ package org.andstatus.todoagenda.prefs.colors
 import android.content.Context
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.fragment.app.FragmentActivity
-import androidx.preference.Preference
+import androidx.preference.ListPreference
 import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_COLOR_SETTINGS_SOURCE
@@ -29,9 +29,12 @@ abstract class ColorsPreferencesFragment :
         val context: Context = activity ?: return
         val colorSettingsSource: ColorSettingsSource =
             ApplicationPreferences.getSupportedColorSettingsSource(context)
-        val preference = findPreference<Preference>(PREF_COLOR_SETTINGS_SOURCE)
+        val preference = findPreference<ListPreference>(PREF_COLOR_SETTINGS_SOURCE)
         if (preference != null) {
             preference.summary = context.getString(colorSettingsSource.titleResId)
+            val supported = ColorSettingsSource.entries.filter { it.supportedByDevice }
+            preference.entries = supported.map { context.getString(it.titleResId) }.toTypedArray()
+            preference.entryValues = supported.map { it.value }.toTypedArray()
         }
     }
 
