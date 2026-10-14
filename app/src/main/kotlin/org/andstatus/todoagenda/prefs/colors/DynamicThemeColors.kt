@@ -1,7 +1,6 @@
 package org.andstatus.todoagenda.prefs.colors
 
 import android.content.Context
-import android.graphics.Color
 import android.os.Build
 import androidx.annotation.ColorRes
 import androidx.annotation.RequiresApi
@@ -55,10 +54,7 @@ private class DynamicPalette(
     @param:ColorRes val primary: Int,
     @param:ColorRes val tertiary: Int,
 ) {
-    /**
-     * The whole widget is one surface: entries have no backgrounds of their own,
-     * and only the Current time line has a color.
-     */
+    /** The header and all entries share one surface color; only the Current time line has a color of its own */
     fun toThemeColors(
         context: Context,
         colorThemeType: ColorThemeType,
@@ -66,7 +62,7 @@ private class DynamicPalette(
         val backgroundColors =
             BackgroundColorPref.entries.associateWith { pref ->
                 ShadingAndColor(
-                    if (pref == BackgroundColorPref.CURRENT_TIME) context.getColor(primary) else Color.TRANSPARENT,
+                    context.getColor(if (pref == BackgroundColorPref.CURRENT_TIME) primary else surface),
                 )
             }
         val textColors =
@@ -78,7 +74,6 @@ private class DynamicPalette(
             backgroundColors = backgroundColors,
             textColorSource = TextColorSource.COLORS,
             textColors = textColors,
-            widgetBackgroundColor = context.getColor(surface),
         )
     }
 
