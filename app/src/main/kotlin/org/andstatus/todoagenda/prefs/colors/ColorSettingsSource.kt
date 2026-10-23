@@ -3,7 +3,6 @@ package org.andstatus.todoagenda.prefs.colors
 import android.os.Build
 import androidx.annotation.StringRes
 import org.andstatus.todoagenda.R
-import org.andstatus.todoagenda.prefs.colors.ColorThemeType.Companion.canHaveDifferentColorsForDark
 
 /** See https://github.com/andstatus/todoagenda/issues/175#issuecomment-6098933074 */
 enum class ColorSettingsSource(
@@ -19,7 +18,7 @@ enum class ColorSettingsSource(
         supportedByDevice = true,
     ),
     TWO_MANUAL(
-        value = "two",
+        value = "manual",
         titleResId = R.string.color_settings_source_two_manual,
         manuallyDefinedColors = true,
         supportedByDevice = canHaveDifferentColorsForDark,

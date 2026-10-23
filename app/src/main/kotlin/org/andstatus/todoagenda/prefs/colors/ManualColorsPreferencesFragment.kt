@@ -48,7 +48,7 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
     private fun showTextSources() {
         val context: Context = activity ?: return
         val textColorSource = ApplicationPreferences.getTextColorSource(context)
-        val preference = findPreference<Preference>(ThemeColors.PREF_TEXT_COLOR_SOURCE)
+        val preference = findPreference<Preference>(ColorTheme.PREF_TEXT_COLOR_SOURCE)
         if (preference != null) {
             preference.summary =
                 """
@@ -99,14 +99,6 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
 
     private fun removeUnavailablePreferences() {
         val context = activity ?: return
-        if (!ColorThemeType.canHaveDifferentColorsForDark) {
-            val screen = preferenceScreen
-            val preference =
-                findPreference<Preference>(InstanceSettings.PREF_COLOR_SETTINGS_SOURCE)
-            if (screen != null && preference != null) {
-                screen.removePreference(preference)
-            }
-        }
         if (ApplicationPreferences.noPastEvents(context)) {
             val screen = preferenceScreen
             val preference = findPreference<Preference>(TimeSection.PAST.preferenceCategoryKey)
@@ -183,7 +175,7 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
                 onColorSettingSourceChanged(activity)
             }
 
-            ThemeColors.PREF_TEXT_COLOR_SOURCE -> {
+            ColorTheme.PREF_TEXT_COLOR_SOURCE -> {
                 val intent: Intent =
                     MainActivity.intentToConfigure(
                         activity,

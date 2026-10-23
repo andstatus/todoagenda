@@ -7,12 +7,11 @@ import org.andstatus.todoagenda.layout.EventEntryLayout
 import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.prefs.colors.ColorSettingsSource
-import org.andstatus.todoagenda.prefs.colors.ColorThemeType
+import org.andstatus.todoagenda.prefs.colors.ColorTheme
+import org.andstatus.todoagenda.prefs.colors.ColorThemes
 import org.andstatus.todoagenda.prefs.colors.DarkLightTheme
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
-import org.andstatus.todoagenda.prefs.colors.ThemeColors
 import org.andstatus.todoagenda.prefs.colors.TimeUntilBackgroundSource
-import org.andstatus.todoagenda.prefs.colors.dynamicThemeColors
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatter
@@ -71,13 +70,7 @@ data class InstanceSettings(
     // Colors
     val colorSettingsSource: ColorSettingsSource = PREF_COLOR_SETTINGS_SOURCE_DEFAULT,
     val darkLightTheme: DarkLightTheme = PREF_DARK_LIGHT_THEME_DEFAULT,
-    private val defaultManualColors: ThemeColors =
-        if (contextIn == null) {
-            ThemeColors.EMPTY
-        } else {
-            ThemeColors(ColorThemeType.SINGLE)
-        },
-    private val darkManualColors: ThemeColors = ThemeColors.EMPTY,
+    private val colorThemes: ColorThemes = ColorThemes(),
     val textShadow: TextShadow = TextShadow.NO_SHADOW,
     val timeUntilBackgroundSource: TimeUntilBackgroundSource = TimeUntilBackgroundSource.defaultEntry,
     //
@@ -146,7 +139,7 @@ data class InstanceSettings(
     val snapshotDate: DateTime? =
         if (snapshotMode.isSnapshotMode) resultsStorage?.executedAt?.get() else null
     val timeZone: DateTimeZone =
-        snapshotDate?.let<DateTime, DateTimeZone?> {
+        snapshotDate?.let {
             if (snapshotMode == SnapshotMode.SNAPSHOT_TIME) it.zone else null
         } ?: if (StringUtil.nonEmpty(lockedTimeZoneId)) {
             DateTimeZone.forID(lockedTimeZoneId)
@@ -239,10 +232,7 @@ data class InstanceSettings(
             // Colors
             put(PREF_COLOR_SETTINGS_SOURCE, colorSettingsSource.value)
             put(PREF_DARK_LIGHT_THEME, darkLightTheme.value)
-            defaultManualColors.toJson(this)
-            if (!darkManualColors.isEmpty) {
-                put(PREF_DARK_THEME, darkManualColors.toJson(JSONObject()))
-            }
+            colorThemes.toJson(this)
             put(PREF_TEXT_SHADOW, textShadow.value)
             put(PREF_TIME_UNTIL_BACKGROUND_SOURCE, timeUntilBackgroundSource.value)
             //
@@ -327,22 +317,7 @@ data class InstanceSettings(
             else -> timeUntilBackgroundSource
         }
 
-    fun colors(): ThemeColors =
-        when (colorSettingsSource) {
-            ColorSettingsSource.SINGLE_MANUAL,
-            ColorSettingsSource.TWO_MANUAL,
-            -> {
-                if (!darkManualColors.isEmpty && isDarkThemeOn(context)) darkManualColors else defaultManualColors
-            }
-
-            ColorSettingsSource.MATERIAL_YOU_TONAL,
-            ColorSettingsSource.MATERIAL_YOU_SEMANTIC,
-            -> {
-                contextIn?.let {
-                    dynamicThemeColors(it, colorSettingsSource, darkLightTheme)
-                } ?: defaultManualColors
-            }
-        }
+    fun colors(): ColorTheme = colorThemes.theme(contextIn, colorSettingsSource, darkLightTheme)
 
     fun widgetHeaderDateFormatter(): DateFormatter = DateFormatter(context, widgetHeaderDateFormat, clock.now())
 
@@ -479,6 +454,8 @@ data class InstanceSettings(
         val PREF_COLOR_SETTINGS_SOURCE_DEFAULT = ColorSettingsSource.SINGLE_MANUAL
         const val PREF_DARK_LIGHT_THEME = "darkLightTheme"
         val PREF_DARK_LIGHT_THEME_DEFAULT = DarkLightTheme.DEFAULT
+
+        @Deprecated("since v.4.15")
         const val PREF_DARK_THEME = "darkTheme"
         const val PREF_TEXT_SHADOW = "textShadow"
         val PREF_TEXT_SHADOW_DEFAULT = TextShadow.NO_SHADOW.name
@@ -573,8 +550,6 @@ data class InstanceSettings(
                             prevName
                         }
                     }
-                val differentColorsForDark: Boolean =
-                    ColorThemeType.canHaveDifferentColorsForDark && json.has(PREF_DARK_THEME)
                 val eventEntryLayout =
                     if (json.has(PREF_EVENT_ENTRY_LAYOUT)) {
                         EventEntryLayout.fromValue(json.getString(PREF_EVENT_ENTRY_LAYOUT))
@@ -751,23 +726,8 @@ data class InstanceSettings(
                             DarkLightTheme.fromValue(json.getString(PREF_DARK_LIGHT_THEME))
                         } else {
                             PREF_DARK_LIGHT_THEME_DEFAULT
-                        },
-                    defaultManualColors =
-                        ThemeColors.fromJson(
-                            if (differentColorsForDark) ColorThemeType.LIGHT else ColorThemeType.SINGLE,
-                            json,
-                        ),
-                    darkManualColors =
-                        if (differentColorsForDark) {
-                            ThemeColors.fromJson(
-                                ColorThemeType.DARK,
-                                json.getJSONObject(
-                                    PREF_DARK_THEME,
-                                ),
-                            )
-                        } else {
-                            ThemeColors.EMPTY
-                        },
+                        }.toSupportedByDevice(),
+                    colorThemes = ColorThemes.fromJson(json),
                     textShadow =
                         if (json.has(PREF_TEXT_SHADOW)) {
                             TextShadow.fromValue(json.getString(PREF_TEXT_SHADOW))
@@ -993,55 +953,6 @@ data class InstanceSettings(
                 }
 
             return synchronized(ApplicationPreferences::class) {
-                // Preserve manual color settings
-                var defaultManualColors: ThemeColors
-                var darkManualColors: ThemeColors
-                when (ApplicationPreferences.getBeingEditedColorThemeType(context)) {
-                    ColorThemeType.DARK -> {
-                        darkManualColors =
-                            ThemeColors.fromApplicationPreferences(ColorThemeType.DARK, context)
-                        defaultManualColors =
-                            settingsStored?.defaultManualColors?.jsonCopy(ColorThemeType.LIGHT)
-                                ?: darkManualColors
-                    }
-
-                    ColorThemeType.LIGHT -> {
-                        defaultManualColors =
-                            ThemeColors.fromApplicationPreferences(ColorThemeType.LIGHT, context)
-                        darkManualColors =
-                            if (settingsStored == null) {
-                                defaultManualColors
-                            } else if (settingsStored.darkManualColors.isEmpty) {
-                                settingsStored.defaultManualColors.jsonCopy(ColorThemeType.DARK)
-                            } else {
-                                settingsStored.darkManualColors.jsonCopy(ColorThemeType.DARK)
-                            }
-                    }
-
-                    ColorThemeType.SINGLE -> {
-                        defaultManualColors =
-                            ThemeColors.fromApplicationPreferences(ColorThemeType.SINGLE, context)
-                        darkManualColors = ThemeColors.EMPTY
-                    }
-
-                    ColorThemeType.UNSPECIFIED,
-                    ColorThemeType.TONAL_LIGHT,
-                    ColorThemeType.TONAL_DARK,
-                    ColorThemeType.SEMANTIC_LIGHT,
-                    ColorThemeType.SEMANTIC_DARK,
-                    -> {
-                        defaultManualColors =
-                            settingsStored?.defaultManualColors?.jsonCopy(ColorThemeType.LIGHT)
-                                ?: ThemeColors.EMPTY
-                        darkManualColors =
-                            if (settingsStored == null || settingsStored.darkManualColors.isEmpty) {
-                                ThemeColors.EMPTY
-                            } else {
-                                settingsStored.darkManualColors.jsonCopy(ColorThemeType.DARK)
-                            }
-                    }
-                }
-
                 InstanceSettings(
                     contextIn = context,
                     widgetId = widgetId,
@@ -1098,8 +1009,12 @@ data class InstanceSettings(
                     colorSettingsSource =
                         ApplicationPreferences.getSupportedColorSettingsSource(context),
                     darkLightTheme = ApplicationPreferences.getDarkLightTheme(context),
-                    darkManualColors = darkManualColors,
-                    defaultManualColors = defaultManualColors,
+                    colorThemes =
+                        (settingsStored?.colorThemes ?: ColorThemes()) +
+                            ApplicationPreferences
+                                .getBeingEditedColorThemeType(context)
+                                .takeIf { it.supportedByDevice }
+                                ?.let { ColorTheme.fromApplicationPreferences(it, context) },
                     textShadow = ApplicationPreferences.getTextShadow(context),
                     timeUntilBackgroundSource =
                         ApplicationPreferences.getTimeUntilBackgroundSource(context),

@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import androidx.core.graphics.toColorInt
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.layout.TimeSection
-import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref.entries
 
 enum class BackgroundColorPref(
     val colorPreferenceName: String,
@@ -15,7 +14,7 @@ enum class BackgroundColorPref(
 ) {
     WIDGET_HEADER(
         "widgetHeaderBackgroundColor",
-        ThemeColors.Companion.TRANSPARENT_BLACK,
+        ColorTheme.Companion.TRANSPARENT_BLACK,
         R.string.appearance_background_color_title,
         TimeSection.ALL,
     ),

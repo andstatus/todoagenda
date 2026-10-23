@@ -14,12 +14,14 @@ abstract class MyPreferenceFragment : PreferenceFragmentCompat() {
         ApplicationPreferences.save(activity, widgetId)
     }
 
-    fun removePreferenceImproved(preferenceName: String?) {
-        val preference = findPreference<Preference>(preferenceName!!)
-        val screen = preferenceScreen
-        if (screen != null && preference != null) {
+    fun removePreferenceImproved(preferenceName: String) {
+        removePreferenceImproved(findPreference(preferenceName))
+    }
+
+    fun removePreferenceImproved(preference: Preference?) {
+        if (preference != null) {
             val group = preference.parent
-            group?.removePreference(preference) ?: screen.removePreference(preference)
+            group?.removePreference(preference) ?: preferenceScreen?.removePreference(preference)
         }
     }
 }

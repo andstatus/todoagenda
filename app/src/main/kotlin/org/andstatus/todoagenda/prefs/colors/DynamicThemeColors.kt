@@ -3,7 +3,6 @@ package org.andstatus.todoagenda.prefs.colors
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.ColorRes
-import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.SEMANTIC_DARK
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.SEMANTIC_LIGHT
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.TONAL_DARK
@@ -12,18 +11,9 @@ import org.andstatus.todoagenda.prefs.colors.ColorThemeType.TONAL_LIGHT
 fun dynamicThemeColors(
     context: Context,
     colorSettingsSource: ColorSettingsSource,
-    darkLightTheme: DarkLightTheme,
-): ThemeColors {
-    if (!colorSettingsSource.supportedByDevice) {
-        error("$colorSettingsSource is not supported by the device")
-    }
-    val dark =
-        when (darkLightTheme) {
-            DarkLightTheme.AUTO -> InstanceSettings.isDarkThemeOn(context)
-            DarkLightTheme.DARK -> true
-            DarkLightTheme.LIGHT -> false
-        }
-    return when (colorSettingsSource) {
+    dark: Boolean,
+): ColorTheme =
+    when (colorSettingsSource) {
         ColorSettingsSource.SINGLE_MANUAL,
         ColorSettingsSource.TWO_MANUAL,
         -> {
@@ -31,14 +21,19 @@ fun dynamicThemeColors(
         }
 
         ColorSettingsSource.MATERIAL_YOU_TONAL -> {
-            tonalPalette(dark).toThemeColors(context, if (dark) TONAL_DARK else TONAL_LIGHT)
+            tonalPalette(dark).toThemeColors(
+                context,
+                if (dark) TONAL_DARK else TONAL_LIGHT,
+            )
         }
 
         ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
-            semanticPalette(dark).toThemeColors(context, if (dark) SEMANTIC_DARK else SEMANTIC_LIGHT)
+            semanticPalette(dark).toThemeColors(
+                context,
+                if (dark) SEMANTIC_DARK else SEMANTIC_LIGHT,
+            )
         }
     }
-}
 
 /** The few Material You color roles that the widget is drawn with */
 private class DynamicPalette(
@@ -52,7 +47,7 @@ private class DynamicPalette(
     fun toThemeColors(
         context: Context,
         colorThemeType: ColorThemeType,
-    ): ThemeColors {
+    ): ColorTheme {
         val backgroundColors =
             BackgroundColorPref.entries.associateWith { pref ->
                 ShadingAndColor(
@@ -63,7 +58,7 @@ private class DynamicPalette(
             TextColorPref.entries.associateWith { pref ->
                 ShadingAndColor(context.getColor(textColorRes(pref)))
             }
-        return ThemeColors(
+        return ColorTheme(
             colorThemeType = colorThemeType,
             backgroundColors = backgroundColors,
             textColorSource = TextColorSource.COLORS,

@@ -1,7 +1,6 @@
 package org.andstatus.todoagenda.prefs.colors
 
 import android.app.Activity
-import android.os.Build
 import androidx.annotation.StringRes
 import org.andstatus.todoagenda.R
 
@@ -13,38 +12,53 @@ enum class ColorThemeType(
     val value: String,
     @field:StringRes val titleResId: Int,
     val manuallyDefinedColors: Boolean,
+    val supportedByDevice: Boolean,
 ) {
-    UNSPECIFIED(value = "none", titleResId = R.string.no_title, manuallyDefinedColors = true),
-    SINGLE(
-        value = "single",
-        titleResId = R.string.appearance_group_color_title,
+    NONE(
+        value = "none",
+        titleResId = R.string.no_title,
         manuallyDefinedColors = true,
+        supportedByDevice = false,
     ),
-    DARK(value = "dark", titleResId = R.string.colors_dark, manuallyDefinedColors = true),
-    LIGHT(value = "light", titleResId = R.string.colors_light, manuallyDefinedColors = true),
+    LIGHT(
+        value = "light",
+        titleResId = R.string.colors_light,
+        manuallyDefinedColors = true,
+        supportedByDevice = true,
+    ),
+    DARK(
+        value = "dark",
+        titleResId = R.string.colors_dark,
+        manuallyDefinedColors = true,
+        supportedByDevice = ColorSettingsSource.TWO_MANUAL.supportedByDevice,
+    ),
     TONAL_LIGHT(
         value = "tonalLight",
         titleResId = R.string.colors_light,
         manuallyDefinedColors = false,
+        supportedByDevice = ColorSettingsSource.MATERIAL_YOU_TONAL.supportedByDevice,
     ),
     TONAL_DARK(
         value = "tonalDark",
         titleResId = R.string.colors_dark,
         manuallyDefinedColors = false,
+        supportedByDevice = ColorSettingsSource.MATERIAL_YOU_TONAL.supportedByDevice,
     ),
     SEMANTIC_LIGHT(
         value = "semanticLight",
         titleResId = R.string.colors_light,
         manuallyDefinedColors = false,
+        supportedByDevice = ColorSettingsSource.MATERIAL_YOU_SEMANTIC.supportedByDevice,
     ),
     SEMANTIC_DARK(
         value = "semanticDark",
         titleResId = R.string.colors_dark,
         manuallyDefinedColors = false,
+        supportedByDevice = ColorSettingsSource.MATERIAL_YOU_SEMANTIC.supportedByDevice,
     ),
     ;
 
-    val isValid: Boolean get() = this != UNSPECIFIED
+    val isValid: Boolean get() = this != NONE
 
     fun setTitle(activity: Activity?): ColorThemeType {
         activity?.setTitle(titleResId)
@@ -52,7 +66,7 @@ enum class ColorThemeType(
     }
 
     companion object {
-        private val defaultValue = SINGLE
+        private val defaultValue = LIGHT
 
         fun fromValue(value: String?): ColorThemeType {
             for (item in entries) {
@@ -62,8 +76,5 @@ enum class ColorThemeType(
             }
             return defaultValue
         }
-
-        /** See https://developer.android.com/guide/topics/ui/look-and-feel/darktheme  */
-        val canHaveDifferentColorsForDark: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     }
 }

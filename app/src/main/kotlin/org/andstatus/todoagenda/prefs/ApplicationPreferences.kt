@@ -15,13 +15,13 @@ import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADO
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
 import org.andstatus.todoagenda.prefs.colors.ColorSettingsSource
+import org.andstatus.todoagenda.prefs.colors.ColorTheme
+import org.andstatus.todoagenda.prefs.colors.ColorTheme.Companion.textColorStored
+import org.andstatus.todoagenda.prefs.colors.ColorTheme.Companion.textShadingStored
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType
 import org.andstatus.todoagenda.prefs.colors.DarkLightTheme
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 import org.andstatus.todoagenda.prefs.colors.TextColorSource
-import org.andstatus.todoagenda.prefs.colors.ThemeColors
-import org.andstatus.todoagenda.prefs.colors.ThemeColors.Companion.textColorStored
-import org.andstatus.todoagenda.prefs.colors.ThemeColors.Companion.textShadingStored
 import org.andstatus.todoagenda.prefs.colors.TimeUntilBackgroundSource
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.util.StringUtil
@@ -123,7 +123,7 @@ object ApplicationPreferences {
             for (pref in BackgroundColorPref.entries) {
                 setInt(context, pref.colorPreferenceName, colors.getBackground(pref).color)
             }
-            setString(context, ThemeColors.PREF_TEXT_COLOR_SOURCE, colors.textColorSource.value)
+            setString(context, ColorTheme.PREF_TEXT_COLOR_SOURCE, colors.textColorSource.value)
             for (pref in TextColorPref.entries) {
                 setString(
                     context,
@@ -387,30 +387,30 @@ object ApplicationPreferences {
         val darkLightTheme = getDarkLightTheme(context)
         val colorThemeTypeOut =
             if (colorThemeTypeIn.manuallyDefinedColors != colorSettingsSource.manuallyDefinedColors) {
-                ColorThemeType.UNSPECIFIED
+                ColorThemeType.NONE
             } else {
                 when (colorSettingsSource) {
                     ColorSettingsSource.SINGLE_MANUAL -> {
-                        if (colorThemeTypeIn == ColorThemeType.LIGHT || colorThemeTypeIn == ColorThemeType.SINGLE) {
-                            ColorThemeType.SINGLE
+                        if (colorThemeTypeIn == ColorThemeType.LIGHT) {
+                            ColorThemeType.LIGHT
                         } else {
-                            ColorThemeType.UNSPECIFIED
+                            ColorThemeType.NONE
                         }
                     }
 
                     ColorSettingsSource.TWO_MANUAL -> {
                         if ((colorThemeTypeIn == ColorThemeType.DARK) || (
-                                (colorThemeTypeIn == ColorThemeType.SINGLE) &&
+                                (colorThemeTypeIn == ColorThemeType.LIGHT) &&
                                     InstanceSettings.isDarkThemeOn(
                                         context,
                                     )
                             )
                         ) {
                             ColorThemeType.DARK
-                        } else if (colorThemeTypeIn == ColorThemeType.LIGHT || colorThemeTypeIn == ColorThemeType.SINGLE) {
+                        } else if (colorThemeTypeIn == ColorThemeType.LIGHT) {
                             ColorThemeType.LIGHT
                         } else {
-                            ColorThemeType.UNSPECIFIED
+                            ColorThemeType.NONE
                         }
                     }
 
@@ -469,7 +469,7 @@ object ApplicationPreferences {
         TextColorSource.fromValue(
             getString(
                 context,
-                ThemeColors.PREF_TEXT_COLOR_SOURCE,
+                ColorTheme.PREF_TEXT_COLOR_SOURCE,
                 TextColorSource.defaultEntry.value,
             ),
         )

@@ -14,7 +14,7 @@ import org.json.JSONObject
 
 /** Colors part of settings for one theme, of one Widget
  * @author yvolk@yurivolkov.com */
-class ThemeColors(
+class ColorTheme(
     val colorThemeType: ColorThemeType,
     val backgroundColors: Map<BackgroundColorPref, ShadingAndColor> = emptyMap(),
     val textColorSource: TextColorSource = TextColorSource.defaultEntry,
@@ -22,7 +22,7 @@ class ThemeColors(
     val textColors: Map<TextColorPref, ShadingAndColor> = emptyMap(),
     val isEmpty: Boolean = false,
 ) {
-    fun jsonCopy(colorThemeType: ColorThemeType): ThemeColors = fromJson(colorThemeType, toJson(JSONObject()))
+    fun jsonCopy(colorThemeType: ColorThemeType): ColorTheme = fromJson(colorThemeType, toJson(JSONObject()))
 
     fun toJson(json: JSONObject): JSONObject {
         try {
@@ -54,7 +54,7 @@ class ThemeColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || other !is ThemeColors) return false
+        if (other == null || other !is ColorTheme) return false
         return toJson(JSONObject()).toString() == other.toJson(JSONObject()).toString()
     }
 
@@ -100,16 +100,16 @@ class ThemeColors(
     ): ContextThemeWrapper = ContextThemeWrapper(context, getShading(pref).themeResId)
 
     companion object {
-        private val TAG = ThemeColors::class.java.simpleName
+        private val TAG = ColorTheme::class.java.simpleName
         const val TRANSPARENT_BLACK = Color.TRANSPARENT
         const val TRANSPARENT_WHITE = 0x00FFFFFF
-        val EMPTY = ThemeColors(ColorThemeType.SINGLE, isEmpty = true)
+        val EMPTY = ColorTheme(ColorThemeType.LIGHT, isEmpty = true)
         const val PREF_TEXT_COLOR_SOURCE = "textColorSource"
 
         fun fromJson(
             colorThemeType: ColorThemeType,
             json: JSONObject,
-        ): ThemeColors =
+        ): ColorTheme =
             try {
                 val backgroundColors: MutableMap<BackgroundColorPref, ShadingAndColor> =
                     mutableMapOf()
@@ -146,7 +146,7 @@ class ThemeColors(
                         if (json.has(pref.colorPreferenceName)) json.getInt(pref.colorPreferenceName) else pref.defaultColor
                     textColors[pref] = ShadingAndColor(color)
                 }
-                ThemeColors(
+                ColorTheme(
                     colorThemeType = colorThemeType,
                     backgroundColors = backgroundColors,
                     textColorSource = textColorSource,
@@ -155,14 +155,14 @@ class ThemeColors(
                     isEmpty = false,
                 )
             } catch (_: JSONException) {
-                Log.w(TAG, "setFromJson failed\n$json")
+                Log.w(TAG, "fromJson failed, $colorThemeType\n$json")
                 EMPTY
             }
 
         fun fromApplicationPreferences(
             colorThemeType: ColorThemeType,
             context: Context,
-        ): ThemeColors {
+        ): ColorTheme {
             val backgroundColors: MutableMap<BackgroundColorPref, ShadingAndColor> = mutableMapOf()
             for (pref in BackgroundColorPref.entries) {
                 val color = ApplicationPreferences.getBackgroundColor(pref, context)
@@ -184,7 +184,7 @@ class ThemeColors(
                     ApplicationPreferences.getInt(context, pref.colorPreferenceName, oldValue.color)
                 textColors[pref] = ShadingAndColor(color)
             }
-            return ThemeColors(
+            return ColorTheme(
                 colorThemeType = colorThemeType,
                 backgroundColors = backgroundColors,
                 textColorSource = textColorSource,

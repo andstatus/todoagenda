@@ -33,8 +33,13 @@ abstract class ColorsPreferencesFragment :
         if (preference != null) {
             preference.summary = context.getString(colorSettingsSource.titleResId)
             val supported = ColorSettingsSource.entries.filter { it.supportedByDevice }
-            preference.entries = supported.map { context.getString(it.titleResId) }.toTypedArray()
-            preference.entryValues = supported.map { it.value }.toTypedArray()
+            if (supported.size > 1) {
+                preference.entries =
+                    supported.map { context.getString(it.titleResId) }.toTypedArray()
+                preference.entryValues = supported.map { it.value }.toTypedArray()
+            } else {
+                removePreferenceImproved(preference)
+            }
         }
     }
 
@@ -43,7 +48,7 @@ abstract class ColorsPreferencesFragment :
     }
 
     fun onColorSettingSourceChanged(activity: FragmentActivity) {
-        if (ApplicationPreferences.getBeingEditedColorThemeType(activity) == ColorThemeType.UNSPECIFIED) {
+        if (ApplicationPreferences.getBeingEditedColorThemeType(activity) == ColorThemeType.NONE) {
             activity.startActivity(
                 MainActivity.intentToConfigure(
                     activity,
