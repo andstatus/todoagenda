@@ -142,7 +142,8 @@
     <!-- Preference frame: Colors -->
     <string name="color_settings_source">Color settings source</string>
     <string name="color_settings_source_single_manual">Single set of manually defined colors</string>
-    <string name="color_settings_source_two_manual">Two sets of manually defined colors for Dark and Light Android themes</string>
+    <string name="color_settings_source_two_manual">Two sets of manually defined colors for Dark and Light Android themes.
+    Switch Android system Dark theme on/off to set colors for Dark/Light theme correspondingly.</string>
     <string name="color_settings_source_tonal">Material You dynamic tonal palette</string>
     <string name="color_settings_source_semantic">Material You dynamic semantic palette</string>
     <string name="color_theme">Color theme</string>

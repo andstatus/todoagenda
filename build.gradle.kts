@@ -38,6 +38,7 @@ extra["espressoCoreVersion"] = "3.7.0" // https://mvnrepository.com/artifact/and
 extra["jodaTimeVersion"] = "2.15.0" // https://github.com/JodaOrg/joda-time/releases
 extra["junitVersion"] = "4.13.2"
 extra["junitJupiterVersion"] = "6.1.3"
+extra["kotestVersion"] = "6.2.6"
 extra["preferenceVersion"] = "1.2.1"
 extra["testCoreVersion"] = "1.7.0"
 extra["testRulesVersion"] = "1.7.0"

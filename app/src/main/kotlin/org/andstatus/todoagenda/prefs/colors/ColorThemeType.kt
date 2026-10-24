@@ -66,7 +66,7 @@ enum class ColorThemeType(
     }
 
     companion object {
-        private val defaultValue = LIGHT
+        private val defaultValue = NONE
 
         fun fromValue(value: String?): ColorThemeType {
             for (item in entries) {

@@ -13,6 +13,7 @@ val espressoCoreVersion = rootProject.extra["espressoCoreVersion"] as String
 val jodaTimeVersion = rootProject.extra["jodaTimeVersion"] as String
 val junitVersion = rootProject.extra["junitVersion"] as String
 val junitJupiterVersion = rootProject.extra["junitJupiterVersion"] as String
+val kotestVersion = rootProject.extra["kotestVersion"] as String
 val preferenceVersion = rootProject.extra["preferenceVersion"] as String
 val testCoreVersion = rootProject.extra["testCoreVersion"] as String
 val testRulesVersion = rootProject.extra["testRulesVersion"] as String
@@ -94,6 +95,12 @@ dependencies {
     implementation("androidx.core:core-ktx:$ktxVersion")
 
     androidTestImplementation("junit:junit:$junitVersion")
+    androidTestImplementation("io.kotest:kotest-runner-junit4:$kotestVersion") {
+        // JVM only: relies on java.lang.instrument and JNA, which aren't available on Android
+        exclude(group = "org.jetbrains.kotlinx", module = "kotlinx-coroutines-debug")
+        exclude(group = "net.java.dev.jna")
+    }
+    androidTestImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
     androidTestImplementation("androidx.test:core:$testCoreVersion")
     androidTestImplementation("androidx.test:rules:$testRulesVersion")
     androidTestImplementation("androidx.test:runner:$testRunnerVersion")

@@ -36,13 +36,17 @@ class DynamicColorsPreferencesFragment : ColorsPreferencesFragment() {
             }
 
             InstanceSettings.PREF_DARK_LIGHT_THEME -> {
-                showDarkLightTheme()
-                setTitle(activity)
+                if (!restartIfThemeChanged(activity)) {
+                    showDarkLightTheme()
+                    setTitle(activity)
+                }
             }
 
             else -> {
                 saveSettings()
                 showColorSettingsSources()
+                showTextShadow()
+                showTimeUntilBackgroundSource()
             }
         }
     }

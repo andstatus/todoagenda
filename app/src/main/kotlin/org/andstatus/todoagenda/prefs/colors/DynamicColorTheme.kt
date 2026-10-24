@@ -3,15 +3,62 @@ package org.andstatus.todoagenda.prefs.colors
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.annotation.ColorRes
+import org.andstatus.todoagenda.layout.TextShadow
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.SEMANTIC_DARK
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.SEMANTIC_LIGHT
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.TONAL_DARK
 import org.andstatus.todoagenda.prefs.colors.ColorThemeType.TONAL_LIGHT
+import org.json.JSONObject
 
-fun dynamicThemeColors(
+/** Colors, which the device provides for the theme, e.g. the Material You palette.
+ * They don't depend on the user's choices, so only the user's settings and the theme type
+ * are stored to JSON.
+ */
+class DynamicColorTheme(
+    colorThemeType: ColorThemeType,
+    override val backgroundColors: Map<BackgroundColorPref, ShadingAndColor> = emptyMap(),
+    override val textColors: Map<TextColorPref, ShadingAndColor> = emptyMap(),
+    override val textShadow: TextShadow = TextShadow.NO_SHADOW,
+    override val timeUntilBackgroundSource: TimeUntilBackgroundSource = TimeUntilBackgroundSource.defaultEntry,
+) : ColorTheme(colorThemeType) {
+    override val textColorSource: TextColorSource = TextColorSource.COLORS
+
+    /** Shadings aren't used, as texts get colors, which the device provides */
+    override val textShadings: Map<TextColorPref, ShadingAndColor> = emptyMap()
+
+    companion object {
+        fun fromJson(
+            colorThemeType: ColorThemeType,
+            json: JSONObject,
+        ): DynamicColorTheme =
+            DynamicColorTheme(
+                colorThemeType = colorThemeType,
+                textShadow = parseTextShadow(json),
+                timeUntilBackgroundSource = parseTimeUntilBackgroundSource(json),
+            )
+
+        fun fromApplicationPreferences(
+            colorThemeType: ColorThemeType,
+            context: Context,
+        ): DynamicColorTheme =
+            DynamicColorTheme(
+                colorThemeType = colorThemeType,
+                textShadow = ApplicationPreferences.getTextShadow(context),
+                timeUntilBackgroundSource =
+                    ApplicationPreferences.getTimeUntilBackgroundSource(
+                        context,
+                    ),
+            )
+    }
+}
+
+/** @param settings a theme of the same type, whose settings (but not colors) should be used */
+fun dynamicColorTheme(
     context: Context,
     colorSettingsSource: ColorSettingsSource,
     dark: Boolean,
+    settings: ColorTheme? = null,
 ): ColorTheme =
     when (colorSettingsSource) {
         ColorSettingsSource.SINGLE_MANUAL,
@@ -24,6 +71,7 @@ fun dynamicThemeColors(
             tonalPalette(dark).toThemeColors(
                 context,
                 if (dark) TONAL_DARK else TONAL_LIGHT,
+                settings,
             )
         }
 
@@ -31,6 +79,7 @@ fun dynamicThemeColors(
             semanticPalette(dark).toThemeColors(
                 context,
                 if (dark) SEMANTIC_DARK else SEMANTIC_LIGHT,
+                settings,
             )
         }
     }
@@ -47,6 +96,7 @@ private class DynamicPalette(
     fun toThemeColors(
         context: Context,
         colorThemeType: ColorThemeType,
+        settings: ColorTheme?,
     ): ColorTheme {
         val backgroundColors =
             BackgroundColorPref.entries.associateWith { pref ->
@@ -58,11 +108,13 @@ private class DynamicPalette(
             TextColorPref.entries.associateWith { pref ->
                 ShadingAndColor(context.getColor(textColorRes(pref)))
             }
-        return ColorTheme(
+        return DynamicColorTheme(
             colorThemeType = colorThemeType,
             backgroundColors = backgroundColors,
-            textColorSource = TextColorSource.COLORS,
             textColors = textColors,
+            textShadow = settings?.textShadow ?: TextShadow.NO_SHADOW,
+            timeUntilBackgroundSource =
+                settings?.timeUntilBackgroundSource ?: TimeUntilBackgroundSource.defaultEntry,
         )
     }
 

@@ -3,6 +3,7 @@ package org.andstatus.todoagenda.prefs.colors
 import android.content.Context
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_DARK_THEME
+import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -25,7 +26,7 @@ class ColorThemes(
             error("$colorSettingsSource is not supported by the device")
         }
         if (context == null) {
-            return theme(ColorThemeType.LIGHT)
+            return manualColorTheme(ColorThemeType.LIGHT)
         }
         val dark =
             when (darkLightTheme) {
@@ -33,31 +34,43 @@ class ColorThemes(
                 DarkLightTheme.DARK -> true
                 DarkLightTheme.LIGHT -> false
             }
-        return when (colorSettingsSource) {
-            ColorSettingsSource.SINGLE_MANUAL -> theme(ColorThemeType.LIGHT)
-            ColorSettingsSource.TWO_MANUAL -> theme(if (dark) ColorThemeType.DARK else ColorThemeType.LIGHT)
-            else -> dynamicThemeColors(context, colorSettingsSource, dark)
+        val colorThemeType =
+            when (colorSettingsSource) {
+                ColorSettingsSource.SINGLE_MANUAL -> ColorThemeType.LIGHT
+                ColorSettingsSource.TWO_MANUAL -> if (dark) ColorThemeType.DARK else ColorThemeType.LIGHT
+                ColorSettingsSource.MATERIAL_YOU_TONAL -> if (dark) ColorThemeType.TONAL_DARK else ColorThemeType.TONAL_LIGHT
+                ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> if (dark) ColorThemeType.SEMANTIC_DARK else ColorThemeType.SEMANTIC_LIGHT
+            }
+        return if (colorSettingsSource.manuallyDefinedColors) {
+            manualColorTheme(colorThemeType)
+        } else {
+            // Only colors are provided by the device, settings are stored in this theme
+            dynamicColorTheme(context, colorSettingsSource, dark, themesMap[colorThemeType])
         }
     }
 
-    fun theme(colorThemeType: ColorThemeType): ColorTheme =
+    fun manualColorTheme(colorThemeType: ColorThemeType): ColorTheme =
         themesMap.getOrElse(colorThemeType) {
             when (colorThemeType) {
                 ColorThemeType.DARK -> themesMap.getOrElse(ColorThemeType.LIGHT) { null }
                 ColorThemeType.LIGHT -> themesMap.getOrElse(ColorThemeType.DARK) { null }
                 else -> null
-            } ?: ColorTheme(colorThemeType)
+            } ?: if (colorThemeType.manuallyDefinedColors) {
+                ManualColorTheme(colorThemeType)
+            } else {
+                error("Unexpected colorThemeType $colorThemeType")
+            }
         }
 
     fun toJson(json: JSONObject): JSONObject {
         try {
-            val nestedJson = JSONObject()
+            val themesArray = JSONArray()
             themesMap.values
                 .filter { it.colorThemeType.supportedByDevice }
                 .forEach { theme ->
-                    nestedJson.put(theme.colorThemeType.value, theme.toJson(JSONObject()))
+                    themesArray.put(theme.toJson(JSONObject()))
                 }
-            json.put(PREF_COLOR_THEMES, nestedJson)
+            json.put(PREF_COLOR_THEMES, themesArray)
         } catch (e: JSONException) {
             throw RuntimeException("Saving ColorThemes to JSON", e)
         }
@@ -68,22 +81,17 @@ class ColorThemes(
         const val PREF_COLOR_THEMES = "colorThemes"
 
         fun fromJson(rootJson: JSONObject): ColorThemes {
-            val themesJson: JSONObject =
-                rootJson.optJSONObject(PREF_COLOR_THEMES)
+            val themesArray: JSONArray =
+                rootJson.optJSONArray(PREF_COLOR_THEMES)
                     ?: return fromJsonV4p14(rootJson)
 
-            return ColorThemeType.entries
-                .filter { it.supportedByDevice }
-                .fold(emptyMap<ColorThemeType, ColorTheme>()) { themesMap, themeType ->
-                    themesJson.optJSONObject(themeType.value)?.let { themeJson ->
-                        ColorTheme
-                            .fromJson(themeType, themeJson)
-                            .takeIf { !it.isEmpty }
-                            ?.let {
-                                themesMap + (themeType to it)
-                            }
-                    } ?: themesMap
-                }.let {
+            return (0 until themesArray.length())
+                .mapNotNull { index ->
+                    ColorTheme
+                        .fromJson(null, themesArray.getJSONObject(index))
+                        .takeIf { it.colorThemeType.supportedByDevice }
+                }.associateBy { it.colorThemeType }
+                .let {
                     ColorThemes(it)
                 }
         }
@@ -97,8 +105,17 @@ class ColorThemes(
                     colorThemeMap[it.colorThemeType] = it
                 }
             if (ColorThemeType.DARK.supportedByDevice && json.has(PREF_DARK_THEME)) {
+                val legacyDarkThemeJson =
+                    JSONObject(json.getJSONObject(PREF_DARK_THEME).toString()).apply {
+                        // Add settings that were stored at the Widget's level, not inside a theme
+                        listOf(
+                            ColorTheme.PREF_TEXT_SHADOW,
+                            ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE,
+                        ).filter { !has(it) && json.has(it) }
+                            .forEach { put(it, json.get(it)) }
+                    }
                 ColorTheme
-                    .fromJson(ColorThemeType.DARK, json.getJSONObject(PREF_DARK_THEME))
+                    .fromJson(ColorThemeType.DARK, legacyDarkThemeJson)
                     .also {
                         colorThemeMap[it.colorThemeType] = it
                     }

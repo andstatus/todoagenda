@@ -2,43 +2,44 @@ package org.andstatus.todoagenda.prefs.colors
 
 import android.content.Context
 import android.graphics.Color
-import android.util.Log
 import android.view.ContextThemeWrapper
 import androidx.annotation.AttrRes
 import org.andstatus.todoagenda.R
-import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.util.RemoteViewsUtil
 import org.andstatus.todoagenda.widget.WidgetEntry
 import org.json.JSONException
 import org.json.JSONObject
 
-/** Colors part of settings for one theme, of one Widget
- * @author yvolk@yurivolkov.com */
-class ColorTheme(
+/** Colors and related settings for one theme, of one Widget.
+ *
+ * Colors are either defined by the user ([ManualColorTheme]) or are provided by the device
+ * ([DynamicColorTheme]), so each variant stores to JSON only the settings it owns. Settings,
+ * which are the same for all variants, are stored by [toJson] of this class.
+ *
+ * @author yvolk@yurivolkov.com
+ */
+sealed class ColorTheme(
     val colorThemeType: ColorThemeType,
-    val backgroundColors: Map<BackgroundColorPref, ShadingAndColor> = emptyMap(),
-    val textColorSource: TextColorSource = TextColorSource.defaultEntry,
-    val textShadings: Map<TextColorPref, ShadingAndColor> = emptyMap(),
-    val textColors: Map<TextColorPref, ShadingAndColor> = emptyMap(),
-    val isEmpty: Boolean = false,
 ) {
-    fun jsonCopy(colorThemeType: ColorThemeType): ColorTheme = fromJson(colorThemeType, toJson(JSONObject()))
+    /** This theme has no settings, e.g. because parsing of the stored settings failed */
+    open val isEmpty: Boolean = false
 
-    fun toJson(json: JSONObject): JSONObject {
+    abstract val backgroundColors: Map<BackgroundColorPref, ShadingAndColor>
+    abstract val textColorSource: TextColorSource
+    abstract val textShadings: Map<TextColorPref, ShadingAndColor>
+    abstract val textColors: Map<TextColorPref, ShadingAndColor>
+    abstract val textShadow: TextShadow
+    abstract val timeUntilBackgroundSource: TimeUntilBackgroundSource
+
+    /** Stores this theme's settings to [json]. Each theme variant stores its own settings only */
+    open fun toJson(json: JSONObject): JSONObject {
         try {
-            for (pref in BackgroundColorPref.entries) {
-                json.put(pref.colorPreferenceName, getBackgroundColor(pref))
-            }
-            json.put(PREF_TEXT_COLOR_SOURCE, textColorSource.value)
-            for (pref in TextColorPref.entries) {
-                json.put(
-                    pref.shadingPreferenceName,
-                    textShadings.textShadingStored(pref).shading.themeName,
-                )
-                json.put(pref.colorPreferenceName, textColors.textColorStored(pref).color)
-            }
+            json.put(PREF_COLOR_THEME_TYPE, colorThemeType.value)
+            json.put(PREF_TEXT_SHADOW, textShadow.value)
+            json.put(PREF_TIME_UNTIL_BACKGROUND_SOURCE, timeUntilBackgroundSource.value)
         } catch (e: JSONException) {
-            throw RuntimeException("Saving settings to JSON", e)
+            throw RuntimeException("Saving color theme settings to JSON", e)
         }
         return json
     }
@@ -92,6 +93,12 @@ class ColorTheme(
             TextColorSource.AUTO -> pref.getShadingForBackground(getBackground(pref.backgroundColorPref).shading)
         }
 
+    fun timeUntilBackgroundSource(pref: TextColorPref): TimeUntilBackgroundSource =
+        when (timeUntilBackgroundSource) {
+            TimeUntilBackgroundSource.AUTO -> getShading(pref).timeUntilBackgroundSource
+            else -> timeUntilBackgroundSource
+        }
+
     fun getEntryBackgroundColor(entry: WidgetEntry): Int = getBackgroundColor(BackgroundColorPref.forTimeSection(entry.timeSection))
 
     fun getThemeContext(
@@ -100,99 +107,51 @@ class ColorTheme(
     ): ContextThemeWrapper = ContextThemeWrapper(context, getShading(pref).themeResId)
 
     companion object {
-        private val TAG = ColorTheme::class.java.simpleName
         const val TRANSPARENT_BLACK = Color.TRANSPARENT
         const val TRANSPARENT_WHITE = 0x00FFFFFF
-        val EMPTY = ColorTheme(ColorThemeType.LIGHT, isEmpty = true)
+        val EMPTY = ManualColorTheme(ColorThemeType.NONE, isEmpty = true)
+        const val PREF_COLOR_THEME_TYPE = "colorThemeType"
         const val PREF_TEXT_COLOR_SOURCE = "textColorSource"
+        const val PREF_TEXT_SHADOW = "textShadow"
+        val PREF_TEXT_SHADOW_DEFAULT = TextShadow.NO_SHADOW.name
+        const val PREF_TIME_UNTIL_BACKGROUND_SOURCE = "timeUntilBackgroundSource"
 
         fun fromJson(
-            colorThemeType: ColorThemeType,
+            typeOverride: ColorThemeType?,
             json: JSONObject,
-        ): ColorTheme =
-            try {
-                val backgroundColors: MutableMap<BackgroundColorPref, ShadingAndColor> =
-                    mutableMapOf()
-                for (pref in BackgroundColorPref.entries) {
-                    val color =
-                        if (json.has(pref.colorPreferenceName)) {
-                            json.getInt(pref.colorPreferenceName)
-                        } else {
-                            pref.defaultColor
-                        }
-                    backgroundColors[pref] = ShadingAndColor(color)
+        ): ColorTheme {
+            val colorThemeType =
+                typeOverride ?: ColorThemeType.fromValue(json.optString(PREF_COLOR_THEME_TYPE))
+            return if (colorThemeType.supportedByDevice) {
+                if (colorThemeType.manuallyDefinedColors) {
+                    ManualColorTheme.fromJson(colorThemeType, json)
+                } else {
+                    DynamicColorTheme.fromJson(colorThemeType, json)
                 }
-                val textColorSource: TextColorSource =
-                    if (json.has(PREF_TEXT_COLOR_SOURCE)) {
-                        TextColorSource.fromValue(json.getString(PREF_TEXT_COLOR_SOURCE))
-                    } else {
-                        // This was default before v.4.4
-                        TextColorSource.SHADING
-                    }
-                val textShadings: MutableMap<TextColorPref, ShadingAndColor> = mutableMapOf()
-                val textColors: MutableMap<TextColorPref, ShadingAndColor> = mutableMapOf()
-                for (pref in TextColorPref.entries) {
-                    val shading =
-                        if (json.has(pref.shadingPreferenceName)) {
-                            Shading.fromThemeName(
-                                json.getString(pref.shadingPreferenceName),
-                                pref.defaultShading,
-                            )
-                        } else {
-                            pref.defaultShading
-                        }
-                    textShadings[pref] = ShadingAndColor(shading)
-                    val color =
-                        if (json.has(pref.colorPreferenceName)) json.getInt(pref.colorPreferenceName) else pref.defaultColor
-                    textColors[pref] = ShadingAndColor(color)
-                }
-                ColorTheme(
-                    colorThemeType = colorThemeType,
-                    backgroundColors = backgroundColors,
-                    textColorSource = textColorSource,
-                    textShadings = textShadings,
-                    textColors = textColors,
-                    isEmpty = false,
-                )
-            } catch (_: JSONException) {
-                Log.w(TAG, "fromJson failed, $colorThemeType\n$json")
+            } else {
                 EMPTY
             }
+        }
 
         fun fromApplicationPreferences(
             colorThemeType: ColorThemeType,
             context: Context,
-        ): ColorTheme {
-            val backgroundColors: MutableMap<BackgroundColorPref, ShadingAndColor> = mutableMapOf()
-            for (pref in BackgroundColorPref.entries) {
-                val color = ApplicationPreferences.getBackgroundColor(pref, context)
-                backgroundColors[pref] = ShadingAndColor(color)
+        ): ColorTheme =
+            if (colorThemeType.manuallyDefinedColors) {
+                ManualColorTheme.fromApplicationPreferences(colorThemeType, context)
+            } else {
+                DynamicColorTheme.fromApplicationPreferences(colorThemeType, context)
             }
-            val textColorSource = ApplicationPreferences.getTextColorSource(context)
-            val textShadings: MutableMap<TextColorPref, ShadingAndColor> = mutableMapOf()
-            val textColors: MutableMap<TextColorPref, ShadingAndColor> = mutableMapOf()
-            for (pref in TextColorPref.entries) {
-                val oldValue = textShadings.textShadingStored(pref)
-                val themeName =
-                    ApplicationPreferences.getString(context, pref.shadingPreferenceName, "")
-                val shading: Shading = Shading.fromThemeName(themeName, oldValue.shading)
-                textShadings[pref] = ShadingAndColor(shading)
-            }
-            for (pref in TextColorPref.entries) {
-                val oldValue = textColors.textColorStored(pref)
-                val color =
-                    ApplicationPreferences.getInt(context, pref.colorPreferenceName, oldValue.color)
-                textColors[pref] = ShadingAndColor(color)
-            }
-            return ColorTheme(
-                colorThemeType = colorThemeType,
-                backgroundColors = backgroundColors,
-                textColorSource = textColorSource,
-                textShadings = textShadings,
-                textColors = textColors,
-                isEmpty = false,
+
+        fun parseTextShadow(json: JSONObject): TextShadow = TextShadow.fromValue(json.optString(PREF_TEXT_SHADOW, PREF_TEXT_SHADOW_DEFAULT))
+
+        fun parseTimeUntilBackgroundSource(json: JSONObject): TimeUntilBackgroundSource =
+            TimeUntilBackgroundSource.fromValue(
+                json.optString(
+                    PREF_TIME_UNTIL_BACKGROUND_SOURCE,
+                    TimeUntilBackgroundSource.defaultEntry.value,
+                ),
             )
-        }
 
         fun Map<TextColorPref, ShadingAndColor>.textShadingStored(colorPref: TextColorPref): ShadingAndColor =
             this.getOrElse(colorPref) { ShadingAndColor(colorPref.defaultShading) }

@@ -13,4 +13,18 @@
         android:entryValues="@array/pref_pref_dark_light_theme_values"
         android:key="darkLightTheme"
         android:title="@string/color_theme" />
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="no"
+        android:entries="@array/pref_text_shadow_entries"
+        android:entryValues="@array/pref_text_shadow_values"
+        android:key="textShadow"
+        android:title="@string/text_shadow_title" />
+
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:defaultValue="auto"
+        android:entries="@array/pref_time_until_background_source_entries"
+        android:entryValues="@array/pref_time_until_background_source_values"
+        android:key="timeUntilBackgroundSource"
+        android:title="@string/time_until_background" />
 </PreferenceScreen>

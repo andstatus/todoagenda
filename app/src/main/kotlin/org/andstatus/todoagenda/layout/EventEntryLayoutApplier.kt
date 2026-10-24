@@ -50,10 +50,11 @@ abstract class EventEntryLayoutApplier(
             rv.setTextViewText(viewId, strTime)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
             val textColorPref = TextColorPref.forTitle(entry)
-            settings.timeUntilBackgroundSource.textColor?.let { color ->
+            val colors = settings.colors()
+            colors.timeUntilBackgroundSource.textColor?.let { color ->
                 rv.setTextColor(viewId, color)
             } ?: RemoteViewsUtil.setTextColor(settings, textColorPref, rv, viewId, R.attr.eventEntryTitle)
-            val timeUntilBackgroundSource = settings.timeUntilBackgroundSource(textColorPref)
+            val timeUntilBackgroundSource = colors.timeUntilBackgroundSource(textColorPref)
             timeUntilBackgroundSource.drawableResId?.let { resId ->
                 RemoteViewsUtil.setBackgroundResource(rv, viewId, resId)
             }

@@ -4,14 +4,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.util.Log
 import org.andstatus.todoagenda.layout.EventEntryLayout
-import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.prefs.colors.ColorSettingsSource
 import org.andstatus.todoagenda.prefs.colors.ColorTheme
 import org.andstatus.todoagenda.prefs.colors.ColorThemes
 import org.andstatus.todoagenda.prefs.colors.DarkLightTheme
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
-import org.andstatus.todoagenda.prefs.colors.TimeUntilBackgroundSource
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatter
@@ -71,8 +69,6 @@ data class InstanceSettings(
     val colorSettingsSource: ColorSettingsSource = PREF_COLOR_SETTINGS_SOURCE_DEFAULT,
     val darkLightTheme: DarkLightTheme = PREF_DARK_LIGHT_THEME_DEFAULT,
     private val colorThemes: ColorThemes = ColorThemes(),
-    val textShadow: TextShadow = TextShadow.NO_SHADOW,
-    val timeUntilBackgroundSource: TimeUntilBackgroundSource = TimeUntilBackgroundSource.defaultEntry,
     //
     // ----------------------------------------------------------------------------------
     // Event details
@@ -233,8 +229,6 @@ data class InstanceSettings(
             put(PREF_COLOR_SETTINGS_SOURCE, colorSettingsSource.value)
             put(PREF_DARK_LIGHT_THEME, darkLightTheme.value)
             colorThemes.toJson(this)
-            put(PREF_TEXT_SHADOW, textShadow.value)
-            put(PREF_TIME_UNTIL_BACKGROUND_SOURCE, timeUntilBackgroundSource.value)
             //
             // ----------------------------------------------------------------------------------
             // Event details
@@ -310,12 +304,6 @@ data class InstanceSettings(
 
     val startOfTimeRange: DateTime?
         get() = eventsEnded.endedAt(clock)
-
-    fun timeUntilBackgroundSource(pref: TextColorPref): TimeUntilBackgroundSource =
-        when (timeUntilBackgroundSource) {
-            TimeUntilBackgroundSource.AUTO -> colors().getShading(pref).timeUntilBackgroundSource
-            else -> timeUntilBackgroundSource
-        }
 
     fun colors(): ColorTheme = colorThemes.theme(contextIn, colorSettingsSource, darkLightTheme)
 
@@ -457,9 +445,6 @@ data class InstanceSettings(
 
         @Deprecated("since v.4.15")
         const val PREF_DARK_THEME = "darkTheme"
-        const val PREF_TEXT_SHADOW = "textShadow"
-        val PREF_TEXT_SHADOW_DEFAULT = TextShadow.NO_SHADOW.name
-        const val PREF_TIME_UNTIL_BACKGROUND_SOURCE = "timeUntilBackgroundSource"
 
         //
         // ----------------------------------------------------------------------------------
@@ -728,22 +713,6 @@ data class InstanceSettings(
                             PREF_DARK_LIGHT_THEME_DEFAULT
                         }.toSupportedByDevice(),
                     colorThemes = ColorThemes.fromJson(json),
-                    textShadow =
-                        if (json.has(PREF_TEXT_SHADOW)) {
-                            TextShadow.fromValue(json.getString(PREF_TEXT_SHADOW))
-                        } else {
-                            EMPTY.textShadow
-                        },
-                    timeUntilBackgroundSource =
-                        if (json.has(PREF_TIME_UNTIL_BACKGROUND_SOURCE)) {
-                            TimeUntilBackgroundSource.fromValue(
-                                json.getString(
-                                    PREF_TIME_UNTIL_BACKGROUND_SOURCE,
-                                ),
-                            )
-                        } else {
-                            EMPTY.timeUntilBackgroundSource
-                        },
                     //
                     // ----------------------------------------------------------------------------------
                     // Event details
@@ -1015,9 +984,6 @@ data class InstanceSettings(
                                 .getBeingEditedColorThemeType(context)
                                 .takeIf { it.supportedByDevice }
                                 ?.let { ColorTheme.fromApplicationPreferences(it, context) },
-                    textShadow = ApplicationPreferences.getTextShadow(context),
-                    timeUntilBackgroundSource =
-                        ApplicationPreferences.getTimeUntilBackgroundSource(context),
                     //
                     // ----------------------------------------------------------------------------------
                     // Event details

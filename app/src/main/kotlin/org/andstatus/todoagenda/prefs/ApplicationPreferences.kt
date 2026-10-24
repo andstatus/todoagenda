@@ -10,9 +10,6 @@ import org.andstatus.todoagenda.layout.WidgetHeaderLayout
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_COLOR_SETTINGS_SOURCE
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_DARK_LIGHT_THEME
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_MAX_NUMBER_OF_EVENTS
-import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
-import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW_DEFAULT
-import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
 import org.andstatus.todoagenda.prefs.colors.BackgroundColorPref
 import org.andstatus.todoagenda.prefs.colors.ColorSettingsSource
 import org.andstatus.todoagenda.prefs.colors.ColorTheme
@@ -138,11 +135,11 @@ object ApplicationPreferences {
                     colors.textColors.textColorStored(pref).color,
                 )
             }
-            setString(context, PREF_TEXT_SHADOW, settings.textShadow.value)
+            setString(context, ColorTheme.PREF_TEXT_SHADOW, colors.textShadow.value)
             setString(
                 context,
-                PREF_TIME_UNTIL_BACKGROUND_SOURCE,
-                settings.timeUntilBackgroundSource.value,
+                ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE,
+                colors.timeUntilBackgroundSource.value,
             )
             //
             // ----------------------------------------------------------------------------------
@@ -348,114 +345,106 @@ object ApplicationPreferences {
     fun getDarkLightTheme(context: Context): DarkLightTheme = DarkLightTheme.fromValue(getString(context, PREF_DARK_LIGHT_THEME))
 
     fun colorsPreferencesTitleResId(context: Context): Int {
-        val colorSettingsSource = getSupportedColorSettingsSource(context)
-        val darkLightTheme = getDarkLightTheme(context)
-        return when (colorSettingsSource) {
-            ColorSettingsSource.SINGLE_MANUAL -> {
-                R.string.appearance_group_color_title
-            }
+        if (getSupportedColorSettingsSource(context) == ColorSettingsSource.SINGLE_MANUAL) {
+            return R.string.appearance_group_color_title
+        }
+        return when (getBeingEditedColorThemeType(context)) {
+            ColorThemeType.DARK,
+            ColorThemeType.TONAL_DARK,
+            ColorThemeType.SEMANTIC_DARK,
+            -> R.string.colors_dark
 
-            ColorSettingsSource.TWO_MANUAL -> {
-                if (InstanceSettings.isDarkThemeOn(context)) {
-                    R.string.colors_dark
-                } else {
-                    R.string.colors_light
-                }
-            }
+            ColorThemeType.LIGHT,
+            ColorThemeType.TONAL_LIGHT,
+            ColorThemeType.SEMANTIC_LIGHT,
+            -> R.string.colors_light
 
-            ColorSettingsSource.MATERIAL_YOU_TONAL,
-            ColorSettingsSource.MATERIAL_YOU_SEMANTIC,
-            -> {
-                if (darkLightTheme == DarkLightTheme.AUTO) {
-                    if (InstanceSettings.isDarkThemeOn(context)) {
-                        R.string.colors_dark
-                    } else {
-                        R.string.colors_light
-                    }
-                } else {
-                    R.string.appearance_group_color_title
-                }
-            }
+            ColorThemeType.NONE -> R.string.appearance_group_color_title
         }
     }
 
     /** Which, if any, [ColorThemeType] is being edited now.
      * Its settings are now stored in the [ApplicationPreferences] */
-    fun getBeingEditedColorThemeType(context: Context): ColorThemeType {
-        val colorThemeTypeIn = getColorThemeType(context)
-        val colorSettingsSource = getSupportedColorSettingsSource(context)
-        val darkLightTheme = getDarkLightTheme(context)
+    fun getBeingEditedColorThemeType(context: Context): ColorThemeType =
+        beingEditedColorThemeType(
+            colorThemeTypeIn = getColorThemeType(context),
+            colorSettingsSource = getSupportedColorSettingsSource(context),
+            darkLightTheme = getDarkLightTheme(context),
+            isDarkThemeOn = InstanceSettings.isDarkThemeOn(context),
+        )
+
+    /** @return the theme, whose settings are edited now, or [ColorThemeType.NONE] if
+     * the preferences hold settings of another theme */
+    internal fun beingEditedColorThemeType(
+        colorThemeTypeIn: ColorThemeType,
+        colorSettingsSource: ColorSettingsSource,
+        darkLightTheme: DarkLightTheme,
+        isDarkThemeOn: Boolean,
+    ): ColorThemeType {
+        if (colorThemeTypeIn.manuallyDefinedColors != colorSettingsSource.manuallyDefinedColors) {
+            return ColorThemeType.NONE
+        }
         val colorThemeTypeOut =
-            if (colorThemeTypeIn.manuallyDefinedColors != colorSettingsSource.manuallyDefinedColors) {
-                ColorThemeType.NONE
-            } else {
-                when (colorSettingsSource) {
-                    ColorSettingsSource.SINGLE_MANUAL -> {
-                        if (colorThemeTypeIn == ColorThemeType.LIGHT) {
-                            ColorThemeType.LIGHT
-                        } else {
-                            ColorThemeType.NONE
-                        }
+            when (colorSettingsSource) {
+                ColorSettingsSource.SINGLE_MANUAL -> {
+                    if (colorThemeTypeIn == ColorThemeType.LIGHT) {
+                        ColorThemeType.LIGHT
+                    } else {
+                        ColorThemeType.NONE
                     }
+                }
 
-                    ColorSettingsSource.TWO_MANUAL -> {
-                        if ((colorThemeTypeIn == ColorThemeType.DARK) || (
-                                (colorThemeTypeIn == ColorThemeType.LIGHT) &&
-                                    InstanceSettings.isDarkThemeOn(
-                                        context,
-                                    )
-                            )
-                        ) {
-                            ColorThemeType.DARK
-                        } else if (colorThemeTypeIn == ColorThemeType.LIGHT) {
-                            ColorThemeType.LIGHT
-                        } else {
-                            ColorThemeType.NONE
-                        }
+                ColorSettingsSource.TWO_MANUAL -> {
+                    when {
+                        colorThemeTypeIn == ColorThemeType.DARK -> ColorThemeType.DARK
+                        colorThemeTypeIn == ColorThemeType.LIGHT && isDarkThemeOn -> ColorThemeType.DARK
+                        colorThemeTypeIn == ColorThemeType.LIGHT -> ColorThemeType.LIGHT
+                        else -> ColorThemeType.NONE
                     }
+                }
 
-                    ColorSettingsSource.MATERIAL_YOU_TONAL -> {
-                        when (darkLightTheme) {
-                            DarkLightTheme.AUTO -> {
-                                if (InstanceSettings.isDarkThemeOn(context)) {
-                                    ColorThemeType.TONAL_DARK
-                                } else {
-                                    ColorThemeType.TONAL_LIGHT
-                                }
-                            }
-
-                            DarkLightTheme.DARK -> {
+                ColorSettingsSource.MATERIAL_YOU_TONAL -> {
+                    when (darkLightTheme) {
+                        DarkLightTheme.AUTO -> {
+                            if (isDarkThemeOn) {
                                 ColorThemeType.TONAL_DARK
-                            }
-
-                            DarkLightTheme.LIGHT -> {
+                            } else {
                                 ColorThemeType.TONAL_LIGHT
                             }
                         }
+
+                        DarkLightTheme.DARK -> {
+                            ColorThemeType.TONAL_DARK
+                        }
+
+                        DarkLightTheme.LIGHT -> {
+                            ColorThemeType.TONAL_LIGHT
+                        }
                     }
+                }
 
-                    ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
-                        when (darkLightTheme) {
-                            DarkLightTheme.AUTO -> {
-                                if (InstanceSettings.isDarkThemeOn(context)) {
-                                    ColorThemeType.TONAL_DARK
-                                } else {
-                                    ColorThemeType.TONAL_LIGHT
-                                }
+                ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
+                    when (darkLightTheme) {
+                        DarkLightTheme.AUTO -> {
+                            if (isDarkThemeOn) {
+                                ColorThemeType.SEMANTIC_DARK
+                            } else {
+                                ColorThemeType.SEMANTIC_LIGHT
                             }
+                        }
 
-                            DarkLightTheme.DARK -> {
-                                ColorThemeType.TONAL_DARK
-                            }
+                        DarkLightTheme.DARK -> {
+                            ColorThemeType.SEMANTIC_DARK
+                        }
 
-                            DarkLightTheme.LIGHT -> {
-                                ColorThemeType.TONAL_LIGHT
-                            }
+                        DarkLightTheme.LIGHT -> {
+                            ColorThemeType.SEMANTIC_LIGHT
                         }
                     }
                 }
             }
-        return colorThemeTypeOut
+        // If the preferences hold settings of another theme, none of the themes is being edited now
+        return if (colorThemeTypeOut == colorThemeTypeIn) colorThemeTypeOut else ColorThemeType.NONE
     }
 
     fun getColorThemeType(context: Context): ColorThemeType = ColorThemeType.fromValue(getString(context, PREF_COLOR_THEME_TYPE))
@@ -478,8 +467,8 @@ object ApplicationPreferences {
         TextShadow.fromValue(
             getString(
                 context,
-                PREF_TEXT_SHADOW,
-                PREF_TEXT_SHADOW_DEFAULT,
+                ColorTheme.PREF_TEXT_SHADOW,
+                ColorTheme.PREF_TEXT_SHADOW_DEFAULT,
             ),
         )
 
@@ -487,7 +476,7 @@ object ApplicationPreferences {
         TimeUntilBackgroundSource.fromValue(
             getString(
                 context,
-                PREF_TIME_UNTIL_BACKGROUND_SOURCE,
+                ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE,
                 TimeUntilBackgroundSource.defaultEntry.value,
             ),
         )

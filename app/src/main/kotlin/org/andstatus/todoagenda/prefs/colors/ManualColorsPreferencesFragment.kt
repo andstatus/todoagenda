@@ -13,12 +13,9 @@ import com.rarepebble.colorpicker.ColorPreferenceDialog
 import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.WidgetConfigurationActivity
-import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
-import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TEXT_SHADOW
-import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_TIME_UNTIL_BACKGROUND_SOURCE
 import java.util.Arrays
 import java.util.stream.Collectors
 
@@ -41,8 +38,6 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
         super.onResume()
         removeUnavailablePreferences()
         showTextSources()
-        showTextShadow()
-        showTimeUntilBackgroundSource()
     }
 
     private fun showTextSources() {
@@ -131,22 +126,6 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
     private fun removeTextColors() {
         for (pref in TextColorPref.entries) {
             removePreferenceImproved(pref.colorPreferenceName)
-        }
-    }
-
-    private fun showTextShadow() {
-        findPreference<ListPreference>(PREF_TEXT_SHADOW)?.let { preference ->
-            TextShadow.fromValue(preference.value).let { textShadow ->
-                preference.summary = requireActivity().getString(textShadow.titleResId)
-            }
-        }
-    }
-
-    private fun showTimeUntilBackgroundSource() {
-        findPreference<ListPreference>(PREF_TIME_UNTIL_BACKGROUND_SOURCE)?.let { preference ->
-            TimeUntilBackgroundSource.fromValue(preference.value).let { source ->
-                preference.summary = requireActivity().getString(source.titleResId)
-            }
         }
     }
 
