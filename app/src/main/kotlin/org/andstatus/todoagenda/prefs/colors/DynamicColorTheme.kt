@@ -2,6 +2,7 @@ package org.andstatus.todoagenda.prefs.colors
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import androidx.annotation.ColorRes
 import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
@@ -21,6 +22,7 @@ class DynamicColorTheme(
     override val textColors: Map<TextColorPref, ShadingAndColor> = emptyMap(),
     override val textShadow: TextShadow = TextShadow.NO_SHADOW,
     override val timeUntilBackgroundSource: TimeUntilBackgroundSource = TimeUntilBackgroundSource.defaultEntry,
+    override val widgetBackgroundColor: Int = Color.TRANSPARENT,
 ) : ColorTheme(colorThemeType) {
     override val textColorSource: TextColorSource = TextColorSource.COLORS
 
@@ -68,7 +70,7 @@ fun dynamicColorTheme(
         }
 
         ColorSettingsSource.MATERIAL_YOU_TONAL -> {
-            tonalPalette(dark).toThemeColors(
+            tonalPalette(dark).toColorTheme(
                 context,
                 if (dark) TONAL_DARK else TONAL_LIGHT,
                 settings,
@@ -76,7 +78,7 @@ fun dynamicColorTheme(
         }
 
         ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
-            semanticPalette(dark).toThemeColors(
+            semanticPalette(dark).toColorTheme(
                 context,
                 if (dark) SEMANTIC_DARK else SEMANTIC_LIGHT,
                 settings,
@@ -93,7 +95,7 @@ private class DynamicPalette(
     @param:ColorRes val tertiary: Int,
 ) {
     /** The header and all entries share one surface color; only the Current time line has a color of its own */
-    fun toThemeColors(
+    fun toColorTheme(
         context: Context,
         colorThemeType: ColorThemeType,
         settings: ColorTheme?,
@@ -115,6 +117,7 @@ private class DynamicPalette(
             textShadow = settings?.textShadow ?: TextShadow.NO_SHADOW,
             timeUntilBackgroundSource =
                 settings?.timeUntilBackgroundSource ?: TimeUntilBackgroundSource.defaultEntry,
+            widgetBackgroundColor = context.getColor(surface),
         )
     }
 

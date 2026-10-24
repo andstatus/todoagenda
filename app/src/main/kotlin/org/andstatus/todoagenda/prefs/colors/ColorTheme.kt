@@ -32,6 +32,9 @@ sealed class ColorTheme(
     abstract val textShadow: TextShadow
     abstract val timeUntilBackgroundSource: TimeUntilBackgroundSource
 
+    /** Behind the whole widget, under the header and entry backgrounds. Not stored: only dynamic sources set it */
+    abstract val widgetBackgroundColor: Int
+
     /** Stores this theme's settings to [json]. Each theme variant stores its own settings only */
     open fun toJson(json: JSONObject): JSONObject {
         try {

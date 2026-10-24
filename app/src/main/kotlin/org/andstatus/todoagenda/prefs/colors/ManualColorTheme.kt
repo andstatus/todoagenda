@@ -1,6 +1,7 @@
 package org.andstatus.todoagenda.prefs.colors
 
 import android.content.Context
+import android.graphics.Color
 import android.util.Log
 import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
@@ -19,6 +20,7 @@ class ManualColorTheme(
     override val textShadow: TextShadow = TextShadow.NO_SHADOW,
     override val timeUntilBackgroundSource: TimeUntilBackgroundSource = TimeUntilBackgroundSource.defaultEntry,
     override val isEmpty: Boolean = false,
+    override val widgetBackgroundColor: Int = Color.TRANSPARENT,
 ) : ColorTheme(colorThemeType) {
     override fun toJson(json: JSONObject): JSONObject {
         super.toJson(json)
