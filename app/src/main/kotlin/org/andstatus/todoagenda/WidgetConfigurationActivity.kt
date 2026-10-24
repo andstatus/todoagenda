@@ -15,6 +15,7 @@ import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.ApplicationPreferences.getSupportedColorSettingsSource
 import org.andstatus.todoagenda.prefs.RootFragment
+import org.andstatus.todoagenda.prefs.colors.ColorSettingsSource
 import org.andstatus.todoagenda.prefs.colors.DynamicColorsPreferencesFragment
 import org.andstatus.todoagenda.prefs.colors.ManualColorsPreferencesFragment
 import org.andstatus.todoagenda.provider.WidgetData
@@ -98,7 +99,11 @@ class WidgetConfigurationActivity :
             restartIntent = MainActivity.intentToConfigure(this, newWidgetId)
         } else if (widgetId == 0) {
             widgetId = newWidgetId
-            ApplicationPreferences.fromInstanceSettings(this, widgetId)
+            val colorSettingsSource =
+                newIntent
+                    .getStringExtra(EXTRA_EDIT_COLOR_SETTINGS_SOURCE)
+                    ?.let { ColorSettingsSource.fromValue(it) }
+            ApplicationPreferences.fromInstanceSettings(this, widgetId, colorSettingsSource)
         }
         if (restartIntent != null) {
             widgetId = 0
@@ -106,6 +111,11 @@ class WidgetConfigurationActivity :
             finish()
         }
         return restartIntent == null
+    }
+
+    /** The activity only switches to editing another Color theme: don't save its settings on pause */
+    fun skipSaveOnPause() {
+        saveOnPause = false
     }
 
     private fun restartIfNeeded() {
@@ -244,6 +254,8 @@ ${e.message}"""
     companion object {
         val EXTRA_GOTO_PREFERENCES_SECTION: String =
             RemoteViewsFactory.PACKAGE + ".extra.GOTO_COLORS_PREFERENCES"
+        val EXTRA_EDIT_COLOR_SETTINGS_SOURCE: String =
+            RemoteViewsFactory.PACKAGE + ".extra.EDIT_COLOR_SETTINGS_SOURCE"
         const val EXTRA_GOTO_SECTION_COLORS = "colors"
         private val TAG = WidgetConfigurationActivity::class.java.simpleName
         const val FRAGMENT_TAG = "settings_fragment"

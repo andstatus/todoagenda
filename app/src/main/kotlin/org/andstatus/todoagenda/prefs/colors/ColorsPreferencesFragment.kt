@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.fragment.app.FragmentActivity
 import androidx.preference.ListPreference
+import androidx.preference.Preference
 import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.WidgetConfigurationActivity
 import org.andstatus.todoagenda.layout.TextShadow
@@ -22,6 +23,11 @@ abstract class ColorsPreferencesFragment :
         showColorSettingsSources()
         showTextShadow()
         showTimeUntilBackgroundSource()
+        findPreference<Preference>(PREF_COLOR_SETTINGS_SOURCE)?.setOnPreferenceChangeListener { _, _ ->
+            // Save settings of the currently edited theme before switching to settings of another theme
+            saveSettings()
+            true
+        }
     }
 
     override fun onPause() {
@@ -68,24 +74,40 @@ abstract class ColorsPreferencesFragment :
     }
 
     fun onColorSettingSourceChanged(activity: FragmentActivity) {
-        if (restartIfThemeChanged(activity)) return
+        val requestedColorSettingsSource =
+            ApplicationPreferences.getSupportedColorSettingsSource(activity)
+        if (restartIfThemeChanged(activity, requestedColorSettingsSource)) return
         setTitle(activity)
         showColorSettingsSources()
     }
 
     /** When the settings, stored in the preferences, belong to another theme, restarts the
      * preferences screen in order to edit only the theme, which is actually selected now.
+     * @param requestedColorSettingsSource a source, selected for editing. It is not stored to
+     * the Widget's settings, until settings of the new theme are saved.
      * @return true if the screen was restarted
      */
-    fun restartIfThemeChanged(activity: FragmentActivity): Boolean {
+    fun restartIfThemeChanged(
+        activity: FragmentActivity,
+        requestedColorSettingsSource: ColorSettingsSource? = null,
+    ): Boolean {
         if (ApplicationPreferences.getBeingEditedColorThemeType(activity) != ColorThemeType.NONE) {
             return false
+        }
+        if (requestedColorSettingsSource != null) {
+            (activity as? WidgetConfigurationActivity)?.skipSaveOnPause()
         }
         val intent = MainActivity.intentToConfigure(activity, widgetId)
         intent.putExtra(
             WidgetConfigurationActivity.EXTRA_GOTO_PREFERENCES_SECTION,
             WidgetConfigurationActivity.EXTRA_GOTO_SECTION_COLORS,
         )
+        if (requestedColorSettingsSource != null) {
+            intent.putExtra(
+                WidgetConfigurationActivity.EXTRA_EDIT_COLOR_SETTINGS_SOURCE,
+                requestedColorSettingsSource.value,
+            )
+        }
         activity.startActivity(intent)
         activity.finish()
         return true

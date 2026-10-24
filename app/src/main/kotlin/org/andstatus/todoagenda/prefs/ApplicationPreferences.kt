@@ -28,12 +28,19 @@ object ApplicationPreferences {
     private const val PREF_COLOR_THEME_TYPE = "colorThemeType"
     private const val PREF_ASK_FOR_PERMISSIONS = "askForPermissions"
 
+    /** @param colorSettingsSource a Color settings source, selected for editing. It is written
+     * to the preferences, but the Widget's settings are not changed (not saved) */
     fun fromInstanceSettings(
         context: Context,
         widgetId: Int,
+        colorSettingsSource: ColorSettingsSource? = null,
     ) {
         synchronized(ApplicationPreferences::class) {
-            val settings = AllSettings.instanceFromId(context, widgetId)
+            var settings = AllSettings.instanceFromId(context, widgetId)
+            if (colorSettingsSource != null) {
+                settings =
+                    settings.copy(colorSettingsSource = colorSettingsSource.toSupportedByDevice())
+            }
             setWidgetId(context, if (widgetId == 0) settings.widgetId else widgetId)
             //
             // ----------------------------------------------------------------------------------
