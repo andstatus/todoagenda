@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Todo Agenda</string>
     <string name="widget_name">Todo Agenda</string>
     <string name="widget_instance_name">Widget name</string>
@@ -318,5 +317,4 @@
     <string name="backup_settings_desc">The same as \"Share events for debugging\", but doesn\'t contain events</string>
     <string name="restore_settings_title">Restore settings from a backup</string>
     <string name="restore_settings_desc">Settings of each ToDo Agenda widget should be restored separately</string>
-
 </resources>

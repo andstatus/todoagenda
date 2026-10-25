@@ -1,7 +1,12 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
-* Material You dynamic colors: "Color settings source" options for the tonal palette (Android 12+)
-  and the semantic palette (Android 14+). Manually defined colors are kept for when you switch back.
+<a id="v4.15"/>
+
+### 2026-10-25 v4.15.0 Material You dynamic color themes
+* "Color settings source" options added for the
+  [Tonal palette](https://source.android.com/docs/core/display/dynamic-color) (Android 12+)
+  and the [Semantic palette](https://m3.material.io/styles/color/roles) (Color roles, Android 14+).
+  Manually defined colors are kept for when you switch back to the manually defined colors.
   [#175](https://github.com/andstatus/todoagenda/issues/175)
 
 <a id="v4.14"/>

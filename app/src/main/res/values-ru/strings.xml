@@ -122,9 +122,17 @@
     <string name="in_N_days">через %d дн.</string>
     <string name="in_HH_mm">через %02d:%02d</string>
     <!-- Preference frame: Colors -->
+    <string name="color_settings_source">Источник настроек цвета</string>
+    <string name="color_settings_source_single_manual">Один набор ручных настроек</string>
+    <string name="color_settings_source_two_manual">Два набора ручных настроек, для Тёмной и для Светлой тем.
+    Включите или выключите на этом Android устройстве Тёмную тему для настройки соответствующих цветов.</string>
+    <string name="color_settings_source_tonal">Тональная динамическая палитра Material You</string>
+    <string name="color_settings_source_semantic">Семантическая динамическая палитра Material You</string>
+    <string name="color_theme">Цветовая тема</string>
+    <string name="color_theme_auto">Автоматическое переключение темы</string>
     <string name="different_colors_for_dark_title">Другие цвета для Тёмной темы Android</string>
     <string name="different_colors_for_dark_off_desc">Одни и те же цвета</string>
-    <string name="different_colors_for_dark_on_desc">Вкключите или выключите на этом устройстве Android Тёмную тему для настройки цвета.</string>
+    <string name="different_colors_for_dark_on_desc">Включите или выключите на этом устройстве Android Тёмную тему для настройки цвета.</string>
     <string name="colors_prefs_desc">Цвет и прозрачность текста и фона</string>
     <string name="appearance_group_color_title">Цвета</string>
     <string name="colors_light">Цвета Светлой темы</string>
