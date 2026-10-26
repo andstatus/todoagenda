@@ -6,14 +6,43 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical">
 
+    <!-- Only one date view is visible; RemoteViewsFactory selects it by the text shadow setting. -->
     <TextView
         android:id="@+id/calendar_current_date"
         style="@style/HeaderCurrentDate"
         android:layout_width="0dp"
-        android:paddingTop="4dp"
-        tools:text="@string/today"
         android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="4dp"
+        tools:text="@string/today" />
+
+    <TextView
+        android:id="@+id/calendar_current_date_shadow_dark"
+        style="@style/HeaderCurrentDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingTop="4dp"
+        android:shadowColor="@color/text_shadow_dark"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:visibility="gone"
+        tools:text="@string/today" />
+
+    <TextView
+        android:id="@+id/calendar_current_date_shadow_light"
+        style="@style/HeaderCurrentDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingTop="4dp"
+        android:shadowColor="@color/text_shadow_light"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:visibility="gone"
+        tools:text="@string/today" />
 
     <ImageView
         android:id="@+id/go_to_today"

@@ -10,7 +10,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.util.Log
 import android.widget.RemoteViews
-import org.andstatus.todoagenda.layout.WidgetLayout
+import org.andstatus.todoagenda.layout.WidgetRootLayout
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.provider.EventProviderType
@@ -153,10 +153,14 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         if (widgetId == 0 || position < 0) return
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val settings = AllSettings.instanceFromId(context, widgetId)
-        val rv = RemoteViews(context.packageName, WidgetLayout.WIDGET_SCROLLABLE.shadowed(settings.colors().textShadow))
+        val rv =
+            RemoteViews(
+                context.packageName,
+                WidgetRootLayout.forWidget(true, settings.widgetHeaderLayout).layoutId,
+            )
         Log.d(TAG, "gotoPosition, Scrolling widget $widgetId to position $position")
         rv.setScrollPosition(R.id.event_list, position)
-        appWidgetManager.updateAppWidget(widgetId, rv)
+        appWidgetManager.partiallyUpdateAppWidget(widgetId, rv)
     }
 
     companion object {

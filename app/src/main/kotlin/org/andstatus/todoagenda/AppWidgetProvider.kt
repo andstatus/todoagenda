@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import org.andstatus.todoagenda.prefs.AllSettings
@@ -72,7 +73,9 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
         for (widgetId in appWidgetIds) {
             RemoteViewsFactory.updateWidget(context, widgetId)
             InstanceState.updated(widgetId)
-            if (AllSettings.instanceFromId(context, widgetId).isScrollableLayout) {
+            if (AllSettings.instanceFromId(context, widgetId).isScrollableLayout &&
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+            ) {
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                     intArrayOf(widgetId),
                     R.id.event_list,

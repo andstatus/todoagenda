@@ -6,13 +6,7 @@
     android:orientation="vertical"
     android:padding="@dimen/widget_padding">
 
-    <LinearLayout
-        android:id="@+id/header_parent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-    </LinearLayout>
+    <include layout="@layout/widget_header_one_row" />
 
     <ListView
         android:id="@+id/event_list"

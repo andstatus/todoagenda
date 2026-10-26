@@ -9,10 +9,13 @@ import android.os.Build
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
+import android.widget.RemoteViews.RemoteCollectionItems
+import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
+import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.layout.TimeSection
 import org.andstatus.todoagenda.layout.WidgetHeaderLayout
-import org.andstatus.todoagenda.layout.WidgetLayout
+import org.andstatus.todoagenda.layout.WidgetRootLayout
 import org.andstatus.todoagenda.prefs.AllSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.MyLocale
@@ -322,6 +325,12 @@ class RemoteViewsFactory(
 
     companion object {
         private val TAG = RemoteViewsFactory::class.java.simpleName
+        private val HEADER_DATE_VIEW_IDS =
+            intArrayOf(
+                R.id.calendar_current_date,
+                R.id.calendar_current_date_shadow_dark,
+                R.id.calendar_current_date_shadow_light,
+            )
         val factories = ConcurrentHashMap<Int, RemoteViewsFactory>()
         private const val MAX_NUMBER_OF_WIDGETS = 100
         private const val REQUEST_CODE_ADD_EVENT = 2
@@ -368,13 +377,12 @@ class RemoteViewsFactory(
                 }
                 val settings = AllSettings.instanceFromId(context, widgetId)
                 val layout =
-                    if (settings.isScrollableLayout) {
-                        WidgetLayout.WIDGET_SCROLLABLE
-                    } else {
-                        WidgetLayout.WIDGET_NON_SCROLLABLE
-                    }
-                val rv =
-                    RemoteViews(context.packageName, layout.shadowed(settings.colors().textShadow))
+                    WidgetRootLayout.forWidget(
+                        settings.isScrollableLayout,
+                        settings.widgetHeaderLayout,
+                    )
+                val rv = RemoteViews(context.packageName, layout.layoutId)
+                Log.d(TAG, "$widgetId updateWidget, root layout:${layout.name}")
                 RemoteViewsUtil.setBackgroundColor(
                     rv,
                     R.id.widget_parent,
@@ -382,7 +390,11 @@ class RemoteViewsFactory(
                 )
                 configureWidgetHeader(settings, rv)
                 if (settings.isScrollableLayout) {
-                    configureWidgetEntriesList(settings, rv)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        configureWidgetEntriesCollection(settings, rv)
+                    } else {
+                        configureWidgetEntriesList(settings, rv)
+                    }
                 } else {
                     configureWidgetEntriesNonScrollable(settings, rv)
                 }
@@ -400,35 +412,35 @@ class RemoteViewsFactory(
                 TAG,
                 settings.widgetId.toString() + " configureWidgetHeader, layout:" + settings.widgetHeaderLayout,
             )
-            rv.removeAllViews(R.id.header_parent)
-            if (settings.widgetHeaderLayout != WidgetHeaderLayout.HIDDEN) {
-                val headerView =
-                    RemoteViews(
-                        settings.context.packageName,
-                        settings.widgetHeaderLayout.widgetLayout?.shadowed(settings.colors().textShadow)
-                            ?: 0,
-                    )
-                rv.addView(R.id.header_parent, headerView)
-                RemoteViewsUtil.setBackgroundColor(
-                    rv,
-                    R.id.action_bar,
-                    settings.colors().getBackgroundColor(BackgroundColorPref.WIDGET_HEADER),
-                )
-                configureCurrentDate(settings, rv)
-                setActionIcons(settings, rv)
-                configureGotoToday(settings, rv)
-                configureAddCalendarEvent(settings, rv)
-                configureAddTask(settings, rv)
-                configureRefresh(settings, rv)
-                configureOverflowMenu(settings, rv)
-            }
+            if (settings.widgetHeaderLayout == WidgetHeaderLayout.HIDDEN) return
+
+            RemoteViewsUtil.setBackgroundColor(
+                rv,
+                R.id.action_bar,
+                settings.colors().getBackgroundColor(BackgroundColorPref.WIDGET_HEADER),
+            )
+            configureCurrentDate(settings, rv)
+            setActionIcons(settings, rv)
+            configureGotoToday(settings, rv)
+            configureAddCalendarEvent(settings, rv)
+            configureAddTask(settings, rv)
+            configureRefresh(settings, rv)
+            configureOverflowMenu(settings, rv)
         }
 
         private fun configureCurrentDate(
             settings: InstanceSettings,
             rv: RemoteViews,
         ) {
-            val viewId = R.id.calendar_current_date
+            val viewId =
+                when (settings.colors().textShadow) {
+                    TextShadow.NO_SHADOW -> R.id.calendar_current_date
+                    TextShadow.DARK_SHADOW -> R.id.calendar_current_date_shadow_dark
+                    TextShadow.LIGHT_SHADOW -> R.id.calendar_current_date_shadow_light
+                }
+            for (id in HEADER_DATE_VIEW_IDS) {
+                rv.setViewVisibility(id, if (id == viewId) View.VISIBLE else View.GONE)
+            }
             rv.setOnClickPendingIntent(
                 viewId,
                 getActionPendingIntent(settings, ACTION_OPEN_CALENDAR),
@@ -553,6 +565,46 @@ class RemoteViewsFactory(
                 getActionPendingIntent(settings, ACTION_CONFIGURE),
             )
             RemoteViewsUtil.setHeaderButtonSize(settings, rv, R.id.overflow_menu)
+        }
+
+        /**
+         * Builds collection items directly instead of using a legacy ListView adapter.
+         *
+         * Starting with Android 15, AppWidgetManager asynchronously converts legacy list adapters
+         * to RemoteCollectionItems before sending an update. That conversion can be delayed while
+         * the provider process is cached, so static widget content (the header) is not updated
+         * together with the list. Direct items keep the whole widget update synchronous.
+         */
+        @RequiresApi(Build.VERSION_CODES.S)
+        private fun configureWidgetEntriesCollection(
+            settings: InstanceSettings,
+            rv: RemoteViews,
+        ) {
+            val factory =
+                factories.computeIfAbsent(settings.widgetId) { id ->
+                    RemoteViewsFactory(settings.context, id, false)
+                }
+            factory.onDataSetChanged()
+            val items =
+                RemoteCollectionItems
+                    .Builder()
+                    .setHasStableIds(false)
+                    .setViewTypeCount(factory.getViewTypeCount())
+            factory.widgetEntries.forEachIndexed { position, entry ->
+                factory.getRemoteViewsAt(position)?.let { views ->
+                    // Collection children cannot have their own PendingIntent; the click is
+                    // resolved by the pending intent template on the ListView below.
+                    views.setOnClickFillInIntent(R.id.event_entry, entry.newOnClickFillInIntent())
+                    items.addItem(factory.getItemId(position), views)
+                }
+            }
+            rv.setRemoteAdapter(R.id.event_list, items.build())
+            rv.setPendingIntentTemplate(
+                R.id.event_list,
+                getActionPendingIntent(settings, ACTION_VIEW_ENTRY),
+            )
+            InstanceState.listRedrawn(settings.widgetId)
+            Log.d(TAG, "${settings.widgetId} configureWidgetEntriesCollection, items:${factory.widgetEntries.size}")
         }
 
         private fun configureWidgetEntriesList(
