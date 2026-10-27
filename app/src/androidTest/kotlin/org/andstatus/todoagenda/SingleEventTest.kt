@@ -1,12 +1,14 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import io.kotest.matchers.types.shouldNotBeSameInstanceAs
 import org.andstatus.todoagenda.calendar.CalendarEvent
 import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.Assert
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -84,8 +86,12 @@ class SingleEventTest : BaseWidgetTest() {
                 title = "Single All day event from millis",
                 startMillisIn = today.millis,
             )
-        Assert.assertEquals(event.startDate.toString(), today.millis, event.startMillis)
-        Assert.assertEquals(event.endDate.toString(), today.plusDays(1).millis, event.endMillis)
+        withClue(event.startDate.toString()) {
+            event.startMillis shouldBe today.millis
+        }
+        withClue(event.endDate.toString()) {
+            event.endMillis shouldBe today.plusDays(1).millis
+        }
     }
 
     private fun assertOneEvent(
@@ -97,24 +103,25 @@ class SingleEventTest : BaseWidgetTest() {
         provider.setExecutedAt(executedAt)
         provider.addRow(event)
         playResults(TAG)
-        Assert.assertFalse(
-            settings.toString(),
-            settings.getActiveEventSources(EventProviderType.CALENDAR).isEmpty(),
-        )
+        withClue(settings.toString()) {
+            settings.getActiveEventSources(EventProviderType.CALENDAR).isEmpty() shouldBe false
+        }
         val source = provider.firstActiveEventSource
-        Assert.assertTrue(source.toString(), source.source.isAvailable)
-        Assert.assertTrue(
-            settings.toString(),
+        withClue(source.toString()) {
+            source.source.isAvailable shouldBe true
+        }
+        withClue(settings.toString()) {
             settings
                 .getActiveEventSource(
                     EventProviderType.CALENDAR,
                     source.source.id,
-                ).source.isAvailable,
-        )
-        Assert.assertEquals(factory.widgetEntries.toString(), 3, factory.widgetEntries.size.toLong())
-        val entry = factory.widgetEntries[1]
-        Assert.assertTrue(entry is CalendarEntry)
-        val eventOut = (entry as CalendarEntry).event
+                ).source.isAvailable shouldBe true
+        }
+        withClue(factory.widgetEntries.toString()) {
+            factory.widgetEntries.size shouldBe 3
+        }
+        val entry = factory.widgetEntries[1].shouldBeInstanceOf<CalendarEntry>()
+        val eventOut = entry.event
         val msgLog =
             """
             Comparing events:
@@ -123,9 +130,13 @@ class SingleEventTest : BaseWidgetTest() {
             
             """.trimIndent()
         if (equal) {
-            Assert.assertEquals(msgLog, event.toString(), eventOut.toString())
+            withClue(msgLog) {
+                eventOut.toString() shouldBe event.toString()
+            }
         } else {
-            Assert.assertNotSame(msgLog, event.toString(), eventOut.toString())
+            withClue(msgLog) {
+                eventOut.toString() shouldNotBeSameInstanceAs event.toString()
+            }
         }
     }
 }

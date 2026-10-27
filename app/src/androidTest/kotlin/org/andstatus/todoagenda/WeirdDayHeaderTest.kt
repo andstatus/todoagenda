@@ -2,7 +2,6 @@ package org.andstatus.todoagenda
 
 import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com

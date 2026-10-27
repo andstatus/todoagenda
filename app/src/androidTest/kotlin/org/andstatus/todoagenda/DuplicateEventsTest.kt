@@ -1,7 +1,7 @@
 package org.andstatus.todoagenda
 
-import org.junit.Assert
-import org.junit.Test
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 
 /**
  * @author yvolk@yurivolkov.com
@@ -15,6 +15,8 @@ class DuplicateEventsTest : BaseWidgetTest() {
         val method = "testIssue354"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.duplicates)
         playResults(method)
-        Assert.assertEquals("Number of entries", 42, factory.widgetEntries.size.toLong())
+        withClue("Number of entries") {
+            factory.widgetEntries.size shouldBe 42
+        }
     }
 }

@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.runner.junit4.KotestTestRunner
 import org.andstatus.todoagenda.R
-import org.junit.Test
+import org.junit.runner.RunWith
 
 /**
  * @author yvolk@yurivolkov.com
  */
-class GenerateLocalizedDescriptions {
+@RunWith(KotestTestRunner::class)
+class GenerateLocalizedDescriptions : AnnotationSpec() {
     @Test
     fun localizedDescriptions() {
         val context1 = InstrumentationRegistry.getInstrumentation().targetContext

@@ -1,8 +1,8 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
 import org.andstatus.todoagenda.prefs.AllDayEventsPlacement
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -16,7 +16,9 @@ class AllDayEventsTest : BaseWidgetTest() {
         assertPosition(8, WidgetEntryPosition.END_OF_DAY)
         assertPosition(9, WidgetEntryPosition.END_OF_DAY)
         assertPosition(10, WidgetEntryPosition.DAY_HEADER)
-        assertPosition(11, WidgetEntryPosition.ENTRY_DATE) // Current time line
+        withClue("Current time line") {
+            assertPosition(11, WidgetEntryPosition.ENTRY_DATE)
+        }
         assertPosition(12, WidgetEntryPosition.END_OF_DAY)
         provider.settings =
             settings.copy(
@@ -27,6 +29,8 @@ class AllDayEventsTest : BaseWidgetTest() {
         assertPosition(2, WidgetEntryPosition.START_OF_DAY)
         assertPosition(10, WidgetEntryPosition.DAY_HEADER)
         assertPosition(11, WidgetEntryPosition.START_OF_DAY)
-        assertPosition(12, WidgetEntryPosition.ENTRY_DATE) // Current time line
+        withClue("Current time line") {
+            assertPosition(12, WidgetEntryPosition.ENTRY_DATE)
+        }
     }
 }

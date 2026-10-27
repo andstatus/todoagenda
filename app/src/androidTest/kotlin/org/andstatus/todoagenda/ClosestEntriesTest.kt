@@ -1,9 +1,9 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.test.R
 import org.andstatus.todoagenda.widget.WidgetEntry
-import org.junit.Assert.assertEquals
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -17,16 +17,18 @@ class ClosestEntriesTest : BaseWidgetTest() {
         playResults(method)
         val title = "Daily all day event"
         val entries: List<WidgetEntry> = factory.widgetEntries.filter { it.title == title }
-        assertEquals("Only closest event", 1, entries.size)
+        withClue("Only closest event") {
+            entries.size shouldBe 1
+        }
         val today = settings.clock.dayOf(provider.executedAt)
-        assertEquals(today, entries[0].shouldBeCalendarEntry.entryDay)
+        entries[0].shouldBeCalendarEntry.entryDay shouldBe today
 
         val firstEntry = factory.widgetEntries.first()
-        assertEquals(
+        withClue(
             "Past events filter check. First entry should not be more than a week ago: $firstEntry",
-            settings.clock.dayOf(2025, 2, 2),
-            firstEntry.entryDay,
-        )
+        ) {
+            firstEntry.entryDay shouldBe settings.clock.dayOf(2025, 2, 2)
+        }
     }
 
     @Test
@@ -37,10 +39,16 @@ class ClosestEntriesTest : BaseWidgetTest() {
         playResults(method)
         val title = "Monday's one week event"
         val entries: List<WidgetEntry> = factory.widgetEntries.filter { it.title == title }
-        assertEquals("Only one entry", 1, entries.size)
+        withClue("Only one entry") {
+            entries.size shouldBe 1
+        }
         val entry = entries[0].shouldBeCalendarEntry
-        assertEquals(settings.clock.dayOf(2025, 2, 3), entry.entryDay)
-        assertEquals("Days of event", 8, entry.event.daysOfEvent)
-        assertEquals("The last day of event", 8, entry.event.dayOfEvent(entry.entryDay))
+        entry.entryDay shouldBe settings.clock.dayOf(2025, 2, 3)
+        withClue("Days of event") {
+            entry.event.daysOfEvent shouldBe 8
+        }
+        withClue("The last day of event") {
+            entry.event.dayOfEvent(entry.entryDay) shouldBe 8
+        }
     }
 }

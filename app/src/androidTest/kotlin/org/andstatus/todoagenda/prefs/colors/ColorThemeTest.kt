@@ -1,5 +1,6 @@
 package org.andstatus.todoagenda.prefs.colors
 
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.AnnotationSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -93,14 +94,18 @@ class ColorThemeTest : AnnotationSpec() {
         json.getString(ColorTheme.PREF_TEXT_SHADOW) shouldBe TextShadow.LIGHT_SHADOW.value
         json.getString(ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE) shouldBe
             TimeUntilBackgroundSource.WHITE.value
-        // Colors are still used for drawing, even though they aren't stored
-        theme.textColorSource shouldBe TextColorSource.COLORS
-        theme.getBackgroundColor(BackgroundColorPref.WIDGET_HEADER) shouldBe backgroundColor
-        theme.textColors.getValue(TextColorPref.WIDGET_HEADER).color shouldBe textColor
+        withClue("Colors are still used for drawing, even though they aren't stored") {
+            theme.textColorSource shouldBe TextColorSource.COLORS
+            theme.getBackgroundColor(BackgroundColorPref.WIDGET_HEADER) shouldBe backgroundColor
+            theme.textColors.getValue(TextColorPref.WIDGET_HEADER).color shouldBe textColor
+        }
     }
 
     @Test
     fun colorsOfADynamicThemeAreNotRestoredFromJson_SettingsAre() {
+        // Couldn't ignore it conditionally.
+        if (!ColorThemeType.TONAL_LIGHT.supportedByDevice) return
+
         val json =
             JSONObject().apply {
                 put(BackgroundColorPref.WIDGET_HEADER.colorPreferenceName, backgroundColor)
@@ -212,17 +217,21 @@ class ColorThemeTest : AnnotationSpec() {
         ColorTheme
             .fromJson(ColorThemeType.DARK, JSONObject())
             .shouldBeInstanceOf<ManualColorTheme>()
-        ColorTheme
-            .fromJson(ColorThemeType.TONAL_LIGHT, JSONObject())
-            .shouldBeInstanceOf<DynamicColorTheme>()
-        ColorTheme
-            .fromJson(ColorThemeType.TONAL_DARK, JSONObject())
-            .shouldBeInstanceOf<DynamicColorTheme>()
-        ColorTheme
-            .fromJson(ColorThemeType.SEMANTIC_LIGHT, JSONObject())
-            .shouldBeInstanceOf<DynamicColorTheme>()
-        ColorTheme
-            .fromJson(ColorThemeType.SEMANTIC_DARK, JSONObject())
-            .shouldBeInstanceOf<DynamicColorTheme>()
+        if (ColorThemeType.TONAL_LIGHT.supportedByDevice) {
+            ColorTheme
+                .fromJson(ColorThemeType.TONAL_LIGHT, JSONObject())
+                .shouldBeInstanceOf<DynamicColorTheme>()
+            ColorTheme
+                .fromJson(ColorThemeType.TONAL_DARK, JSONObject())
+                .shouldBeInstanceOf<DynamicColorTheme>()
+        }
+        if (ColorThemeType.SEMANTIC_LIGHT.supportedByDevice) {
+            ColorTheme
+                .fromJson(ColorThemeType.SEMANTIC_LIGHT, JSONObject())
+                .shouldBeInstanceOf<DynamicColorTheme>()
+            ColorTheme
+                .fromJson(ColorThemeType.SEMANTIC_DARK, JSONObject())
+                .shouldBeInstanceOf<DynamicColorTheme>()
+        }
     }
 }

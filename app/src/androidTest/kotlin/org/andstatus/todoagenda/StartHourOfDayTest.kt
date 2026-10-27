@@ -1,14 +1,13 @@
 package org.andstatus.todoagenda
 
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.prefs.EndedSomeTimeAgo
 import org.andstatus.todoagenda.provider.QueryResultsStorage
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.DayHeader
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -35,15 +34,13 @@ class StartHourOfDayTest : BaseWidgetTest() {
                 .withTimeAtStartOfDay()
         val today: DateTime = thisDay.plusHours(startHourOfDay)
         val firstEntry = factory.widgetEntries[0]
-        assertTrue(
-            "First entry should be be today's header: $firstEntry",
-            firstEntry is DayHeader && firstEntry.entryDay == thisDay,
-        )
+        withClue("First entry should be be today's header: $firstEntry") {
+            (firstEntry is DayHeader && firstEntry.entryDay == thisDay) shouldBe true
+        }
         val secondEntry = factory.widgetEntries[1]
-        assertTrue(
-            "Second entry should not end before today: $secondEntry",
-            secondEntry is CalendarEntry && !secondEntry.event.endDate.isBefore(today),
-        )
+        withClue("Second entry should not end before today: $secondEntry") {
+            (secondEntry is CalendarEntry && !secondEntry.event.endDate.isBefore(today)) shouldBe true
+        }
     }
 
     private fun assertSplitEvent(
@@ -59,25 +56,21 @@ class StartHourOfDayTest : BaseWidgetTest() {
             factory.widgetEntries.indexOfLast {
                 it.entryDay == thisDay && it is CalendarEntry
             }
-        assertTrue(
-            "Should exist Dec 22 entry ${factory.widgetEntries}",
-            indLastDec22 > 0,
-        )
+        withClue("Should exist Dec 22 entry ${factory.widgetEntries}") {
+            (indLastDec22 > 0) shouldBe true
+        }
         val lastDec22Entry: CalendarEntry = factory.widgetEntries[indLastDec22] as CalendarEntry
-        assertEquals(
-            "Last day entry start date $lastDec22Entry",
-            entryStartDate,
-            lastDec22Entry.event.startDate,
-        )
-        assertTrue(
+        withClue("Last day entry start date $lastDec22Entry") {
+            lastDec22Entry.event.startDate shouldBe entryStartDate
+        }
+        withClue(
             "Entry should continue on the next day ${lastDec22Entry.eventTimeString}, $lastDec22Entry",
-            lastDec22Entry.eventTimeString.endsWith(" →"),
-        )
+        ) {
+            lastDec22Entry.eventTimeString.endsWith(" →") shouldBe true
+        }
         val firstDec23Entry: CalendarEntry = factory.widgetEntries[indLastDec22 + 2] as CalendarEntry
-        assertEquals(
-            "Next day entry start date $firstDec23Entry",
-            entryStartDate,
-            firstDec23Entry.event.startDate,
-        )
+        withClue("Next day entry start date $firstDec23Entry") {
+            firstDec23Entry.event.startDate shouldBe entryStartDate
+        }
     }
 }

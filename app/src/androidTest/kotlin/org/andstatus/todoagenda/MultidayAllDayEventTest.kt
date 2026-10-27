@@ -1,13 +1,13 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.fail
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.test.R
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.DayHeader
 import org.andstatus.todoagenda.widget.LastEntry
 import org.andstatus.todoagenda.widget.LastEntryType
-import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -27,49 +27,49 @@ class MultidayAllDayEventTest : BaseWidgetTest() {
         factory.widgetEntries.forEachIndexed { ind, entry ->
             val logMsg = method + "; " + String.format("%02d ", ind) + entry.toString()
             if (entry.entryDay.isBefore(today)) {
-                Assert.fail("Is present before today $logMsg")
+                fail("Is present before today $logMsg")
             }
             if (entry.entryDay.isAfter(endOfRangeTime)) {
-                Assert.fail("After end of range $logMsg")
+                fail("After end of range $logMsg")
             }
             val dayOfEntry = entry.entryDay.dayOfYear
             if (entry is DayHeader) {
                 if (dayOfHeaderPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {
-                        Assert.fail("No today's header $logMsg")
+                        fail("No today's header $logMsg")
                     }
                 } else {
-                    assertEquals("No header $logMsg", (dayOfHeaderPrev + 1).toLong(), dayOfEntry.toLong())
+                    withClue("No header $logMsg") {
+                        dayOfEntry shouldBe dayOfHeaderPrev + 1
+                    }
                 }
                 dayOfHeaderPrev = dayOfEntry
             } else if (entry is LastEntry) {
-                assertEquals(LastEntryType.END_OF_LIST, entry.type)
+                entry.type shouldBe LastEntryType.END_OF_LIST
             } else if (entry is CalendarEntry) {
                 if (dayOfEventEntryPrev == 0) {
                     if (entry.entryDate.withTimeAtStartOfDay().isAfter(today)) {
-                        Assert.fail("Today not filled $logMsg")
+                        fail("Today not filled $logMsg")
                     }
-                    assertEquals("Day of event", 4, entry.event.dayOfEvent(entry.entryDay))
-                    assertEquals("Days of event", 37, entry.event.daysOfEvent)
+                    withClue("Day of event") {
+                        entry.event.dayOfEvent(entry.entryDay) shouldBe 4
+                    }
+                    withClue("Days of event") {
+                        entry.event.daysOfEvent shouldBe 37
+                    }
                 } else {
-                    assertEquals(
-                        "Day not filled $logMsg",
-                        (dayOfEventEntryPrev + 1).toLong(),
-                        dayOfEntry.toLong(),
-                    )
+                    withClue("Day not filled $logMsg") {
+                        dayOfEntry shouldBe dayOfEventEntryPrev + 1
+                    }
                 }
                 dayOfEventEntryPrev = dayOfEntry
             }
         }
-        assertEquals(
-            "Wrong last day header $method",
-            endOfRangeTime.dayOfYear.toLong(),
-            dayOfHeaderPrev.toLong(),
-        )
-        assertEquals(
-            "Wrong last filled day $method",
-            endOfRangeTime.dayOfYear.toLong(),
-            dayOfEventEntryPrev.toLong(),
-        )
+        withClue("Wrong last day header $method") {
+            dayOfHeaderPrev shouldBe endOfRangeTime.dayOfYear
+        }
+        withClue("Wrong last filled day $method") {
+            dayOfEventEntryPrev shouldBe endOfRangeTime.dayOfYear
+        }
     }
 }

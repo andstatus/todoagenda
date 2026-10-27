@@ -1,9 +1,9 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.provider.QueryRow
 import org.andstatus.todoagenda.widget.CalendarEntry
-import org.junit.Assert
-import org.junit.Test
 import java.util.concurrent.TimeUnit
 
 /**
@@ -19,13 +19,17 @@ class RecurringEventsTest : BaseWidgetTest() {
     @Test
     fun testShowRecurringEvents() {
         generateEventInstances()
-        Assert.assertEquals("Entries: " + factory.widgetEntries.size, 15, countCalendarEntries().toLong())
+        withClue("Entries: " + factory.widgetEntries.size) {
+            countCalendarEntries() shouldBe 15
+        }
         provider.settings =
             settings.copy(
                 showOnlyClosestInstanceOfRecurringEvent = true,
             )
         generateEventInstances()
-        Assert.assertEquals("Entries: " + factory.widgetEntries.size, 1, countCalendarEntries().toLong())
+        withClue("Entries: " + factory.widgetEntries.size) {
+            countCalendarEntries() shouldBe 1
+        }
     }
 
     fun countCalendarEntries(): Int {

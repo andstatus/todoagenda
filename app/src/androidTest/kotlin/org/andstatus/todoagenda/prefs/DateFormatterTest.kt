@@ -1,13 +1,13 @@
 package org.andstatus.todoagenda.prefs
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.BaseWidgetTest
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatType
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatValue
 import org.andstatus.todoagenda.prefs.dateformat.DateFormatter
 import org.joda.time.DateTime
-import org.junit.Assert
-import org.junit.Test
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 
@@ -105,7 +105,7 @@ class DateFormatterTest : BaseWidgetTest() {
                 now.monthOfYear().get(),
                 now.dayOfMonth().get(),
             )
-        Assert.assertEquals(javaFormatted, javaFormatted(javaPattern, now))
+        javaFormatted(javaPattern, now) shouldBe javaFormatted
         assertPattern(now, javaPattern, javaFormatted)
         assertPattern(now, "$javaPattern b", "$javaFormatted 0")
         assertPattern(now, "BBB $javaPattern b", "$todayText $javaFormatted")
@@ -187,7 +187,6 @@ class DateFormatterTest : BaseWidgetTest() {
     fun dateKeepsItsOwnTimeZone() {
         val originalTimeZone = TimeZone.getDefault()
         try {
-            // Simulate a device in Italy while the widget is locked to London (BST).
             TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"))
             val londonDate = DateTime.parse("2025-09-07T00:30:00.000+01:00")
             val formatter =
@@ -196,7 +195,9 @@ class DateFormatterTest : BaseWidgetTest() {
                     DateFormatValue.of(DateFormatType.CUSTOM, "yyyy-MM-dd HH:mm"),
                     londonDate,
                 )
-            Assert.assertEquals("2025-09-07 00:30", formatter.formatDate(londonDate))
+            withClue("Simulate a device in Italy while the widget is locked to London (BST).") {
+                formatter.formatDate(londonDate) shouldBe "2025-09-07 00:30"
+            }
         } finally {
             TimeZone.setDefault(originalTimeZone)
         }
@@ -210,7 +211,9 @@ class DateFormatterTest : BaseWidgetTest() {
         val format = DateFormatValue.of(DateFormatType.CUSTOM, pattern)
         val now = settings.clock.now()
         val formatter = DateFormatter(settings.context, format, now)
-        Assert.assertEquals("Date: $date, Now:$now, Pattern: [$pattern]", expected, formatter.formatDate(date))
+        withClue("Date: $date, Now:$now, Pattern: [$pattern]") {
+            formatter.formatDate(date) shouldBe expected
+        }
     }
 
     companion object {

@@ -9,6 +9,7 @@ import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.test.core.app.ActivityScenario
 import androidx.test.platform.app.InstrumentationRegistry
+import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.AnnotationSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -111,32 +112,37 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
             val fragment = waitForCurrentColorsFragment()
             fragment.shouldBeInstanceOf<DynamicColorsPreferencesFragment>()
             ApplicationPreferences.getTextShadow(context) shouldBe TextShadow.DARK_SHADOW
-            // The user selects the dark part. The app closes the settings, saves them
-            // and opens the settings of the dark part again:
-            setPreference(
-                fragment,
-                InstanceSettings.PREF_DARK_LIGHT_THEME,
-                DarkLightTheme.DARK.value,
-            )
-            waitUntil("The app didn't save the settings and reopen them for the dark theme") {
-                val saved = savedSettings()
-                saved.darkLightTheme == DarkLightTheme.DARK &&
-                    ApplicationPreferences.getColorThemeType(context) == ColorThemeType.TONAL_DARK &&
-                    ApplicationPreferences.getTextShadow(context) == TextShadow.LIGHT_SHADOW
+            withClue(
+                "The user selects the dark part. The app closes the settings, saves them " +
+                    "and opens the settings of the dark part again:",
+            ) {
+                setPreference(
+                    fragment,
+                    InstanceSettings.PREF_DARK_LIGHT_THEME,
+                    DarkLightTheme.DARK.value,
+                )
+                waitUntil("The app didn't save the settings and reopen them for the dark theme") {
+                    val saved = savedSettings()
+                    saved.darkLightTheme == DarkLightTheme.DARK &&
+                        ApplicationPreferences.getColorThemeType(context) == ColorThemeType.TONAL_DARK &&
+                        ApplicationPreferences.getTextShadow(context) == TextShadow.LIGHT_SHADOW
+                }
             }
-            // Read the settings, which the app saved itself
-            val saved = savedSettings()
-            saved.darkLightTheme shouldBe DarkLightTheme.DARK
-            ApplicationPreferences.getTextShadow(context) shouldBe TextShadow.LIGHT_SHADOW
-            ApplicationPreferences.getTimeUntilBackgroundSource(context) shouldBe
-                TimeUntilBackgroundSource.WHITE
-            val darkPart = saved.colors()
-            darkPart.textShadow shouldBe TextShadow.LIGHT_SHADOW
-            darkPart.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.WHITE
-            // Settings of the light part stay as they were
-            val lightPart = savedTheme(ColorSettingsSource.MATERIAL_YOU_TONAL, DarkLightTheme.LIGHT)
-            lightPart.textShadow shouldBe TextShadow.DARK_SHADOW
-            lightPart.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.YELLOW
+            withClue("Read the settings, which the app saved itself") {
+                val saved = savedSettings()
+                saved.darkLightTheme shouldBe DarkLightTheme.DARK
+                ApplicationPreferences.getTextShadow(context) shouldBe TextShadow.LIGHT_SHADOW
+                ApplicationPreferences.getTimeUntilBackgroundSource(context) shouldBe
+                    TimeUntilBackgroundSource.WHITE
+                val darkPart = saved.colors()
+                darkPart.textShadow shouldBe TextShadow.LIGHT_SHADOW
+                darkPart.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.WHITE
+            }
+            withClue("Settings of the light part stay as they were") {
+                val lightPart = savedTheme(ColorSettingsSource.MATERIAL_YOU_TONAL, DarkLightTheme.LIGHT)
+                lightPart.textShadow shouldBe TextShadow.DARK_SHADOW
+                lightPart.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.YELLOW
+            }
         } finally {
             runCatching { scenario.close() }
         }
@@ -167,46 +173,57 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
         try {
             val manualFragment = waitForCurrentColorsFragment()
             manualFragment.shouldBeInstanceOf<ManualColorsPreferencesFragment>()
-            // The user edits the currently selected (manual) theme
-            setPreference(manualFragment, ColorTheme.PREF_TEXT_SHADOW, TextShadow.DARK_SHADOW.value)
-            savedTheme(ColorSettingsSource.SINGLE_MANUAL).textShadow shouldBe TextShadow.DARK_SHADOW
-            // ... and then selects another "Color settings source"
-            setPreference(
-                manualFragment,
-                PREF_COLOR_SETTINGS_SOURCE,
-                ColorSettingsSource.MATERIAL_YOU_TONAL.value,
-            )
-            // The app saves settings of the previous theme, loads settings of the new theme
-            // to ApplicationPreferences and opens the settings for the new theme
-            waitUntil("The settings of the new theme were not opened") {
-                ApplicationPreferences.getSupportedColorSettingsSource(context) ==
-                    ColorSettingsSource.MATERIAL_YOU_TONAL &&
-                    ApplicationPreferences.getColorThemeType(context) == ColorThemeType.TONAL_LIGHT &&
-                    ApplicationPreferences.getTextShadow(context) == TextShadow.LIGHT_SHADOW &&
-                    ApplicationPreferences.getTimeUntilBackgroundSource(context) ==
-                    TimeUntilBackgroundSource.WHITE
+            withClue("The user edits the currently selected (manual) theme") {
+                setPreference(manualFragment, ColorTheme.PREF_TEXT_SHADOW, TextShadow.DARK_SHADOW.value)
+                savedTheme(ColorSettingsSource.SINGLE_MANUAL).textShadow shouldBe TextShadow.DARK_SHADOW
+            }
+            withClue("... and then selects another \"Color settings source\"") {
+                setPreference(
+                    manualFragment,
+                    PREF_COLOR_SETTINGS_SOURCE,
+                    ColorSettingsSource.MATERIAL_YOU_TONAL.value,
+                )
+            }
+            withClue(
+                "The app saves settings of the previous theme, loads settings of the new theme " +
+                    "to ApplicationPreferences and opens the settings for the new theme",
+            ) {
+                waitUntil("The settings of the new theme were not opened") {
+                    ApplicationPreferences.getSupportedColorSettingsSource(context) ==
+                        ColorSettingsSource.MATERIAL_YOU_TONAL &&
+                        ApplicationPreferences.getColorThemeType(context) == ColorThemeType.TONAL_LIGHT &&
+                        ApplicationPreferences.getTextShadow(context) == TextShadow.LIGHT_SHADOW &&
+                        ApplicationPreferences.getTimeUntilBackgroundSource(context) ==
+                        TimeUntilBackgroundSource.WHITE
+                }
             }
             val dynamicFragment = waitForCurrentColorsFragment()
             dynamicFragment.shouldBeInstanceOf<DynamicColorsPreferencesFragment>()
-            // The changed Color settings source is only a request to edit the new theme:
-            // it is not stored to the Widget's settings yet
-            savedSettings().colorSettingsSource shouldBe ColorSettingsSource.SINGLE_MANUAL
-            savedSettings().colors().textShadow shouldBe TextShadow.DARK_SHADOW
-            // The previous theme's change is saved
-            savedTheme(ColorSettingsSource.SINGLE_MANUAL).textShadow shouldBe TextShadow.DARK_SHADOW
-            // The user edits the new theme
-            setPreference(dynamicFragment, ColorTheme.PREF_TEXT_SHADOW, TextShadow.NO_SHADOW.value)
-            setPreference(
-                dynamicFragment,
-                ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE,
-                TimeUntilBackgroundSource.BLACK.value,
-            )
-            // The user exits the settings, and the app saves the changes
-            finishActivities()
-            waitUntil("The settings of the new theme were not saved") {
-                val tonal = savedTheme(ColorSettingsSource.MATERIAL_YOU_TONAL)
-                tonal.textShadow == TextShadow.NO_SHADOW &&
-                    tonal.timeUntilBackgroundSource == TimeUntilBackgroundSource.BLACK
+            withClue(
+                "The changed Color settings source is only a request to edit the new theme: " +
+                    "it is not stored to the Widget's settings yet",
+            ) {
+                savedSettings().colorSettingsSource shouldBe ColorSettingsSource.SINGLE_MANUAL
+                savedSettings().colors().textShadow shouldBe TextShadow.DARK_SHADOW
+            }
+            withClue("The previous theme's change is saved") {
+                savedTheme(ColorSettingsSource.SINGLE_MANUAL).textShadow shouldBe TextShadow.DARK_SHADOW
+            }
+            withClue("The user edits the new theme") {
+                setPreference(dynamicFragment, ColorTheme.PREF_TEXT_SHADOW, TextShadow.NO_SHADOW.value)
+                setPreference(
+                    dynamicFragment,
+                    ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE,
+                    TimeUntilBackgroundSource.BLACK.value,
+                )
+            }
+            withClue("The user exits the settings, and the app saves the changes") {
+                finishActivities()
+                waitUntil("The settings of the new theme were not saved") {
+                    val tonal = savedTheme(ColorSettingsSource.MATERIAL_YOU_TONAL)
+                    tonal.textShadow == TextShadow.NO_SHADOW &&
+                        tonal.timeUntilBackgroundSource == TimeUntilBackgroundSource.BLACK
+                }
             }
             val manual = savedTheme(ColorSettingsSource.SINGLE_MANUAL)
             manual.textShadow shouldBe TextShadow.DARK_SHADOW
@@ -263,9 +280,10 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
     ) {
         instrumentation.runOnMainSync {
             val preference = fragment.findPreference<ListPreference>(key).shouldNotBeNull()
-            // The same sequence of calls as when the user selects a value in the list
-            if (preference.callChangeListener(value)) {
-                preference.value = value
+            withClue("The same sequence of calls as when the user selects a value in the list") {
+                if (preference.callChangeListener(value)) {
+                    preference.value = value
+                }
             }
         }
     }

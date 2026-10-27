@@ -1,12 +1,16 @@
 package org.andstatus.todoagenda.prefs
 
-import org.junit.Assert
-import org.junit.Test
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.runner.junit4.KotestTestRunner
+import org.junit.runner.RunWith
 
 /**
  * @author yvolk@yurivolkov.com
  */
-class KeywordsFilterTest {
+@RunWith(KotestTestRunner::class)
+class KeywordsFilterTest : AnnotationSpec() {
     @Test
     fun testPhrases() {
         var query = "\"do it\""
@@ -33,17 +37,25 @@ class KeywordsFilterTest {
     private fun assertOneQueryToKeywords(query: String, vararg keywords: String) {
         val size = keywords.size
         val filter1 = KeywordsFilter(false, query)
-        Assert.assertEquals(filter1.toString(), size.toLong(), filter1.keywords.size.toLong())
+        withClue(filter1.toString()) {
+            filter1.keywords.size.toLong() shouldBe size.toLong()
+        }
         for (ind in 0 until size) {
-            Assert.assertEquals(filter1.toString(), keywords[ind], filter1.keywords[ind])
+            withClue(filter1.toString()) {
+                filter1.keywords[ind] shouldBe keywords[ind]
+            }
         }
     }
 
     private fun assertMatch(query: String, body: String) {
-        Assert.assertTrue("no keywords from '$query' match: '$body'", KeywordsFilter(false, query).matched(body))
+        withClue("no keywords from '$query' match: '$body'") {
+            KeywordsFilter(false, query).matched(body) shouldBe true
+        }
     }
 
     private fun assertNotMatch(query: String, body: String) {
-        Assert.assertFalse("Some keyword from '$query' match: '$body'", KeywordsFilter(false, query).matched(body))
+        withClue("Some keyword from '$query' match: '$body'") {
+            KeywordsFilter(false, query).matched(body) shouldBe false
+        }
     }
 }

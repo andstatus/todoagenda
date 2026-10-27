@@ -1,7 +1,7 @@
 package org.andstatus.todoagenda
 
-import org.junit.Assert
-import org.junit.Test
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 
 /**
  * @author yvolk@yurivolkov.com
@@ -17,6 +17,8 @@ class DefaultColorsEventsTest : BaseWidgetTest() {
         val method = "testIssue327"
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.default_colors)
         playResults(method)
-        Assert.assertEquals("Number of entries", 14, factory.widgetEntries.size.toLong())
+        withClue("Number of entries") {
+            factory.widgetEntries.size shouldBe 14
+        }
     }
 }

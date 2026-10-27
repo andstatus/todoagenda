@@ -1,6 +1,12 @@
 package org.andstatus.todoagenda
 
 import android.util.Log
+import io.kotest.assertions.withClue
+import io.kotest.core.spec.style.AnnotationSpec
+import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.runner.junit4.KotestTestRunner
 import org.andstatus.todoagenda.prefs.FilterMode
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.provider.FakeCalendarContentProvider
@@ -8,16 +14,14 @@ import org.andstatus.todoagenda.widget.LastEntry
 import org.andstatus.todoagenda.widget.LastEntryType
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
 import org.joda.time.DateTime
-import org.junit.After
-import org.junit.Assert
-import org.junit.Assert.assertTrue
-import org.junit.Before
+import org.junit.runner.RunWith
 import kotlin.math.abs
 
 /**
  * @author yvolk@yurivolkov.com
  */
-open class BaseWidgetTest {
+@RunWith(KotestTestRunner::class)
+abstract class BaseWidgetTest : AnnotationSpec() {
     protected lateinit var provider: FakeCalendarContentProvider
 
     protected val factory1: RemoteViewsFactory by lazy {
@@ -132,14 +136,19 @@ open class BaseWidgetTest {
         lastEntryType: LastEntryType,
     ) {
         val widgetEntries = factory.widgetEntries
-        Assert.assertTrue(
-            "Expecting " + lastEntryType + " at " + (ind + 1) + "th entry, but found only " +
-                widgetEntries.size + " entries",
-            widgetEntries.size > ind,
-        )
+        withClue(
+            "Expecting $lastEntryType at ${ind + 1}th entry, but found only " +
+                "${widgetEntries.size} entries",
+        ) {
+            widgetEntries.size shouldBeGreaterThan ind
+        }
         val lastEntry = widgetEntries[ind] as? LastEntry
-        assertTrue("Expected LastEntry but was: ${widgetEntries[ind]}", lastEntry != null)
-        Assert.assertEquals(widgetEntries[ind].toString(), lastEntryType, lastEntry?.type)
+        withClue("Expected LastEntry but was: ${widgetEntries[ind]}") {
+            lastEntry.shouldNotBeNull()
+        }
+        withClue(widgetEntries[ind].toString()) {
+            lastEntry!!.type shouldBe lastEntryType
+        }
     }
 
     protected fun assertPosition(
@@ -147,12 +156,15 @@ open class BaseWidgetTest {
         position: WidgetEntryPosition,
     ) {
         val widgetEntries = factory.widgetEntries
-        Assert.assertTrue(
-            "Expecting " + position + " at " + (ind + 1) + "th entry, but found only " +
-                widgetEntries.size + " entries",
-            widgetEntries.size > ind,
-        )
-        Assert.assertEquals(widgetEntries[ind].toString(), position, widgetEntries[ind].entryPosition)
+        withClue(
+            "Expecting $position at ${ind + 1}th entry, but found only " +
+                "${widgetEntries.size} entries",
+        ) {
+            widgetEntries.size shouldBeGreaterThan ind
+        }
+        withClue(widgetEntries[ind].toString()) {
+            widgetEntries[ind].entryPosition shouldBe position
+        }
     }
 
     companion object {

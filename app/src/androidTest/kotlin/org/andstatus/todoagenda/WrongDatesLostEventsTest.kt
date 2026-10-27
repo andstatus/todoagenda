@@ -1,8 +1,8 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.widget.CalendarEntry
-import org.junit.Assert
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -17,22 +17,20 @@ class WrongDatesLostEventsTest : BaseWidgetTest() {
         provider.loadResultsAndSettings(org.andstatus.todoagenda.test.R.raw.wrong_dates_lost_events)
         provider.settings = settings.copy(showCurrentTimeLine = false)
         playResults(method)
-        Assert.assertEquals("Number of entries", 11, factory.widgetEntries.size.toLong())
-        Assert.assertEquals("On Saturday", "Maker Fair", (factory.widgetEntries[4] as CalendarEntry).event.title)
-        Assert.assertEquals(
-            "On Saturday",
-            6,
-            factory.widgetEntries[4]
-                .entryDate.dayOfWeek
-                .toLong(),
-        )
-        Assert.assertEquals("On Sunday", "Ribakovs", (factory.widgetEntries[7] as CalendarEntry).event.title)
-        Assert.assertEquals(
-            "On Sunday",
-            7,
-            factory.widgetEntries[7]
-                .entryDate.dayOfWeek
-                .toLong(),
-        )
+        withClue("Number of entries") {
+            factory.widgetEntries.size shouldBe 11
+        }
+        withClue("On Saturday") {
+            (factory.widgetEntries[4] as CalendarEntry).event.title shouldBe "Maker Fair"
+        }
+        withClue("On Saturday") {
+            factory.widgetEntries[4].entryDate.dayOfWeek shouldBe 6
+        }
+        withClue("On Sunday") {
+            (factory.widgetEntries[7] as CalendarEntry).event.title shouldBe "Ribakovs"
+        }
+        withClue("On Sunday") {
+            factory.widgetEntries[7].entryDate.dayOfWeek shouldBe 7
+        }
     }
 }

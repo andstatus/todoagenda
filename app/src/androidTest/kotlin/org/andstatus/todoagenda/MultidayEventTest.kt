@@ -1,14 +1,12 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.calendar.CalendarEvent
 import org.andstatus.todoagenda.widget.CalendarEntry
 import org.joda.time.DateTime
-import org.junit.Assert
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -47,27 +45,53 @@ class MultidayEventTest : BaseWidgetTest() {
                 }
             }
         }
-        assertNotNull(entry1)
-        assertFalse("Is not active event", entry1!!.event.isOngoing)
-        assertEquals("Days of event", 2, entry1.event.daysOfEvent)
-        assertEquals("First day of event", 1, entry1.event.dayOfEvent(entry1.entryDay))
-        assertTrue("Is Part of Multi Day Event", entry1.isPartOfMultiDayEvent)
-        assertTrue("Is start of Multi Day Event", entry1.isStartOfMultiDayEvent)
-        assertFalse("Is not an end of Multi Day Event", entry1.isEndOfMultiDayEvent)
-        assertEquals("Start Time didn't change for today's event", event.startDate, entry1.entryDate)
-        assertEquals("Entry end time should be the same as Event end time", event.endDate, entry1.endDate)
-        assertNotNull(entry2)
-        assertFalse("Is not active event", entry2!!.event.isOngoing)
-        assertEquals("Second day of event", 2, entry2.event.dayOfEvent(entry2.entryDay))
-        assertTrue("Is Part of Multi Day Event", entry2.isPartOfMultiDayEvent)
-        assertFalse("Is not start of Multi Day Event", entry2.isStartOfMultiDayEvent)
-        assertTrue("Is end of Multi Day Event", entry2.isEndOfMultiDayEvent)
-        assertEquals("Start Time of tomorrow's entry is midnight", today.plusDays(1), entry2.entryDate)
-        assertEquals(
-            "Tomorrow event entry end time is the same as for the event",
-            entry2.event.endDate,
-            entry2.endDate,
-        )
+        entry1.shouldNotBeNull()
+        withClue("Is not active event") {
+            entry1!!.event.isOngoing shouldBe false
+        }
+        withClue("Days of event") {
+            entry1!!.event.daysOfEvent shouldBe 2
+        }
+        withClue("First day of event") {
+            entry1!!.event.dayOfEvent(entry1!!.entryDay) shouldBe 1
+        }
+        withClue("Is Part of Multi Day Event") {
+            entry1!!.isPartOfMultiDayEvent shouldBe true
+        }
+        withClue("Is start of Multi Day Event") {
+            entry1!!.isStartOfMultiDayEvent shouldBe true
+        }
+        withClue("Is not an end of Multi Day Event") {
+            entry1!!.isEndOfMultiDayEvent shouldBe false
+        }
+        withClue("Start Time didn't change for today's event") {
+            entry1!!.entryDate shouldBe event.startDate
+        }
+        withClue("Entry end time should be the same as Event end time") {
+            entry1!!.endDate shouldBe event.endDate
+        }
+        entry2.shouldNotBeNull()
+        withClue("Is not active event") {
+            entry2!!.event.isOngoing shouldBe false
+        }
+        withClue("Second day of event") {
+            entry2!!.event.dayOfEvent(entry2!!.entryDay) shouldBe 2
+        }
+        withClue("Is Part of Multi Day Event") {
+            entry2!!.isPartOfMultiDayEvent shouldBe true
+        }
+        withClue("Is not start of Multi Day Event") {
+            entry2!!.isStartOfMultiDayEvent shouldBe false
+        }
+        withClue("Is end of Multi Day Event") {
+            entry2!!.isEndOfMultiDayEvent shouldBe true
+        }
+        withClue("Start Time of tomorrow's entry is midnight") {
+            entry2!!.entryDate shouldBe today.plusDays(1)
+        }
+        withClue("Tomorrow event entry end time is the same as for the event") {
+            entry2!!.endDate shouldBe entry2!!.event.endDate
+        }
     }
 
     /**
@@ -88,7 +112,9 @@ class MultidayEventTest : BaseWidgetTest() {
                 startDateIn = friday.plusHours(19),
                 endDateIn = sunday.plusHours(15),
             )
-        assertEquals("Days of event", 3, event.daysOfEvent)
+        withClue("Days of event") {
+            event.daysOfEvent shouldBe 3
+        }
         assertSundayEntryAt(event, sunday, friday.plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(1).plusHours(14))
         assertSundayEntryAt(event, sunday, friday.plusDays(2).plusHours(14))
@@ -100,12 +126,14 @@ class MultidayEventTest : BaseWidgetTest() {
         currentDateTime: DateTime,
     ) {
         val entry1 = getSundayEntryAt(event, currentDateTime)
-        assertEquals(sunday, entry1!!.entryDate)
-        assertEquals(event.endDate, entry1.endDate)
-        assertEquals(event.title, entry1.title)
+        entry1!!.entryDate shouldBe sunday
+        entry1.endDate shouldBe event.endDate
+        entry1.title shouldBe event.title
         val timeString = entry1.eventTimeString
-        assertTrue(timeString, timeString.contains(ARROW))
-        assertEquals(timeString, timeString.indexOf(ARROW).toLong(), timeString.lastIndexOf(ARROW).toLong())
+        withClue(timeString) {
+            timeString.contains(ARROW) shouldBe true
+            timeString.lastIndexOf(ARROW) shouldBe timeString.indexOf(ARROW)
+        }
     }
 
     private fun getSundayEntryAt(
@@ -120,12 +148,12 @@ class MultidayEventTest : BaseWidgetTest() {
         for (item in factory.widgetEntries) {
             if (item is CalendarEntry) {
                 if (item.entryDate.dayOfMonth == 20) {
-                    Assert.assertNull(sundayEntry)
+                    sundayEntry.shouldBeNull()
                     sundayEntry = item
                 }
             }
         }
-        assertNotNull(sundayEntry)
+        sundayEntry.shouldNotBeNull()
         return sundayEntry
     }
 

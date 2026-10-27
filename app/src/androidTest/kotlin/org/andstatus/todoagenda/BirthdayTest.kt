@@ -1,5 +1,7 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.prefs.AllDayEventsPlacement
 import org.andstatus.todoagenda.prefs.EndedSomeTimeAgo
 import org.andstatus.todoagenda.prefs.LastEntryAppearance
@@ -10,8 +12,6 @@ import org.andstatus.todoagenda.widget.CalendarEntry
 import org.andstatus.todoagenda.widget.LastEntry
 import org.andstatus.todoagenda.widget.LastEntryType
 import org.joda.time.DateTime
-import org.junit.Assert
-import org.junit.Test
 
 /**
  * @author yvolk@yurivolkov.com
@@ -96,46 +96,22 @@ class BirthdayTest : BaseWidgetTest() {
         provider.clear()
         provider.addResults(inputs)
         playResults(TAG)
-        Assert.assertEquals(
-            (entriesWithoutLastExpected + (if (lastEntryType == null) 0 else 1)),
-            factory.widgetEntries.size,
-        )
+        factory.widgetEntries.size shouldBe
+            (entriesWithoutLastExpected + (if (lastEntryType == null) 0 else 1))
         if (entriesWithoutLastExpected > 0) {
             val birthday = factory.widgetEntries[1] as CalendarEntry
-            Assert.assertEquals(
-                9,
-                birthday.entryDate
-                    .dayOfMonth()
-                    .get()
-                    .toLong(),
-            )
-            Assert.assertEquals(
-                0,
-                birthday.entryDate
-                    .hourOfDay()
-                    .get()
-                    .toLong(),
-            )
-            Assert.assertEquals(
-                0,
-                birthday.entryDate
-                    .minuteOfHour()
-                    .get()
-                    .toLong(),
-            )
-            Assert.assertEquals(
-                0,
-                birthday.entryDate
-                    .millisOfDay()
-                    .get()
-                    .toLong(),
-            )
-            Assert.assertEquals(true, birthday.allDay)
+            birthday.entryDate.dayOfMonth().get() shouldBe 9
+            birthday.entryDate.hourOfDay().get() shouldBe 0
+            birthday.entryDate.minuteOfHour().get() shouldBe 0
+            birthday.entryDate.millisOfDay().get() shouldBe 0
+            birthday.allDay shouldBe true
         }
         if (lastEntryType != null) {
             val entry = factory.widgetEntries[factory.widgetEntries.size - 1]
             val lastEntry = entry as? LastEntry
-            Assert.assertEquals("Last entry: $entry", lastEntryType, lastEntry?.type)
+            withClue("Last entry: $entry") {
+                lastEntry?.type shouldBe lastEntryType
+            }
         }
     }
 }

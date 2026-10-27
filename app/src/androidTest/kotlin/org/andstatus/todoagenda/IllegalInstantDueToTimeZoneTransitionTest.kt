@@ -1,6 +1,9 @@
 package org.andstatus.todoagenda
 
 import android.util.Log
+import io.kotest.assertions.fail
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
 import org.andstatus.todoagenda.calendar.CalendarEvent
 import org.andstatus.todoagenda.prefs.MyLocale.APP_DEFAULT_LOCALE
 import org.andstatus.todoagenda.prefs.OrderedEventSource
@@ -11,8 +14,6 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.LocalDateTime
 import org.json.JSONException
-import org.junit.Assert
-import org.junit.Test
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -44,7 +45,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
         oneTimeDst("1980-04-06T00:00:00+00:00")
         if (provider.firstActiveEventSource === OrderedEventSource.EMPTY) {
             Log.e(TAG, settings.toJson().toString(2))
-            Assert.fail("No active event sources")
+            fail("No active event sources")
         }
         provider.addRow(
             CalendarEvent(
@@ -57,7 +58,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
             ),
         )
         playResults(TAG)
-        Assert.assertEquals(5, factory.widgetEntries.size.toLong())
+        factory.widgetEntries.size.toLong() shouldBe 5L
     }
 
     private fun oneTimeDst(iso8601time: String) {
@@ -86,16 +87,17 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
                 .withDayOfMonth(27)
                 .withHourOfDay(2)
 
-        // This code is here to illustrate that the problem exists
-        try {
-            val myDateBroken = localDateTime.toDateTime(dateTimeZone)
-            Assert.fail("No exception for $localDateTime -> $myDateBroken")
-        } catch (iae: IllegalArgumentException) {
-            Log.v(
-                TAG,
-                "Sure enough, invalid instant due to time zone offset transition: " +
-                    localDateTime,
-            )
+        withClue("This code is here to illustrate that the problem exists") {
+            try {
+                val myDateBroken = localDateTime.toDateTime(dateTimeZone)
+                fail("No exception for $localDateTime -> $myDateBroken")
+            } catch (iae: IllegalArgumentException) {
+                Log.v(
+                    TAG,
+                    "Sure enough, invalid instant due to time zone offset transition: " +
+                        localDateTime,
+                )
+            }
         }
         if (dateTimeZone.isLocalDateTimeGap(localDateTime)) {
             localDateTime = localDateTime.withHourOfDay(3)
@@ -133,7 +135,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
                     15,
                     DateTimeZone.UTC,
                 ).plusSeconds(4)
-            Assert.assertEquals(
+            DateUtil.exactMinutesPlusMinutes(nowUtc, periodMinutes) shouldBe
                 DateTime(
                     2020,
                     3,
@@ -141,15 +143,17 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
                     2,
                     15 + 1 + periodMinutes,
                     DateTimeZone.UTC,
-                ),
-                DateUtil.exactMinutesPlusMinutes(nowUtc, periodMinutes),
-            )
+                )
             val now1 = nowUtc.plusHours(5).withZone(zone)
             val next1 = DateUtil.exactMinutesPlusMinutes(now1, periodMinutes)
-            Assert.assertEquals("Next time: $next1", 1, next1.hourOfDay.toLong())
+            withClue("Next time: $next1") {
+                next1.hourOfDay.toLong() shouldBe 1L
+            }
             val now2 = nowUtc.plusHours(6).withZone(zone)
             val next2 = DateUtil.exactMinutesPlusMinutes(now2, periodMinutes)
-            Assert.assertEquals("Next time: $next2", 3, next2.hourOfDay.toLong())
+            withClue("Next time: $next2") {
+                next2.hourOfDay.toLong() shouldBe 3L
+            }
             val nowWinnipeg =
                 DateTime(
                     2020,
@@ -168,7 +172,7 @@ class IllegalInstantDueToTimeZoneTransitionTest : BaseWidgetTest() {
                     54 + 1 + periodMinutes - 60,
                     zone,
                 )
-            Assert.assertEquals(expWinnipeg, DateUtil.exactMinutesPlusMinutes(nowWinnipeg, periodMinutes))
+            DateUtil.exactMinutesPlusMinutes(nowWinnipeg, periodMinutes) shouldBe expWinnipeg
         } finally {
             MyClock.myDefaultTimeZone = null
         }

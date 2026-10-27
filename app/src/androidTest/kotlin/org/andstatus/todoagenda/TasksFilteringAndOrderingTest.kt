@@ -1,15 +1,14 @@
 package org.andstatus.todoagenda
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldStartWith
 import org.andstatus.todoagenda.layout.EventEntryLayout
 import org.andstatus.todoagenda.prefs.FilterMode
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.TaskScheduling
 import org.andstatus.todoagenda.prefs.TasksWithoutDates
 import org.andstatus.todoagenda.widget.WidgetEntryPosition
-import org.hamcrest.MatcherAssert
-import org.hamcrest.core.StringStartsWith
-import org.junit.Assert
-import org.junit.Test
 import java.util.function.UnaryOperator
 
 /**
@@ -381,13 +380,14 @@ class TasksFilteringAndOrderingTest : BaseWidgetTest() {
         for (ind in names.indices) {
             when (val entryPosition = WidgetEntryPosition.fromValue(names[ind])) {
                 WidgetEntryPosition.UNKNOWN ->
-                    MatcherAssert.assertThat(
-                        "ind=$ind",
-                        widgetEntries[ind].title,
-                        StringStartsWith.startsWith(names[ind]),
-                    )
+                    withClue("ind=$ind") {
+                        widgetEntries[ind].title shouldStartWith names[ind]
+                    }
 
-                else -> Assert.assertEquals("ind=$ind", entryPosition, widgetEntries[ind].entryPosition)
+                else ->
+                    withClue("ind=$ind") {
+                        widgetEntries[ind].entryPosition shouldBe entryPosition
+                    }
             }
         }
     }
