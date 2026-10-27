@@ -87,7 +87,10 @@ class DateFormatter(
         date: DateTime,
         flags: Int,
     ): String {
-        val millis = toJavaDate(date).time
+        // Format the actual instant in the date's own time zone. Constructing a java.util.Date
+        // from date fields used to apply the device time zone, which shifted the date when the
+        // widget was locked to another time zone.
+        val millis: Long = date.millis
         return DateUtils
             .formatDateRange(
                 context,
@@ -116,7 +119,8 @@ class DateFormatter(
             try {
                 val pattern2 = preProcessNumberOfDaysToEvent(date, pattern)
                 val simpleDateFormat = SimpleDateFormat(pattern2, MyLocale.locale)
-                simpleDateFormat.format(toJavaDate(date))
+                simpleDateFormat.timeZone = date.zone.toTimeZone()
+                simpleDateFormat.format(date.toDate())
             } catch (e: Exception) {
                 e.localizedMessage
             }
@@ -191,7 +195,7 @@ class DateFormatter(
         private const val NUMBER_OF_DAYS_LOWER_LETTER = 'b'
         private const val NUMBER_OF_DAYS_UPPER_LETTER = 'B'
 
-        fun toJavaDate(date: DateTime): Date = Date(date.yearOfEra - 1900, date.monthOfYear - 1, date.dayOfMonth)
+        fun toJavaDate(date: DateTime): Date = date.toDate()
 
         fun formatNumberOfDaysToEvent(
             context: Context?,

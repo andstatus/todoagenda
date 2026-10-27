@@ -71,15 +71,25 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         Log.d(TAG, "onUpdate, widgetIds:" + asList(appWidgetIds) + ", context:" + context)
         for (widgetId in appWidgetIds) {
-            RemoteViewsFactory.updateWidget(context, widgetId)
+            val updated = RemoteViewsFactory.updateWidget(context, widgetId)
             InstanceState.updated(widgetId)
-            if (AllSettings.instanceFromId(context, widgetId).isScrollableLayout &&
+            val isScrollable =
+                try {
+                    AllSettings.instanceFromId(context, widgetId).isScrollableLayout
+                } catch (e: Exception) {
+                    Log.w(TAG, "$widgetId Unable to load settings after update", e)
+                    false
+                }
+            if (updated &&
+                isScrollable &&
                 Build.VERSION.SDK_INT < Build.VERSION_CODES.S
             ) {
                 appWidgetManager.notifyAppWidgetViewDataChanged(
                     intArrayOf(widgetId),
                     R.id.event_list,
                 )
+            } else if (!updated) {
+                Log.w(TAG, "$widgetId update failed; not notifying its collection")
             }
         }
     }

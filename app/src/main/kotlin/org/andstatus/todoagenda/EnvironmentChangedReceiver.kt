@@ -214,7 +214,10 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
                         PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE,
                     )
                 val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager?
-                am?.set(AlarmManager.RTC, alarmTime.millis, pendingIntent)
+                // setAndAllowWhileIdle is delivered from Doze (possibly inexact), unlike a
+                // plain set(), so the header date is refreshed shortly after midnight even when
+                // the device is idle.
+                am?.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, alarmTime.millis, pendingIntent)
             }
         }
 

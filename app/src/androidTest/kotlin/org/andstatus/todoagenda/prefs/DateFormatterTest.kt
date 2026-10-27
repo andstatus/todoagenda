@@ -9,6 +9,7 @@ import org.joda.time.DateTime
 import org.junit.Assert
 import org.junit.Test
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 /**
  * @author yvolk@yurivolkov.com
@@ -182,6 +183,25 @@ class DateFormatterTest : BaseWidgetTest() {
         assertPattern(now.minusDays(5), "bbbb", "-5")
     }
 
+    @Test
+    fun dateKeepsItsOwnTimeZone() {
+        val originalTimeZone = TimeZone.getDefault()
+        try {
+            // Simulate a device in Italy while the widget is locked to London (BST).
+            TimeZone.setDefault(TimeZone.getTimeZone("Europe/Rome"))
+            val londonDate = DateTime.parse("2025-09-07T00:30:00.000+01:00")
+            val formatter =
+                DateFormatter(
+                    provider.context,
+                    DateFormatValue.of(DateFormatType.CUSTOM, "yyyy-MM-dd HH:mm"),
+                    londonDate,
+                )
+            Assert.assertEquals("2025-09-07 00:30", formatter.formatDate(londonDate))
+        } finally {
+            TimeZone.setDefault(originalTimeZone)
+        }
+    }
+
     private fun assertPattern(
         date: DateTime,
         pattern: String,
@@ -199,7 +219,9 @@ class DateFormatterTest : BaseWidgetTest() {
             date: DateTime,
         ): String {
             val locale = MyLocale.locale
-            return SimpleDateFormat(javaPattern, locale).format(DateFormatter.toJavaDate(date))
+            val formatter = SimpleDateFormat(javaPattern, locale)
+            formatter.timeZone = date.zone.toTimeZone()
+            return formatter.format(DateFormatter.toJavaDate(date))
         }
     }
 }

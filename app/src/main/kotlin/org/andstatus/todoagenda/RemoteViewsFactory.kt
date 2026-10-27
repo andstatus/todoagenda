@@ -368,51 +368,83 @@ class RemoteViewsFactory(
         fun updateWidget(
             context: Context,
             widgetId: Int,
-        ) {
-            try {
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                if (appWidgetManager == null) {
-                    Log.d(TAG, "$widgetId updateWidget, appWidgetManager is null, context:$context")
-                    return
+        ): Boolean {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            if (appWidgetManager == null) {
+                Log.d(TAG, "$widgetId updateWidget, appWidgetManager is null, context:$context")
+                return false
+            }
+            val settings =
+                try {
+                    AllSettings.instanceFromId(context, widgetId)
+                } catch (e: Exception) {
+                    Log.w(TAG, "$widgetId Unable to load settings in updateWidget", e)
+                    return false
                 }
-                val settings = AllSettings.instanceFromId(context, widgetId)
-                val layout =
-                    WidgetRootLayout.forWidget(
-                        settings.isScrollableLayout,
-                        settings.widgetHeaderLayout,
-                    )
-                val rv = RemoteViews(context.packageName, layout.layoutId)
-                Log.d(TAG, "$widgetId updateWidget, root layout:${layout.name}")
-                RemoteViewsUtil.setBackgroundColor(
-                    rv,
-                    R.id.widget_parent,
-                    settings.colors().widgetBackgroundColor,
-                )
-                configureWidgetHeader(settings, rv)
-                if (settings.isScrollableLayout) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        configureWidgetEntriesCollection(settings, rv)
-                    } else {
-                        configureWidgetEntriesList(settings, rv)
-                    }
-                } else {
-                    configureWidgetEntriesNonScrollable(settings, rv)
-                }
+            return try {
+                val rv = buildWidgetRemoteViews(settings, settings.widgetHeaderLayout)
                 appWidgetManager.updateAppWidget(widgetId, rv)
+                true
             } catch (e: Exception) {
                 Log.w(TAG, "$widgetId Exception in updateWidget, context:$context", e)
+                if (settings.widgetHeaderLayout == WidgetHeaderLayout.HIDDEN) {
+                    false
+                } else {
+                    // A broken optional header must not prevent the rest of the widget from
+                    // updating. Retry once with the header hidden; the next regular update will
+                    // try the configured header again.
+                    try {
+                        val fallback = buildWidgetRemoteViews(settings, WidgetHeaderLayout.HIDDEN)
+                        appWidgetManager.updateAppWidget(widgetId, fallback)
+                        Log.w(TAG, "$widgetId Widget updated without a header after header failure")
+                        true
+                    } catch (fallbackException: Exception) {
+                        Log.w(TAG, "$widgetId Fallback update without a header failed", fallbackException)
+                        false
+                    }
+                }
             }
+        }
+
+        private fun buildWidgetRemoteViews(
+            settings: InstanceSettings,
+            headerLayout: WidgetHeaderLayout,
+        ): RemoteViews {
+            val layout =
+                WidgetRootLayout.forWidget(
+                    settings.isScrollableLayout,
+                    headerLayout,
+                )
+            val rv = RemoteViews(settings.context.packageName, layout.layoutId)
+            Log.d(TAG, "${settings.widgetId} updateWidget, root layout:${layout.name}")
+            RemoteViewsUtil.setBackgroundColor(
+                rv,
+                R.id.widget_parent,
+                settings.colors().widgetBackgroundColor,
+            )
+            configureWidgetHeader(settings, rv, headerLayout)
+            if (settings.isScrollableLayout) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    configureWidgetEntriesCollection(settings, rv)
+                } else {
+                    configureWidgetEntriesList(settings, rv)
+                }
+            } else {
+                configureWidgetEntriesNonScrollable(settings, rv)
+            }
+            return rv
         }
 
         private fun configureWidgetHeader(
             settings: InstanceSettings,
             rv: RemoteViews,
+            headerLayout: WidgetHeaderLayout,
         ) {
             Log.d(
                 TAG,
-                settings.widgetId.toString() + " configureWidgetHeader, layout:" + settings.widgetHeaderLayout,
+                settings.widgetId.toString() + " configureWidgetHeader, layout:" + headerLayout,
             )
-            if (settings.widgetHeaderLayout == WidgetHeaderLayout.HIDDEN) return
+            if (headerLayout == WidgetHeaderLayout.HIDDEN) return
 
             RemoteViewsUtil.setBackgroundColor(
                 rv,
