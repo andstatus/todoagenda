@@ -9,6 +9,7 @@ import org.andstatus.todoagenda.MainActivity
 import org.andstatus.todoagenda.WidgetConfigurationActivity
 import org.andstatus.todoagenda.layout.TextShadow
 import org.andstatus.todoagenda.prefs.ApplicationPreferences
+import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.InstanceSettings.Companion.PREF_COLOR_SETTINGS_SOURCE
 import org.andstatus.todoagenda.prefs.MyPreferenceFragment
 
@@ -21,6 +22,7 @@ abstract class ColorsPreferencesFragment :
         setTitle(context)
         preferenceManager.sharedPreferences!!.registerOnSharedPreferenceChangeListener(this)
         showColorSettingsSources()
+        showDarkLightTheme()
         showTextShadow()
         showTimeUntilBackgroundSource()
         findPreference<Preference>(PREF_COLOR_SETTINGS_SOURCE)?.setOnPreferenceChangeListener { _, _ ->
@@ -35,7 +37,7 @@ abstract class ColorsPreferencesFragment :
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    fun showColorSettingsSources() {
+    open fun showColorSettingsSources() {
         val context: Context = activity ?: return
         val colorSettingsSource: ColorSettingsSource =
             ApplicationPreferences.getSupportedColorSettingsSource(context)
@@ -55,6 +57,15 @@ abstract class ColorsPreferencesFragment :
 
     fun setTitle(context: FragmentActivity) {
         context.setTitle(ApplicationPreferences.colorsPreferencesTitleResId(context))
+    }
+
+    fun showDarkLightTheme() {
+        val context: Context = activity ?: return
+        val darkLightTheme: DarkLightTheme =
+            ApplicationPreferences.getDarkLightTheme(context)
+        findPreference<Preference>(InstanceSettings.PREF_DARK_LIGHT_THEME)?.let { preference ->
+            preference.summary = context.getString(darkLightTheme.titleResId)
+        }
     }
 
     fun showTextShadow() {

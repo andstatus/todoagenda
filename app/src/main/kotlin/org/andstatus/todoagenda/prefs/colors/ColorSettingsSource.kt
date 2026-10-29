@@ -45,21 +45,33 @@ enum class ColorSettingsSource(
         isDarkThemeOn: Boolean,
     ): ColorThemeType =
         when (this) {
-            SINGLE_MANUAL -> ColorThemeType.LIGHT
-            // Two manually defined themes always follow the device's dark theme
-            TWO_MANUAL -> if (isDarkThemeOn) ColorThemeType.DARK else ColorThemeType.LIGHT
-            MATERIAL_YOU_TONAL ->
+            SINGLE_MANUAL -> {
+                ColorThemeType.LIGHT
+            }
+
+            TWO_MANUAL -> {
+                if (darkLightTheme.isDark(isDarkThemeOn)) {
+                    ColorThemeType.DARK
+                } else {
+                    ColorThemeType.LIGHT
+                }
+            }
+
+            MATERIAL_YOU_TONAL -> {
                 if (darkLightTheme.isDark(isDarkThemeOn)) {
                     ColorThemeType.TONAL_DARK
                 } else {
                     ColorThemeType.TONAL_LIGHT
                 }
-            MATERIAL_YOU_SEMANTIC ->
+            }
+
+            MATERIAL_YOU_SEMANTIC -> {
                 if (darkLightTheme.isDark(isDarkThemeOn)) {
                     ColorThemeType.SEMANTIC_DARK
                 } else {
                     ColorThemeType.SEMANTIC_LIGHT
                 }
+            }
         }
 
     companion object {

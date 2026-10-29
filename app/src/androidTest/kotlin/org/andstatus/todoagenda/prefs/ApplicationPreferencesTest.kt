@@ -60,30 +60,65 @@ class ApplicationPreferencesTest : AnnotationSpec() {
     }
 
     @Test
-    fun twoManualThemesFollowSystemDarkMode() {
+    fun twoManualThemesFollowColorThemeSetting() {
         beingEdited(
             colorThemeTypeIn = ColorThemeType.LIGHT,
             colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
-            isDarkThemeOn = false,
+            darkLightTheme = DarkLightTheme.LIGHT,
+            isDarkThemeOn = true,
         ) shouldBe ColorThemeType.LIGHT
         beingEdited(
             colorThemeTypeIn = ColorThemeType.DARK,
             colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
-            isDarkThemeOn = true,
+            darkLightTheme = DarkLightTheme.DARK,
+            isDarkThemeOn = false,
         ) shouldBe ColorThemeType.DARK
         beingEdited(
             colorThemeTypeIn = ColorThemeType.LIGHT,
             colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
+            darkLightTheme = DarkLightTheme.DARK,
+            isDarkThemeOn = false,
+        ) shouldBe ColorThemeType.NONE
+        beingEdited(
+            colorThemeTypeIn = ColorThemeType.DARK,
+            colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
+            darkLightTheme = DarkLightTheme.LIGHT,
             isDarkThemeOn = true,
         ) shouldBe ColorThemeType.NONE
     }
 
     @Test
-    fun twoManualThemeTypeFollowsSystemDarkModeOnly() {
+    fun twoManualThemesFollowSystemDarkModeWhenAuto() {
+        beingEdited(
+            colorThemeTypeIn = ColorThemeType.LIGHT,
+            colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
+            darkLightTheme = DarkLightTheme.AUTO,
+            isDarkThemeOn = false,
+        ) shouldBe ColorThemeType.LIGHT
+        beingEdited(
+            colorThemeTypeIn = ColorThemeType.DARK,
+            colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
+            darkLightTheme = DarkLightTheme.AUTO,
+            isDarkThemeOn = true,
+        ) shouldBe ColorThemeType.DARK
+        beingEdited(
+            colorThemeTypeIn = ColorThemeType.LIGHT,
+            colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
+            darkLightTheme = DarkLightTheme.AUTO,
+            isDarkThemeOn = true,
+        ) shouldBe ColorThemeType.NONE
+    }
+
+    @Test
+    fun twoManualThemeTypeFollowsColorThemeSetting() {
         ColorSettingsSource.TWO_MANUAL
-            .themeType(DarkLightTheme.LIGHT, isDarkThemeOn = true) shouldBe ColorThemeType.DARK
+            .themeType(DarkLightTheme.LIGHT, isDarkThemeOn = true) shouldBe ColorThemeType.LIGHT
         ColorSettingsSource.TWO_MANUAL
-            .themeType(DarkLightTheme.DARK, isDarkThemeOn = false) shouldBe ColorThemeType.LIGHT
+            .themeType(DarkLightTheme.DARK, isDarkThemeOn = false) shouldBe ColorThemeType.DARK
+        ColorSettingsSource.TWO_MANUAL
+            .themeType(DarkLightTheme.AUTO, isDarkThemeOn = true) shouldBe ColorThemeType.DARK
+        ColorSettingsSource.TWO_MANUAL
+            .themeType(DarkLightTheme.AUTO, isDarkThemeOn = false) shouldBe ColorThemeType.LIGHT
     }
 
     @Test

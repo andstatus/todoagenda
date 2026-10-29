@@ -94,6 +94,7 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
 
     private fun removeUnavailablePreferences() {
         val context = activity ?: return
+        showDarkLightThemeAvailability()
         if (ApplicationPreferences.noPastEvents(context)) {
             val screen = preferenceScreen
             val preference = findPreference<Preference>(TimeSection.PAST.preferenceCategoryKey)
@@ -115,6 +116,18 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
                 removeShadings()
             }
         }
+    }
+
+    override fun showColorSettingsSources() {
+        super.showColorSettingsSources()
+        showDarkLightThemeAvailability()
+    }
+
+    /** The Color theme is only used by two manually defined themes */
+    private fun showDarkLightThemeAvailability() {
+        val context = activity ?: return
+        findPreference<Preference>(InstanceSettings.PREF_DARK_LIGHT_THEME)?.isVisible =
+            ApplicationPreferences.getSupportedColorSettingsSource(context) == ColorSettingsSource.TWO_MANUAL
     }
 
     private fun removeShadings() {
@@ -152,6 +165,13 @@ class ManualColorsPreferencesFragment : ColorsPreferencesFragment() {
         when (key) {
             InstanceSettings.PREF_COLOR_SETTINGS_SOURCE -> {
                 onColorSettingSourceChanged(activity)
+            }
+
+            InstanceSettings.PREF_DARK_LIGHT_THEME -> {
+                if (!restartIfThemeChanged(activity)) {
+                    showDarkLightTheme()
+                    setTitle(activity)
+                }
             }
 
             ColorTheme.PREF_TEXT_COLOR_SOURCE -> {

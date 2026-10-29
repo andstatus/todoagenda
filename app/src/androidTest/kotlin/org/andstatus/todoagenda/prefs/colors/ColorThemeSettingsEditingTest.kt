@@ -139,7 +139,8 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
                 darkPart.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.WHITE
             }
             withClue("Settings of the light part stay as they were") {
-                val lightPart = savedTheme(ColorSettingsSource.MATERIAL_YOU_TONAL, DarkLightTheme.LIGHT)
+                val lightPart =
+                    savedTheme(ColorSettingsSource.MATERIAL_YOU_TONAL, DarkLightTheme.LIGHT)
                 lightPart.textShadow shouldBe TextShadow.DARK_SHADOW
                 lightPart.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.YELLOW
             }
@@ -174,7 +175,11 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
             val manualFragment = waitForCurrentColorsFragment()
             manualFragment.shouldBeInstanceOf<ManualColorsPreferencesFragment>()
             withClue("The user edits the currently selected (manual) theme") {
-                setPreference(manualFragment, ColorTheme.PREF_TEXT_SHADOW, TextShadow.DARK_SHADOW.value)
+                setPreference(
+                    manualFragment,
+                    ColorTheme.PREF_TEXT_SHADOW,
+                    TextShadow.DARK_SHADOW.value,
+                )
                 savedTheme(ColorSettingsSource.SINGLE_MANUAL).textShadow shouldBe TextShadow.DARK_SHADOW
             }
             withClue("... and then selects another \"Color settings source\"") {
@@ -210,7 +215,11 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
                 savedTheme(ColorSettingsSource.SINGLE_MANUAL).textShadow shouldBe TextShadow.DARK_SHADOW
             }
             withClue("The user edits the new theme") {
-                setPreference(dynamicFragment, ColorTheme.PREF_TEXT_SHADOW, TextShadow.NO_SHADOW.value)
+                setPreference(
+                    dynamicFragment,
+                    ColorTheme.PREF_TEXT_SHADOW,
+                    TextShadow.NO_SHADOW.value,
+                )
                 setPreference(
                     dynamicFragment,
                     ColorTheme.PREF_TIME_UNTIL_BACKGROUND_SOURCE,
@@ -232,6 +241,70 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
             tonal.textShadow shouldBe TextShadow.NO_SHADOW
             tonal.timeUntilBackgroundSource shouldBe TimeUntilBackgroundSource.BLACK
             savedSettings().colorSettingsSource shouldBe ColorSettingsSource.MATERIAL_YOU_TONAL
+        } finally {
+            runCatching { scenario.close() }
+        }
+    }
+
+    @Test
+    fun manualColorThemeCanBeSwitchedAndEditedWithoutChangingDeviceDarkTheme() {
+        if (!ColorSettingsSource.TWO_MANUAL.supportedByDevice) return
+        provider.settings =
+            provider.settings.copy(
+                colorSettingsSource = ColorSettingsSource.TWO_MANUAL,
+                darkLightTheme = DarkLightTheme.LIGHT,
+                colorThemes =
+                    ColorThemes() +
+                        manualTheme(
+                            ColorThemeType.LIGHT,
+                            TextShadow.DARK_SHADOW,
+                            TimeUntilBackgroundSource.YELLOW,
+                        ) +
+                        manualTheme(
+                            ColorThemeType.DARK,
+                            TextShadow.LIGHT_SHADOW,
+                            TimeUntilBackgroundSource.WHITE,
+                        ),
+            )
+        val scenario = launchSettings()
+        try {
+            val lightFragment = waitForCurrentColorsFragment()
+            lightFragment.shouldBeInstanceOf<ManualColorsPreferencesFragment>()
+            ApplicationPreferences.getColorThemeType(context) shouldBe ColorThemeType.LIGHT
+            ApplicationPreferences.getTextShadow(context) shouldBe TextShadow.DARK_SHADOW
+            withClue("The user selects the dark part without changing the device dark theme") {
+                setPreference(
+                    lightFragment,
+                    InstanceSettings.PREF_DARK_LIGHT_THEME,
+                    DarkLightTheme.DARK.value,
+                )
+                waitUntil("The app didn't save the settings and reopen them for the dark theme") {
+                    ApplicationPreferences.getColorThemeType(context) == ColorThemeType.DARK &&
+                        ApplicationPreferences.getTextShadow(context) == TextShadow.LIGHT_SHADOW
+                }
+            }
+            val darkFragment = waitForCurrentColorsFragment()
+            darkFragment.shouldBeInstanceOf<ManualColorsPreferencesFragment>()
+            withClue("The user edits the dark part and exits the settings") {
+                setPreference(
+                    darkFragment,
+                    ColorTheme.PREF_TEXT_SHADOW,
+                    TextShadow.NO_SHADOW.value,
+                )
+                waitUntil("The dark part settings were not saved") {
+                    savedTheme(
+                        ColorSettingsSource.TWO_MANUAL,
+                        DarkLightTheme.DARK,
+                    ).textShadow == TextShadow.NO_SHADOW
+                }
+            }
+            withClue("Settings of the light part stay as they were") {
+                savedTheme(
+                    ColorSettingsSource.TWO_MANUAL,
+                    DarkLightTheme.LIGHT,
+                ).textShadow shouldBe TextShadow.DARK_SHADOW
+            }
+            savedSettings().darkLightTheme shouldBe DarkLightTheme.DARK
         } finally {
             runCatching { scenario.close() }
         }
@@ -321,6 +394,17 @@ class ColorThemeSettingsEditingTest : AnnotationSpec() {
                 colorSettingsSource = colorSettingsSource,
                 darkLightTheme = darkLightTheme,
             ).colors()
+
+    private fun manualTheme(
+        colorThemeType: ColorThemeType,
+        textShadow: TextShadow,
+        timeUntilBackgroundSource: TimeUntilBackgroundSource,
+    ): ManualColorTheme =
+        ManualColorTheme(
+            colorThemeType = colorThemeType,
+            textShadow = textShadow,
+            timeUntilBackgroundSource = timeUntilBackgroundSource,
+        )
 
     private fun tonalTheme(
         colorThemeType: ColorThemeType,
