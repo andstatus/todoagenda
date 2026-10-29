@@ -2,12 +2,15 @@
 
 <a id="v4.15"/>
 
-### 2026-10-25 v4.15.0 Material You dynamic color themes
+### 2026-10-29 v4.15.1 Material You dynamic color themes
 * "Color settings source" options added for the
   [Tonal palette](https://source.android.com/docs/core/display/dynamic-color) (Android 12+)
   and the [Semantic palette](https://m3.material.io/styles/color/roles) (Color roles, Android 14+).
   Manually defined colors are kept for when you switch back to the manually defined colors.
   [#175](https://github.com/andstatus/todoagenda/issues/175)
+* "Dark/Light theme" option added to allow editing and applying Dark and Light color themes
+  without toggling device (system) "Dark theme".
+* Widget updates fixes.
 
 <a id="v4.14"/>
 

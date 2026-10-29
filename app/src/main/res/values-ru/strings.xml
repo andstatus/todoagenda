@@ -128,7 +128,7 @@
     Включите или выключите на этом Android устройстве Тёмную тему для настройки соответствующих цветов.</string>
     <string name="color_settings_source_tonal">Тональная динамическая палитра Material You</string>
     <string name="color_settings_source_semantic">Семантическая динамическая палитра Material You</string>
-    <string name="color_theme">Цветовая тема</string>
+    <string name="dark_light_theme">Тёмная/Светлая тема</string>
     <string name="color_theme_auto">Автоматическое переключение темы</string>
     <string name="different_colors_for_dark_title">Другие цвета для Тёмной темы Android</string>
     <string name="different_colors_for_dark_off_desc">Одни и те же цвета</string>
