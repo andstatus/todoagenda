@@ -391,65 +391,7 @@ object ApplicationPreferences {
         if (colorThemeTypeIn.manuallyDefinedColors != colorSettingsSource.manuallyDefinedColors) {
             return ColorThemeType.NONE
         }
-        val colorThemeTypeOut =
-            when (colorSettingsSource) {
-                ColorSettingsSource.SINGLE_MANUAL -> {
-                    if (colorThemeTypeIn == ColorThemeType.LIGHT) {
-                        ColorThemeType.LIGHT
-                    } else {
-                        ColorThemeType.NONE
-                    }
-                }
-
-                ColorSettingsSource.TWO_MANUAL -> {
-                    when {
-                        colorThemeTypeIn == ColorThemeType.DARK -> ColorThemeType.DARK
-                        colorThemeTypeIn == ColorThemeType.LIGHT && isDarkThemeOn -> ColorThemeType.DARK
-                        colorThemeTypeIn == ColorThemeType.LIGHT -> ColorThemeType.LIGHT
-                        else -> ColorThemeType.NONE
-                    }
-                }
-
-                ColorSettingsSource.MATERIAL_YOU_TONAL -> {
-                    when (darkLightTheme) {
-                        DarkLightTheme.AUTO -> {
-                            if (isDarkThemeOn) {
-                                ColorThemeType.TONAL_DARK
-                            } else {
-                                ColorThemeType.TONAL_LIGHT
-                            }
-                        }
-
-                        DarkLightTheme.DARK -> {
-                            ColorThemeType.TONAL_DARK
-                        }
-
-                        DarkLightTheme.LIGHT -> {
-                            ColorThemeType.TONAL_LIGHT
-                        }
-                    }
-                }
-
-                ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> {
-                    when (darkLightTheme) {
-                        DarkLightTheme.AUTO -> {
-                            if (isDarkThemeOn) {
-                                ColorThemeType.SEMANTIC_DARK
-                            } else {
-                                ColorThemeType.SEMANTIC_LIGHT
-                            }
-                        }
-
-                        DarkLightTheme.DARK -> {
-                            ColorThemeType.SEMANTIC_DARK
-                        }
-
-                        DarkLightTheme.LIGHT -> {
-                            ColorThemeType.SEMANTIC_LIGHT
-                        }
-                    }
-                }
-            }
+        val colorThemeTypeOut = colorSettingsSource.themeType(darkLightTheme, isDarkThemeOn)
         // If the preferences hold settings of another theme, none of the themes is being edited now
         return if (colorThemeTypeOut == colorThemeTypeIn) colorThemeTypeOut else ColorThemeType.NONE
     }

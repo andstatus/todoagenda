@@ -19,6 +19,14 @@ enum class DarkLightTheme(
 
     fun toSupportedByDevice(): DarkLightTheme = if (supportedByDevice) this else LIGHT
 
+    /** Whether the dark colors should be used */
+    fun isDark(isDarkThemeOn: Boolean): Boolean =
+        when (this) {
+            AUTO -> isDarkThemeOn
+            DARK -> true
+            LIGHT -> false
+        }
+
     companion object {
         val DEFAULT = AUTO
 

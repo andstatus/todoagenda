@@ -79,6 +79,14 @@ class ApplicationPreferencesTest : AnnotationSpec() {
     }
 
     @Test
+    fun twoManualThemeTypeFollowsSystemDarkModeOnly() {
+        ColorSettingsSource.TWO_MANUAL
+            .themeType(DarkLightTheme.LIGHT, isDarkThemeOn = true) shouldBe ColorThemeType.DARK
+        ColorSettingsSource.TWO_MANUAL
+            .themeType(DarkLightTheme.DARK, isDarkThemeOn = false) shouldBe ColorThemeType.LIGHT
+    }
+
+    @Test
     fun singleManualThemeIsEditedInAnyMode() {
         beingEdited(
             colorThemeTypeIn = ColorThemeType.LIGHT,

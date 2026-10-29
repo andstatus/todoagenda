@@ -28,39 +28,37 @@ class ColorThemes(
         if (context == null) {
             return manualColorTheme(ColorThemeType.LIGHT)
         }
-        val dark =
-            when (darkLightTheme) {
-                DarkLightTheme.AUTO -> InstanceSettings.isDarkThemeOn(context)
-                DarkLightTheme.DARK -> true
-                DarkLightTheme.LIGHT -> false
-            }
-        val colorThemeType =
-            when (colorSettingsSource) {
-                ColorSettingsSource.SINGLE_MANUAL -> ColorThemeType.LIGHT
-                ColorSettingsSource.TWO_MANUAL -> if (dark) ColorThemeType.DARK else ColorThemeType.LIGHT
-                ColorSettingsSource.MATERIAL_YOU_TONAL -> if (dark) ColorThemeType.TONAL_DARK else ColorThemeType.TONAL_LIGHT
-                ColorSettingsSource.MATERIAL_YOU_SEMANTIC -> if (dark) ColorThemeType.SEMANTIC_DARK else ColorThemeType.SEMANTIC_LIGHT
-            }
+        val isDarkThemeOn = InstanceSettings.isDarkThemeOn(context)
+        val colorThemeType = colorSettingsSource.themeType(darkLightTheme, isDarkThemeOn)
         return if (colorSettingsSource.manuallyDefinedColors) {
             manualColorTheme(colorThemeType)
         } else {
             // Only colors are provided by the device, settings are stored in this theme
-            dynamicColorTheme(context, colorSettingsSource, dark, themesMap[colorThemeType])
+            dynamicColorTheme(
+                context,
+                colorSettingsSource,
+                darkLightTheme.isDark(isDarkThemeOn),
+                themesMap[colorThemeType],
+            )
         }
     }
 
-    fun manualColorTheme(colorThemeType: ColorThemeType): ColorTheme =
-        themesMap.getOrElse(colorThemeType) {
+    fun manualColorTheme(colorThemeType: ColorThemeType): ColorTheme {
+        themesMap[colorThemeType]?.let { return it }
+        val otherTheme =
             when (colorThemeType) {
-                ColorThemeType.DARK -> themesMap.getOrElse(ColorThemeType.LIGHT) { null }
-                ColorThemeType.LIGHT -> themesMap.getOrElse(ColorThemeType.DARK) { null }
+                ColorThemeType.DARK -> themesMap[ColorThemeType.LIGHT]
+                ColorThemeType.LIGHT -> themesMap[ColorThemeType.DARK]
                 else -> null
-            } ?: if (colorThemeType.manuallyDefinedColors) {
+            }
+        // Settings of the other theme are a starting point for the not yet customized one
+        return (otherTheme as? ManualColorTheme)?.copy(colorThemeType = colorThemeType)
+            ?: if (colorThemeType.manuallyDefinedColors) {
                 ManualColorTheme(colorThemeType)
             } else {
                 error("Unexpected colorThemeType $colorThemeType")
             }
-        }
+    }
 
     fun toJson(json: JSONObject): JSONObject {
         try {

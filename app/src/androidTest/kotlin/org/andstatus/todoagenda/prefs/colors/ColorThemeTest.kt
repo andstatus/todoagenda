@@ -210,6 +210,19 @@ class ColorThemeTest : AnnotationSpec() {
     }
 
     @Test
+    fun themeOfAnotherTypeIsCopiedToTheRequestedType() {
+        val lightTheme = ManualColorTheme(colorThemeType = ColorThemeType.LIGHT)
+        val themes = ColorThemes() + lightTheme
+
+        val darkTheme = themes.manualColorTheme(ColorThemeType.DARK)
+        darkTheme.colorThemeType shouldBe ColorThemeType.DARK
+        darkTheme shouldBe lightTheme.copy(colorThemeType = ColorThemeType.DARK)
+
+        val darkOnly = ColorThemes() + ManualColorTheme(colorThemeType = ColorThemeType.DARK)
+        darkOnly.manualColorTheme(ColorThemeType.LIGHT).colorThemeType shouldBe ColorThemeType.LIGHT
+    }
+
+    @Test
     fun jsonVariantDependsOnThemeType() {
         ColorTheme
             .fromJson(ColorThemeType.LIGHT, JSONObject())

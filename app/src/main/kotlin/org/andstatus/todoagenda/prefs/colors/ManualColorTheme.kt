@@ -22,6 +22,21 @@ class ManualColorTheme(
     override val isEmpty: Boolean = false,
     override val widgetBackgroundColor: Int = Color.TRANSPARENT,
 ) : ColorTheme(colorThemeType) {
+    /** Same settings, but for another theme, e.g. the Light theme settings are used as a
+     * starting point for the Dark theme until the user customizes it */
+    fun copy(colorThemeType: ColorThemeType = this.colorThemeType): ManualColorTheme =
+        ManualColorTheme(
+            colorThemeType = colorThemeType,
+            backgroundColors = backgroundColors,
+            textColorSource = textColorSource,
+            textShadings = textShadings,
+            textColors = textColors,
+            textShadow = textShadow,
+            timeUntilBackgroundSource = timeUntilBackgroundSource,
+            isEmpty = isEmpty,
+            widgetBackgroundColor = widgetBackgroundColor,
+        )
+
     override fun toJson(json: JSONObject): JSONObject {
         super.toJson(json)
         try {
