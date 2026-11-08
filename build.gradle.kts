@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:9.4.1")
+        classpath("com.android.tools.build:gradle:9.5.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 
@@ -35,7 +35,7 @@ extra["targetSdkVersion"] = 37
 extra["annotationVersion"] = "1.0.1"
 extra["appCompatVersion"] = "1.8.0" // https://mvnrepository.com/artifact/androidx.appcompat/appcompat
 extra["espressoCoreVersion"] = "3.7.0" // https://mvnrepository.com/artifact/androidx.test.espresso/espresso-core
-extra["jodaTimeVersion"] = "2.15.0" // https://github.com/JodaOrg/joda-time/releases
+extra["jodaTimeVersion"] = "2.15.1" // https://github.com/JodaOrg/joda-time/releases
 extra["junitVersion"] = "4.13.2"
 extra["junitJupiterVersion"] = "6.1.3"
 extra["kotestVersion"] = "6.2.6"
