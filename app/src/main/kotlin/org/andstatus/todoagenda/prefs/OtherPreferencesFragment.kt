@@ -18,8 +18,13 @@ import org.andstatus.todoagenda.util.DateUtil
 import org.joda.time.DateTime
 import java.util.TimeZone
 
-class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChangeListener {
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+class OtherPreferencesFragment :
+    MyPreferenceFragment(),
+    OnSharedPreferenceChangeListener {
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         addPreferencesFromResource(R.xml.preferences_other)
         removeUnavailablePreferences()
     }
@@ -40,8 +45,9 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
         val preference = findPreference<CheckBoxPreference>(InstanceSettings.PREF_LOCK_TIME_ZONE)
         if (preference != null) {
             val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
-            val isChecked = snapshotMode == SnapshotMode.SNAPSHOT_TIME ||
-                ApplicationPreferences.isTimeZoneLocked(requireActivity())
+            val isChecked =
+                snapshotMode == SnapshotMode.SNAPSHOT_TIME ||
+                    ApplicationPreferences.isTimeZoneLocked(requireActivity())
             if (preference.isChecked != isChecked) {
                 preference.isChecked = isChecked
             }
@@ -54,34 +60,38 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
                 ?: return
         val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
         preference.isEnabled = snapshotMode != SnapshotMode.SNAPSHOT_TIME
-        preference.summary = String.format(
-            getText(if (preference.isChecked) R.string.lock_time_zone_on_desc else R.string.lock_time_zone_off_desc).toString(),
-            settings.timeZone.getName(DateTime.now(settings.timeZone).millis)
-        )
+        preference.summary =
+            String.format(
+                getText(if (preference.isChecked) R.string.lock_time_zone_on_desc else R.string.lock_time_zone_off_desc).toString(),
+                settings.timeZone.getName(DateTime.now(settings.timeZone).millis),
+            )
     }
 
     private fun showStartHourOfDay() {
         val preference =
             findPreference<Preference>(InstanceSettings.PREF_START_HOUR_OF_DAY) as EditTextPreference?
         if (preference != null) {
-            val value = ApplicationPreferences.getIntStoredAsString(
-                requireActivity(),
-                InstanceSettings.PREF_START_HOUR_OF_DAY,
-                0
-            )
+            val value =
+                ApplicationPreferences.getIntStoredAsString(
+                    requireActivity(),
+                    InstanceSettings.PREF_START_HOUR_OF_DAY,
+                    0,
+                )
             preference.summary = value.toString()
         }
     }
 
     private fun showSnapshotMode() {
-        val preference = findPreference<ListPreference>(InstanceSettings.PREF_SNAPSHOT_MODE)
-            ?: return
+        val preference =
+            findPreference<ListPreference>(InstanceSettings.PREF_SNAPSHOT_MODE)
+                ?: return
         val settings = settings
-        val entries = arrayOf(
-            getText(R.string.snapshot_mode_live_data),
-            formatSnapshotModeSummary(settings, R.string.snapshot_mode_time),
-            formatSnapshotModeSummary(settings, R.string.snapshot_mode_now)
-        )
+        val entries =
+            arrayOf(
+                getText(R.string.snapshot_mode_live_data),
+                formatSnapshotModeSummary(settings, R.string.snapshot_mode_time),
+                formatSnapshotModeSummary(settings, R.string.snapshot_mode_now),
+            )
         preference.entries = entries
         val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
         if (snapshotMode.isSnapshotMode) {
@@ -91,16 +101,25 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
         }
     }
 
-    private fun formatSnapshotModeSummary(settings: InstanceSettings, valueResId: Int): String {
-        val snapshotDateString: CharSequence = if (settings.hasResults) {
-            DateFormatter(
-                settings.context, DateFormatType.DEFAULT_WEEKDAY.defaultValue,
-                settings.clock.now()
-            ).formatDate(settings.resultsStorage!!.executedAt.get()).toString() +
-                " " + DateUtil.formatTime({ settings }, settings.resultsStorage!!.executedAt.get())
-        } else {
-            "..."
-        }
+    private fun formatSnapshotModeSummary(
+        settings: InstanceSettings,
+        valueResId: Int,
+    ): String {
+        val snapshotDateString: CharSequence =
+            if (settings.hasResults) {
+                DateFormatter(
+                    settings.context,
+                    DateFormatType.DEFAULT_WEEKDAY.defaultValue,
+                    settings.clock.now(),
+                ).formatDate(settings.resultsStorage!!.executedAt.get()).toString() +
+                    " " +
+                    DateUtil.formatTime(
+                        { settings },
+                        settings.resultsStorage!!.executedAt.get(),
+                    )
+            } else {
+                "..."
+            }
         return String.format(getText(valueResId).toString(), snapshotDateString)
     }
 
@@ -109,24 +128,30 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
             findPreference<Preference>(InstanceSettings.PREF_REFRESH_PERIOD_MINUTES) as EditTextPreference?
         if (preference != null) {
             val value = ApplicationPreferences.getRefreshPeriodMinutes(requireActivity())
-            preference.summary = String.format(getText(R.string.refresh_period_minutes_desc).toString(), value)
+            preference.summary =
+                String.format(getText(R.string.refresh_period_minutes_desc).toString(), value)
         }
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
-        when (preference.key) {
-            InstanceSettings.PREF_LOCK_TIME_ZONE -> if (preference is CheckBoxPreference) {
-                val timeZone = if (preference.isChecked) TimeZone.getDefault().id else ""
-                ApplicationPreferences.setLockedTimeZoneId(
-                    activity,
-                    timeZone
-                )
-                settings.copy(lockedTimeZoneIdIn = timeZone)
-                    .let { AllSettings.addOrReplace(TAG, requireActivity(), it) }
-                showLockTimeZone()
-            }
+        activity?.let { activity1 ->
+            when (preference.key) {
+                InstanceSettings.PREF_LOCK_TIME_ZONE -> {
+                    if (preference is CheckBoxPreference) {
+                        val timeZone = if (preference.isChecked) TimeZone.getDefault().id else ""
+                        ApplicationPreferences.setLockedTimeZoneId(
+                            activity1,
+                            timeZone,
+                        )
+                        settings
+                            .copy(lockedTimeZoneIdIn = timeZone)
+                            .let { AllSettings.addOrReplace(TAG, requireActivity(), it) }
+                        showLockTimeZone()
+                    }
+                }
 
-            else -> {}
+                else -> {}
+            }
         }
         return super.onPreferenceTreeClick(preference)
     }
@@ -136,33 +161,45 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
         preferenceManager.sharedPreferences!!.unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+    override fun onSharedPreferenceChanged(
+        sharedPreferences: SharedPreferences?,
+        key: String?,
+    ) {
         when (key) {
             InstanceSettings.PREF_WIDGET_INSTANCE_NAME -> {
                 requireActivity().finish()
                 startActivity(
                     MainActivity.intentToConfigure(
-                        activity, ApplicationPreferences.getWidgetId(
-                            activity
-                        )
-                    )
+                        activity,
+                        ApplicationPreferences.getWidgetId(
+                            activity,
+                        ),
+                    ),
                 )
             }
 
-            InstanceSettings.PREF_START_HOUR_OF_DAY -> showStartHourOfDay()
-            InstanceSettings.PREF_REFRESH_PERIOD_MINUTES -> showRefreshPeriod()
+            InstanceSettings.PREF_START_HOUR_OF_DAY -> {
+                showStartHourOfDay()
+            }
+
+            InstanceSettings.PREF_REFRESH_PERIOD_MINUTES -> {
+                showRefreshPeriod()
+            }
+
             InstanceSettings.PREF_SNAPSHOT_MODE -> {
                 val snapshotMode = ApplicationPreferences.getSnapshotMode(requireActivity())
-                val settings = settings.copy(
-                    snapshotModeIn = snapshotMode,
-                    resultsStorage = if (snapshotMode.isSnapshotMode && !settings.hasResults) {
-                        QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
-                    } else if (snapshotMode.isSnapshotMode) {
-                        settings.resultsStorage
-                    } else {
-                        null
-                    }
-                )
+                val settings =
+                    settings.copy(
+                        snapshotModeIn = snapshotMode,
+                        resultsStorage =
+                            if (snapshotMode.isSnapshotMode && !settings.hasResults) {
+                                QueryResultsStorage.getNewResults(requireActivity(), settings.widgetId)
+                            } else if (snapshotMode.isSnapshotMode) {
+                                settings.resultsStorage
+                            } else {
+                                null
+                            },
+                    )
                 settings.save(key, "newResultsForSnapshotMode")
                 AllSettings.addOrReplace(TAG, requireActivity(), settings)
                 showSnapshotMode()
@@ -191,5 +228,4 @@ class OtherPreferencesFragment : MyPreferenceFragment(), OnSharedPreferenceChang
             }
         }
     }
-
 }

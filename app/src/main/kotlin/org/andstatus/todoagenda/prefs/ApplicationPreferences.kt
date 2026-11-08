@@ -2,6 +2,7 @@ package org.andstatus.todoagenda.prefs
 
 import android.content.Context
 import android.text.TextUtils
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 import org.andstatus.todoagenda.R
 import org.andstatus.todoagenda.layout.EventEntryLayout
@@ -27,6 +28,7 @@ object ApplicationPreferences {
     const val PREF_DIFFERENT_COLORS_FOR_DARK = "differentColorsForDark"
     private const val PREF_COLOR_THEME_TYPE = "colorThemeType"
     private const val PREF_ASK_FOR_PERMISSIONS = "askForPermissions"
+    private const val PREF_BOOT_COMPLETED = "bootCompleted"
 
     /** @param colorSettingsSource a Color settings source, selected for editing. It is written
      * to the preferences, but the Widget's settings are not changed (not saved) */
@@ -245,14 +247,14 @@ object ApplicationPreferences {
     fun getWidgetId(context: Context?): Int = if (context == null) 0 else getInt(context, InstanceSettings.PREF_WIDGET_ID, 0)
 
     fun setWidgetId(
-        context: Context?,
+        context: Context,
         value: Int,
     ) {
         setInt(context, InstanceSettings.PREF_WIDGET_ID, value)
     }
 
     fun setWidgetHeaderDateFormat(
-        context: Context?,
+        context: Context,
         dateFormatValue: DateFormatValue?,
     ) {
         setDateFormat(context, InstanceSettings.PREF_WIDGET_HEADER_DATE_FORMAT, dateFormatValue)
@@ -272,16 +274,16 @@ object ApplicationPreferences {
         )
 
     fun setActiveEventSources(
-        context: Context?,
+        context: Context,
         sources: List<OrderedEventSource>?,
     ) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
-        val editor = prefs.edit()
-        editor.putString(
-            InstanceSettings.PREF_ACTIVE_SOURCES,
-            OrderedEventSource.toJsonString(sources),
-        )
-        editor.apply()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs.edit {
+            putString(
+                InstanceSettings.PREF_ACTIVE_SOURCES,
+                OrderedEventSource.toJsonString(sources),
+            )
+        }
     }
 
     fun getEventRange(context: Context): Int =
@@ -294,7 +296,7 @@ object ApplicationPreferences {
         )
 
     fun setEventRange(
-        context: Context?,
+        context: Context,
         value: Int,
     ) {
         setString(context, InstanceSettings.PREF_EVENT_RANGE, value.toString())
@@ -306,7 +308,7 @@ object ApplicationPreferences {
         )
 
     fun setEventsEnded(
-        context: Context?,
+        context: Context,
         value: EndedSomeTimeAgo?,
     ) {
         setString(context, InstanceSettings.PREF_EVENTS_ENDED, value!!.save())
@@ -329,7 +331,7 @@ object ApplicationPreferences {
     fun getHideBasedOnKeywords(context: Context): String = getString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS)
 
     private fun setHideBasedOnKeywords(
-        context: Context?,
+        context: Context,
         value: String?,
     ) {
         setString(context, InstanceSettings.PREF_HIDE_BASED_ON_KEYWORDS, value)
@@ -338,7 +340,7 @@ object ApplicationPreferences {
     fun getShowBasedOnKeywords(context: Context): String = getString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, "")
 
     private fun setShowBasedOnKeywords(
-        context: Context?,
+        context: Context,
         value: String?,
     ) {
         setString(context, InstanceSettings.PREF_SHOW_BASED_ON_KEYWORDS, value)
@@ -400,7 +402,7 @@ object ApplicationPreferences {
 
     fun getBackgroundColor(
         pref: BackgroundColorPref,
-        context: Context?,
+        context: Context,
     ): Int = getInt(context, pref.colorPreferenceName, pref.defaultColor)
 
     fun getTextColorSource(context: Context): TextColorSource =
@@ -530,7 +532,7 @@ object ApplicationPreferences {
         )
 
     fun setDateFormat(
-        context: Context?,
+        context: Context,
         key: String?,
         value: DateFormatValue?,
     ) {
@@ -553,7 +555,7 @@ object ApplicationPreferences {
     fun getLockedTimeZoneId(context: Context): String = getString(context, InstanceSettings.PREF_LOCKED_TIME_ZONE_ID, "")
 
     fun setLockedTimeZoneId(
-        context: Context?,
+        context: Context,
         value: String?,
     ) {
         setString(context, InstanceSettings.PREF_LOCKED_TIME_ZONE_ID, value)
@@ -563,7 +565,7 @@ object ApplicationPreferences {
         SnapshotMode.fromValue(getString(context, InstanceSettings.PREF_SNAPSHOT_MODE, ""))
 
     fun setRefreshPeriodMinutes(
-        context: Context?,
+        context: Context,
         value: Int,
     ) {
         setString(
@@ -665,7 +667,7 @@ object ApplicationPreferences {
     }
 
     fun setAllDayEventsPlacement(
-        context: Context?,
+        context: Context,
         value: AllDayEventsPlacement,
     ) {
         setString(context, InstanceSettings.PREF_ALL_DAY_EVENTS_PLACEMENT, value.value)
@@ -692,14 +694,14 @@ object ApplicationPreferences {
     fun getFilterMode(context: Context): FilterMode = FilterMode.fromValue(getString(context, InstanceSettings.PREF_FILTER_MODE))
 
     private fun setString(
-        context: Context?,
+        context: Context,
         key: String?,
         value: String?,
     ) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
-        val editor = prefs.edit()
-        editor.putString(key, value)
-        editor.apply()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs.edit {
+            putString(key, value)
+        }
     }
 
     fun getIntStoredAsString(
@@ -735,9 +737,9 @@ object ApplicationPreferences {
         value: Boolean,
     ) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
-        val editor = prefs.edit()
-        editor.putBoolean(key, value)
-        editor.apply()
+        prefs.edit {
+            putBoolean(key, value)
+        }
     }
 
     fun getBoolean(
@@ -750,22 +752,22 @@ object ApplicationPreferences {
     }
 
     private fun setInt(
-        context: Context?,
+        context: Context,
         key: String?,
         value: Int,
     ) {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
-        val editor = prefs.edit()
-        editor.putInt(key, value)
-        editor.apply()
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs.edit {
+            putInt(key, value)
+        }
     }
 
     fun getInt(
-        context: Context?,
+        context: Context,
         key: String?,
         defaultValue: Int,
     ): Int {
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context!!)
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         return prefs?.getInt(key, defaultValue) ?: defaultValue
     }
 
@@ -798,4 +800,26 @@ object ApplicationPreferences {
         }
 
     fun Int.limitToString(): String = if (this < 1) "" else toString()
+
+    fun clearBootCompleted(context: Context) = setString(context, PREF_BOOT_COMPLETED, "")
+
+    fun hasBootCompleted(
+        context: Context,
+        widgetId: Int,
+    ): Boolean = getBootCompleted(context).contains(widgetId.toString())
+
+    fun getBootCompleted(context: Context): List<String> =
+        getString(context, PREF_BOOT_COMPLETED, "")
+            .takeIf { it.isNotBlank() }
+            ?.split(",")
+            ?: emptyList()
+
+    fun addBootCompleted(
+        context: Context,
+        widgetId: Int,
+    ) = getBootCompleted(context)
+        .plus(widgetId.toString())
+        .distinct()
+        .joinToString(",")
+        .let { setString(context, PREF_BOOT_COMPLETED, it) }
 }

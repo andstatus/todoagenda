@@ -14,7 +14,11 @@ import org.andstatus.todoagenda.provider.EventProviderType
 class EventSourcesPreferencesFragment : MyPreferenceFragment() {
     var savedActiveSources: List<OrderedEventSource>? = emptyList<OrderedEventSource>()
     var clickedSources: MutableList<EventSource> = ArrayList()
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+
+    override fun onCreatePreferences(
+        savedInstanceState: Bundle?,
+        rootKey: String?,
+    ) {
         addPreferencesFromResource(R.xml.preferences_event_sources)
     }
 
@@ -28,10 +32,11 @@ class EventSourcesPreferencesFragment : MyPreferenceFragment() {
         if (savedActiveSources != activeSourcesNew) {
             savedActiveSources = activeSourcesNew
             Log.i(
-                TAG, """
-     $this
-     Loaded ${savedActiveSources!!.size}
-     """.trimIndent()
+                TAG,
+                """
+                $this
+                Loaded ${savedActiveSources!!.size}
+                """.trimIndent(),
             )
             showAllSources(activeSourcesNew)
         }
@@ -60,7 +65,10 @@ class EventSourcesPreferencesFragment : MyPreferenceFragment() {
         }
     }
 
-    private fun addAsPreference(source: EventSource?, isChecked: Boolean) {
+    private fun addAsPreference(
+        source: EventSource?,
+        isChecked: Boolean,
+    ) {
         val checkboxPref = CheckBoxPreference(requireActivity())
         checkboxPref.title =
             (if (source!!.isAvailable) "" else getText(R.string.not_found).toString() + ": ") + source.title
@@ -71,10 +79,14 @@ class EventSourcesPreferencesFragment : MyPreferenceFragment() {
         checkboxPref.isChecked = isChecked
     }
 
-    private fun getDrawable(isCalendar: Boolean, color: Int): Drawable {
-        val drawable = resources.getDrawable(
-            if (isCalendar) R.drawable.prefs_calendar_entry else R.drawable.task_icon
-        )
+    private fun getDrawable(
+        isCalendar: Boolean,
+        color: Int,
+    ): Drawable {
+        val drawable =
+            resources.getDrawable(
+                if (isCalendar) R.drawable.prefs_calendar_entry else R.drawable.task_icon,
+            )
         drawable.colorFilter = LightingColorFilter(0x0, color)
         return drawable
     }
@@ -86,20 +98,16 @@ class EventSourcesPreferencesFragment : MyPreferenceFragment() {
         super.onPause()
     }
 
-    fun saveSelectedSources() {
-        synchronized(setLock) {
-            val selectedSources = selectedSources
-            Log.i(
-                TAG, """
-     $this
-     Saving ${selectedSources.size}
-     """.trimIndent()
-            )
-            ApplicationPreferences.setActiveEventSources(activity, selectedSources)
-            savedActiveSources = selectedSources
+    fun saveSelectedSources() =
+        activity?.let { activity1 ->
+            synchronized(setLock) {
+                val selectedSources = selectedSources
+                Log.i(TAG, "$this Saving ${selectedSources.size}")
+                ApplicationPreferences.setActiveEventSources(activity1, selectedSources)
+                savedActiveSources = selectedSources
+            }
+            loadSelectedInOtherInstances()
         }
-        loadSelectedInOtherInstances()
-    }
 
     private val selectedSources: List<OrderedEventSource>
         get() {
@@ -120,18 +128,22 @@ class EventSourcesPreferencesFragment : MyPreferenceFragment() {
             return OrderedEventSource.addAll(selectedSources, clickedSelectedSources)
         }
 
-    private fun getCheckedSources(preferenceScreen: PreferenceScreen, prefCount: Int): MutableList<EventSource> {
+    private fun getCheckedSources(
+        preferenceScreen: PreferenceScreen,
+        prefCount: Int,
+    ): MutableList<EventSource> {
         val checkedSources: MutableList<EventSource> = ArrayList()
         for (i in 0 until prefCount) {
             val preference = preferenceScreen.getPreference(i)
             if (preference is CheckBoxPreference) {
                 val checkBox = preference
                 if (checkBox.isChecked) {
-                    val eventSource: EventSource = EventSource.fromStoredString(
-                        checkBox.extras.getString(
-                            SOURCE_ID
+                    val eventSource: EventSource =
+                        EventSource.fromStoredString(
+                            checkBox.extras.getString(
+                                SOURCE_ID,
+                            ),
                         )
-                    )
                     if (eventSource !== EventSource.EMPTY) {
                         checkedSources.add(eventSource)
                     }
@@ -164,7 +176,6 @@ class EventSourcesPreferencesFragment : MyPreferenceFragment() {
     }
 
     companion object {
-        private val TAG = EventSourcesPreferencesFragment::class.java.simpleName
         private const val SOURCE_ID = "sourceId"
         private val setLock = Any()
     }

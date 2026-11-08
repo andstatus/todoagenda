@@ -7,11 +7,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
 import android.util.Log
-import android.widget.RemoteViews
-import org.andstatus.todoagenda.layout.WidgetRootLayout
+import androidx.core.net.toUri
 import org.andstatus.todoagenda.prefs.AllSettings
+import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.util.CalendarIntentUtil
@@ -92,25 +91,15 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
                 startActivity(context, activityIntent, action, widgetId, "Open widget Settings")
             }
 
-            else -> updateAllWidgets(context)
-        }
-    }
+            Intent.ACTION_BOOT_COMPLETED -> {
+                ApplicationPreferences.clearBootCompleted(context)
+                updateAllWidgets(context)
+            }
 
-    private fun gotoToday(
-        context: Context,
-        widgetId: Int,
-    ) {
-        val settings = AllSettings.instanceFromId(context, widgetId)
-        if (!settings.isScrollableLayout) return
-
-        val factory: RemoteViewsFactory? = RemoteViewsFactory.factories[widgetId]
-        val position1 = factory?.tomorrowsPosition ?: 0
-        val position2 = factory?.todaysPosition ?: 0
-        gotoPosition(context, widgetId, position1)
-        if (position1 >= 0 && position2 >= 0 && position1 != position2) {
-            sleep(1000)
+            else -> {
+                updateAllWidgets(context)
+            }
         }
-        gotoPosition(context, widgetId, position2)
     }
 
     private fun onReceive(
@@ -121,7 +110,13 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
     ) {
         val entryId = intent.getLongExtra(WidgetEntry.EXTRA_WIDGET_ENTRY_ID, 0)
         val activityIntent: Intent? = RemoteViewsFactory.getOnClickIntent(widgetId, entryId)
-        startActivity(context, activityIntent, action, widgetId, "Open Calendar/Tasks app.\nentryId:$entryId")
+        startActivity(
+            context,
+            activityIntent,
+            action,
+            widgetId,
+            "Open Calendar/Tasks app.\nentryId:$entryId",
+        )
     }
 
     private fun startActivity(
@@ -143,24 +138,6 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             }
         }
         Log.d(TAG, msgLog)
-    }
-
-    private fun gotoPosition(
-        context: Context,
-        widgetId: Int,
-        position: Int,
-    ) {
-        if (widgetId == 0 || position < 0) return
-        val appWidgetManager = AppWidgetManager.getInstance(context)
-        val settings = AllSettings.instanceFromId(context, widgetId)
-        val rv =
-            RemoteViews(
-                context.packageName,
-                WidgetRootLayout.forWidget(true, settings.widgetHeaderLayout).layoutId,
-            )
-        Log.d(TAG, "gotoPosition, Scrolling widget $widgetId to position $position")
-        rv.setScrollPosition(R.id.event_list, position)
-        appWidgetManager.partiallyUpdateAppWidget(widgetId, rv)
     }
 
     companion object {
@@ -205,7 +182,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
                 val intent =
                     Intent(context, EnvironmentChangedReceiver::class.java)
                         .setAction(RemoteViewsFactory.ACTION_MIDNIGHT_ALARM)
-                        .setData(Uri.parse("intent:midnightAlarm$counter"))
+                        .setData("intent:midnightAlarm$counter".toUri())
                 val pendingIntent =
                     PendingIntent.getBroadcast(
                         context,
@@ -228,7 +205,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             var periodMinutes = TimeUnit.DAYS.toMinutes(1).toInt()
             for (settings in instances.values) {
                 val period = settings.refreshPeriodMinutes
-                if (period > 0 && period < periodMinutes) {
+                if (period in 1..<periodMinutes) {
                     periodMinutes = period
                 }
             }
@@ -261,20 +238,20 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         fun sleep(millis: Int) {
             try {
                 Thread.sleep(millis.toLong())
-            } catch (e: InterruptedException) {
+            } catch (_: InterruptedException) {
                 // Ignored
             }
         }
 
         fun updateWidget(
-            context: Context?,
+            context: Context,
             widgetId: Int,
         ) {
             val intent = Intent(context, AppWidgetProvider::class.java)
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(widgetId))
             Log.d(TAG, "updateWidget:$widgetId, context:$context")
-            context!!.sendBroadcast(intent)
+            context.sendBroadcast(intent)
         }
 
         fun updateAllWidgets(context: Context) {
@@ -282,7 +259,10 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
             val widgetIds: IntArray = AppWidgetProvider.getWidgetIds(context)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
-            Log.d(TAG, "updateAllWidgets:" + AppWidgetProvider.asList(widgetIds) + ", context:" + context)
+            Log.d(
+                TAG,
+                "updateAllWidgets:" + AppWidgetProvider.asList(widgetIds) + ", context:" + context,
+            )
             context.sendBroadcast(intent)
         }
     }
