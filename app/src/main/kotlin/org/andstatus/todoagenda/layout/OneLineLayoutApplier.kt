@@ -44,7 +44,7 @@ class OneLineLayoutApplier(
             val viewToHide = if (daysAsText) R.id.event_entry_days_right else R.id.event_entry_days
             rv.setViewVisibility(viewToHide, View.GONE)
             rv.setViewVisibility(viewToShow, View.VISIBLE)
-            rv.setTextViewText(viewToShow, entry.formatEntryDate())
+            RemoteViewsUtil.setText(settings, rv, viewToShow, entry.formatEntryDate())
             RemoteViewsUtil.setViewWidth(
                 settings,
                 rv,
@@ -68,7 +68,12 @@ class OneLineLayoutApplier(
     ) {
         val viewId = R.id.event_entry_time
         RemoteViewsUtil.setMultiline(rv, viewId, settings.isMultilineDetails)
-        rv.setTextViewText(viewId, entry.eventTimeString.replace(CalendarEntry.Companion.SPACE_DASH_SPACE, "\n"))
+        RemoteViewsUtil.setText(
+            settings,
+            rv,
+            viewId,
+            entry.eventTimeString.replace(CalendarEntry.Companion.SPACE_DASH_SPACE, "\n"),
+        )
         if (settings.isMultilineDetails) {
             RemoteViewsUtil.setViewWidth(settings, rv, viewId, R.dimen.event_time_width)
             RemoteViewsUtil.setMaxLines(rv, viewId, settings.maxLinesDetails)

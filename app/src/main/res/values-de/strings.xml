@@ -66,9 +66,6 @@
         um Widgets auf dem gleichen oder verschiedenen Geräten zu klonen.</string>
     <string name="app_description_4000_chars_max_part14">Android 4+ unterstützt. Unterstützt Android Tablets.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Kompaktes Layout</string>
-    <string name="compact_layout_off_desc">Normaler Abstand zwischen Widget-Teilen</string>
-    <string name="compact_layout_on_desc">Minimaler Abstand zwischen Widget-Teilen, dünne Ränder</string>
     <string name="layout_prefs_desc">Widget-Elemente platzieren, anzeigen und verbergen</string>
     <string name="layout_prefs_title">Ansicht</string>
     <string name="widget_header_layout">Widget-Kopfzeilenansicht</string>

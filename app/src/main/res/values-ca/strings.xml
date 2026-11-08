@@ -61,9 +61,6 @@
         clonació de ginys en dispositius iguals o diferents.</string>
     <string name="app_description_4000_chars_max_part14">Compatible amb Android 4+. Admet les tauletes Android.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Disseny compacte</string>
-    <string name="compact_layout_off_desc">Espai normal entre les parts de l\'enginy</string>
-    <string name="compact_layout_on_desc">Espai mínim entre les parts de l\'enginy, vores fines</string>
     <string name="layout_prefs_desc">Col·loca, mostra o oculta elements del giny</string>
     <string name="layout_prefs_title">Disposició</string>
     <string name="widget_header_layout">Disposició de la capçalera del giny</string>

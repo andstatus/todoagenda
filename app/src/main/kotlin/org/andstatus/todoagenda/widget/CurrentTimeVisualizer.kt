@@ -30,7 +30,7 @@ class CurrentTimeVisualizer(
             )
         }
         RemoteViewsUtil.setBackgroundColor(rv, R.id.event_entry, settings.colors().getEntryBackgroundColor(entry))
-        RemoteViewsUtil.setCompact(settings, rv)
+        RemoteViewsUtil.setEntrySpacing(settings, rv)
         return rv
     }
 }

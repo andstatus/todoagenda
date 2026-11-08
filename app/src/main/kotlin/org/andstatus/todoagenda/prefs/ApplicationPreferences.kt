@@ -45,7 +45,19 @@ object ApplicationPreferences {
             //
             // ----------------------------------------------------------------------------------
             // Layout
+            setString(
+                context,
+                InstanceSettings.PREF_ENTRY_SPACING,
+                settings.entrySpacing.preferenceValue,
+            )
+            setBoolean(context, InstanceSettings.PREF_ENTRY_SPACING_MIGRATED, true)
             setBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, settings.isCompactLayout)
+            setString(
+                context,
+                InstanceSettings.PREF_FONT_FAMILY,
+                settings.fontFamily.preferenceValue,
+            )
+            setString(context, InstanceSettings.PREF_FONT_WIDTH, settings.fontWidth.preferenceValue)
             setBoolean(
                 context,
                 InstanceSettings.PREF_SCROLLABLE_LAYOUT,
@@ -771,7 +783,43 @@ object ApplicationPreferences {
 
     fun getWidgetInstanceName(context: Context): String = getString(context, InstanceSettings.PREF_WIDGET_INSTANCE_NAME, "")
 
-    fun isCompactLayout(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, false)
+    fun getEntrySpacing(context: Context): EntrySpacing {
+        if (!getBoolean(context, InstanceSettings.PREF_ENTRY_SPACING_MIGRATED, false)) {
+            migrateEntrySpacing(context)
+        }
+        return EntrySpacing.fromPreferenceValue(
+            getString(context, InstanceSettings.PREF_ENTRY_SPACING, ""),
+        )
+    }
+
+    /**
+     * Migrates the old "Compact layout" checkbox to the "Spacing between entries" list.
+     * The migration is done only once, and the fact of the migration is stored in preferences
+     * (see [InstanceSettings.PREF_ENTRY_SPACING_MIGRATED]), because a list preference
+     * may write its default value before this method is called.
+     */
+    private fun migrateEntrySpacing(context: Context) {
+        val entrySpacing =
+            EntrySpacing.fromLegacyCompactLayout(
+                getBoolean(context, InstanceSettings.PREF_COMPACT_LAYOUT, false),
+            )
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+        prefs
+            .edit()
+            .putString(InstanceSettings.PREF_ENTRY_SPACING, entrySpacing.preferenceValue)
+            .putBoolean(InstanceSettings.PREF_ENTRY_SPACING_MIGRATED, true)
+            .apply()
+    }
+
+    fun getFontFamily(context: Context): FontFamily =
+        FontFamily.fromPreferenceValue(
+            getString(context, InstanceSettings.PREF_FONT_FAMILY, ""),
+        )
+
+    fun getFontWidth(context: Context): FontWidth =
+        FontWidth.fromPreferenceValue(
+            getString(context, InstanceSettings.PREF_FONT_WIDTH, ""),
+        )
 
     fun isScrollableLayout(context: Context?): Boolean = getBoolean(context, InstanceSettings.PREF_SCROLLABLE_LAYOUT, true)
 

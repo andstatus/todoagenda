@@ -61,9 +61,6 @@
         clonando widgets aqui ou em outro aparelho.</string>
     <string name="app_description_4000_chars_max_part14">Suporte a Android 4+. Suporta tablets Android.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Layout compacto</string>
-    <string name="compact_layout_off_desc">Espaço normal entre partes do widget</string>
-    <string name="compact_layout_on_desc">Espaço mínimo entre partes do widget, bordas finas</string>
     <string name="layout_prefs_desc">Posicione, mostre e oculte elementos do widget</string>
     <string name="layout_prefs_title">Layout</string>
     <string name="widget_header_layout">Layout do cabeçalho do widget</string>

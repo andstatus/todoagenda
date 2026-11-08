@@ -31,8 +31,8 @@ android {
     }
 
     defaultConfig {
-        versionCode = 721
-        versionName = "4.15.1"
+        versionCode = 722
+        versionName = "4.16.0"
         minSdk = rootMinSdkVersion
         targetSdk = rootTargetSdkVersion
 

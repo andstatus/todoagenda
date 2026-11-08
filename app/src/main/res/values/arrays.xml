@@ -30,6 +30,57 @@
         <item>ONE_LINE</item>
     </string-array>
 
+    <string-array name="pref_entry_spacing_entries">
+        <item>@string/entry_spacing_compact</item>
+        <item>@string/entry_spacing_normal</item>
+        <item>@string/entry_spacing_relaxed</item>
+        <item>@string/entry_spacing_loose</item>
+    </string-array>
+    <string-array name="pref_entry_spacing_values" tools:ignore="MissingTranslation">
+        <item>compact</item>
+        <item>normal</item>
+        <item>relaxed</item>
+        <item>loose</item>
+    </string-array>
+
+    <string-array name="pref_font_family_entries">
+        <item>@string/font_family_default</item>
+        <item>@string/font_family_sans_serif</item>
+        <item>@string/font_family_sans_serif_condensed</item>
+        <item>@string/font_family_sans_serif_light</item>
+        <item>@string/font_family_sans_serif_medium</item>
+        <item>@string/font_family_serif</item>
+        <item>@string/font_family_monospace</item>
+        <item>@string/font_family_casual</item>
+        <item>@string/font_family_cursive</item>
+    </string-array>
+    <string-array name="pref_font_family_values" tools:ignore="MissingTranslation">
+        <item>default</item>
+        <item>sans_serif</item>
+        <item>sans_serif_condensed</item>
+        <item>sans_serif_light</item>
+        <item>sans_serif_medium</item>
+        <item>serif</item>
+        <item>monospace</item>
+        <item>casual</item>
+        <item>cursive</item>
+    </string-array>
+
+    <string-array name="pref_font_width_entries">
+        <item>@string/font_width_condensed</item>
+        <item>@string/font_width_narrow</item>
+        <item>@string/font_width_normal</item>
+        <item>@string/font_width_wide</item>
+        <item>@string/font_width_extra_wide</item>
+    </string-array>
+    <string-array name="pref_font_width_values" tools:ignore="MissingTranslation">
+        <item>0.8</item>
+        <item>0.9</item>
+        <item>1.0</item>
+        <item>1.1</item>
+        <item>1.2</item>
+    </string-array>
+
     <string-array name="pref_last_entry_entries">
         <item>@string/last_entry_with_message</item>
         <item>@string/last_entry_empty</item>

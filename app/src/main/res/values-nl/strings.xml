@@ -66,9 +66,6 @@
         kopieer widgets op hetzelfde of andere apparaten.</string>
     <string name="app_description_4000_chars_max_part14">Android 7+ ondersteund. Ondersteunt Android tablets.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Compacte indeling</string>
-    <string name="compact_layout_off_desc">Normale ruimte tussen widgetonderdelen</string>
-    <string name="compact_layout_on_desc">Minimale ruimte tussen widgetonderdelen, dunne randen</string>
     <string name="layout_prefs_desc">Plaatsen, weergeven en verbergen widget-elementen</string>
     <string name="layout_prefs_title">Indeling</string>
     <string name="widget_header_layout">Widget koptekst indeling</string>

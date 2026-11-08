@@ -33,7 +33,7 @@ class TimeBelowTitleLayoutApplier(
             rv.setViewVisibility(viewId, View.GONE)
         } else {
             rv.setViewVisibility(viewId, View.VISIBLE)
-            rv.setTextViewText(viewId, eventDetails)
+            RemoteViewsUtil.setText(settings, rv, viewId, eventDetails)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_details)
             RemoteViewsUtil.setTextColor(
                 settings,

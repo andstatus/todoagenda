@@ -56,9 +56,6 @@ Utilize o botão \"Ir para Hoje\" para regressar ao dia atual.</string>
     <string name="app_description_4000_chars_max_part16">Ocultação de eventos duplicados.</string>
     <string name="app_description_4000_chars_max_part14">Apenas para >= Android 7. Também disponível para tablets.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Disposição compacta</string>
-    <string name="compact_layout_off_desc">Espaço normal entre as partes do widget</string>
-    <string name="compact_layout_on_desc">Espaço mínimo entre as partes do widget, limites finos</string>
     <string name="layout_prefs_desc">Colocar, mostrar e ocultar partes do widget</string>
     <string name="layout_prefs_title">Disposição</string>
     <string name="widget_header_layout">Disposição do cabeçalho do widget</string>

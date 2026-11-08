@@ -43,7 +43,9 @@ data class InstanceSettings(
     //
     // ----------------------------------------------------------------------------------
     // Layout
-    val isCompactLayout: Boolean = false,
+    val entrySpacing: EntrySpacing = EntrySpacing.NORMAL,
+    val fontFamily: FontFamily = FontFamily.DEFAULT,
+    val fontWidth: FontWidth = FontWidth.NORMAL,
     val isScrollableLayout: Boolean = true,
     val widgetHeaderLayout: WidgetHeaderLayout = WidgetHeaderLayout.defaultValue,
     val widgetHeaderDateFormat: DateFormatValue = PREF_WIDGET_HEADER_DATE_FORMAT_DEFAULT,
@@ -170,6 +172,10 @@ data class InstanceSettings(
             startHourOfDay = startHourOfDay,
         )
 
+    /** Kept for backward compatibility: the compact layout is the most compact [EntrySpacing] */
+    val isCompactLayout: Boolean
+        get() = entrySpacing.isCompact
+
     val isEmpty: Boolean
         get() = widgetId == 0
 
@@ -203,7 +209,10 @@ data class InstanceSettings(
             //
             // ----------------------------------------------------------------------------------
             // Layout
-            put(PREF_COMPACT_LAYOUT, isCompactLayout)
+            put(PREF_ENTRY_SPACING, entrySpacing.preferenceValue)
+            put(PREF_COMPACT_LAYOUT, isCompactLayout) // migrated to PREF_ENTRY_SPACING
+            put(PREF_FONT_FAMILY, fontFamily.preferenceValue)
+            put(PREF_FONT_WIDTH, fontWidth.preferenceValue)
             put(PREF_SCROLLABLE_LAYOUT, isScrollableLayout)
             put(PREF_WIDGET_HEADER_LAYOUT, widgetHeaderLayout.value)
             put(PREF_WIDGET_HEADER_DATE_FORMAT, widgetHeaderDateFormat.save())
@@ -404,7 +413,11 @@ data class InstanceSettings(
         //
         // ----------------------------------------------------------------------------------
         // Layout
-        const val PREF_COMPACT_LAYOUT = "compactLayout"
+        const val PREF_ENTRY_SPACING = "entrySpacing"
+        const val PREF_COMPACT_LAYOUT = "compactLayout" // Replaced by PREF_ENTRY_SPACING
+        const val PREF_ENTRY_SPACING_MIGRATED = "entrySpacingMigrated"
+        const val PREF_FONT_FAMILY = "fontFamily"
+        const val PREF_FONT_WIDTH = "fontWidth"
         const val PREF_SCROLLABLE_LAYOUT = "scrollableLayout"
         const val PREF_WIDGET_HEADER_LAYOUT = "widgetHeaderLayout"
         private const val PREF_SHOW_DATE_ON_WIDGET_HEADER = "showDateOnWidgetHeader" // till v 4.0
@@ -559,11 +572,25 @@ data class InstanceSettings(
                     //
                     // ----------------------------------------------------------------------------------
                     // Layout
-                    isCompactLayout =
-                        if (json.has(PREF_COMPACT_LAYOUT)) {
-                            json.getBoolean(PREF_COMPACT_LAYOUT)
+                    entrySpacing =
+                        if (json.has(PREF_ENTRY_SPACING)) {
+                            EntrySpacing.fromPreferenceValue(json.getString(PREF_ENTRY_SPACING))
+                        } else if (json.has(PREF_COMPACT_LAYOUT)) {
+                            EntrySpacing.fromLegacyCompactLayout(json.getBoolean(PREF_COMPACT_LAYOUT))
                         } else {
-                            EMPTY.isCompactLayout
+                            EMPTY.entrySpacing
+                        },
+                    fontFamily =
+                        if (json.has(PREF_FONT_FAMILY)) {
+                            FontFamily.fromPreferenceValue(json.getString(PREF_FONT_FAMILY))
+                        } else {
+                            EMPTY.fontFamily
+                        },
+                    fontWidth =
+                        if (json.has(PREF_FONT_WIDTH)) {
+                            FontWidth.fromPreferenceValue(json.getString(PREF_FONT_WIDTH))
+                        } else {
+                            EMPTY.fontWidth
                         },
                     isScrollableLayout =
                         if (json.has(PREF_SCROLLABLE_LAYOUT)) {
@@ -928,7 +955,9 @@ data class InstanceSettings(
                     //
                     // ----------------------------------------------------------------------------------
                     // Layout
-                    isCompactLayout = ApplicationPreferences.isCompactLayout(context),
+                    entrySpacing = ApplicationPreferences.getEntrySpacing(context),
+                    fontFamily = ApplicationPreferences.getFontFamily(context),
+                    fontWidth = ApplicationPreferences.getFontWidth(context),
                     isScrollableLayout = ApplicationPreferences.isScrollableLayout(context),
                     widgetHeaderLayout = ApplicationPreferences.getWidgetHeaderLayout(context),
                     widgetHeaderDateFormat =

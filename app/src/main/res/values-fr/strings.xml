@@ -64,9 +64,6 @@
         clonez des widgets sur des appareils différents ou identiques .</string>
     <string name="app_description_4000_chars_max_part14">Compatible avec Android 4+. Compatible avec les tablettes Android.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Affichage compact</string>
-    <string name="compact_layout_off_desc">Espacement normal des différents éléments du widget</string>
-    <string name="compact_layout_on_desc">Espacement réduit des différents éléments du widget, bordures minces</string>
     <string name="layout_prefs_desc">Positionnez,, affichez et masquez les éléments du widget</string>
     <string name="layout_prefs_title">Disposition</string>
     <string name="widget_header_layout">Mise en page de l\'en-tête du widget</string>

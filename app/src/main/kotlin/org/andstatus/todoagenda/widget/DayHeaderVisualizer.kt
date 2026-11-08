@@ -43,7 +43,7 @@ class DayHeaderVisualizer(
             R.id.event_entry,
             settings.colors().getEntryBackgroundColor(entry)
         )
-        RemoteViewsUtil.setCompact(settings, rv)
+        RemoteViewsUtil.setEntrySpacing(settings, rv)
         setTitle(position, entry, rv, textColorPref)
         setDayHeaderSeparator(position, rv, themeContext)
         return rv
@@ -56,7 +56,7 @@ class DayHeaderVisualizer(
         textColorPref: TextColorPref,
     ) {
         val dateString = getTitleString(entry).toString().uppercase(MyLocale.locale)
-        rv.setTextViewText(R.id.day_header_title, dateString)
+        RemoteViewsUtil.setText(settings, rv, R.id.day_header_title, dateString)
         RemoteViewsUtil.setTextSize(settings, rv, R.id.day_header_title, R.dimen.day_header_title)
         RemoteViewsUtil.setTextColor(
             settings,

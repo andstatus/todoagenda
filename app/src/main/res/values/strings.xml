@@ -70,9 +70,31 @@
     <string name="app_description_4000_chars_max_part14">Android 7+ supported. Supports Android tablets.</string>
 
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Compact layout</string>
-    <string name="compact_layout_off_desc">Normal space between widget parts</string>
-    <string name="compact_layout_on_desc">Minimum space between widget parts, thin borders</string>
+    <string name="entry_spacing_title">Spacing between entries</string>
+    <string name="entry_spacing_desc">Vertical space between entries. The "Compact" option also removes horizontal padding</string>
+    <string name="entry_spacing_compact">Compact</string>
+    <string name="entry_spacing_normal">Normal</string>
+    <string name="entry_spacing_relaxed">Relaxed</string>
+    <string name="entry_spacing_loose">Loose</string>
+    <string name="font_category_title">Font</string>
+    <string name="font_family_title">Font family</string>
+    <string name="font_family_desc">Font family for all texts of this widget. Available families depend on the device</string>
+    <string name="font_family_default">Device default</string>
+    <string name="font_family_sans_serif">Sans serif</string>
+    <string name="font_family_sans_serif_condensed">Sans serif condensed (narrow)</string>
+    <string name="font_family_sans_serif_light">Sans serif light</string>
+    <string name="font_family_sans_serif_medium">Sans serif medium</string>
+    <string name="font_family_serif">Serif</string>
+    <string name="font_family_monospace">Monospace</string>
+    <string name="font_family_casual">Casual</string>
+    <string name="font_family_cursive">Cursive</string>
+    <string name="font_width_title">Font width</string>
+    <string name="font_width_desc">Make all texts narrower or wider, keeping their height</string>
+    <string name="font_width_condensed">Condensed (80%)</string>
+    <string name="font_width_narrow">Narrow (90%)</string>
+    <string name="font_width_normal">Normal (100%)</string>
+    <string name="font_width_wide">Wide (110%)</string>
+    <string name="font_width_extra_wide">Extra wide (120%)</string>
     <string name="scrollable_layout_title">Scrollable layout</string>
     <string name="scrollable_layout_off_desc">The list of events is non-scrollable</string>
     <string name="scrollable_layout_on_desc">Allow scrolling through the list of events</string>
