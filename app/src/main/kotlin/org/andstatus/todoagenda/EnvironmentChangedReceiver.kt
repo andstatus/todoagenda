@@ -10,7 +10,6 @@ import android.content.IntentFilter
 import android.util.Log
 import androidx.core.net.toUri
 import org.andstatus.todoagenda.prefs.AllSettings
-import org.andstatus.todoagenda.prefs.ApplicationPreferences
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.provider.EventProviderType
 import org.andstatus.todoagenda.util.CalendarIntentUtil
@@ -34,6 +33,11 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
         AllSettings.ensureLoadedFromFiles(context)
         val widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
         val settings = if (widgetId == 0) null else AllSettings.loadedInstances[widgetId]
+        if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
+            clearBootCompleted(context)
+            return
+        }
+
         val action =
             if (settings == null || intent.action.isNullOrBlank()) {
                 RemoteViewsFactory.ACTION_REFRESH
@@ -89,11 +93,6 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             RemoteViewsFactory.ACTION_CONFIGURE -> {
                 val activityIntent: Intent = MainActivity.intentToConfigure(context, widgetId)
                 startActivity(context, activityIntent, action, widgetId, "Open widget Settings")
-            }
-
-            Intent.ACTION_BOOT_COMPLETED -> {
-                ApplicationPreferences.clearBootCompleted(context)
-                updateAllWidgets(context)
             }
 
             else -> {
@@ -261,7 +260,7 @@ class EnvironmentChangedReceiver : BroadcastReceiver() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
             Log.d(
                 TAG,
-                "updateAllWidgets:" + AppWidgetProvider.asList(widgetIds) + ", context:" + context,
+                "updateAllWidgets:" + widgetIds.toList() + ", context:" + context,
             )
             context.sendBroadcast(intent)
         }

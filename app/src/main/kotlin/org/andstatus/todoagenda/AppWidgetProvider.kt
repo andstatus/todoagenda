@@ -8,7 +8,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import org.andstatus.todoagenda.prefs.AllSettings
-import java.util.AbstractList
 
 class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
     init {
@@ -19,13 +18,16 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
         context: Context,
         appWidgetManager: AppWidgetManager,
         widgetId: Int,
-        newOptions: Bundle
+        newOptions: Bundle,
     ) {
         Log.d(TAG, "$widgetId onOptionsChanged")
         super.onAppWidgetOptionsChanged(context, appWidgetManager, widgetId, newOptions)
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         Log.d(TAG, "onReceive, intent:$intent")
         AllSettings.ensureLoadedFromFiles(context)
         val action = intent.action
@@ -35,8 +37,9 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
             if (widgetIds == null || widgetIds.size == 0) {
                 widgetIds = getWidgetIds(context)
                 Log.d(
-                    TAG, "onUpdate, input: no widgetIds, discovered here:" +
-                        asList(widgetIds) + ", context:" + context
+                    TAG,
+                    "onUpdate, input: no widgetIds, discovered here:" +
+                        widgetIds.toList() + ", context:" + context,
                 )
             }
             if (widgetIds.isNotEmpty()) {
@@ -52,65 +55,75 @@ class AppWidgetProvider : android.appwidget.AppWidgetProvider() {
         super.onEnabled(context)
     }
 
-    override fun onRestored(context: Context, oldWidgetIds: IntArray, newWidgetIds: IntArray) {
+    override fun onRestored(
+        context: Context,
+        oldWidgetIds: IntArray,
+        newWidgetIds: IntArray,
+    ) {
         Log.d(
-            TAG, "onRestored, oldWidgetIds:" + asList(oldWidgetIds) +
-                ", newWidgetIds:" + asList(newWidgetIds)
+            TAG,
+            "onRestored, oldWidgetIds:" + oldWidgetIds.toList() +
+                ", newWidgetIds:" + newWidgetIds.toList(),
         )
         super.onRestored(context, oldWidgetIds, newWidgetIds)
     }
 
-    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
-        Log.d(TAG, "onDeleted, widgetIds:" + asList(appWidgetIds))
+    override fun onDeleted(
+        context: Context,
+        appWidgetIds: IntArray,
+    ) {
+        Log.d(TAG, "onDeleted, widgetIds:" + appWidgetIds.toList())
         super.onDeleted(context, appWidgetIds)
         for (widgetId in appWidgetIds) {
             AllSettings.delete(context, widgetId)
         }
     }
 
-    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
-        Log.d(TAG, "onUpdate, widgetIds:" + asList(appWidgetIds) + ", context:" + context)
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray,
+    ) {
+        Log.d(TAG, "onUpdate, widgetIds:" + appWidgetIds.toList() + ", context:" + context)
         for (widgetId in appWidgetIds) {
             val updated = RemoteViewsFactory.updateWidget(context, widgetId)
             InstanceState.updated(widgetId)
-            val isScrollable =
-                try {
-                    AllSettings.instanceFromId(context, widgetId).isScrollableLayout
-                } catch (e: Exception) {
-                    Log.w(TAG, "$widgetId Unable to load settings after update", e)
-                    false
+            try {
+                AllSettings.instanceFromId(context, widgetId)
+            } catch (e: Exception) {
+                Log.w(TAG, "$widgetId Unable to load settings after update", e)
+                null
+            }?.let { settings ->
+                if (updated && settings.isScrollableLayout &&
+                    Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                ) {
+                    appWidgetManager.notifyAppWidgetViewDataChanged(
+                        intArrayOf(widgetId),
+                        R.id.event_list,
+                    )
+                } else if (!updated) {
+                    Log.w(TAG, "$widgetId update failed; not notifying its collection")
                 }
-            if (updated &&
-                isScrollable &&
-                Build.VERSION.SDK_INT < Build.VERSION_CODES.S
-            ) {
-                appWidgetManager.notifyAppWidgetViewDataChanged(
-                    intArrayOf(widgetId),
-                    R.id.event_list,
-                )
-            } else if (!updated) {
-                Log.w(TAG, "$widgetId update failed; not notifying its collection")
+                delayedGotoToday(settings)
             }
         }
     }
 
     companion object {
         private val TAG = AppWidgetProvider::class.java.simpleName
-        fun asList(ints: IntArray): List<Int> {
-            return object : AbstractList<Int>() {
-                override fun get(index: Int): Int = ints[index]
 
-                override val size: Int get() = ints.size
-            }
-        }
-
-        fun getWidgetIds(context: Context?): IntArray {
+        fun getWidgetIds(context: Context): IntArray {
             val appWidgetManager = AppWidgetManager.getInstance(context)
-            return if (appWidgetManager == null) intArrayOf() else appWidgetManager.getAppWidgetIds(
-                ComponentName(
-                    context!!, AppWidgetProvider::class.java
+            return if (appWidgetManager == null) {
+                intArrayOf()
+            } else {
+                appWidgetManager.getAppWidgetIds(
+                    ComponentName(
+                        context,
+                        AppWidgetProvider::class.java,
+                    ),
                 )
-            )
+            }
         }
     }
 }
