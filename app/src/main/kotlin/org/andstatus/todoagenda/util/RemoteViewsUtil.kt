@@ -5,6 +5,9 @@ import android.content.res.Resources.NotFoundException
 import android.graphics.Color
 import android.graphics.Paint
 import android.os.Build
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.TypefaceSpan
 import android.util.Log
 import android.util.TypedValue
 import android.widget.RemoteViews
@@ -13,12 +16,14 @@ import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.IdRes
 import org.andstatus.todoagenda.R
+import org.andstatus.todoagenda.prefs.FontFamily
 import org.andstatus.todoagenda.prefs.InstanceSettings
 import org.andstatus.todoagenda.prefs.colors.TextColorPref
 
 object RemoteViewsUtil {
     private val TAG = RemoteViewsUtil::class.java.simpleName
     private const val METHOD_SET_TEXT_SIZE = "setTextSize"
+    private const val METHOD_SET_TEXT_SCALE_X = "setTextScaleX"
     private const val METHOD_SET_BACKGROUND_COLOR = "setBackgroundColor"
     private const val METHOD_SET_BACKGROUND_RESOURCE = "setBackgroundResource"
     private const val METHOD_SET_SINGLE_LINE = "setSingleLine"
@@ -29,11 +34,12 @@ object RemoteViewsUtil {
     private const val METHOD_SET_HEIGHT = "setHeight"
     private const val METHOD_SET_PAINT_FLAGS = "setPaintFlags"
 
-    fun setCompact(
+    fun setEntrySpacing(
         settings: InstanceSettings,
         rv: RemoteViews,
     ) {
-        if (settings.isCompactLayout) {
+        val spacing = settings.entrySpacing
+        if (spacing.isCompact) {
             setPadding(
                 settings = settings,
                 rv = rv,
@@ -44,16 +50,49 @@ object RemoteViewsUtil {
                 bottomDimenId = R.dimen.zero,
             )
         } else {
-            setPadding(
-                settings = settings,
-                rv = rv,
-                viewId = R.id.event_entry,
-                leftDimenId = R.dimen.calender_padding,
-                topDimenId = R.dimen.entry_top_bottom_padding,
-                rightDimenId = R.dimen.calender_padding,
-                bottomDimenId = R.dimen.entry_top_bottom_padding,
+            val horizontalPadding = getScaledValueInPixels(settings, R.dimen.calender_padding)
+            val verticalPadding =
+                Math.round(
+                    getScaledValueInPixels(settings, R.dimen.entry_top_bottom_padding) *
+                        spacing.verticalPaddingMultiplier,
+                )
+            rv.setViewPadding(
+                R.id.event_entry,
+                horizontalPadding,
+                verticalPadding,
+                horizontalPadding,
+                verticalPadding,
             )
         }
+    }
+
+    /**
+     * Sets a text of a widget's view, applying the [FontFamily] and the [org.andstatus.todoagenda.prefs.FontWidth]
+     * from the Widget's settings.
+     *
+     * Font family is applied with [TypefaceSpan], because [RemoteViews] has no method to set a typeface.
+     * The span is parceled to the launcher, so only font families, available on the device, can be used.
+     */
+    fun setText(
+        settings: InstanceSettings,
+        rv: RemoteViews,
+        viewId: Int,
+        text: CharSequence,
+    ) {
+        rv.setTextViewText(viewId, withFontFamily(settings.fontFamily, text))
+        rv.setFloat(viewId, METHOD_SET_TEXT_SCALE_X, settings.fontWidth.scaleX)
+    }
+
+    fun withFontFamily(fontFamily: FontFamily, text: CharSequence): CharSequence {
+        val family = fontFamily.family ?: return text
+        val spannable = SpannableString(text)
+        spannable.setSpan(
+            TypefaceSpan(family),
+            0,
+            spannable.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+        )
+        return spannable
     }
 
     fun setPadding(

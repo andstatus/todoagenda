@@ -61,9 +61,6 @@
          同じまたは異なるデバイスでウィジェットを複製します。</string>
     <string name="app_description_4000_chars_max_part14">Android 4 以降をサポートしています。Android タブレットをサポートしています。</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">コンパクトレイアウト</string>
-    <string name="compact_layout_off_desc">ウィジェット部品の間は通常の間隔</string>
-    <string name="compact_layout_on_desc">ウィジェット部品の間は最小間隔、細い枠</string>
     <string name="layout_prefs_desc">ウィジェット要素の配置、表示、非表示</string>
     <string name="layout_prefs_title">レイアウト</string>
     <string name="widget_header_layout">ウィジェット ヘッダーのレイアウト</string>

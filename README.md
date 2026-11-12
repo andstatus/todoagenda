@@ -25,6 +25,7 @@ selected calendars and task lists.
 * Customize colors and transparency of different widget parts, of their texts and backgrounds.
 * Scroll through the list of events. Use "Go to Today" button to return to today instantly.
 * Customize the text size of the widget.
+* Choose a font family and a font width (including a condensed one), and the spacing between entries.
 * Fully resizable widget with alternative layouts.
 * Indicators for alerts and recurring events.
 * Lock time zone when travelling to different time zones.

@@ -53,9 +53,6 @@
     <string name="app_description_4000_chars_max_part17">Tworzenie kopii zapasowej ustawień, kopiowanie widżetu na to samo lub inne urządzenia.</string>
     <string name="app_description_4000_chars_max_part14">Wsparcie dla Androida 7+. Wsparcie również dla tabletów z Androidem.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Układ kompaktowy</string>
-    <string name="compact_layout_off_desc">Normalny odstęp między częściami widżetu</string>
-    <string name="compact_layout_on_desc">Minimalny odstęp między częściami widżetów, cienkie ramki</string>
     <string name="layout_prefs_desc">Pokaż lub ukryj elementy nagłówka</string>
     <string name="layout_prefs_title">Układ</string>
     <string name="widget_header_layout">Układ nagłówka</string>

@@ -25,9 +25,9 @@ class LastEntryVisualizer(
         val rv = RemoteViews(context.packageName, entry.type.widgetLayout.shadowed(settings.colors().textShadow))
         val viewId = R.id.event_entry
         if (entry.appearance == LastEntryAppearance.WITH_MESSAGE) {
-            rv.setTextViewText(viewId, context.getText(entry.type.valueResId))
+            RemoteViewsUtil.setText(settings, rv, viewId, context.getText(entry.type.valueResId))
         } else {
-            rv.setTextViewText(viewId, context.getText(R.string.one_space))
+            RemoteViewsUtil.setText(settings, rv, viewId, context.getText(R.string.one_space))
         }
         RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
         RemoteViewsUtil.setTextColor(settings, TextColorPref.forTitle(entry), rv, viewId, R.attr.eventEntryTitle)

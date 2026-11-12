@@ -56,9 +56,6 @@
         在同一或不同的设备上的克隆部件。</string>
     <string name="app_description_4000_chars_max_part14">支持Android 4+ 支持。支持 Android 桌面。</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">紧凑布局</string>
-    <string name="compact_layout_off_desc">小部件之间的正常间隔</string>
-    <string name="compact_layout_on_desc">小部件、细边框之间的最小间隔</string>
     <string name="layout_prefs_desc">放置、显示和隐藏小部件元素</string>
     <string name="layout_prefs_title">布局</string>
     <string name="widget_header_layout">小部件头部布局</string>

@@ -1,5 +1,17 @@
 ## [Todo Agenda](https://github.com/andstatus/todoagenda#readme) Changelog
 
+<a id="v4.16"/>
+
+### 2026-11-08 v4.16.0 Font settings and spacing between entries
+* "Font" settings section added to the Layout settings of each widget:
+  "Font family", "Font width" and "Text size". A condensed (narrow) font family
+  and a narrower font width allow to fit more information in one line.
+  [#192](https://github.com/andstatus/todoagenda/issues/192)
+* "Spacing between entries" setting replaces the "Compact layout" checkbox.
+  In addition to the "Compact" and "Normal" options, there are "Relaxed" and "Loose" options
+  with more vertical padding between entries, which makes events easier to distinguish.
+  [#192](https://github.com/andstatus/todoagenda/issues/192)
+
 <a id="v4.15"/>
 
 ### 2026-10-29 v4.15.1 Material You dynamic color themes

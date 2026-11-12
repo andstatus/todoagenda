@@ -483,7 +483,9 @@ class RemoteViewsFactory(
                     .formatDate(settings.clock.now())
                     .toString()
                     .uppercase(MyLocale.locale)
-            rv.setTextViewText(
+            RemoteViewsUtil.setText(
+                settings,
+                rv,
                 viewId,
                 if (StringUtil.isEmpty(formattedDate)) "                    " else formattedDate,
             )

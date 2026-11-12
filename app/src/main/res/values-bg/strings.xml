@@ -36,9 +36,6 @@
     <string name="app_description_4000_chars_max_part01">Todo Agenda  е уиджет за събития и задачи.
         Всеки уиджет има собствена конфигурация и показва избрания списък текущи и бъдещи събития и задачи.</string>
     <!-- Preference frame: Layout -->
-    <string name="compact_layout_title">Компактен изглед</string>
-    <string name="compact_layout_off_desc">Нормално разстояние между елементите на уиджета</string>
-    <string name="compact_layout_on_desc">Минимално разстояние между елементите на уиджета</string>
     <string name="widget_header_date_format">Формат дата за уиджета</string>
     <string name="appearance_day_header_alignment_desc">Настройка за подравняване на заглавната част</string>
     <string name="appearance_day_header_alignment_title">Подравняване на заглавието</string>

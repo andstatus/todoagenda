@@ -1,14 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
-        android:key="compactLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:defaultValue="false"
-        android:summaryOn="@string/compact_layout_on_desc"
-        android:summaryOff="@string/compact_layout_off_desc"
-        android:title="@string/compact_layout_title" />
+    <org.andstatus.todoagenda.prefs.MultilineListPreference
+        android:key="entrySpacing"
+        android:defaultValue="normal"
+        android:entries="@array/pref_entry_spacing_entries"
+        android:entryValues="@array/pref_entry_spacing_values"
+        android:summary="@string/entry_spacing_desc"
+        android:title="@string/entry_spacing_title" />
 
     <org.andstatus.todoagenda.prefs.MultilineCheckBoxPreference
         android:key="scrollableLayout"
@@ -128,6 +127,32 @@
             android:summary="5"
             android:title="@string/maxlines_details_title"
             android:dependency="multiline_details" />
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/font_category_title">
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:key="fontFamily"
+            android:defaultValue="default"
+            android:entries="@array/pref_font_family_entries"
+            android:entryValues="@array/pref_font_family_values"
+            android:summary="@string/font_family_desc"
+            android:title="@string/font_family_title" />
+
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:key="fontWidth"
+            android:defaultValue="1.0"
+            android:entries="@array/pref_font_width_entries"
+            android:entryValues="@array/pref_font_width_values"
+            android:summary="@string/font_width_desc"
+            android:title="@string/font_width_title" />
+
+        <org.andstatus.todoagenda.prefs.MultilineListPreference
+            android:key="textSizeScale"
+            android:defaultValue="1.0"
+            android:entries="@array/pref_text_size_entries"
+            android:entryValues="@array/pref_text_size_values"
+            android:summary="@string/appearance_text_size_desc"
+            android:title="@string/appearance_text_size_title" />
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/other_widget_parts">

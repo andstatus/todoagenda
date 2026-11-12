@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import org.andstatus.todoagenda.R
@@ -19,7 +20,21 @@ class LayoutPreferencesFragment :
         rootKey: String?,
     ) {
         addPreferencesFromResource(R.xml.preferences_layout)
+        showSelectedEntry(InstanceSettings.PREF_ENTRY_SPACING)
+        showSelectedEntry(InstanceSettings.PREF_FONT_FAMILY)
+        showSelectedEntry(InstanceSettings.PREF_FONT_WIDTH)
     }
+
+    /**
+     * Shows the currently selected entry as the summary.
+     * A summary provider is used instead of setting a summary text directly, because
+     * [ListPreference.getSummary] treats the summary as a format string and crashes
+     * on '%' characters (e.g. on the "Condensed (80%)" entry).
+     */
+    private fun showSelectedEntry(key: String) =
+        findPreference<ListPreference>(key)?.apply {
+            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+        }
 
     override fun onResume() {
         super.onResume()

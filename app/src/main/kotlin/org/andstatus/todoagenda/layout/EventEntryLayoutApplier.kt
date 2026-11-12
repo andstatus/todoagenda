@@ -30,7 +30,7 @@ abstract class EventEntryLayoutApplier(
         setTime(entry, rv)
         setTextStrikethrough(entry, rv)
         visualizer.setIndicators(entry, rv)
-        RemoteViewsUtil.setCompact(settings, rv)
+        RemoteViewsUtil.setEntrySpacing(settings, rv)
         setBackground(rv, entry)
         return rv
     }
@@ -47,7 +47,7 @@ abstract class EventEntryLayoutApplier(
                 ?.takeIf { it.days == null || it.days < 1000 }
         if (timeUntil != null) {
             val strTime = timeUntil.format(settings)
-            rv.setTextViewText(viewId, strTime)
+            RemoteViewsUtil.setText(settings, rv, viewId, strTime)
             RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
             val textColorPref = TextColorPref.forTitle(entry)
             val colors = settings.colors()
@@ -69,7 +69,7 @@ abstract class EventEntryLayoutApplier(
         rv: RemoteViews,
     ) {
         val viewId = R.id.event_entry_title
-        rv.setTextViewText(viewId, getTitleString(entry))
+        RemoteViewsUtil.setText(settings, rv, viewId, getTitleString(entry))
         RemoteViewsUtil.setTextSize(settings, rv, viewId, R.dimen.event_entry_title)
         RemoteViewsUtil.setTextColor(
             settings,
